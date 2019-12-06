@@ -250,16 +250,26 @@ def service_settings():
 
 
 @pytest.fixture(scope="module")
-def service(backends_mapping, custom_service, service_settings, service_proxy_settings):
-    "Preconfigured service with backend defined existing over whole testsing session"
-    return custom_service(service_settings, service_proxy_settings, backends_mapping)
+def lifecycle_hooks():
+    """List of objects with hooks into app/svc creation and deletion
+
+    Hooks should implement methods defined and documented in testsuite.lifecycle_hook.LifecycleHook
+    or should inherit from that class"""
+
+    return []
 
 
 @pytest.fixture(scope="module")
-def application(service, custom_application, custom_app_plan):
+def service(backends_mapping, custom_service, service_settings, service_proxy_settings, lifecycle_hooks):
+    "Preconfigured service with backend defined existing over whole testsing session"
+    return custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+
+
+@pytest.fixture(scope="module")
+def application(service, custom_application, custom_app_plan, lifecycle_hooks):
     "application bound to the account and service existing over whole testing session"
     plan = custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), service)
-    return custom_application(rawobj.Application(randomize("App"), plan))
+    return custom_application(rawobj.Application(randomize("App"), plan), hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
@@ -291,6 +301,14 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
     return _custom_app_plan
 
 
+def _select_hooks(hook, hooks):
+    """Returns list of callable hooks of given name"""
+
+    if not hooks:
+        return ()
+    return [getattr(i, hook) for i in hooks if hasattr(i, hook)]
+
+
 # custom_app_plan dependency is needed to ensure cleanup in correct order
 @pytest.fixture(scope="module")
 def custom_application(account, custom_app_plan, request, testconfig):  # pylint: disable=unused-argument
@@ -298,25 +316,35 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
 
     Args:
         :param params: dict for remote call, rawobj.Application should be used
+        :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook
 
     (Typical) Usage:
         plan = custom_app_plan(rawobj.ApplicationPlan("CustomPlan"), service)
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
-    apps = []
 
-    def _custom_application(params, autoclean=True):
+    def _custom_application(params, autoclean=True, hooks=None):
+        for hook in _select_hooks("before_application", hooks):
+            params = hook(params)
+
         app = account.applications.create(params=params)
 
-        if autoclean:
-            apps.append(app)
+        if autoclean and not testconfig["skip_cleanup"]:
+            def finalizer():
+                for hook in _select_hooks("on_application_delete", hooks):
+                    try:
+                        hook(app)
+                    finally:
+                        pass
+                app.delete()
+            request.addfinalizer(finalizer)
 
         app.api_client_verify = testconfig["ssl_verify"]
 
-        return app
+        for hook in _select_hooks("on_application_create", hooks):
+            hook(app)
 
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(lambda: [item.delete() for item in apps])
+        return app
 
     return _custom_application
 
@@ -336,13 +364,24 @@ def custom_service(threescale, request, testconfig, staging_gateway):
 
     Args:
         :param params: dict for remote call
-        :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used"""
-    svcs = []
+        :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used
+        :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook"""
 
-    def _custom_service(params, proxy_params=None, backends=None, autoclean=True):
+    def _custom_service(params, proxy_params=None, backends=None, autoclean=True, hooks=None):
+        for hook in _select_hooks("before_service", hooks):
+            params, proxy_params = hook(params, proxy_params)
+
         svc = threescale.services.create(params=staging_gateway.get_service_settings(params))
-        if autoclean:
-            svcs.append(svc)
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            def finalizer():
+                for hook in _select_hooks("on_service_delete", hooks):
+                    try:
+                        hook(svc)
+                    finally:
+                        pass
+                svc.delete()
+            request.addfinalizer(finalizer)
 
         # Due to asynchronous nature of 3scale the proxy is not always ready immediately,
         # this is not necessarily bug of 3scale but we need to compensate for it regardless
@@ -355,15 +394,10 @@ def custom_service(threescale, request, testconfig, staging_gateway):
             svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
         staging_gateway.register_service(svc)
 
+        for hook in _select_hooks("on_service_create", hooks):
+            hook(svc)
+
         return svc
-
-    if not testconfig["skip_cleanup"]:
-        def _cleanup():
-            for svc in svcs:
-                staging_gateway.unregister_service(svc)
-                svc.delete()
-
-        request.addfinalizer(_cleanup)
 
     return _custom_service
 
@@ -376,26 +410,31 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         :param name: name of backend
         :param endpoint: endpoint of backend
     """
-    backends = []
 
-    def _custom_backend(name="backend", endpoint=None, autoclean=True):
+    def _custom_backend(name="backend", endpoint=None, autoclean=True, hooks=None):
         if endpoint is None:
             endpoint = private_base_url()
-        params = {
-            "name": randomize(name),
-            "private_endpoint": endpoint
-        }
+
+        params = {"name": randomize(name), "private_endpoint": endpoint}
+
+        for hook in _select_hooks("before_backend", hooks):
+            hook(params)
+
         backend = threescale.backends.create(params=params)
-        if autoclean:
-            backends.append(backend)
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            def finalizer():
+                for hook in _select_hooks("on_backend_delete", hooks):
+                    try:
+                        hook(backend)
+                    finally:
+                        pass
+                backend.delete()
+            request.addfinalizer(finalizer)
+
+        for hook in _select_hooks("on_backend_create", hooks):
+            hook(backend)
 
         return backend
-
-    if not testconfig["skip_cleanup"]:
-        def _cleanup():
-            for backend in backends:
-                backend.delete()
-
-        request.addfinalizer(_cleanup)
 
     return _custom_backend

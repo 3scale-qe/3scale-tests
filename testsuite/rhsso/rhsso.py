@@ -7,6 +7,42 @@ from keycloak.admin.users import User
 from keycloak.openid_connect import KeycloakOpenidConnect
 from keycloak.realm import KeycloakRealm
 
+from threescale_api.resources import Service
+
+
+class OIDCClientAuthHook:
+    """Configure rhsso auth through app hooks"""
+
+    def __init__(self, rhsso_service_info, credentials_location=None):
+        self.rhsso_service_info = rhsso_service_info
+        self.credentials_location = credentials_location
+
+    def before_service(self, service_params, proxy_params):
+        """Set service auth mode to OIDC, configure proxy accordingly"""
+
+        service_params.update(backend_version=Service.AUTH_OIDC)
+
+        proxy_params.update(
+            credentials_location="authorization",
+            oidc_issuer_endpoint=self.rhsso_service_info.authorization_url(),
+            oidc_issuer_type="keycloak")
+
+        return service_params, proxy_params
+
+    # pylint: disable=no-self-use
+    def on_service_create(self, service):
+        """Update oidc config"""
+
+        service.proxy.oidc.update(params={
+            "oidc_configuration": {
+                "standard_flow_enabled": False,
+                "direct_access_grants_enabled": True}})
+
+    def on_application_create(self, application):
+        """Register OIDC auth object for api_client"""
+
+        application.register_auth("oidc", OIDCClientAuth(self.rhsso_service_info, self.credentials_location))
+
 
 class RHSSO:
     """Helper class for RHSSO server"""
@@ -101,7 +137,6 @@ class OIDCClientAuth:
             location = application.service.proxy.list().entity["credentials_location"]
         app_key = application.keys.list()["keys"][0]["key"]["value"]
         token = self.rhsso.password_authorize(application["client_id"], app_key)
-        credentials = {"access_token": token}
 
         def _process_request(request):
             access_token = token()
