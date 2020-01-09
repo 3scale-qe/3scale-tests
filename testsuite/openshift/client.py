@@ -10,6 +10,7 @@ import yaml
 
 import openshift as oc
 
+from testsuite.openshift.env import Environ
 from testsuite.openshift.objects import Secrets, ConfigMaps
 
 
@@ -101,9 +102,14 @@ class OpenShiftClient:
 
     @property
     def config_maps(self):
-        """Dict-like access to secrets"""
+        """Dict-like access to config maps"""
 
         return ConfigMaps(self)
+
+    def environ(self, deployment_name: str):
+        """Dict-like access to environment variables of a deployment config """
+
+        return Environ(openshift=self, deployment=deployment_name)
 
     def scale(self, deployment_name: str, replicas: int):
         """
@@ -134,20 +140,6 @@ class OpenShiftClient:
             :param deployment_name: DeploymentConfig name
         """
         self.do_action("rollout", ["latest", deployment_name])
-        self._wait_for_deployment(deployment_name)
-
-    def set_env(self, deployment_name: str, envs: Dict[str, str] = None):
-        """Set environment variables to DeploymentConfig.
-
-        Args:
-            :param deployment_name: DeploymentConfig name
-            :param envs: Key-pair of environment variables
-        """
-        opt_args = []
-        if envs:
-            opt_args.append([f"{n}={v}" for n, v in envs.items()])
-
-        self.do_action("set", ["env", "dc", deployment_name, opt_args])
         self._wait_for_deployment(deployment_name)
 
     # pylint: disable=too-many-arguments
