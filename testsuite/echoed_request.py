@@ -15,7 +15,7 @@ class EchoedRequest:  # pylint: disable=too-few-public-methods
     def __init__(self, response: requests.Response) -> None:
         self.response = response
         self.json = response.json()
-        self.headers = CaseInsensitiveDict(data=self.json.get("headers"))
+        self.headers: CaseInsensitiveDict = CaseInsensitiveDict(data=self.json.get("headers"))
         self.params = self.json.get("args")
         self.body = self.json.get("body")
         self.path = self.json.get("path")

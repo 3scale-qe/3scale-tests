@@ -1,17 +1,18 @@
 """Module containing classes that manipulate deployment configs environment"""
 import re
 from contextlib import ExitStack
+import typing
 
-# pylint: disable=import-error
-# I have no idea why pylint cannot find typing
-from typing.re import Match
+if typing.TYPE_CHECKING:
+    # pylint: disable=cyclic-import
+    from testsuite.openshift.client import OpenShiftClient
 
 
 class EnvironmentVariable:
     """Class for working with pure environmental variable that is set directly"""
     pattern = r"(?P<name>.*)=(?P<value>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: Match) -> None:  # noqa: F821
+    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: typing.Match) -> None:
         self.name = match.group("name")
         self.match = match
         self.deployment = deployment
@@ -36,7 +37,7 @@ class SecretEnvironmentVariable(EnvironmentVariable):
     """Class for working with environmental variable that is set from secret"""
     pattern = r"#\ (?P<name>.*)\ from\ secret\ (?P<secret>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: Match) -> None:  # noqa: F821
+    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: typing.Match) -> None:
         super().__init__(openshift, deployment, match)
         self.secret = match.group("secret")
         self.key = match.group("key")
@@ -55,7 +56,7 @@ class ConfigMapEnvironmentVariable(EnvironmentVariable):
     """Class for working with environment variable that is set from configmap"""
     pattern = r"#\ (?P<name>.*)\ from\ configmap\ (?P<config>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: Match) -> None:  # noqa: F821
+    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: typing.Match) -> None:
         super().__init__(openshift, deployment, match)
         self.config = match.group("config")
         self.key = match.group("key")
@@ -74,7 +75,7 @@ class Environ:
     """Contains all env variables for a specific deployment config"""
     types = [EnvironmentVariable, SecretEnvironmentVariable, ConfigMapEnvironmentVariable]
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str) -> None:  # noqa: F821
+    def __init__(self, openshift: 'OpenShiftClient', deployment: str) -> None:
         self.openshift = openshift
         self.deployment_name = deployment
         self.__envs = None

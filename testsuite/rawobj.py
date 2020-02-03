@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     import threescale_api.resources as resources
 
 
-def PolicyConfig(name: str, configuration: dict, version: dict = "builtin", enabled: bool = True) -> dict:
+def PolicyConfig(name: str, configuration: dict, version: str = "builtin", enabled: bool = True) -> dict:
     """Creates policy config to be passed to API to policy chain
     Args:
         :param name: Policy name as known by 3scale
@@ -59,7 +59,7 @@ def Method(system_name: str, friendly_name: str = None, unit: str = "hit"):
 
 
 # pylint: disable=unused-argument
-def Mapping(metric: 'Metric', pattern: str = "/", http_method: str = "GET", delta: int = 1):
+def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1):
     """Builder of parameters to create Mapping
     Args:
         :param metric: Metric to be mapped

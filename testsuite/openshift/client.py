@@ -163,18 +163,18 @@ class OpenShiftClient:
         opt_args = []
 
         if secret_type:
-            opt_args.append(["--type", secret_type.value])
+            opt_args.extend(["--type", secret_type.value])
 
         if literals:
-            opt_args.append([f"--from-literal={n}={v}" for n, v in literals.items()])
+            opt_args.extend([f"--from-literal={n}={v}" for n, v in literals.items()])
 
         if files:
-            opt_args.append([f"--from-file={n}={v}" for n, v in files.items()])
+            opt_args.extend([f"--from-file={n}={v}" for n, v in files.items()])
 
         if kind == SecretKinds.TLS:
             if cert_path is None or cert_key_path is None:
                 raise ValueError("cert_path and cert_key_path required.")
-            opt_args.append(["--cert", cert_path, "--key", cert_key_path])
+            opt_args.extend(["--cert", cert_path, "--key", cert_key_path])
 
         self.do_action("create", ["secret", f"{kind.value}", f"{name}", opt_args])
 
@@ -187,7 +187,7 @@ class OpenShiftClient:
         """
         opt_args = []
         if params:
-            opt_args.append([f"--param={n}={v}" for n, v in params.items()])
+            opt_args.extend([f"--param={n}={v}" for n, v in params.items()])
 
         self.do_action("new-app", ["-f", source, opt_args])
         deployments = oc.selector("dc").qnames()
@@ -232,10 +232,10 @@ class OpenShiftClient:
         """
         opt_args = ["--name", volume_name]
         if mount_path:
-            opt_args.append([f"--mount-path", mount_path])
+            opt_args.extend([f"--mount-path", mount_path])
 
         if secret_name:
-            opt_args.append([f"--secret-name", secret_name])
+            opt_args.extend([f"--secret-name", secret_name])
 
         self.do_action("set", ["volume", f"dc/{deployment_name}", f"--{action}", opt_args])
         self._wait_for_deployment(deployment_name)
