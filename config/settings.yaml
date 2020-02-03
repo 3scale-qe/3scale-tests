@@ -1,0 +1,26 @@
+default:
+  skip_cleanup: false
+  ssl_verify: true
+  ignore_insecure_ssl_warning: false
+  threescale:
+    version: "2.7"
+    service:
+      backends:
+        httpbin: https://httpbin.org:443
+        echo-api: https://echo-api.3scale.net:443
+    gateway:
+      type: "apicast"
+      configuration:
+        staging_deployment: "apicast-staging"
+        production_deployment: "apicast-production"
+  rhsso:
+    test_user:
+      username: testUser
+      password: testUser
+  openshift:
+    projects:
+      threescale:
+        name: "3scale"
+  redis:
+    url: redis://apicast-testing-redis:6379/1
+

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+
+lint_py() {
+	pylint "$@"
+	PYLINT_STATUS=$?
+
+	flake8 "$@"
+	FLAKE8_STATUS=$?
+
+	#mypy "$@"
+	#MYPY_STATUS=$?
+
+	echo
+	echo "Searching for dirs missing __init__.py"
+	! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$'
+	ALL_PACKAGES=$?
+
+	[ $PYLINT_STATUS = 0 ] && [ $FLAKE8_STATUS = 0 ] && [ $ALL_PACKAGES = 0 ]
+	# [ $PYLINT_STATUS = 0 ] && [ $FLAKE8_STATUS = 0 ] # && [ $MYPY_STATUS = 0 ]
+}
+
+lint_py testsuite

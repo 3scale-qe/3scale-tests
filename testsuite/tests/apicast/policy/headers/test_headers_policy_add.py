@@ -1,0 +1,46 @@
+"""
+Rewrite /spec/functional_specs/policies/headers/header_policy_add_spec.rb
+"""
+import pytest
+from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
+
+
+@pytest.fixture(scope="module")
+def policy_settings():
+    """ configure headers in policy """
+    return rawobj.PolicyConfig("headers", {
+        "response": [{"op": "add",
+                      "header": "X-RESPONSE-CUSTOM-ADD",
+                      "value_type": "plain",
+                      "value": "Additional response header"}],
+        "request": [{"op": "add",
+                     "header": "X-REQUEST-CUSTOM-ADD",
+                     "value_type": "plain",
+                     "value": "Additional request header"}],
+        "enable": True})
+
+
+def test_headers_policy_doesnt_exist(application, testconfig):
+    """ will not add header to the response if it does not exist"""
+    response = application.test_request(verify=testconfig["ssl_verify"])
+    echoed_request = EchoedRequest.create(response)
+
+    assert "X-Response-Custom-Add" not in response.headers
+    assert "X-Request-Custom-Add" not in echoed_request.headers
+
+
+def test_headers_policy_another_value_to_request(api_client):
+    """ must add another value to the existing header of the request """
+    response = api_client.get("/get", headers={'X-REQUEST-CUSTOM-ADD': 'Original header'})
+    echoed_request = EchoedRequest.create(response)
+
+    assert echoed_request.headers["X-Request-Custom-Add"] == "Original header,Additional request header"
+
+
+def test_headers_policy_another_value_to_response(api_client):
+    """ must add another value to the existing header of the response """
+    response = api_client.get("/response-headers", params={"X-RESPONSE-CUSTOM-ADD": "Original"})
+
+    assert "X-Response-Custom-Add" in response.headers
+    assert response.headers["X-Response-Custom-Add"] == "Original, Additional response header"

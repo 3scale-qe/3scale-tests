@@ -1,0 +1,38 @@
+"""
+Rewrite spec/functional_specs/policies/upstream_rewrite/nil_added_when_empty_params_spec.rb
+Issue: https://issues.jboss.org/browse/THREESCALE-1506
+"""
+import pytest
+
+from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
+
+
+@pytest.fixture(scope="module")
+def service_proxy_settings(service_proxy_settings):
+    """Set headers as credentials location"""
+    # By default credentials are located in query, and we need query to be empty
+    service_proxy_settings.update(credentials_location="headers")
+    return service_proxy_settings
+
+
+@pytest.fixture(scope="module")
+def service(service, backend):
+    """Add upstream policy"""
+    proxy = service.proxy.list()
+    proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
+        "rules": [{"url": backend("echo-api"), "regex": "v1"}]}))
+
+    return service
+
+
+def test_upstream_policy_empty_params(application, testconfig):
+    """
+    Test if it redirect to the echo-api without nil params
+    """
+    client = application.api_client(verify=testconfig["ssl_verify"])
+    response = client.get("/v1")
+    assert response.status_code == 200
+    echoed_request = EchoedRequest.create(response)
+    assert echoed_request.path == "/v1"
+    assert echoed_request.params == ""

@@ -1,0 +1,31 @@
+[dev-packages]
+flake8 = "*"
+mypy = "*"
+pylint = "*"
+ipdb = "*"
+
+# Have commented out python-language-server to make it available quickly
+# for the development
+#python-language-server = "*"
+#pyls-mypy = "*"
+#pyls-isort = "*"
+
+[packages]
+pytest-xdist = "*"
+openshift = {editable = true, git = "https://github.com/michaeltcoelho/openshift-client-python.git", ref = "add-setup"}
+pytest = "*"
+pytest-cases = "*"
+requests = "*"
+3scale-api = "*"
+dynaconf = "*"
+netifaces = "*"
+python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-client.git", editable = true}
+backoff = "*"
+websocket_client = "*"
+# For developing purposes should be added 3scale-api library from source or
+# from github repository
+# 3scale-api = {editable = true,path = "./../3scale-api-python"}
+# 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
+
+[requires]
+python_version = "3"
