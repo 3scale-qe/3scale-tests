@@ -1,6 +1,6 @@
 .PHONY: quality-check lint pylint flake8 mypy all-is-package pytest tests clean commit-acceptance run configure configure-dev pipenv pipenv-dev
 
-commit-acceptance quality-check lint: pylint flake8 all-is-package
+commit-acceptance quality-check lint: pylint flake8 mypy all-is-package
 
 pylint flake8 mypy: configure-dev
 	pipenv run $@ $(flags) testsuite
