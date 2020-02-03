@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/policies/caching/caching_allow_policy_spec.rb
 """
 import pytest
 from testsuite import rawobj
+from testsuite.gateways import GATEWAY_CLASS, SystemApicastGateway
 
 
 @pytest.fixture(scope="module")
@@ -22,6 +23,8 @@ def prod_client(application, testconfig, redeploy_production_gateway):
 
 
 @pytest.mark.disruptive
+@pytest.mark.skipif(not issubclass(GATEWAY_CLASS, SystemApicastGateway),
+                    reason="This test requires production gateway")
 def test_caching_policy_allow(prod_client, openshift):
     """
     Test caching policy with caching mode set to Allow
