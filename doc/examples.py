@@ -63,6 +63,7 @@ def prod_client(application, testconfig, redeploy_production_gateway):
 
 
 # and then make requests using this fixture
+@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
 def test_production_call(prod_client):
     response = prod_client.get("/get")
 
