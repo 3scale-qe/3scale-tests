@@ -6,6 +6,7 @@ from typing import Dict, List
 from urllib.parse import urlparse
 import pytest
 from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
@@ -111,18 +112,19 @@ def test_query_rewrite_policy_liquid_set(api_client, service, all_params):
 
     assert response.status_code == 200
 
-    jrequest = response.json()
+    echoed_request = EchoedRequest.create(response)
+    echoed_request_params = echoed_request.params
     parsed_url = urlparse(service.proxy.list()['sandbox_endpoint'])
 
-    assert jrequest["args"]["normal_arg"] == "value"
-    assert jrequest["args"]["liquid_arg"] == "Service " + str(service["id"])
-    assert jrequest["args"]["uri"] == "/get"
-    assert jrequest["args"]["md5_uri"] == "D3170460F7014C0475FF0723DEEFFD4B".lower()
-    assert jrequest["args"]["host"] == parsed_url.hostname
-    assert jrequest["args"]["http_method"] == "GET"
+    assert echoed_request_params["normal_arg"] == "value"
+    assert echoed_request_params["liquid_arg"] == "Service " + str(service["id"])
+    assert echoed_request_params["uri"] == "/get"
+    assert echoed_request_params["md5_uri"] == "D3170460F7014C0475FF0723DEEFFD4B".lower()
+    assert echoed_request_params["host"] == parsed_url.hostname
+    assert echoed_request_params["http_method"] == "GET"
 
     for param in all_params:
         # Path should not be empty
-        assert param in jrequest["args"]
+        assert param in echoed_request_params
         # Argument should not be empty
-        assert len(jrequest["args"][param]) != 0
+        assert len(echoed_request_params[param]) != 0
