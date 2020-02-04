@@ -17,9 +17,9 @@ default:
       threescale:
         name: "{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
   rhsso:
-      test_user:
-        username: testUser
-        password: testUser
+    test_user:
+      username: testUser
+      password: testUser
 
 
 # dynaconf uses development environment by default
@@ -27,34 +27,29 @@ development:
   threescale:
     admin:
       url: https://3scale-admin.{DEVELOPMENT_THREESCALE_SUPERDOMAIN}
+      token: "{DEVELOPMENT_ADMIN_ACCESS_TOKEN}"
+      username: admin
+      password: "{DEVELOPMENT_ADMIN_PASSWORD}"
     master:
       url: https://master.{DEVELOPMENT_THREESCALE_SUPERDOMAIN}
+      token: "{DEVELOPMENT_MASTER_ACCESS_TOKEN}"
+      username: master
+      password: "{DEVELOPMENT_MASTER_PASSWORD}"
     service:
       backends:
         primary: https://httpbin.{DEVELOPMENT_TESTENV_DOMAIN}:443
+        httpbin-go: https://httpbingo.{DEVELOPMENT_TESTENV_DOMAIN}:443
   rhsso:
+    # admin credentials
+    username: "{DEFAULT_RHSSO_ADMIN_USERNAME}"
+    password: "{DEFAULT_RHSSO_ADMIN_PASSWORD}"
     url: http://sso-testing-sso.{DEVELOPMENT_TESTENV_DOMAIN}
   openshift:
+    projects:
+      threescale:
+        name: "{DEVELOPMENT_OPENSHIFT_THREESCALE_PROJECT}"
     servers:
       default:
         server_url: "{DEVELOPMENT_OPENSHIFT_URL}"
   redis:
     url: redis://apicast-testing-redis:6379/1
-aws:
-  threescale:
-    admin:
-      url: https://3scale-admin.{AWS_THREESCALE_SUPERDOMAIN}
-    master:
-      url: https://master.{AWS_THREESCALE_SUPERDOMAIN}
-    service:
-      backends:
-        primary: https://httpbin.{AWS_TESTENV_DOMAIN}:443
-  rhsso:
-      url: http://sso-sso.apps.{AWS_TESTENV_DOMAIN}
-  openshift:
-    servers:
-      default:
-        server_url: "{AWS_OPENSHIFT_URL}"
-    projects:
-      threescale:
-        name: "{AWS_OPENSHIFT_THREESCALE_PROJECT}"
