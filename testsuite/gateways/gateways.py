@@ -4,8 +4,6 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
-from testsuite.openshift.client import OpenShiftClient
-
 
 class AbstractGateway(ABC):
     """Basic gateway for use with Apicast"""

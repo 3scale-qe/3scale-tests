@@ -15,7 +15,7 @@ class SystemApicastGateway(AbstractApicastGateway):
             self.deployment_name = configuration["staging_deployment"]
         else:
             self.deployment_name = configuration["production_deployment"]
-        self.openshift = openshift()
+        self.openshift: OpenShiftClient = openshift()
 
     def get_service_settings(self, service_settings: Dict) -> Dict:
         return service_settings
@@ -24,13 +24,13 @@ class SystemApicastGateway(AbstractApicastGateway):
         return proxy_settings
 
     def set_env(self, name: str, value):
-        pass
+        self.openshift.environ(self.deployment_name)[name] = value
 
     def get_env(self, name: str):
-        pass
+        return self.openshift.environ(self.deployment_name)[name]
 
     def reload(self):
-        pass
+        self.openshift.rollout(f"dc/{self.deployment_name}")
 
 
 class SelfManagedApicastGateway(AbstractApicastGateway):

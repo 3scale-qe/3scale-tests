@@ -4,7 +4,7 @@
 
 *Has production gateway*: Yes
 
-*Has implemented reload*: No
+*Has implemented reload*: Yes
 ```
 gateway:
   type: "apicast"
