@@ -9,13 +9,13 @@ from testsuite.openshift.client import OpenShiftClient
 
 class SystemApicastGateway(AbstractApicastGateway):
     """Apicast that is deployed with 3scale"""
-    def __init__(self, staging: bool, configuration, openshift: OpenShiftClient):
+    def __init__(self, staging: bool, configuration, openshift):
         super().__init__(staging, configuration, openshift)
         if staging:
             self.deployment_name = configuration["staging_deployment"]
         else:
             self.deployment_name = configuration["production_deployment"]
-        self.openshift = openshift
+        self.openshift = openshift()
 
     def get_service_settings(self, service_settings: Dict) -> Dict:
         return service_settings
