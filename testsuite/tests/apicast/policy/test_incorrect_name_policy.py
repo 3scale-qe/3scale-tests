@@ -14,16 +14,6 @@ def policy_settings():
     return rawobj.PolicyConfig("incorrect_name", {"rules": []})
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    """api_client using production gateway"""
-
-    application.service.proxy.list().promote()
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
 def test_incorrect_name_policy_staging_call(api_client):
     """Calls through staging gateway should be still working"""
 
@@ -37,5 +27,5 @@ def test_incorrect_name_policy_staging_call(api_client):
 def test_incorrect_name_policy_production_call(prod_client):
     """Calls through production gateway should be still working"""
 
-    response = prod_client.get("/get")
+    response = prod_client().get("/get")
     assert response.status_code == 200

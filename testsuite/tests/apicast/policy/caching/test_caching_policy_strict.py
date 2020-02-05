@@ -18,16 +18,6 @@ def policy_settings():
     return rawobj.PolicyConfig("caching", {"caching_type": "strict"})
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    "Promote API to the production gateway"
-
-    application.service.proxy.list().promote(version=2)
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
 @pytest.mark.disruptive
 def test_caching_policy_strict(prod_client, openshift):
     """
@@ -42,23 +32,24 @@ def test_caching_policy_strict(prod_client, openshift):
     Scale backend-listener up to old value
     """
 
+    client = prod_client(version=2)
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = prod_client.get("/")
+    response = client.get("/")
     assert response.status_code == 200
     openshift.scale("backend-listener", 0)
 
     # Test if requests start failing on production calls after first successful request
     try:
-        response = prod_client.get("/")
+        response = client.get("/")
         assert response.status_code == 200
         status_code1 = 0
         status_code2 = 0
         timeout = time.time() + 40
         while time.time() < timeout:
-            response1 = prod_client.get("/")
+            response1 = client.get("/")
             status_code1 = response1.status_code
-            response2 = prod_client.get("/")
+            response2 = client.get("/")
             status_code2 = response2.status_code
             if status_code1 == 403 and status_code2 == 403:
                 break

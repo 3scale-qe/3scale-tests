@@ -14,16 +14,6 @@ def policy_settings():
     return rawobj.PolicyConfig("caching", {"caching_type": "allow"})
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    "Promote API to the production gateway"
-
-    application.service.proxy.list().promote(version=2)
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
 @pytest.mark.disruptive
 def test_caching_policy_allow(prod_client, openshift):
     """
@@ -40,28 +30,29 @@ def test_caching_policy_allow(prod_client, openshift):
     Scale backend-listener up to old value
     """
 
+    client = prod_client(version=2)
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = prod_client.get("/", params=None)
+    response = client.get("/", params=None)
     assert response.status_code == 200
-    response = prod_client.get("/", params={"user_key": ":user_key"})
+    response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
     openshift.scale("backend-listener", 0)
 
     try:
         # Test if response succeed on production calls with valid credentials
         for _ in range(3):
-            response = prod_client.get("/", params=None)
+            response = client.get("/", params=None)
             assert response.status_code == 200
 
         # Test if response fail on production calls with known invalid credentials
         for _ in range(3):
-            response = prod_client.get("/", params={"user_key": ":user_key"})
+            response = client.get("/", params={"user_key": ":user_key"})
             assert response.status_code == 403
 
         # Test if response succeed on production calls with unknown invalid credentials
         for _ in range(3):
-            response = prod_client.get("/", params={"user_key": ":123"})
+            response = client.get("/", params={"user_key": ":123"})
             assert response.status_code == 200
     finally:
         openshift.scale("backend-listener", replicas)

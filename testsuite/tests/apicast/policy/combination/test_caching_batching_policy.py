@@ -18,25 +18,16 @@ def service(service):
     return service
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    """Promote API to the production gateway"""
-
-    application.service.proxy.list().promote(version=2)
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
-@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 @pytest.mark.disruptive
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = prod_client.get("/", params=None)
+    client = prod_client(application, version=2)
+    response = client.get("/", params=None)
     assert response.status_code == 200
-    response = prod_client.get("/", params={"user_key": ":user_key"})
+    response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
     openshift.scale("backend-listener", 0)
 
@@ -46,12 +37,12 @@ def test_batcher_caching_policy(prod_client, application, openshift):
     try:
         # Test if response succeed on production calls with valid credentials
         for _ in range(3):
-            response = prod_client.get("/", params=None)
+            response = client.get("/", params=None)
             assert response.status_code == 200
 
         # Test if response fail on production calls with known invalid credentials
         for _ in range(3):
-            response = prod_client.get("/", params={"user_key": ":user_key"})
+            response = client.get("/", params={"user_key": ":user_key"})
             assert response.status_code == 403
 
         usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
