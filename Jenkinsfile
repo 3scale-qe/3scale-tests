@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('quality-check') {
             steps {
-                sh 'make commit-acceptance'
+                sh 'make clean commit-acceptance'
             } 
         }
     } 
