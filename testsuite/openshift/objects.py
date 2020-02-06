@@ -1,14 +1,19 @@
 """This module contains basic objects for working with openshift resources """
 from io import StringIO
 import base64
+import typing
 import yaml
+
+if typing.TYPE_CHECKING:
+    # pylint: disable=cyclic-import
+    from testsuite.openshift.client import OpenShiftClient
 
 
 # pylint: disable=too-few-public-methods
 class YAMLDataObject:
     """Dict-like interface to generic openshift resource yaml"""
 
-    def __init__(self, client: "OpenShiftClient", resource_name: str):  # noqa: F821
+    def __init__(self, client: 'OpenShiftClient', resource_name: str):
         self._client = client
         self._resource_name = resource_name
 
@@ -24,7 +29,7 @@ class YAMLDataObject:
 class Secrets(YAMLDataObject):
     """Dict-like interface to openshift secrets"""
 
-    def __init__(self, client: "OpenShiftClient"):  # noqa: F821
+    def __init__(self, client: 'OpenShiftClient'):
         super().__init__(client, "secret")
 
     def __getitem__(self, name: str):
@@ -45,5 +50,5 @@ class Secrets(YAMLDataObject):
 class ConfigMaps(YAMLDataObject):
     """Dict-like interface to openshift secrets"""
 
-    def __init__(self, client: "OpenShiftClient"):  # noqa: F821
+    def __init__(self, client: 'OpenShiftClient'):
         super().__init__(client, "cm")
