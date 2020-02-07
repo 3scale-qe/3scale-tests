@@ -3,7 +3,7 @@ default:
   ssl_verify: true
   ignore_insecure_ssl_warning: false
   threescale:
-    version: "2.7"
+    version: "2.8"
     service:
       backends:
         httpbin: https://httpbin.org:443
