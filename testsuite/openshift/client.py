@@ -129,9 +129,11 @@ class OpenShiftClient:
         Args:
             :param deployment_name: DeploymentConfig name
         """
-        selector = oc.selector("dc/" + deployment_name)
-        deployment = selector.objects()[0]
-        return deployment.model.spec.replicas
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            selector = oc.selector("dc/" + deployment_name)
+            deployment = selector.objects()[0]
+            return deployment.model.spec.replicas
 
     def rollout(self, deployment_name: str):
         """Rollout a new version of a Deployment.
