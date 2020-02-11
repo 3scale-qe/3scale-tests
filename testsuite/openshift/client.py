@@ -1,17 +1,13 @@
 """This module implements an openshift interface with openshift oc client wrapper."""
 
 import enum
-import math
-from io import StringIO
 from contextlib import ExitStack
 from typing import List, Dict, Union
-
-import yaml
 
 import openshift as oc
 
 from testsuite.openshift.env import Environ
-from testsuite.openshift.objects import Secrets, ConfigMaps
+from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 
 
 class SecretKinds(enum.Enum):
@@ -28,39 +24,6 @@ class SecretTypes(enum.Enum):
     OPAQUE = "opaque"
     BASIC_AUTH = "kubernetes.io/basic-auth"
     TLS = "kubernetes.io/ssl"
-
-
-class Routes:
-    """Dict-like interface to OpenShift routes"""
-
-    def __init__(self, client) -> None:
-        self._client = client
-
-    def __iter__(self):
-        """Return iterator for OpenShift routes"""
-        data = yaml.load(
-            StringIO(self._client.do_action("get", ["route", "-o", "yaml"]).out()),
-            Loader=yaml.FullLoader)
-        return iter([data] if data["kind"] == "Route" else data["items"])
-
-    def __getitem__(self, name):
-        """Return requested route in yaml format"""
-        return yaml.load(
-            StringIO(self._client.do_action("get", ["route", name, "-o", "yaml"]).out()),
-            Loader=yaml.FullLoader)
-
-    def for_service(self, service) -> list:
-        """
-        Return routes for specific service
-        It will sort results by 3scale.net/tenant_id label
-        Usage: getting routes for admin portal, master portal...
-        :param service: service name in OpenShift
-        :return: list of routes
-        """
-        routes = [r for r in self if r["spec"]["to"]["name"] == service]
-        routes = list(sorted(routes,
-                             key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", math.inf))))
-        return routes
 
 
 class OpenShiftClient:
