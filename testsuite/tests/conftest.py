@@ -41,6 +41,30 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding disruptive tests")
 
 
+# pylint: disable=unused-argument
+def pytest_report_header(config):
+    """Add basic details about testsuite configuration"""
+
+    environment = settings["env_for_dynaconf"]
+    openshift = settings["openshift"]["servers"]["default"]["server_url"]
+    project = settings["openshift"]["projects"]["threescale"]["name"]
+
+    threescale = "{dynamic}"
+
+    try:
+        threescale = settings["threescale"]["admin"]["url"]
+    except KeyError:
+        pass
+
+    return [
+        "",
+        f"testsuite: environment = {environment}",
+        f"testsuite: openshift = {openshift}",
+        f"testsuite: project = {project}",
+        f"testsuite: threescale = {threescale}",
+        ""]
+
+
 @pytest.fixture(scope="session")
 def openshift(testconfig):
     "OpenShift client generator"
