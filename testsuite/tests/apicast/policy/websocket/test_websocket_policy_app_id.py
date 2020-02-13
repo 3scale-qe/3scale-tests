@@ -25,10 +25,10 @@ def service_settings(service_settings):
     return service_settings
 
 
-def test_basic_websocket_200(websocket_uri, app_id_app_key):
+def test_basic_websocket_200(websocket_uri, app_id_app_key, websocket_options):
     """Basic test for websockets with valid app_id and app_key"""
     websocket_uri = websocket_uri + app_id_app_key
-    websocket = create_connection(websocket_uri)
+    websocket = create_connection(websocket_uri, **websocket_options)
     try:
         testing_value = "Websocket testing"
         websocket.send(testing_value)
@@ -38,12 +38,12 @@ def test_basic_websocket_200(websocket_uri, app_id_app_key):
         websocket.close()
 
 
-def test_basic_websocket_403(websocket_uri, application):
+def test_basic_websocket_403(websocket_uri, application, websocket_options):
     """Basic test for websocket with invalid app_key"""
     app_id = application["application_id"]
     websocket_uri = websocket_uri + f"app_id={app_id}&app_key=invalid"
     with pytest.raises(WebSocketBadStatusException, match="Handshake status 403 Forbidden"):
-        create_connection(websocket_uri)
+        create_connection(websocket_uri, **websocket_options)
 
 
 def test_basic_request_200(api_client):
