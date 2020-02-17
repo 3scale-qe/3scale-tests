@@ -22,7 +22,10 @@ def service_proxy_settings(private_base_url):
 @pytest.fixture
 def websocket_uri(application):
     """Websocket URI in format: wss://<apicast-url>/websocket-echo"""
-    url = application.service.proxy.list()['sandbox_endpoint'].replace("https://", "wss://", 1)
+    url = application.service.proxy.list()['sandbox_endpoint']\
+        .replace("https://", "wss://", 1)\
+        .replace("http://", "ws://", 1)
+
     url = urljoin(url, "/websocket-echo")
     return url
 
