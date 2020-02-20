@@ -71,8 +71,8 @@ def test_production_call(prod_client):
 ###############################################################################
 # When requiring compatible backend to be used define following fixture
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
-    return rawobj.Proxy(backend("echo_api"))
+def service_proxy_settings(private_base_url):
+    return rawobj.Proxy(private_base_url("echo_api"))
 
 
 ###############################################################################

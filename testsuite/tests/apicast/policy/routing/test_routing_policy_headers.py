@@ -8,7 +8,7 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service(service, backend):
+def service(service, private_base_url):
     """
     Set policy settings
     """
@@ -21,7 +21,7 @@ def service(service, backend):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": backend("httpbin"), "condition": test_header}]}})
+            "rules": [{"url": private_base_url("httpbin"), "condition": test_header}]}})
     return service
 
 
@@ -35,22 +35,22 @@ def test_routing_policy_with_header(api_client, service):
     assert echoed_request.headers["Host"] == "httpbin.org"
 
 
-def test_routing_policy_with_header_without_id(api_client, backend):
+def test_routing_policy_with_header_without_id(api_client, private_base_url):
     """
     Test for the request send with Test-Header without matching value
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test-Header": "Not-Service-ID"})
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
-def test_routing_policy_without_header(api_client, backend):
+def test_routing_policy_without_header(api_client, private_base_url):
     """
      Test for the request send without Test-Header
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200

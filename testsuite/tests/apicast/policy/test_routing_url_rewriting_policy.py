@@ -7,15 +7,15 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
+def service_proxy_settings(private_base_url):
     """
     Use 3scale echo-api as backend due to various URLs
     """
-    return rawobj.Proxy(backend("echo-api"))
+    return rawobj.Proxy(private_base_url("echo-api"))
 
 
 @pytest.fixture(scope="module")
-def service(service, backend):
+def service(service, private_base_url):
     """
     Set policy settings
     """
@@ -32,7 +32,7 @@ def service(service, backend):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": backend("httpbin"),
+            "rules": [{"url": private_base_url("httpbin"),
                        "condition": {"operations": [{"liquid_value": '{{ original_request.path }}', "op": 'matches',
                                                      "value": '/anything', "match": "liquid",
                                                      }]},

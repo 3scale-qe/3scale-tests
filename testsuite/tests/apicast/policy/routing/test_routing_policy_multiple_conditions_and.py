@@ -8,7 +8,7 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service(service, backend):
+def service(service, private_base_url):
     """
     Set policy settings
     """
@@ -20,7 +20,7 @@ def service(service, backend):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": backend("echo-api") + "/route",
+            "rules": [{"url": private_base_url("echo-api") + "/route",
                        "condition": {"combine_op": "and", "operations": [test_header1, test_header2]},
                        }]}})
 
@@ -35,11 +35,11 @@ def api_client(application, testconfig):
     return application.api_client(verify=testconfig["ssl_verify"])
 
 
-def test_routing_policy_route_testing(api_client, backend):
+def test_routing_policy_route_testing(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to /route/get
     """
-    parsed_url = urlparse(backend("echo-api"))
+    parsed_url = urlparse(private_base_url("echo-api"))
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "testing"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -47,44 +47,44 @@ def test_routing_policy_route_testing(api_client, backend):
     assert echoed_request.path == "/route/get"
 
 
-def test_routing_policy_route_hello(api_client, backend):
+def test_routing_policy_route_hello(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to /route/get
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "hello"})
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
-def test_routing_policy_noroute_test(api_client, backend):
+def test_routing_policy_noroute_test(api_client, private_base_url):
     """
     Test for the request send with Test1 valid and Test2 invalid value to httpbin api
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "noroute", "Test2": "test"})
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
-def test_routing_policy_route(api_client, backend):
+def test_routing_policy_route(api_client, private_base_url):
     """
     Test for the request send without Test2 to httpbin api
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "route"})
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
-def test_routing_policy_empty(api_client, backend):
+def test_routing_policy_empty(api_client, private_base_url):
     """
     Test for the request send without any header to / to httpbin api
     """
-    parsed_url = urlparse(backend())
+    parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
