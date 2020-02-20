@@ -44,16 +44,21 @@ class SelfManagedApicast(AbstractApicast):
 
     CAPABILITIES = [Capability.APICAST]
 
-    def __init__(self, staging: bool, configuration, openshift: OpenShiftClient) -> None:
-        """
-        :param staging_endpoint: Staging endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-staging.localhost:8080
-        :param production_endpoint: Production endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-production.localhost:8080
-        """
+    def __init__(self, staging: bool, configuration, openshift) -> None:
         super().__init__(staging, configuration, openshift)
         self.staging_endpoint = configuration["sandbox_endpoint"]
         self.production_endpoint = configuration["production_endpoint"]
+
+        deployments = configuration["deployments"]
+        if staging:
+            self.deployment = deployments["staging"]
+        else:
+            self.deployment = deployments["production"]
+
+        # Load openshift configuration
+        self.project = configuration.get("project", "threescale")
+        self.server = configuration.get("server", "default")
+        self.openshift = openshift(server_name=self.server, project_name=self.project)
 
     def get_service_settings(self, service_settings: Dict) -> Dict:
         service_settings.update({
@@ -62,18 +67,18 @@ class SelfManagedApicast(AbstractApicast):
         return service_settings
 
     def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
-        name = service["system_name"]
+        entity_id = service.entity_id
         proxy_settings.update({
-            "sandbox_endpoint": self.staging_endpoint % name,
-            "endpoint": self.production_endpoint % name
+            "sandbox_endpoint": self.staging_endpoint % entity_id,
+            "endpoint": self.production_endpoint % entity_id
         })
         return proxy_settings
 
     def set_env(self, name: str, value):
-        raise NotImplementedError()
+        self.openshift.environ(self.deployment)[name] = value
 
     def get_env(self, name: str):
-        raise NotImplementedError()
+        return self.openshift.environ(self.deployment)[name]
 
     def reload(self):
-        raise NotImplementedError()
+        self.openshift.rollout(self.deployment)

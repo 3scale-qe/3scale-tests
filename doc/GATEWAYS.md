@@ -23,17 +23,22 @@ gateway:
 ## Self-managed Apicast
 *Description*: Self-managed apicast that is deployed somewhere else and we only know their address
 
-*Has production gateway*: No
+*Has production gateway*: Yes
 
-*Has implemented reload*: No
+*Has implemented reload*: Yes
 
-*Capabilities*: "APICAST" 
+*Capabilities*: "APICAST, PRODUCTION_GATEWAY" 
 ```
 gateway:
   type: "apicast-selfmanaged"
   configuration:
     sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
     production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
+    deployment:                                                      # DeploymentConfigs
+        staging: "selfmanaged-staging"
+        production: "selfmanaged-production"
+    project: "threescale"                                            # OpenShift project containing the apicasts
+    server: "server"                                                 # OpenShift server containing the apicasts
 ```
 ## Container Apicast
 *Description*: Self-managed apicast that is deployed somewhere else and we only know their address
