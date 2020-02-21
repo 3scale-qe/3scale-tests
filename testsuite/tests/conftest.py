@@ -185,9 +185,9 @@ def service_settings():
 
 
 @pytest.fixture(scope="module")
-def service(custom_service, service_settings, service_proxy_settings):
+def service(backends_mapping, custom_service, service_settings, service_proxy_settings):
     "Preconfigured service with backend defined existing over whole testsing session"
-    return custom_service(service_settings, service_proxy_settings)
+    return custom_service(service_settings, service_proxy_settings, backends_mapping)
 
 
 @pytest.fixture(scope="module")
@@ -255,6 +255,15 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
 
 
 @pytest.fixture(scope="module")
+def backends_mapping():
+    """
+    Due to the new 3Scale feature, we need to be able to create  custom backends and backend usages and then pass them
+    to creation of custom service. By default, it does nothing, just lets you skip creating a backend in test files.
+    """
+    return {}
+
+
+@pytest.fixture(scope="module")
 def custom_service(threescale, request, testconfig, staging_gateway):
     """Parametrized custom Service
 
@@ -263,15 +272,18 @@ def custom_service(threescale, request, testconfig, staging_gateway):
         :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used"""
     svcs = []
 
-    def _custom_service(params, proxy_params):
+    def _custom_service(params, proxy_params=None, backends=None):
         svc = threescale.services.create(params=staging_gateway.get_service_settings(params))
         svcs.append(svc)
 
         # Due to asynchronous nature of 3scale the proxy is not always ready immediately,
         # this is not necessarily bug of 3scale but we need to compensate for it regardless
         time.sleep(1)
-
-        svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
+        if backends:
+            for path, backend in backends.items():
+                svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
+        elif proxy_params:
+            svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
         staging_gateway.register_service(svc)
 
         return svc
@@ -281,6 +293,39 @@ def custom_service(threescale, request, testconfig, staging_gateway):
             for svc in svcs:
                 staging_gateway.unregister_service(svc)
                 svc.delete()
+
         request.addfinalizer(_cleanup)
 
     return _custom_service
+
+
+@pytest.fixture(scope="module")
+def custom_backend(threescale, request, testconfig, private_base_url):
+    """
+    Parametrized custom Backend
+    Args:
+        :param name: name of backend
+        :param endpoint: endpoint of backend
+    """
+    backends = []
+
+    def _custom_backend(name="backend", endpoint=None):
+        if endpoint is None:
+            endpoint = private_base_url()
+        params = {
+            "name": randomize(name),
+            "private_endpoint": endpoint
+        }
+        backend = threescale.backends.create(params=params)
+        backends.append(backend)
+
+        return backend
+
+    if not testconfig["skip_cleanup"]:
+        def _cleanup():
+            for backend in backends:
+                backend.delete()
+
+        request.addfinalizer(_cleanup)
+
+    return _custom_backend
