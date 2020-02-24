@@ -1,4 +1,5 @@
 """Conftest for websocket policy tests"""
+import ssl
 from urllib.parse import urljoin
 
 import pytest
@@ -24,3 +25,10 @@ def websocket_uri(application):
     url = application.service.proxy.list()['sandbox_endpoint'].replace("https://", "wss://", 1)
     url = urljoin(url, "/websocket-echo")
     return url
+
+
+@pytest.fixture
+def websocket_options(testconfig):
+    """Websocket options"""
+    options = {"sslopt": {} if testconfig["ssl_verify"] else {"cert_reqs": ssl.CERT_NONE}}
+    return options

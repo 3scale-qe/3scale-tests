@@ -17,10 +17,10 @@ def user_key(application):
     return f"?{name}={key}"
 
 
-def test_basic_websocket_200(websocket_uri, user_key):
+def test_basic_websocket_200(websocket_uri, user_key, websocket_options):
     """Basic test for websockets with valid user_key"""
     websocket_uri = websocket_uri + user_key
-    websocket = create_connection(websocket_uri)
+    websocket = create_connection(websocket_uri, **websocket_options)
     try:
         testing_value = "Websocket testing"
         websocket.send(testing_value)
@@ -30,11 +30,11 @@ def test_basic_websocket_200(websocket_uri, user_key):
         websocket.close()
 
 
-def test_basic_websocket_403(websocket_uri):
+def test_basic_websocket_403(websocket_uri, websocket_options):
     """Basic test for websocket with invalid user key"""
     websocket_uri = websocket_uri + "?user_key=123456"
     with pytest.raises(WebSocketBadStatusException, match="Handshake status 403 Forbidden"):
-        create_connection(websocket_uri)
+        create_connection(websocket_uri, **websocket_options)
 
 
 def test_basic_request_200(api_client):
