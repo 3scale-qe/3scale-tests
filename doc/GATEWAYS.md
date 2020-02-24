@@ -1,0 +1,40 @@
+# Gateway configuration
+## Standard Apicast
+*Description*: Default apicasts that are deployed by 3scale
+
+*Has production gateway*: Yes
+
+*Has implemented reload*: No
+```
+gateway:
+  type: "apicast"
+  configuration:
+    staging_deployment: "apicast-staging"              # Name of the staging apicast deployment in the Openshift
+    production_deployment: "apicast-production"        # Name of the production apicast deployment in the Openshift
+```
+## Self-managed Apicast
+*Description*: Self-managed apicast that is deployed somewhere else and we only know their address
+
+*Has production gateway*: No
+
+*Has implemented reload*: No
+```
+gateway:
+  type: "apicast-selfmanaged"
+  configuration:
+    sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
+    production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
+```
+## Container Apicast
+*Description*: Self-managed apicast that is deployed somewhere else and we only know their address
+
+*Has production gateway*: No
+
+*Has implemented reload*: No
+```
+gateway:
+  type: "apicast-containerized"
+  configuration:
+    sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
+    production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
+```
