@@ -79,7 +79,7 @@ def test_headers_policy_extra_headers_jwt(api_client, rhsso_service_info, applic
     token = rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
 
     response = api_client.get("/get", params={'access_token': token})
-    exp, nbf, iat, iss, aud, _, azp, auth_time = response.headers["X-RESPONSE-CUSTOM-JWT"].split(";")
+    exp, nbf, iat, iss, _, _, azp, auth_time = response.headers["X-RESPONSE-CUSTOM-JWT"].split(";")
 
     # add 10 seconds to now because there can be different times
     # in Jenkins machine and machine with Apicast
@@ -89,5 +89,4 @@ def test_headers_policy_extra_headers_jwt(api_client, rhsso_service_info, applic
     assert float(iat) <= now
     assert float(auth_time) <= now
     assert rhsso_service_info.issuer_url() == iss
-    assert aud == azp
     assert azp == application["application_id"]
