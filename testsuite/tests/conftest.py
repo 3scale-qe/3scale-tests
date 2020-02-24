@@ -157,13 +157,13 @@ def rhsso_service_info(request, testconfig):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
+def service_proxy_settings(private_base_url):
     "dict of proxy settings to be used when service created"
-    return rawobj.Proxy(backend())
+    return rawobj.Proxy(private_base_url())
 
 
 @pytest.fixture(scope="module")
-def backend(testconfig):
+def private_base_url(testconfig):
     """URL to API backend.
 
     This is callable fixture with parameter `kind`.
@@ -172,10 +172,10 @@ def backend(testconfig):
     Args:
         :param kind: Desired type of backend; possible values 'primary' (default), 'httpbin', 'echo-api'"""
 
-    def _backend(kind="primary"):
+    def _private_base_url(kind="primary"):
         return testconfig["threescale"]["service"]["backends"][kind]
 
-    return _backend
+    return _private_base_url
 
 
 @pytest.fixture(scope="module")

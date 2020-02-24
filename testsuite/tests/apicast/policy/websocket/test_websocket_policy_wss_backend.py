@@ -10,9 +10,9 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8')")
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
+def service_proxy_settings(private_base_url):
     """Websocket are only available on httpbin go"""
-    url = backend("httpbin-go").replace("https://", "wss://", 1)
+    url = private_base_url("httpbin-go").replace("https://", "wss://", 1)
     return rawobj.Proxy(url)
 
 

@@ -17,11 +17,11 @@ def service_proxy_settings(service_proxy_settings):
 
 
 @pytest.fixture(scope="module")
-def service(service, backend):
+def service(service, private_base_url):
     """Add upstream policy"""
     proxy = service.proxy.list()
     proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": backend("echo-api"), "regex": "v1"}]}))
+        "rules": [{"url": private_base_url("echo-api"), "regex": "v1"}]}))
 
     return service
 

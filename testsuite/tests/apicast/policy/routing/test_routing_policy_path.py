@@ -7,15 +7,15 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
+def service_proxy_settings(private_base_url):
     """
     Require compatible backend to be used
     """
-    return rawobj.Proxy(backend("echo-api"))
+    return rawobj.Proxy(private_base_url("echo-api"))
 
 
 @pytest.fixture(scope="module")
-def service(service, backend):
+def service(service, private_base_url):
     """
     Set policy settings
     """
@@ -27,7 +27,7 @@ def service(service, backend):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": backend("httpbin"),
+            "rules": [{"url": private_base_url("httpbin"),
                        "host_header": "test.httpbin.org",
                        "condition": routing_policy_op}]}})
 

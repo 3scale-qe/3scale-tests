@@ -16,9 +16,9 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(backend):
+def service_proxy_settings(private_base_url):
     "cors require compatible backend to be used"
-    return rawobj.Proxy(backend("echo-api"))
+    return rawobj.Proxy(private_base_url("echo-api"))
 
 
 def test_cors_headers_for_same_origin(api_client):
