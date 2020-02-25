@@ -55,3 +55,26 @@ gateway:
     sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
     production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
 ```
+## Apicast Operator
+*Description*: Self-managed apicast deployed by operator
+
+*Has production gateway*: Yes
+
+*Has implemented reload*: Yes
+
+*Capabilities*: "APICAST, PRODUCTION_GATEWAY" 
+```
+gateway:
+  type: "apicast-selfmanaged"
+  configuration:
+    sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
+    production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
+    deployments:
+        staging: "selfmanaged-staging"
+        production: "selfmanaged-production"
+    project: "threescale"
+    server: "server"
+    services:                                                         # Services that apicasts are available on
+        staging: "apicast-staging"
+        production: "apicast-production"                                   
+```

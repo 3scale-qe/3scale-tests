@@ -1,6 +1,8 @@
 """Collection of gateways that run in containerized environment"""
 from typing import Dict
 
+from threescale_api.resources import Service
+
 from testsuite.gateways.gateways import AbstractApicast
 
 
