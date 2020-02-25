@@ -25,6 +25,7 @@ def service_proxy_settings(service_proxy_settings):
     return service_proxy_settings
 
 
+@pytest.mark.smoke
 def test_should_accept_user_key_passed_by_basic_auth(application, testconfig):
     """
     Check credentials passed using the basic auth.

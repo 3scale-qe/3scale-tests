@@ -14,7 +14,7 @@ run tests pytest: configure
 	pipenv run python -m pytest $(flags) testsuite
 
 smoke: configure
-	pipenv run python -m pytest -m smoke $(flags) testsuite
+	pipenv run python -m pytest -n 6 -m smoke $(flags) testsuite
 
 junit:
 	pipenv run python -m pytest --junitxml=junit.xml $(flags) testsuite

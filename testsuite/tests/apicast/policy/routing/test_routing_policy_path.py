@@ -34,6 +34,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.smoke
 def test_routing_policy_path_anything(api_client):
     """
     Test for the request path send to /anything to httpbin.org/anything

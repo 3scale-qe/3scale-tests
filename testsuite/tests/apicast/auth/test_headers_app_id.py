@@ -23,6 +23,7 @@ def service_proxy_settings(service_proxy_settings):
     return service_proxy_settings
 
 
+@pytest.mark.smoke
 def test_auth_headers_app_id(application, testconfig):
     """Test client access using Headers app_id
 

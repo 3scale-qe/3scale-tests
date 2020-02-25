@@ -23,6 +23,7 @@ def test_headers_policy_delete_response(api_client):
     assert "X-RESPONSE-CUSTOM" not in response.headers
 
 
+@pytest.mark.smoke
 def test_headers_policy_delete_request(api_client):
     """Test if it delete header from request"""
     response = api_client.get("/get")
