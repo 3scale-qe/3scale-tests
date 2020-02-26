@@ -7,6 +7,7 @@ from time import sleep
 import pytest
 
 from testsuite import rawobj
+from testsuite.gateways.gateways import Capability
 
 
 @pytest.fixture(scope="module")
@@ -27,6 +28,7 @@ def prod_client(application, testconfig, redeploy_production_gateway):
     return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
 
 
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 @pytest.mark.disruptive
 def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
