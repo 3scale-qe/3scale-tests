@@ -9,9 +9,9 @@ import urllib3
 import openshift as oc
 from dynaconf import settings
 from threescale_api import client
+import testsuite.gateways as gateways
 
 from testsuite import rawobj
-from testsuite.gateways import GATEWAY_CLASSES
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.utils import randomize
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
@@ -145,7 +145,7 @@ def account(threescale, request, testconfig):
 def staging_gateway(request, testconfig, openshift):
     """Staging gateway"""
     configuration = testconfig["threescale"]["gateway"]["configuration"]
-    gateway = GATEWAY_CLASSES["staging"](configuration=configuration, openshift=openshift, staging=True)
+    gateway = gateways.CLASSES["staging"](configuration=configuration, openshift=openshift, staging=True)
     gateway.create()
 
     request.addfinalizer(gateway.destroy)
@@ -156,7 +156,7 @@ def staging_gateway(request, testconfig, openshift):
 def production_gateway(request, testconfig, openshift):
     """Production gateway"""
     configuration = testconfig["threescale"]["gateway"]["configuration"]
-    gateway = GATEWAY_CLASSES["production"]
+    gateway = gateways.CLASSES["production"]
     if gateway is None:
         raise NotImplementedError()
     gateway = gateway(configuration=configuration, openshift=openshift, staging=False)
