@@ -5,6 +5,8 @@ import time
 import pytest
 
 import urllib3
+
+import openshift as oc
 from dynaconf import settings
 from threescale_api import client
 
@@ -101,16 +103,26 @@ def testconfig():
 def threescale(testconfig, openshift):
     "Threescale client"
 
-    try:
-        token = testconfig["threescale"]["admin"]["token"]
-    except KeyError:
-        token = openshift().secrets["system-seed"]["ADMIN_ACCESS_TOKEN"]
+    oc_error = None
 
     try:
-        url = testconfig["threescale"]["admin"]["url"]
-    except KeyError:
-        route = openshift().routes.for_service("system-provider")[0]
-        url = "https://" + route["spec"]["host"]
+        try:
+            token = testconfig["threescale"]["admin"]["token"]
+        except KeyError:
+            token = openshift().secrets["system-seed"]["ADMIN_ACCESS_TOKEN"]
+
+        try:
+            url = testconfig["threescale"]["admin"]["url"]
+        except KeyError:
+            route = openshift().routes.for_service("system-provider")[0]
+            url = "https://" + route["spec"]["host"]
+    except oc.OpenShiftPythonException as err:
+        oc_error = err.result.as_dict()["actions"][0]["err"]
+
+    # This is needed because pytest tracks all the tracebacks back and prints them all.
+    # Raising this from except would print much much more.
+    if oc_error:
+        raise Exception(f"(From Openshift) {oc_error}")
 
     verify = testconfig["ssl_verify"]
     return client.ThreeScaleClient(url, token, ssl_verify=verify)
