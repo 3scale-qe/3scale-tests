@@ -2,7 +2,7 @@
 This is complication of examples how to use testsuite and write tests. As such
 this is not supposed to be executed and it isn't goal to have this executable
 """
-
+from testsuite.gateways.gateways import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
 import pytest
@@ -64,6 +64,7 @@ def prod_client(application, testconfig, redeploy_production_gateway):
 
 # and then make requests using this fixture
 @pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
 def test_production_call(prod_client):
     response = prod_client.get("/get")
 

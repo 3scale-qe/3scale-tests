@@ -3,12 +3,18 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
-from testsuite.gateways.gateways import AbstractApicastGateway
+from testsuite.gateways.gateways import AbstractApicastGateway, Capability
 from testsuite.openshift.client import OpenShiftClient
 
 
 class SystemApicastGateway(AbstractApicastGateway):
     """Apicast that is deployed with 3scale"""
+
+    CAPABILITIES = [Capability.SAME_CLUSTER,
+                    Capability.CUSTOM_ENVIRONMENT,
+                    Capability.APICAST,
+                    Capability.PRODUCTION_GATEWAY]
+
     def __init__(self, staging: bool, configuration, openshift):
         super().__init__(staging, configuration, openshift)
         if staging:
@@ -35,6 +41,9 @@ class SystemApicastGateway(AbstractApicastGateway):
 
 class SelfManagedApicastGateway(AbstractApicastGateway):
     """Gateway for use with already deployed self-managed Apicast without ability to edit it"""
+
+    CAPABILITIES = [Capability.APICAST]
+
     def __init__(self, staging: bool, configuration, openshift: OpenShiftClient) -> None:
         """
         :param staging_endpoint: Staging endpoint URL template with with one parameter to insert the service name

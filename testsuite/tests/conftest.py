@@ -41,6 +41,12 @@ def pytest_runtest_setup(item):
     marks = [i.name for i in item.iter_markers()]
     if "disruptive" in marks and not item.config.getoption("--disruptive"):
         pytest.skip("Excluding disruptive tests")
+    if "capabilities" in marks:
+        capability_marks = item.iter_markers(name="capabilities")
+        for mark in capability_marks:
+            for capability in mark.args:
+                if capability not in gateways.CAPABILITIES:
+                    pytest.skip(f"Skipping test because current gateway doesn't have capability {capability}")
 
 
 # pylint: disable=unused-argument
