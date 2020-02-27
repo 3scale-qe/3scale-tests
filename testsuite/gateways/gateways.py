@@ -4,13 +4,11 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
-from testsuite.openshift.client import OpenShiftClient
-
 
 class AbstractGateway(ABC):
     """Basic gateway for use with Apicast"""
 
-    def __init__(self, staging: bool, configuration, openshift: OpenShiftClient):
+    def __init__(self, staging: bool, configuration, openshift):
         self.is_staging = staging
         self.configuration = configuration
         self.openshift = openshift

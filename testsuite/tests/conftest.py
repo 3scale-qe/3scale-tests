@@ -141,19 +141,19 @@ def account(threescale, request, testconfig):
     return account
 
 
-@pytest.fixture(scope="module")
-def staging_gateway(request, testconfig):
+@pytest.fixture(scope="session")
+def staging_gateway(request, testconfig, openshift):
     """Staging gateway"""
     configuration = testconfig["threescale"]["gateway"]["configuration"]
-    gateway = GATEWAY_CLASSES["staging"](configuration=configuration, openshift=openshift, staging=False)
+    gateway = GATEWAY_CLASSES["staging"](configuration=configuration, openshift=openshift, staging=True)
     gateway.create()
 
     request.addfinalizer(gateway.destroy)
     return gateway
 
 
-@pytest.fixture(scope="module")
-def production_gateway(request, testconfig):
+@pytest.fixture(scope="session")
+def production_gateway(request, testconfig, openshift):
     """Production gateway"""
     configuration = testconfig["threescale"]["gateway"]["configuration"]
     gateway = GATEWAY_CLASSES["production"]
