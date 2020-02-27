@@ -1,11 +1,9 @@
+
 """Collection of classes for working with different ssl certificate tools."""
 import abc
 import collections
-import tempfile
-import os
 from typing import List
-
-from cfssl import CFSSL
+from urllib.parse import urlparse
 
 CreateCertificateResponse = collections.namedtuple("CreateCerficateResponse", ["certificate", "key"])
 GetCertificateResponse = collections.namedtuple("GetCertificateResponse",
@@ -25,24 +23,6 @@ class Certificate(abc.ABC):  # pylint: disable=too-few-public-methods
             :param names: Subject Information to be added to the request.
             :param hosts: Hosts to be added to the request.
         """
-
-
-class CFSSLCertificate(Certificate):  # pylint: disable=too-few-public-methods
-    """CFSSL Certificate implementation."""
-
-    def __init__(self, host: str, port: int, ssl: bool = False,
-                 verify_cert: bool = False):
-        self.cfssl = CFSSL(host, port, ssl=ssl, verify_cert=verify_cert)
-
-    def create(self, common_name: str, names: List[str] = None,
-               hosts: List[str] = None) -> CreateCertificateResponse:
-        new_key = self.cfssl.new_key(hosts, names, common_name=common_name)
-
-        signed_certificate = self.cfssl.sign(new_key["certificate_request"], hosts=hosts)
-
-        return CreateCertificateResponse(
-            certificate=signed_certificate,
-            key=new_key["private_key"])
 
 
 class CertificateStore(abc.ABC):
@@ -65,37 +45,6 @@ class CertificateStore(abc.ABC):
         """
 
 
-class TmpCertificateStore(CertificateStore):
-    """Temporary file implementation."""
-
-    def __init__(self):
-        self.tempdir = tempfile.gettempdir()
-        self.path = f"{self.tempdir}/certs"
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-    def _read(self, name: str, ext: str) -> str:
-        with open(f"{self.path}/{name}.{ext}", "r") as file:
-            content = file.read()
-        return content
-
-    def _persist(self, name: str, ext: str, content: str):
-        with open(f"{self.path}/{name}.{ext}", "w") as file:
-            file.write(content)
-
-    def save(self, name: str, cert: str, key: str):
-        self._persist(name, "crt", cert)
-        self._persist(name, "key", key)
-
-    def get(self, name: str) -> GetCertificateResponse:
-        return GetCertificateResponse(
-            certificate=self._read(name, "crt"),
-            key=self._read(name, "key"),
-            certificate_path=f"{self.path}/{name}.crt",
-            key_path=f"{self.path}/{name}.key",
-        )
-
-
 class CertificateManager:  # pylint: disable=too-few-public-methods
     """Certificate Manager.
 
@@ -114,3 +63,49 @@ class CertificateManager:  # pylint: disable=too-few-public-methods
         certificate = self.certificate.create(*args, **kwargs)
         self.store.save(label, certificate.certificate, certificate.key)
         return certificate
+
+
+class SSLCertificate:
+    """Class for working with certificate stuff for TLSAPicast."""
+
+    def __init__(self, endpoint: str, cert_manager: CertificateManager, cert_store: CertificateStore):
+        self.endpoint = endpoint
+        self._cert_manager = cert_manager
+        self._cert_store = cert_store
+
+    @property
+    def _hostname(self):
+        """Returns wildcard endpoint."""
+        return urlparse(self.endpoint % "*").hostname
+
+    @property
+    def _csr_names(self):
+        """Returns data for CSR's names field."""
+        return {
+            "O": self._hostname,
+            "OU": "IT",
+            "L": "San Francisco",
+            "ST": "California",
+            "C": "US",
+        }
+
+    def create(self, label: str) -> CreateCertificateResponse:
+        """Create a new ssl certificate.
+        Args:
+            :param label: Identifier for the certificate.
+        Returns:
+            certificate: Certificate PEM-like.
+            private_key: Key PEM-like.
+        """
+        return self._cert_manager.create(label, self._hostname, hosts=[self._hostname],
+                                         names=[self._csr_names])
+
+    def get(self, label: str) -> GetCertificateResponse:
+        """Get existent certificate.
+        Args:
+            :param label: Identifier for the certificate.
+        Returns:
+            certificate: Certificate PEM-like.
+            private_key: Key PEM-like.
+        """
+        return self._cert_store.get(label)
