@@ -73,6 +73,7 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
 
 # For JWT details see https://www.iana.org/assignments/jwt/jwt.xhtml
 # jwt.exp; jwt.nbf; jwt.iat; jwt.iss; jwt.aud; jwt.typ; jwt.azp; jwt.auth_time
+@pytest.mark.flaky
 def test_headers_policy_extra_headers_jwt(api_client, rhsso_service_info, application):
     "Test should contain extra header with correct info from JWT object"
     app_key = application.keys.list()["keys"][0]["key"]["value"]
