@@ -1,8 +1,8 @@
 """Collection of gateways that run in containerized environment"""
-from testsuite.gateways.apicast import SelfManagedApicastGateway
+from testsuite.gateways.apicast import SelfManagedApicast
 
 
-class ContainerizedApicastGatewayGateway(SelfManagedApicastGateway):
+class ContainerizedApicast(SelfManagedApicast):
     """
     Gateway intended for use with RHEL based Apicasts deployed in containerized environments
     For the time being its is functionally the same as SelfManagedApicast

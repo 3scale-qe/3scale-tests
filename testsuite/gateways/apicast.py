@@ -3,11 +3,11 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
-from testsuite.gateways.gateways import AbstractApicastGateway, Capability
+from testsuite.gateways.gateways import AbstractApicast, Capability
 from testsuite.openshift.client import OpenShiftClient
 
 
-class SystemApicastGateway(AbstractApicastGateway):
+class SystemApicast(AbstractApicast):
     """Apicast that is deployed with 3scale"""
 
     CAPABILITIES = [Capability.SAME_CLUSTER,
@@ -39,7 +39,7 @@ class SystemApicastGateway(AbstractApicastGateway):
         self.openshift.rollout(f"dc/{self.deployment_name}")
 
 
-class SelfManagedApicastGateway(AbstractApicastGateway):
+class SelfManagedApicast(AbstractApicast):
     """Gateway for use with already deployed self-managed Apicast without ability to edit it"""
 
     CAPABILITIES = [Capability.APICAST]
