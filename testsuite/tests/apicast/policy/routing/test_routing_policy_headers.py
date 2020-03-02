@@ -25,6 +25,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.smoke
 def test_routing_policy_with_header(api_client, service):
     """
     Test for the request send with Test-Header and matching value

@@ -29,6 +29,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.smoke
 def test_routing_policy_route1(api_client, private_base_url):
     """
     Test for the request with matching path to /route1/get

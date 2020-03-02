@@ -23,6 +23,7 @@ def policy_settings():
                      "value": "Additional request header"}]})
 
 
+@pytest.mark.smoke
 def test_headers_policy_function(application, testconfig):
     """testing custom header policy"""
     response = application.test_request(verify=testconfig["ssl_verify"])

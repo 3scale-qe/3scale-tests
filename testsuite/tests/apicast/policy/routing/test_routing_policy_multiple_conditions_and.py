@@ -35,6 +35,7 @@ def api_client(application, testconfig):
     return application.api_client(verify=testconfig["ssl_verify"])
 
 
+@pytest.mark.smoke
 def test_routing_policy_route_testing(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to /route/get

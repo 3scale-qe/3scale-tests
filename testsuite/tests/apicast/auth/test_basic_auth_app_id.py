@@ -25,6 +25,7 @@ def service_proxy_settings(service_proxy_settings):
     return service_proxy_settings
 
 
+@pytest.mark.smoke
 def test_basic_auth_app_id_key(application, testconfig):
     """Test client access with Basic HTTP Auth using app id and app key
 

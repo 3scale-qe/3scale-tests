@@ -21,6 +21,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.smoke
 def test_routing_policy_route_testing(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to echo/route/get
