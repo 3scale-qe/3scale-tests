@@ -22,6 +22,7 @@ netifaces = "*"
 python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-client.git", editable = true}
 backoff = "*"
 websocket_client = "*"
+hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref = "development"}
 # For developing purposes should be added 3scale-api library from source or
 # from github repository
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}

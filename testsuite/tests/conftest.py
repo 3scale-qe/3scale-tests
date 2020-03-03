@@ -3,6 +3,7 @@ import os
 import time
 
 import pytest
+import threescale_api
 
 import urllib3
 
@@ -13,7 +14,7 @@ import testsuite.gateways as gateways
 
 from testsuite import rawobj
 from testsuite.openshift.client import OpenShiftClient
-from testsuite.utils import randomize
+from testsuite.utils import randomize, retry_for_session
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
 if settings["ignore_insecure_ssl_warning"]:
@@ -27,6 +28,11 @@ if settings["ssl_verify"] and "REQUESTS_CA_BUNDLE" not in os.environ:
         if os.path.exists(ca_bundle):
             os.environ["REQUESTS_CA_BUNDLE"] = ca_bundle
             break
+
+
+# Monkey-patch for HTTP/2, needs to be fixed with  plugable api_client for application
+if settings["http2"]:
+    threescale_api.utils.HttpClient.retry_for_session = staticmethod(retry_for_session)
 
 
 def pytest_addoption(parser):
