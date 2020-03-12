@@ -248,11 +248,12 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
         :param service: Service object for which plan should be created"""
     plans = []
 
-    def _custom_app_plan(params, service=None):
+    def _custom_app_plan(params, service=None, autoclean=True):
         if service is None:
             service = custom_service({"name": randomize("service")}, service_proxy_settings)
         plan = service.app_plans.create(params=params)
-        plans.append(plan)
+        if autoclean:
+            plans.append(plan)
         return plan
 
     if not testconfig["skip_cleanup"]:
@@ -275,10 +276,11 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
     """
     apps = []
 
-    def _custom_application(params):
+    def _custom_application(params, autoclean=True):
         app = account.applications.create(params=params)
 
-        apps.append(app)
+        if autoclean:
+            apps.append(app)
 
         app.api_client_verify = testconfig["ssl_verify"]
 
@@ -308,9 +310,10 @@ def custom_service(threescale, request, testconfig, staging_gateway):
         :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used"""
     svcs = []
 
-    def _custom_service(params, proxy_params=None, backends=None):
+    def _custom_service(params, proxy_params=None, backends=None, autoclean=True):
         svc = threescale.services.create(params=staging_gateway.get_service_settings(params))
-        svcs.append(svc)
+        if autoclean:
+            svcs.append(svc)
 
         # Due to asynchronous nature of 3scale the proxy is not always ready immediately,
         # this is not necessarily bug of 3scale but we need to compensate for it regardless
@@ -345,7 +348,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
     """
     backends = []
 
-    def _custom_backend(name="backend", endpoint=None):
+    def _custom_backend(name="backend", endpoint=None, autoclean=True):
         if endpoint is None:
             endpoint = private_base_url()
         params = {
@@ -353,7 +356,8 @@ def custom_backend(threescale, request, testconfig, private_base_url):
             "private_endpoint": endpoint
         }
         backend = threescale.backends.create(params=params)
-        backends.append(backend)
+        if autoclean:
+            backends.append(backend)
 
         return backend
 
