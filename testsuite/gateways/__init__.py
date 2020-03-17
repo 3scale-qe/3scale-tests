@@ -8,7 +8,7 @@ from testsuite.gateways.containers import ContainerizedApicastGatewayGateway
 
 def load_gateway():
     """Gateway that is used to run tests"""
-    global GATEWAY_CLASS  # pylint: disable=global-statement
+    global CLASS  # pylint: disable=global-statement
     gateway = settings["threescale"]["gateway"]
 
     gateway_type = gateway["type"]
@@ -30,5 +30,6 @@ def load_gateway():
     }
 
 
-GATEWAY_CLASSES = load_gateway()
-GATEWAY_CLASS = GATEWAY_CLASSES["staging"]
+CLASSES = load_gateway()
+CLASS = CLASSES["staging"]
+CAPABILITIES = CLASS.CAPABILITIES

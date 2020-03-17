@@ -18,9 +18,11 @@ spec/functional_specs/policies/rate_limit/fixed_window/
 """
 import time
 import backoff
+import pytest
 
 from pytest_cases import fixture_plus, cases_data, parametrize_plus, fixture_ref
 from testsuite import rawobj
+from testsuite.gateways.gateways import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import randomize
 
@@ -77,6 +79,7 @@ def retry_requests(client, client2):
     return code_1, code_2
 
 
+@pytest.mark.required_capabilities(Capability.SAME_CLUSTER)
 def test_fixed_window(api_client, api_client2, config):
     """
     Test global fixed window test different configurations with global scope based on configuration cases

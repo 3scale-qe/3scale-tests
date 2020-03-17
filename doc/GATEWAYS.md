@@ -1,10 +1,18 @@
-# Gateway configuration
+# Known Capabilities
+* `PRODUCTION_GATEWAY`: Gateway contains production gateway and can be used for calls to production.
+* `APICAST`: Gateway is of type Apicast (so far all the gateways are Apicast).
+* `CUSTOM_ENVIRONMENT`: You can set or read environmental variables for gateway.
+* `SAME_CLUSTER`: Gateway is always located on the same cluster as 3scale, so it has access to internal services.
+
+# Gateway type configuration
 ## Standard Apicast
 *Description*: Default apicasts that are deployed by 3scale
 
 *Has production gateway*: Yes
 
 *Has implemented reload*: Yes
+
+*Capabilities*: "PRODUCTION_GATEWAY, APICAST, CUSTOM_ENVIRONMENT, SAME_CLUSTER" 
 ```
 gateway:
   type: "apicast"
@@ -18,6 +26,8 @@ gateway:
 *Has production gateway*: No
 
 *Has implemented reload*: No
+
+*Capabilities*: "APICAST" 
 ```
 gateway:
   type: "apicast-selfmanaged"
@@ -31,6 +41,8 @@ gateway:
 *Has production gateway*: No
 
 *Has implemented reload*: No
+
+*Capabilities*: "APICAST" 
 ```
 gateway:
   type: "apicast-containerized"

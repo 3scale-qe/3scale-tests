@@ -4,8 +4,7 @@ Rewrite spec/functional_specs/policies/incorrect_policy_name_spec.rb
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways import GATEWAY_CLASS
-from testsuite.gateways.apicast import SystemApicastGateway
+from testsuite.gateways.gateways import Capability
 
 
 @pytest.fixture(scope="module")
@@ -34,8 +33,7 @@ def test_incorrect_name_policy_staging_call(api_client):
 
 @pytest.mark.slow
 @pytest.mark.disruptive
-@pytest.mark.skipif(not issubclass(GATEWAY_CLASS, SystemApicastGateway),
-                    reason="This test requires production gateway")
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_incorrect_name_policy_production_call(prod_client):
     """Calls through production gateway should be still working"""
 

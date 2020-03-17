@@ -6,7 +6,7 @@ Test if we are able to create custom policies through registers and use them.
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways import GATEWAY_CLASS, SystemApicastGateway
+from testsuite.gateways.gateways import Capability
 
 
 @pytest.fixture
@@ -78,8 +78,7 @@ def policy_settings():
 
 # pylint: disable=unused-argument
 @pytest.mark.disruptive
-@pytest.mark.skipif(not issubclass(GATEWAY_CLASS, SystemApicastGateway),
-                    reason="This test requires production gateway")
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_policy_registry(custom_policies, threescale, schema, service, prod_client):
     """
     Test policy registry with custom policy

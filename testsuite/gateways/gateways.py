@@ -1,12 +1,23 @@
 """Module containing all baasic gateways"""
+import enum
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, List
 
 from threescale_api.resources import Service
 
 
+class Capability(enum.Enum):
+    """Enum containing all known gateway capabilities"""
+    PRODUCTION_GATEWAY = "production"
+    APICAST = "apicast"
+    CUSTOM_ENVIRONMENT = "env"
+    SAME_CLUSTER = "internal-cluster"
+
+
 class AbstractGateway(ABC):
     """Basic gateway for use with Apicast"""
+
+    CAPABILITIES: List[Capability] = []
 
     def __init__(self, staging: bool, configuration, openshift):
         self.is_staging = staging
@@ -40,6 +51,9 @@ class AbstractGateway(ABC):
 
 class AbstractApicastGateway(AbstractGateway):
     """Interface defining basic functionality of an Apicast gateway"""
+
+    CAPABILITIES = [Capability.APICAST]
+
     @abstractmethod
     def set_env(self, name: str, value):
         """Sets the value of environmental variable"""
