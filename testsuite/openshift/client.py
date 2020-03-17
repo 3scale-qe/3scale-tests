@@ -76,7 +76,7 @@ class OpenShiftClient:
 
         return Environ(openshift=self, deployment=deployment_name)
 
-    def patch(self, resource_type: str, resource_name: str, patch: Dict[str, Any], patch_type: str = None):
+    def patch(self, resource_type: str, resource_name: str, patch, patch_type: str = None):
         """Patch the specified resource
         Args:
             :param resource_type: The resource type to be deleted. Ex.: service, route, deploymentconfig
@@ -298,4 +298,19 @@ class OpenShiftClient:
                 success_func=lambda pod: (
                     pod.model.status.phase == "Running" and pod.model.status.containerStatuses[0].ready
                 )
+            )
+
+    def wait_for_ready(self, deployment_name: str):
+        """
+        Wait for a given deployment to be scaled.
+        Args:
+            :param deployment_name: The deployment name
+        """
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            # pylint: disable=no-member
+            # https://github.com/PyCQA/pylint/issues/3137
+            stack.enter_context(oc.timeout(90))
+            oc.selector(f"deployment/{deployment_name}").until_all(
+                success_func=lambda deployment: "readyReplicas" in deployment.model.status
             )

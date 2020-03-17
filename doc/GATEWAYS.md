@@ -117,3 +117,25 @@ gateway:
     production_endpoint: "https://%s.localhost:8080"                                     # Optional: Wildcard address for production address for service
     apicast_configuration_url: "https://<admin access token>@<3scale admin URL>"         # Optional: Apicast config. URL
 ```
+
+## Service Mesh gateway
+*Description*: Gateway for 3scale-istio-adapter with service mesh (Istio)
+
+*Has production gateway*: No
+
+*Has implemented reload*: No
+
+*Capabilities*: "ISTIO"
+```
+gateway:
+  type: "service-mesh"
+  configuration:
+    httpbin:
+      project: "httpbin"               # Optional: name of the httpbin openshift project
+      deployment: "httpbin"            # Optional: deployment name of the httpbin
+      path: "httpbin"                  # Optional: URL path of httpbin
+    mesh:
+      project: "service-mesh"          # Optional: name of the service mesh openshift project
+    server: "istio"                    # Openshift server with Service mesh
+    credentials: "httpbin"             # Credentials name for the adapter
+```
