@@ -15,16 +15,6 @@ def policy_settings():
     return rawobj.PolicyConfig("caching", {"caching_type": "none"})
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    "Promote API to the production gateway"
-
-    application.service.proxy.list().promote(version=2)
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
 @pytest.mark.disruptive
 def test_caching_policy_none(prod_client, openshift):
     """
@@ -36,16 +26,17 @@ def test_caching_policy_none(prod_client, openshift):
     Scale backend-listener up to old value
     """
 
+    client = prod_client(version=2)
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = prod_client.get("/")
+    response = client.get("/")
     assert response.status_code == 200
     openshift.scale("backend-listener", 0)
 
     # Test if responses will fail on production calls
     try:
         for _ in range(3):
-            response = prod_client.get("/")
+            response = client.get("/")
             assert response.status_code == 403
     finally:
         openshift.scale("backend-listener", replicas)

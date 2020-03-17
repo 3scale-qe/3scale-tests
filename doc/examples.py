@@ -52,22 +52,39 @@ def service_proxy_settings(service_proxy_settings):
     
     
 ###############################################################################
-# To call using production gateway define following fixture
+# To test call against production gateway you can use the prod_client fixture which promotes the configuration to
+# production and then creates the actual client
 # (default value of the version is 1)
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    """api_client using production gateway"""
-    application.service.proxy.list().promote(version='foo_version')
-    redeploy_production_gateway()
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
 
-
-# and then make requests using this fixture
+# If you don't need to promote a specific version you can use it like this (the default version promoted is 1)
 @pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
 @pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
-def test_production_call(prod_client):
-    response = prod_client.get("/get")
+def test_production_call(application, prod_client):
+    client = prod_client(application)
+    response = client.get("/get")
 
+
+# or you can specify the version yourself
+@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
+def test_version_production_call(application, prod_client):
+    client = prod_client(application, version=3)
+    response = client.get("/get")
+
+
+# you can also create production client without promoting the configuration or redeploying the gateway
+@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
+def test_production_call_without_promote(application, prod_client):
+    client = prod_client(application, promote=False)
+    response = client.get("/get")
+
+
+@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
+@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
+def test_production_call_without_redeploy(application, prod_client):
+    client = prod_client(application, redeploy=False)
+    response = client.get("/get")
 
 ###############################################################################
 # When requiring compatible backend to be used define following fixture

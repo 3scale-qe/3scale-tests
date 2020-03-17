@@ -59,15 +59,6 @@ def custom_policies(threescale, schema, request, testconfig):
         request.addfinalizer(_cleanup)
 
 
-@pytest.fixture
-def prod_client(application, testconfig, redeploy_production_gateway):
-    """Promote API to the production gateway"""
-    application.service.proxy.list().promote(version='2')
-    redeploy_production_gateway()
-
-    return application.api_client(endpoint="endpoint", verify=testconfig["ssl_verify"])
-
-
 @pytest.fixture(scope="module")
 def policy_settings():
     """Add policy_registry policy with custom configuration"""
@@ -106,7 +97,7 @@ def test_policy_registry(custom_policies, threescale, schema, service, prod_clie
     policy = service.proxy.list()["policies_config"][1]
 
     assert policy["name"] == "policy_registry"
-    assert prod_client.get("/get").status_code == 200
+    assert prod_client(version=2).get("/get").status_code == 200
 
     # Test if we are able to get custom policy by ID
     policy = threescale.policy_registry.read(policies[1].entity_id)

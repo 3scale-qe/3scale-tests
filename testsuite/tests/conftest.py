@@ -91,12 +91,29 @@ def openshift(testconfig):
     return _client
 
 
-@pytest.fixture()
-def redeploy_production_gateway(openshift):
-    "Redeploys production gateway"
-    def _func():
-        openshift().rollout("dc/apicast-production")
-    return _func
+@pytest.fixture(scope="module")
+def prod_client(testconfig, production_gateway, application):
+    """Prepares application and service for production use and creates new production client
+
+    Parameters:
+        app (Application): Application for which create the client.
+        promote (bool): If true, then this method also promotes proxy configuration to production.
+        version (int): Proxy configuration version of service to promote.
+        redeploy (bool): If true, then the production gateway will be reloaded
+
+    Returns:
+        api_client (HttpClient): Api client for application
+
+    """
+    def _prod_client(app=application, promote: bool = True, version: int = 1, redeploy: bool = True):
+        if promote:
+            app.service.proxy.list().promote(version=version)
+        if redeploy:
+            production_gateway.reload()
+
+        return app.api_client(endpoint="endpoint")
+
+    return _prod_client
 
 
 @pytest.fixture(scope="session")
