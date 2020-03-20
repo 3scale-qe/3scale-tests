@@ -196,10 +196,6 @@ class OpenShiftClient:
             source = f"--file={source}"
 
         self.do_action("new-app", [source, opt_args])
-        deployments = oc.selector("dc").qnames()
-        for deployment in deployments:
-            deployment_name = deployment.split("/")[1]
-            self._wait_for_deployment(deployment_name)
 
     def add_volume(self, deployment_name: str, volume_name: str, mount_path: str,
                    secret_name: str = None):

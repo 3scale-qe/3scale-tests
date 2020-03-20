@@ -11,6 +11,8 @@ default:
         httpbin: https://httpbin.org:443
         echo-api: https://echo-api.3scale.net:443
     gateway:
+      template: "https://github.com/3scale/3scale-amp-openshift-templates/raw/master/apicast-gateway/apicast.yml"
+      image: "registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.8"
       type: "apicast"
       configuration:
         staging_deployment: "apicast-staging"
@@ -21,4 +23,3 @@ default:
       password: testUser
   redis:
     url: redis://apicast-testing-redis:6379/1
-
