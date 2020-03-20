@@ -6,7 +6,7 @@ import pytest
 from websocket import create_connection, WebSocketBadStatusException
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8')")
+pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.8')"), pytest.mark.flaky]
 
 
 @pytest.fixture
