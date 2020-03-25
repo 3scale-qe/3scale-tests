@@ -2,8 +2,14 @@
 Sets up gateway defined in testsuite settings
 """
 from dynaconf import settings
-from testsuite.gateways.apicast import SystemApicastGateway, SelfManagedApicastGateway
-from testsuite.gateways.containers import ContainerizedApicastGatewayGateway
+from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast
+from testsuite.gateways.containers import ContainerizedApicast
+
+GATEWAYS = {
+    "apicast": (SystemApicast, SystemApicast),
+    "apicast-container": (ContainerizedApicast, None),
+    "apicast-selfmanaged": (SelfManagedApicast, None),
+}
 
 
 def load_gateway():
@@ -12,17 +18,10 @@ def load_gateway():
     gateway = settings["threescale"]["gateway"]
 
     gateway_type = gateway["type"]
-    if gateway_type == "apicast":
-        staging_gateway = SystemApicastGateway
-        production_gateway = staging_gateway
-    elif gateway_type == "apicast-container":
-        staging_gateway = ContainerizedApicastGatewayGateway
-        production_gateway = None
-    elif gateway_type == "apicast-selfmanaged":
-        staging_gateway = SelfManagedApicastGateway
-        production_gateway = None
-    else:
+    if gateway_type not in GATEWAYS:
         raise ValueError(f"Gateway {gateway_type} is not supported")
+
+    staging_gateway, production_gateway = GATEWAYS[gateway_type]
 
     return {
         "staging": staging_gateway,

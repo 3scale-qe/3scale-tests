@@ -49,7 +49,7 @@ class AbstractGateway(ABC):
         """Destroys gateway"""
 
 
-class AbstractApicastGateway(AbstractGateway):
+class AbstractApicast(AbstractGateway):
     """Interface defining basic functionality of an Apicast gateway"""
 
     CAPABILITIES = [Capability.APICAST]
