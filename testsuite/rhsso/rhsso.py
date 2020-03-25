@@ -1,17 +1,14 @@
 """
 Utility resources for RHSSO manipulation
 """
-
-import backoff
-
 from keycloak.admin.clients import Client
 from keycloak.admin.realm import Realm
 from keycloak.admin.users import User
 from keycloak.openid_connect import KeycloakOpenidConnect
-from keycloak.realm import KeycloakRealm
-from keycloak.exceptions import KeycloakClientError
 
 from threescale_api.resources import Service
+
+from testsuite.rhsso.realm import RetryKeycloakRealm
 
 
 class OIDCClientAuthHook:
@@ -56,7 +53,7 @@ class RHSSO:
 
     def __init__(self, server_url, username, password) -> None:
         self.server_url = server_url
-        self.realm = KeycloakRealm(server_url=server_url, realm_name='master')
+        self.realm = RetryKeycloakRealm(server_url=server_url, realm_name='master')
         self.oidc = KeycloakOpenidConnect(realm=self.realm, client_id="admin-cli", client_secret=None)
         self.admin = self.realm.admin
         self.token = self.oidc.password_credentials(username=username, password=password)
@@ -68,10 +65,9 @@ class RHSSO:
 
     def create_oidc_client(self, realm, client_id, secret):
         """Creates OIDC client"""
-        keycloak_realm = KeycloakRealm(server_url=self.server_url, realm_name=realm.realm)
+        keycloak_realm = RetryKeycloakRealm(server_url=self.server_url, realm_name=realm.realm)
         return KeycloakOpenidConnect(realm=keycloak_realm, client_id=client_id, client_secret=secret)
 
-    @backoff.on_exception(backoff.fibo, KeycloakClientError, max_tries=8)
     # pylint: disable=too-many-arguments
     def password_authorize(self, realm, client_id, secret, username, password):
         """Returns token retrived by password authentication"""
