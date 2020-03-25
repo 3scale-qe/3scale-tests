@@ -91,15 +91,29 @@ class RHSSOServiceConfiguration:
 class OIDCClientAuth:
     """Authentication class for  OIDC based authorization"""
 
-    def __init__(self, service_rhsso_info) -> None:
+    def __init__(self, service_rhsso_info, location=None) -> None:
         self.rhsso = service_rhsso_info
+        self.location = location
 
     def __call__(self, application):
+        location = self.location
+        if location is None:
+            location = application.service.proxy.list().entity["credentials_location"]
         app_key = application.keys.list()["keys"][0]["key"]["value"]
         token = self.rhsso.password_authorize(application["client_id"], app_key)
 
         def _process_request(request):
-            request.headers.update({'Authorization': 'Bearer ' + token.token["access_token"]})
+            access_token = token()
+            credentials = {"access_token": access_token}
+
+            if location == "authorization":
+                request.headers.update({'Authorization': 'Bearer ' + access_token})
+            elif location == "headers":
+                request.prepare_headers(credentials)
+            elif location == "query":
+                request.prepare_url(request.url, credentials)
+            else:
+                raise ValueError("Unknown credentials location '%s'" % location)
             return request
 
         return _process_request
