@@ -101,6 +101,7 @@ class OIDCClientAuth:
             location = application.service.proxy.list().entity["credentials_location"]
         app_key = application.keys.list()["keys"][0]["key"]["value"]
         token = self.rhsso.password_authorize(application["client_id"], app_key)
+        credentials = {"access_token": token}
 
         def _process_request(request):
             access_token = token()
