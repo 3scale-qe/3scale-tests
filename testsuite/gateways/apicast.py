@@ -1,5 +1,6 @@
 """Collection of gateways that are Apicast-based"""
 from typing import Dict
+from urllib.parse import urlparse
 
 from threescale_api.resources import Service
 
@@ -44,16 +45,21 @@ class SelfManagedApicast(AbstractApicast):
 
     CAPABILITIES = [Capability.APICAST]
 
-    def __init__(self, staging: bool, configuration, openshift: OpenShiftClient) -> None:
-        """
-        :param staging_endpoint: Staging endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-staging.localhost:8080
-        :param production_endpoint: Production endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-production.localhost:8080
-        """
+    def __init__(self, staging: bool, configuration, openshift) -> None:
         super().__init__(staging, configuration, openshift)
         self.staging_endpoint = configuration["sandbox_endpoint"]
         self.production_endpoint = configuration["production_endpoint"]
+
+        deployments = configuration["deployments"]
+        if staging:
+            self.deployment = deployments["staging"]
+        else:
+            self.deployment = deployments["production"]
+
+        # Load openshift configuration
+        self.project = configuration.get("project", "threescale")
+        self.server = configuration.get("server", "default")
+        self.openshift = openshift(server_name=self.server, project_name=self.project)
 
     def get_service_settings(self, service_settings: Dict) -> Dict:
         service_settings.update({
@@ -62,12 +68,43 @@ class SelfManagedApicast(AbstractApicast):
         return service_settings
 
     def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
-        name = service["system_name"]
+        entity_id = service.entity_id
         proxy_settings.update({
-            "sandbox_endpoint": self.staging_endpoint % name,
-            "endpoint": self.production_endpoint % name
+            "sandbox_endpoint": self.staging_endpoint % entity_id,
+            "endpoint": self.production_endpoint % entity_id
         })
         return proxy_settings
+
+    def set_env(self, name: str, value):
+        self.openshift.environ(self.deployment)[name] = value
+
+    def get_env(self, name: str):
+        return self.openshift.environ(self.deployment)[name]
+
+    def reload(self):
+        self.openshift.rollout(self.deployment)
+
+
+class OperatorApicast(SelfManagedApicast):
+    """Gateway for use with Apicast deployed by operator"""
+    def __init__(self, staging: bool, configuration, openshift) -> None:
+        super().__init__(staging, configuration, openshift)
+        services = configuration["services"]
+        self.service_staging = services["staging"]
+        self.service_production = services["production"]
+
+    def register_service(self, service: Service):
+        entity_id = service.entity_id
+        staging_url = urlparse(self.staging_endpoint % entity_id)
+        prod_url = urlparse(self.production_endpoint % entity_id)
+        self.openshift.routes.create(name=f"{entity_id}-staging",
+                                     service=self.service_staging, hostname=staging_url.hostname)
+        self.openshift.routes.create(name=f"{entity_id}-production",
+                                     service=self.service_production, hostname=prod_url.hostname)
+
+    def unregister_service(self, service: Service):
+        del self.openshift.routes[f"{service.entity_id}-staging"]
+        del self.openshift.routes[f"{service.entity_id}-production"]
 
     def set_env(self, name: str, value):
         raise NotImplementedError()
@@ -76,4 +113,7 @@ class SelfManagedApicast(AbstractApicast):
         raise NotImplementedError()
 
     def reload(self):
-        raise NotImplementedError()
+        self.openshift.do_action("delete", ["pod", "--force",
+                                            "--grace-period=0", "-l", f"deployment={self.deployment}"])
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(f"deployment/{self.deployment}")
