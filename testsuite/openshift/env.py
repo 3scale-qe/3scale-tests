@@ -98,6 +98,18 @@ class Environ:
                     self.__envs[env.name] = env
                     break
 
+    def set_many(self, envs: typing.Dict[str, str]):
+        """Allow setting many envs at a time."""
+        env_args = []
+        for name, value in envs.items():
+            env_args.append(f"{name}={value}")
+
+        self.openshift.do_action("set", ["env", "dc", self.deployment_name, env_args])
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(self.deployment_name)
+        # refresh envs on the next access to self._envs
+        self.__envs = None
+
     def __getitem__(self, name):
         if name not in self._envs:
             raise KeyError(name)

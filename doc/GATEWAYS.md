@@ -78,3 +78,49 @@ gateway:
         staging: "apicast-staging"
         production: "apicast-production"                                   
 ```
+
+## Template Apicast
+*Description*: Self-managed template-based apicast that is deployed somewhere else and we only know their address
+
+*Has production gateway*: Yes
+
+*Has implemented reload*: Yes
+
+*Capabilities*: "PRODUCTION_GATEWAY, APICAST, CUSTOM_ENVIRONMENT, SAME_CLUSTER"
+```
+gateway:
+  type: "apicast-template"
+  configuration:
+    template: "https://www.xxxxxx.com.br/apicast.yml"                                    # Either URL or loca path to the apicast template yaml
+    image: "docker-registry.default.svc:5000/<project name>/amp-apicast:latest"          # Registry endpoint to apicast image
+    deployments:
+        staging: "template-apicast-staging"                                              # Staging deployment name
+        production: "template-apicast-production"                                        # Production deployment name
+    sandbox_endpoint: "http://%s-staging.localhost:8080"                                 # Wildcard address for staging address for service
+    production_endpoint: "http://%s-production.localhost:8080"                           # Wildcard address for production address for service
+    apicast_configuration_url_secret: "https://<admin access token>@<3scale admin URL>"  # Optional: Apicast config. URL
+```
+## TLS Apicast
+*Description*: Self-managed apicast that is deployed with ssl certificates somewhere else and we only know their address
+
+*Has production gateway*: Yes
+
+*Has implemented reload*: No
+
+*Capabilities*: "PRODUCTION_GATEWAY, APICAST, CUSTOM_ENVIRONMENT, SAME_CLUSTER"
+```
+gateway:
+  type: "apicast-tls"
+  configuration:
+    template: "https://www.xxxxxx.com.br/apicast.yml"                                    # Either URL or loca path to the apicast template yaml
+    image: "docker-registry.default.svc:5000/<project name>/amp-apicast:latest"          # Registry endpoint to apicast image
+    deployments:
+        staging: "tls-apicast-staging"                                                   # Staging deployment name
+        production: "tls-apicast-production"                                             # Production deployment name
+    sandbox_endpoint: "https://%s.localhost:8080"                                        # Wildcard address for staging address for service
+    production_endpoint: "https://%s.localhost:8080"                                     # Wildcard address for production address for service
+    apicast_configuration_url_secret: "https://<admin access token>@<3scale admin URL>"  # Optional: Apicast config. URL
+    cfssl:
+      host: 0.0.0.0     # CFSSL server api URL
+      port: 8888        # CFSSL server api port
+```

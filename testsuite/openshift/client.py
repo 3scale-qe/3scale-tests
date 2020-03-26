@@ -1,8 +1,10 @@
 """This module implements an openshift interface with openshift oc client wrapper."""
 
 import enum
+import json
 from contextlib import ExitStack
-from typing import List, Dict, Union
+import os
+from typing import List, Dict, Union, Any
 
 import openshift as oc
 
@@ -74,6 +76,42 @@ class OpenShiftClient:
 
         return Environ(openshift=self, deployment=deployment_name)
 
+    def patch(self, resource_type: str, resource_name: str, patch: Dict[str, Any], patch_type: str = None):
+        """Patch the specified resource
+        Args:
+            :param resource_type: The resource type to be deleted. Ex.: service, route, deploymentconfig
+            :param resource_name: The resource name to be patched
+            :param patch: The patch to be applied to the resource
+            :param patch_type: Optional. The type of patch being provided; one of [json merge strategic]
+        """
+        cmd_args = []
+        if patch_type:
+            cmd_args.append(["--type", patch_type])
+
+        patch_serialized = json.dumps(patch)
+        self.do_action("patch", [resource_type, resource_name, cmd_args, "-p", patch_serialized])
+
+    def apply(self, resource: Dict[str, Any]):
+        """Apply the specified resource to the server.
+        Args:
+            :param resource: A dict containing the configuration to be applied
+        """
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            oc.apply(resource)
+
+    def delete(self, resource_type: str, name: str, force: bool = False):
+        """Delete a resource.
+        Args:
+            :param resource_type: The resource type to be deleted. Ex.: service, route, deploymentconfig
+            :param name: The resource name
+            :param force: Pass --force to oc delete
+        """
+        args = []
+        if force:
+            args.append("-f")
+        self.do_action("delete", [resource_type, name, args])
+
     def scale(self, deployment_name: str, replicas: int):
         """
         Scale an existing version of Deployment.
@@ -83,7 +121,7 @@ class OpenShiftClient:
         """
         self.do_action("scale", ["--replicas=" + str(replicas), "dc", deployment_name])
         if replicas > 0:
-            self._wait_for_scale(deployment_name)
+            self._wait_for_deployment(deployment_name)
 
     # pylint: disable=no-self-use
     def get_replicas(self, deployment_name: str):
@@ -147,14 +185,17 @@ class OpenShiftClient:
         """Create application based on source code.
 
         Args:
-            :param source: The source of the image, template or code that has a public repository
-            :param params: The parameters to be passed to the source when building it
+            :param source: The source of the template, it must be either an url or a path to a local file.
+            :param params: The parameters to be passed to the source when building it.
         """
         opt_args = []
         if params:
             opt_args.extend([f"--param={n}={v}" for n, v in params.items()])
 
-        self.do_action("new-app", ["-f", source, opt_args])
+        if os.path.isfile(source):
+            source = f"--file={source}"
+
+        self.do_action("new-app", [source, opt_args])
         deployments = oc.selector("dc").qnames()
         for deployment in deployments:
             deployment_name = deployment.split("/")[1]
@@ -209,15 +250,7 @@ class OpenShiftClient:
         """Wait for a given deployment to be running.
 
         Args:
-            :param deployment_name: The deployment name
-        """
-        self.do_action("rollout", ["status", deployment_name])
-
-    def _wait_for_scale(self, deployment_name: str):
-        """
-        Wait for a given deployment to be scaled.
-        Args:
-            :param deployment_name: The deployment name
+            :param deployment_name: The deployment name.
         """
         with ExitStack() as stack:
             self.prepare_context(stack)
