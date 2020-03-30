@@ -77,7 +77,9 @@ def test_debug_policy(api_client, access_token, service):
         - contains remote address
         - contains JWT object
     """
-
+    # pylint: disable=protected-access
+    # Auth session needs to be None when we are testing access_token
+    api_client._session.auth = None
     response = api_client.get('/get', params={'access_token': access_token})
     assert response.status_code == 200
 
