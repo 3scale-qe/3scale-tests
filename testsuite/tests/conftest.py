@@ -350,6 +350,7 @@ def custom_service(threescale, request, testconfig, staging_gateway):
         if backends:
             for path, backend in backends.items():
                 svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
+                svc.proxy.list().update()  # You have to update proxy.list() to promote product to Staging APIcast
         elif proxy_params:
             svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
         staging_gateway.register_service(svc)
