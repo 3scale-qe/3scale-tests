@@ -3,45 +3,16 @@ Rewrite spec/functional_specs/policies/batcher/batcher_policy_oidc_spec.rb
 """
 from time import sleep
 import pytest
-from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.rhsso.rhsso import OIDCClientAuth
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 
-@pytest.fixture(scope="module")
-def service_settings(service_settings):
-    "Set auth mode to OIDC"
-    service_settings.update(backend_version=Service.AUTH_OIDC)
-    return service_settings
+@pytest.fixture(scope="module", autouse=True)
+def rhsso_setup(lifecycle_hooks, rhsso_service_info):
+    """Have application/service with RHSSO auth configured"""
 
-
-@pytest.fixture(scope="module")
-def service_proxy_settings(rhsso_service_info, service_proxy_settings):
-    "Set OIDC issuer and type"
-    service_proxy_settings.update(
-        oidc_issuer_endpoint=rhsso_service_info.authorization_url(),
-        oidc_issuer_type="keycloak")
-    return service_proxy_settings
-
-
-@pytest.fixture(scope="module")
-def service(service):
-    "Update OIDC configuration"
-    service.proxy.oidc.update(params={
-        "oidc_configuration": {
-            "standard_flow_enabled": False,
-            "direct_access_grants_enabled": True
-        }
-    })
-    return service
-
-
-@pytest.fixture(scope="module")
-def application(rhsso_service_info, application):
-    "Add OIDC client authentication"
-    application.register_auth("oidc", OIDCClientAuth(rhsso_service_info))
-    return application
+    lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
 @pytest.fixture(scope="module")
@@ -59,8 +30,9 @@ def test_batcher_policy_oidc(api_client, application, rhsso_service_info):
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
 
     for _ in range(5):
-        api_client.get("/get", headers={'access_token': token})
+        response = api_client.get("/get", headers={'access_token': token})
 
+    assert response.request.headers["Authorization"].startswith("Bearer")  # RHSSO used?
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before
 
