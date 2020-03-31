@@ -59,13 +59,16 @@ def Method(system_name: str, friendly_name: str = None, unit: str = "hit"):
 
 
 # pylint: disable=unused-argument
-def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1):
+def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1,
+            last: str = "false"):
     """Builder of parameters to create Mapping
     Args:
         :param metric: Metric to be mapped
         :param pattern: URL pattern to map; deafult: /
         :param http_method: Method to map; default: GET
-        :param delta: Incremental unit; default: 1"""
+        :param delta: Incremental unit; default: 1
+        :param last: If true, no other rules will be processed after
+                     matching this one; default: false"""
 
     metric_id = metric["id"]  # pylint: disable=possibly-unused-variable
     del metric
