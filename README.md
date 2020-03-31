@@ -26,15 +26,17 @@ after that you can install dependencies using the pipenv
 ```bash
 $ pipenv install --dev
 ```
-### Creating your personal secrets file 
+### Customize the configuration
 
-Create a secrets file in the `config` directory from the secrets file template `.secrets.yaml.tpl`.
+Default configuration is stored in ``config/settings.yaml`` and
+``config/.secrets.yaml``. These files are supposed to be unchanged. To modify
+the configuration use config/settings.local.yaml file that will override the
+defaults. Consult ``config/settings.yaml.tpl`` for possible options.
 
-```
-$ cp config/.secrets.yaml.tpl config/.secrets.yaml
-```
-
-Edit your `.secrets.yaml` using you preferred editor by following the instructions on it.
+BEWARE! ``config/.secrets.yaml`` contains sensitive data and it is encrypted
+thus. Due to the encypryption the format is 'invalid' and dynaconf can't parse
+the configuration properly. Either decrypt ``config/.secrets.yaml`` (``git crypt unlock``)
+or delete the file and provide your own settings in ``config/settings.local.yaml``
 
 ### Run the tests
 
