@@ -14,7 +14,7 @@ import testsuite.gateways as gateways
 
 from testsuite import rawobj
 from testsuite.openshift.client import OpenShiftClient
-from testsuite.utils import randomize, retry_for_session
+from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
 if settings["ignore_insecure_ssl_warning"]:
@@ -160,7 +160,7 @@ def threescale(testconfig, openshift):
 @pytest.fixture(scope="session")
 def account(threescale, request, testconfig):
     "Preconfigured account existing over whole testing session"
-    name = randomize("account")
+    name = blame(request, "id")
     account = dict(name=name, username=name, org_name=name)
     account = threescale.accounts.create(params=account)
 
@@ -205,12 +205,12 @@ def rhsso_service_info(request, testconfig):
     rhsso = RHSSO(server_url=cnf["url"],
                   username=cnf["username"],
                   password=cnf["password"])
-    realm = rhsso.create_realm(randomize("realm"))
+    realm = rhsso.create_realm(blame(request, "realm"))
 
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
 
-    client = realm.clients.create(id=randomize("client"), serviceAccountsEnabled=True, standardFlowEnabled=False)
+    client = realm.clients.create(id=blame(request, "client"), serviceAccountsEnabled=True, standardFlowEnabled=False)
 
     username = cnf["test_user"]["username"]
     password = cnf["test_user"]["password"]
@@ -244,9 +244,9 @@ def private_base_url(testconfig):
 
 
 @pytest.fixture(scope="module")
-def service_settings():
+def service_settings(request):
     "dict of service settings to be used when service created"
-    return {"name": randomize("service")}
+    return {"name": blame(request, "svc")}
 
 
 @pytest.fixture(scope="module")
@@ -266,10 +266,10 @@ def service(backends_mapping, custom_service, service_settings, service_proxy_se
 
 
 @pytest.fixture(scope="module")
-def application(service, custom_application, custom_app_plan, lifecycle_hooks):
+def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
     "application bound to the account and service existing over whole testing session"
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), service)
-    return custom_application(rawobj.Application(randomize("App"), plan), hooks=lifecycle_hooks)
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
@@ -289,7 +289,7 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
 
     def _custom_app_plan(params, service=None, autoclean=True):
         if service is None:
-            service = custom_service({"name": randomize("service")}, service_proxy_settings)
+            service = custom_service({"name": blame(request, "svc")}, service_proxy_settings)
         plan = service.app_plans.create(params=params)
         if autoclean:
             plans.append(plan)
@@ -323,9 +323,13 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
 
-    def _custom_application(params, autoclean=True, hooks=None):
+    def _custom_application(params, autoclean=True, hooks=None, annotate=True):
+        params = params.copy()
         for hook in _select_hooks("before_application", hooks):
             params = hook(params)
+
+        if annotate:
+            params["description"] = blame_desc(request, params.get("description"))
 
         app = account.applications.create(params=params)
 
@@ -367,9 +371,14 @@ def custom_service(threescale, request, testconfig, staging_gateway):
         :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used
         :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook"""
 
-    def _custom_service(params, proxy_params=None, backends=None, autoclean=True, hooks=None):
+    # pylint: disable=too-many-arguments
+    def _custom_service(params, proxy_params=None, backends=None, autoclean=True, hooks=None, annotate=True):
+        params = params.copy()
         for hook in _select_hooks("before_service", hooks):
             params, proxy_params = hook(params, proxy_params)
+
+        if annotate:
+            params["description"] = blame_desc(request, params.get("description"))
 
         svc = threescale.services.create(params=staging_gateway.get_service_settings(params))
 
@@ -411,11 +420,11 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         :param endpoint: endpoint of backend
     """
 
-    def _custom_backend(name="backend", endpoint=None, autoclean=True, hooks=None):
+    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None):
         if endpoint is None:
             endpoint = private_base_url()
 
-        params = {"name": randomize(name), "private_endpoint": endpoint}
+        params = {"name": blame(request, name), "private_endpoint": endpoint}
 
         for hook in _select_hooks("before_backend", hooks):
             hook(params)
