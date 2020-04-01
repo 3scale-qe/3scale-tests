@@ -24,19 +24,19 @@ from pytest_cases import fixture_plus, cases_data, parametrize_plus, fixture_ref
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
-from testsuite.utils import randomize
+from testsuite.utils import blame
 
 
 @fixture_plus
-def service_plus(service_proxy_settings, custom_service):
+def service_plus(service_proxy_settings, custom_service, request):
     """Service configured with config"""
-    return custom_service({"name": randomize("service")}, service_proxy_settings)
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
 @fixture_plus
-def service_plus2(service_proxy_settings, custom_service):
+def service_plus2(service_proxy_settings, custom_service, request):
     """Service configured with parametrized config"""
-    return custom_service({"name": randomize("service")}, service_proxy_settings)
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
 @fixture_plus
@@ -52,18 +52,18 @@ def config(service, scope, case_data, service_plus, service_plus2):
 
 
 @fixture_plus
-def application(service_plus, custom_app_plan, custom_application):
+def application(service_plus, custom_app_plan, custom_application, request):
     """First application bound to the account and service_plus"""
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), service_plus)
-    return custom_application(rawobj.Application(randomize("App"), plan))
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_plus)
+    return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
 @fixture_plus
-def application2(config, custom_app_plan, custom_application):
+def application2(config, custom_app_plan, custom_application, request):
     """Second application bound to the account and service_plus"""
     service = config[1]
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), service)
-    return custom_application(rawobj.Application(randomize("App"), plan))
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
 @backoff.on_predicate(backoff.constant, lambda x: x[0] != 429 or x[1] != 429, config_cases.TIME_WINDOW)

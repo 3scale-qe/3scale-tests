@@ -5,7 +5,7 @@ import pytest
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
-from testsuite.utils import randomize
+from testsuite.utils import blame
 
 ERROR_MESSAGE = "Invalid JWT check"
 
@@ -42,10 +42,10 @@ def application(rhsso_service_info, application):
 
 
 @pytest.fixture(scope="module")
-def application_doesnt_match(service, custom_application, custom_app_plan, rhsso_service_info):
+def application_doesnt_match(service, custom_application, custom_app_plan, rhsso_service_info, request):
     """Second application that doesn't match jwt claim check policy"""
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), service)
-    application = custom_application(rawobj.Application(randomize("App"), plan))
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    application = custom_application(rawobj.Application(blame(request, "app"), plan))
     application.register_auth("oidc", OIDCClientAuth(rhsso_service_info))
     return application
 
