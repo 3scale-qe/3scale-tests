@@ -7,7 +7,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.echoed_request import EchoedRequest
-from testsuite.utils import randomize
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -18,10 +18,10 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 
 
 @pytest.fixture(scope="module")
-def second_application(custom_application, custom_app_plan, service, lifecycle_hooks):
+def second_application(custom_application, custom_app_plan, service, lifecycle_hooks, request):
     "Create a second application"
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("CustomAppPlan")), service)
-    app = custom_application(rawobj.Application(randomize("CustomApp-test"), plan), lifecycle_hooks)
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "CustAPlan")), service)
+    app = custom_application(rawobj.Application(blame(request, "CustApp-test"), plan), lifecycle_hooks)
     return app
 
 

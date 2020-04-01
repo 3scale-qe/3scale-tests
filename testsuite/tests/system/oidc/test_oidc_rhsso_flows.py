@@ -18,7 +18,7 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite.rhsso.rhsso import OIDCClientAuth
-from testsuite.utils import randomize
+from testsuite.utils import blame_desc
 
 DEFAULT_FLOWS = {
     "implicit_flow_enabled": False,
@@ -62,7 +62,7 @@ def application(rhsso_service_info, application):
     return application
 
 
-def change_flows(application, flow_to_update):
+def change_flows(application, flow_to_update, request):
     """
     Changes flows to given application
     :param application: application
@@ -72,7 +72,7 @@ def change_flows(application, flow_to_update):
     params = {**DEFAULT_FLOWS, **flow_to_update}
     TESTING_FLOWS.update(params)
     update = application.service.proxy.oidc.update(params={"oidc_configuration": params})
-    application["description"] = randomize("description")
+    application["description"] = blame_desc(request, "description")
     application.update()
     return update
 
@@ -99,13 +99,13 @@ def get_flows(rhsso_client):
     ("standard_flow_enabled", (False, True, False, False)),
     ("direct_access_grants_enabled", (False, False, True, False)),
     ("service_accounts_enabled", (False, False, False, True))])
-def test(application, rhsso_service_info, flow_type, expected):
+def test(application, rhsso_service_info, request, flow_type, expected):
     """
     Test checks if the change of the flows of 3scale service were reflected on
     the RHSSO client for 3scale application.
     """
 
-    result = change_flows(application, {flow_type: True})
+    result = change_flows(application, {flow_type: True}, request)
     assert result is not None
 
     rhsso_client = rhsso_service_info.realm.clients.by_client_id(application["client_id"])

@@ -4,13 +4,13 @@ Default conftest for rate limit tests
 import pytest
 from pytest_cases import fixture_plus
 
-from testsuite.utils import randomize
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="function")
-def service_settings():
+def service_settings(request):
     """dict of service settings to be used when service created"""
-    return {"name": randomize("service")}
+    return {"name": blame(request, "svc")}
 
 
 @fixture_plus

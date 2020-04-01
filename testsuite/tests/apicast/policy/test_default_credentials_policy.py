@@ -5,7 +5,7 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.utils import randomize
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
@@ -19,17 +19,17 @@ def application(application, service):
 
 
 @pytest.fixture(scope="module")
-def service_app_id_key(custom_service, service_proxy_settings):
+def service_app_id_key(custom_service, service_proxy_settings, request):
     "Another service using app_id/key auth configuration"
-    settings = {"name": randomize("CustomService"), "backend_version": Service.AUTH_APP_ID_KEY}
+    settings = {"name": blame(request, "CustSvc"), "backend_version": Service.AUTH_APP_ID_KEY}
     return custom_service(settings, service_proxy_settings)
 
 
 @pytest.fixture(scope="module")
-def application_app_id_key(custom_application, custom_app_plan, service_app_id_key):
+def application_app_id_key(custom_application, custom_app_plan, service_app_id_key, request):
     "Application with default_credentials policy configured to use app_id/key"
-    plan = custom_app_plan(rawobj.ApplicationPlan(randomize("CustomAppPlan")), service_app_id_key)
-    app = custom_application(rawobj.Application(randomize("CustomApp"), plan))
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "CustAPlan")), service_app_id_key)
+    app = custom_application(rawobj.Application(blame(request, "CustApp"), plan))
 
     service_app_id_key.proxy.list().policies.insert(0, rawobj.PolicyConfig("default_credentials", {
         "auth_type": "app_id_and_app_key",
