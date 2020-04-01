@@ -70,7 +70,10 @@ def pytest_report_header(config):
 
     environment = settings["env_for_dynaconf"]
     openshift = settings["openshift"]["servers"]["default"]["server_url"]
-    project = settings["openshift"]["projects"]["threescale"]["name"]
+    try:
+        project = settings["openshift"]["projects"]["threescale"]["name"]
+    except KeyError:
+        project = f"{environment} (using env value)"
 
     threescale = "{dynamic}"
 
@@ -99,15 +102,19 @@ def logger(request, pytestconfig):
 def openshift(testconfig):
     "OpenShift client generator"
     servers = testconfig["openshift"]["servers"]
-    projects = testconfig["openshift"]["projects"]
 
     def _client(server_name: str = "default", project_name: str = "threescale") -> OpenShiftClient:
         if server_name not in servers:
             raise AttributeError("Server %s is not defined in configuration" % server_name)
-        if project_name not in projects:
-            raise AttributeError("Project %s is not defined in configuration" % project_name)
+        try:
+            project_name = testconfig["openshift"]["projects"][project_name]["name"]
+        except KeyError:
+            if project_name != "threescale":
+                raise AttributeError("Project %s is not defined in configuration" % project_name)
+            project_name = testconfig["env_for_dynaconf"]
+
         server = servers[server_name]
-        return OpenShiftClient(project_name=projects[project_name]["name"],
+        return OpenShiftClient(project_name=project_name,
                                server_url=server.get("server_url", None),
                                token=server.get("token", None))
     return _client
