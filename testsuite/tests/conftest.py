@@ -379,7 +379,7 @@ def backends_mapping():
 
 
 @pytest.fixture(scope="module")
-def custom_service(threescale, request, testconfig, staging_gateway):
+def custom_service(threescale, request, testconfig, staging_gateway, logger):
     """Parametrized custom Service
 
     Args:
@@ -405,7 +405,26 @@ def custom_service(threescale, request, testconfig, staging_gateway):
                         hook(svc)
                     except Exception:  # pylint: disable=broad-except
                         pass
+
+                implicit = []
+                if not backends and proxy_params:  # implicit backend created
+                    bindings = svc.backend_usages.list()
+                    bindings = [svc.threescale_client.backends[i["backend_id"]] for i in bindings]
+                    implicit = [
+                        i for i in bindings
+                        if i["name"] == f"{svc['name']} Backend"
+                        and i["description"] == f"Backend of {svc['name']}"]
+
                 svc.delete()
+
+                try:
+                    if len(implicit) == 1:
+                        implicit[0].delete()
+                    else:
+                        logger.debug("Unexpected count of candidates for implicit backend: %s", str(implicit))
+                except Exception as err:  # pylint: disable=broad-except
+                    logger.debug("An error occurred during attempt to delete implicit backend: %s", str(err))
+
             request.addfinalizer(finalizer)
 
         # Due to asynchronous nature of 3scale the proxy is not always ready immediately,
