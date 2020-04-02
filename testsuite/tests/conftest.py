@@ -338,7 +338,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
                 for hook in _select_hooks("on_application_delete", hooks):
                     try:
                         hook(app)
-                    finally:
+                    except Exception:  # pylint: disable=broad-except
                         pass
                 app.delete()
             request.addfinalizer(finalizer)
@@ -387,7 +387,7 @@ def custom_service(threescale, request, testconfig, staging_gateway):
                 for hook in _select_hooks("on_service_delete", hooks):
                     try:
                         hook(svc)
-                    finally:
+                    except Exception:  # pylint: disable=broad-except
                         pass
                 svc.delete()
             request.addfinalizer(finalizer)
@@ -436,7 +436,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
                 for hook in _select_hooks("on_backend_delete", hooks):
                     try:
                         hook(backend)
-                    finally:
+                    except Exception:  # pylint: disable=broad-except
                         pass
                 backend.delete()
             request.addfinalizer(finalizer)
