@@ -2,10 +2,10 @@
 Shadow request classes to unify workflow over different backends
 e.g httpbin-go returns headers 'Host': ["httpbingo.org"], but httpbin returns 'Host': "httpbin.org"
 """
-from urllib.parse import urlparse
+
+# pylint: disable=too-few-public-methods
 
 import requests
-from dynaconf import settings
 from requests.structures import CaseInsensitiveDict
 
 
@@ -23,50 +23,14 @@ class EchoedRequest:  # pylint: disable=too-few-public-methods
     @staticmethod
     def create(response: requests.Response):
         """Factory method to create different backends"""
-        url = EchoedRequest.__get_url(response)
-        if url == _PrimaryRequest.base_hostname():
-            return _PrimaryRequest(response)
-        if url == _HttpbinRequest.base_hostname():
-            return _HttpbinRequest(response)
-        if url == _EchoApiRequest.base_hostname():
+
+        if "echo-api" in response.json()["headers"].get("HTTP_HOST", ""):
             return _EchoApiRequest(response)
-        if url == _HttpbinGoRequest.base_hostname():
+
+        if "httpbingo." in response.json()["headers"].get("Host", ""):
             return _HttpbinGoRequest(response)
 
         return EchoedRequest(response)
-
-    @staticmethod
-    def __get_url(response: requests.Response) -> str:
-        """Gets URL from response"""
-        headers = response.json()["headers"]
-        url = headers.get('HTTP_HOST') or headers.get('Host')
-        if isinstance(url, list):
-            url = url[0]
-        return url
-
-    @staticmethod
-    def _base_hostname(kind):
-        """Returns hostname for specific backend"""
-        url = settings["threescale"]["service"]["backends"][kind]
-        return urlparse(url).hostname
-
-
-class _PrimaryRequest(EchoedRequest):
-    """Wrapper over Primary backend"""
-
-    @staticmethod
-    def base_hostname():
-        """Returns hostname for primary backend"""
-        return EchoedRequest._base_hostname("primary")
-
-
-class _HttpbinRequest(EchoedRequest):
-    """Wrapper over Primary backend"""
-
-    @staticmethod
-    def base_hostname():
-        """Returns hostname for httpbin backend"""
-        return EchoedRequest._base_hostname("httpbin")
 
 
 class _EchoApiRequest(EchoedRequest):
@@ -75,11 +39,6 @@ class _EchoApiRequest(EchoedRequest):
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
         self.headers = self.__process_headers()
-
-    @staticmethod
-    def base_hostname():
-        """Returns hostname for echo api backend"""
-        return EchoedRequest._base_hostname("echo-api")
 
     def __process_headers(self) -> CaseInsensitiveDict:
         headers = self.headers
@@ -97,11 +56,6 @@ class _HttpbinGoRequest(EchoedRequest):
         super().__init__(response)
         self.headers = self.__process_headers()
         self.params = self.__process_params()
-
-    @staticmethod
-    def base_hostname():
-        """Returns hostname for httpbin go backend"""
-        return EchoedRequest._base_hostname("httpbin-go")
 
     def __process_params(self) -> CaseInsensitiveDict:
         params = self.params
