@@ -7,6 +7,7 @@ default:
     version: "2.8"
     service:
       backends:
+        primary: https://echo-api.3scale.net:443
         httpbin: https://httpbin.org:443
         echo-api: https://echo-api.3scale.net:443
     gateway:
