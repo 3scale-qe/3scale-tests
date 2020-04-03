@@ -36,7 +36,11 @@ def test_headers_policy_another_value_to_request(api_client):
     response = api_client.get("/get", headers={'X-REQUEST-CUSTOM-ADD': 'Original header'})
     echoed_request = EchoedRequest.create(response)
 
-    assert echoed_request.headers["X-Request-Custom-Add"] == "Original header,Additional request header"
+    # format can differ based on different backend?
+    # proper fix is needed in lib
+    assert echoed_request.headers["X-Request-Custom-Add"] in (
+        "Original header, Additional request header",
+        "Original header,Additional request header")
 
 
 def test_headers_policy_another_value_to_response(api_client):
