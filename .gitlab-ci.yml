@@ -1,0 +1,6 @@
+image: "registry.access.redhat.com/ubi8/python-36"
+before_script:
+  - pip install -q pipenv
+acceptance:
+  script:
+    - PIPENV_VERBOSITY=-1 make commit-acceptance
