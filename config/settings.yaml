@@ -19,10 +19,6 @@ default:
     test_user:
       username: testUser
       password: testUser
-  openshift:
-    projects:
-      threescale:
-        name: "3scale"
   redis:
     url: redis://apicast-testing-redis:6379/1
 
