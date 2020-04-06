@@ -86,7 +86,7 @@ class OpenShiftClient:
         """
         cmd_args = []
         if patch_type:
-            cmd_args.append(["--type", patch_type])
+            cmd_args.extend(["--type", patch_type])
 
         patch_serialized = json.dumps(patch)
         self.do_action("patch", [resource_type, resource_name, cmd_args, "-p", patch_serialized])

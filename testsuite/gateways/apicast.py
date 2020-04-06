@@ -219,6 +219,7 @@ class TemplateApicast(SelfManagedApicast):
 
         self.openshift.new_app(self.template, self.get_app_params())
 
+        # pylint: disable=protected-access
         self.openshift._wait_for_deployment(self.deployment)
 
     def destroy(self):
