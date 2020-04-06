@@ -3,7 +3,6 @@ flake8 = "*"
 mypy = "*"
 pylint = "*"
 ipdb = "*"
-
 # Have commented out python-language-server to make it available quickly
 # for the development
 #python-language-server = "*"
@@ -27,6 +26,7 @@ hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref
 # from github repository
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
 # 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
+cfssl = "==0.0.3b243"
 
 [requires]
 python_version = "3"

@@ -1,11 +1,12 @@
 """This module contains basic objects for working with openshift resources """
-import math
-from io import StringIO
 import base64
+import enum
+import math
 import typing
+from io import StringIO
 from typing import List, Union
-
 import yaml
+
 
 if typing.TYPE_CHECKING:
     # pylint: disable=cyclic-import
@@ -54,12 +55,30 @@ class RemoteMapping:
 class Routes(RemoteMapping):
     """Dict-like interface to OpenShift routes"""
 
+    class Types(enum.Enum):
+        """Route types enum."""
+
+        EDGE = "edge"
+        PASSTHROUGH = "passthrough"
+        REENCRYPT = "reencrypt"
+
     def __init__(self, client,) -> None:
         super().__init__(client, "route")
 
-    def create(self, name, service, hostname):
-        """Return requested route in yaml format"""
+    def expose(self, name, service, hostname):
+        """Expose containers internally as services or externally via routes.
+        Returns requested route in yaml format.
+        """
         return self._client.do_action("expose", ["service", service, f"--hostname={hostname}", f"--name={name}"])
+
+    def create(self, name: str, route_type: "Types" = Types.EDGE, **kwargs):
+        """Expose containers externally via secured routes
+        Args:
+            :param route_type: the route type available in Route.Types
+            :param kwargs: options for the command
+        """
+        cmd_args = [f"--{k}={v}" for k, v in kwargs.items()]
+        self._client.do_action("create", ["route", route_type.value, name, cmd_args])
 
     def for_service(self, service) -> list:
         """

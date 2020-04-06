@@ -2,14 +2,16 @@
 Sets up gateway defined in testsuite settings
 """
 from dynaconf import settings
-from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast
+from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
 from testsuite.gateways.containers import ContainerizedApicast
 
 GATEWAYS = {
     "apicast": (SystemApicast, SystemApicast),
     "apicast-container": (ContainerizedApicast, None),
     "apicast-selfmanaged": (SelfManagedApicast, None),
-    "apicast-operator": (OperatorApicast, None)
+    "apicast-operator": (OperatorApicast, None),
+    "apicast-template": (TemplateApicast, TemplateApicast),
+    "apicast-tls": (TLSApicast, TLSApicast),
 }
 
 
