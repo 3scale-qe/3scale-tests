@@ -1,12 +1,13 @@
 """
-Test if routing policy should only match paths that start with the routing path of the backend
-https://issues.redhat.com/browse/THREESCALE-4736
+Test if APIAP routing only match paths that contain whole routing path
+https://issues.redhat.com/browse/THREESCALE-4904
 """
 import pytest
+import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
+pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 
 
 @pytest.fixture(scope="module")
@@ -25,7 +26,7 @@ def mapping_rules(service, threescale):
     Backend 1:
         - Add mapping rule with path "/anything/test"
     Backend 2:
-        - Add mapping rule with path "/anything/bin
+        - Add mapping rule with path "/anything/bin"
     """
     backends = service.backend_usages.list()
     backend_test = threescale.backends.read(backends[0]["backend_id"])
@@ -37,9 +38,25 @@ def mapping_rules(service, threescale):
     service.proxy.list().update()
 
 
+@pytest.fixture(scope="module")
+def api_client(application):
+    """
+    Client without retry attempts
+
+    This testing expect 404 returns what is handled by default retry feature.
+    To avoid long time execution because of retry client without retry will be
+    used. Firstly a request with retry is made to ensure all is setup.
+    """
+    assert application.api_client().get("/bin/anything/bin").status_code == 200
+
+    session = requests.Session()
+    session.auth = application.authobj
+    return application.api_client(session=session)
+
+
 # pylint: disable=unused-argument
-def test(api_client, mapping_rules, service):
-    """"
+def test_apiap_routing_to_backend(api_client, mapping_rules, service):
+    """
     Test if:
         - request with path "/test/bin/anything/test" have status code 200
         - request with path "/bin/anything/bin" have status code 200
