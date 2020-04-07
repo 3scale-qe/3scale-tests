@@ -1,4 +1,4 @@
-.PHONY: quality-check lint pylint flake8 mypy all-is-package pytest tests clean commit-acceptance run configure configure-dev pipenv pipenv-dev
+.PHONY: quality-check lint pylint flake8 mypy all-is-package pytest tests clean commit-acceptance run configure configure-dev pipenv pipenv-dev container-image
 
 commit-acceptance quality-check lint: pylint flake8 mypy all-is-package
 
@@ -33,6 +33,9 @@ Pipfile.lock: Pipfile
 configure pipenv: .make-pipenv-sync
 
 configure-dev pipenv-dev: .make-pipenv-sync-dev
+
+container-image:
+	docker build -t 3scale-py-testsuite .
 
 clean:
 	rm -f Pipfile.lock .make-*
