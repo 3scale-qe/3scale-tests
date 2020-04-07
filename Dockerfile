@@ -1,8 +1,8 @@
 FROM registry.access.redhat.com/ubi7/python-36:latest
 LABEL description="Required env variables: \
-THREESCALE_TESTSUITE_OPENSHIFT__servers__default__server_url={OPENSHIFT_URL}; \
-THREESCALE_TESTSUITE_OPENSHIFT__servers__default__token={OPENSHIFT_TOKEN}; \
-THREESCALE_TESTSUITE_OPENSHIFT__projects__threescale__name={OPENSHIFT_PROJECT}"
+_3SCALE_TESTS_OPENSHIFT__servers__default__server_url={OPENSHIFT_URL}; \
+_3SCALE_TESTS_OPENSHIFT__servers__default__token={OPENSHIFT_TOKEN}; \
+_3SCALE_TESTS_OPENSHIFT__projects__threescale__name={OPENSHIFT_PROJECT}"
 
 USER root
 
