@@ -1,8 +1,12 @@
-.PHONY: quality-check lint pylint flake8 mypy all-is-package pytest tests clean commit-acceptance run configure configure-dev pipenv pipenv-dev container-image
+.PHONY: commit-acceptance pylint flake8 mypy all-is-package \
+	pytest tests smoke junit \
+	pipenv pipenv-dev \
+	container-image \
+	clean
 
-commit-acceptance quality-check lint: pylint flake8 mypy all-is-package
+commit-acceptance: pylint flake8 mypy all-is-package
 
-pylint flake8 mypy: configure-dev
+pylint flake8 mypy: pipenv-dev
 	pipenv run $@ $(flags) testsuite
 
 all-is-package:
@@ -10,13 +14,13 @@ all-is-package:
 	@echo "Searching for dirs missing __init__.py"
 	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
-run tests pytest: configure
+pytest tests: pipenv
 	pipenv run python -m pytest $(flags) testsuite
 
-smoke: configure
+smoke: pipenv
 	pipenv run python -m pytest -n 6 -m smoke $(flags) testsuite
 
-junit:
+junit: pipenv
 	pipenv run python -m pytest --junitxml=junit.xml $(flags) testsuite
 
 Pipfile.lock: Pipfile
@@ -30,9 +34,9 @@ Pipfile.lock: Pipfile
 	pipenv sync --dev
 	touch .make-pipenv-sync-dev .make-pipenv-sync
 
-configure pipenv: .make-pipenv-sync
+pipenv: .make-pipenv-sync
 
-configure-dev pipenv-dev: .make-pipenv-sync-dev
+pipenv-dev: .make-pipenv-sync-dev
 
 container-image:
 	docker build -t 3scale-py-testsuite .
