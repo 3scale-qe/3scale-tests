@@ -16,8 +16,6 @@ all-is-package:
 	@echo "Searching for dirs missing __init__.py"
 	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
-
-
 pytest tests: pipenv
 	pipenv run python -m pytest --tb=$(TB) $(flags) testsuite
 
