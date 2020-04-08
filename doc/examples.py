@@ -8,6 +8,7 @@ from testsuite.rhsso.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
 import pytest
 import rawobj
+import requests
 
 
 ################################################################################
@@ -50,8 +51,8 @@ def service_proxy_settings(service_proxy_settings):
     """Expect credentials to be passed in headers"""
     service_proxy_settings.update({"credentials_location": "headers"})
     return service_proxy_settings
-    
-    
+
+
 ###############################################################################
 # To test call against production gateway you can use the prod_client fixture which promotes the configuration to
 # production and then creates the actual client
@@ -125,3 +126,14 @@ def staging_gateway(request, configuration):
 
     request.addfinalizer(gateway.destroy)
     return gateway
+
+
+###############################################################################
+# To skip apicast retrying on 404 status code
+def test_skip_apicast_retrying_on_404(application):
+    session = requests.Session()
+    session.auth = application.authobj
+
+    client = application.api_client(session=session)
+
+    assert client.get("/status/404").status_code == 404
