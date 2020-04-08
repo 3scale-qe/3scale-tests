@@ -143,7 +143,7 @@ class OpenShiftClient:
             :param deployment_name: DeploymentConfig name
         """
         self.do_action("rollout", ["latest", deployment_name])
-        self._wait_for_deployment(deployment_name)
+        self.do_action("rollout", ["status", deployment_name])
 
     # pylint: disable=too-many-arguments
     def create_secret(self, name: str, kind: "SecretKinds", secret_type: "SecretTypes" = None,
