@@ -1,3 +1,5 @@
+TB=short
+
 .PHONY: commit-acceptance pylint flake8 mypy all-is-package \
 	pytest tests smoke junit \
 	pipenv pipenv-dev \
@@ -15,8 +17,9 @@ all-is-package:
 	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 
+
 pytest tests: pipenv
-	pipenv run python -m pytest $(flags) testsuite
+	pipenv run python -m pytest --tb=$(TB) $(flags) testsuite
 
 test: ## Run test
 test: pytest tests
