@@ -1,5 +1,4 @@
 """Module responsible for processing configuration"""
-from openshift import OpenShiftPythonException
 from dynaconf import settings
 
 from testsuite.certificates import CertificateManager, CFSSLCertificate, TmpCertificateStore
@@ -77,25 +76,29 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
             return settings["env_for_dynaconf"]
 
     def _load_token(self):
+        # This part is trying to get the admin token, by default is saved in the
+        # system-seed openshift secret
+        token = settings.get("threescale", {}).get("admin", {}).get("token")
+        if token:
+            return token
+
         try:
-            try:
-                return settings["threescale"]["admin"]["token"]
-            except KeyError:
-                return self.openshift().secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
-        except OpenShiftPythonException as err:
-            oc_error = err.result.as_dict()["actions"][0]["err"]
-            raise Exception(f"(From Openshift) {oc_error}")
+            return self.openshift().secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
+        except KeyError:
+            Exception("(From Openshift) cannot get system-seed access token. Review your settings")
 
     def _load_url(self):
+        # This is trying to get system default route. If not defined, is going to
+        # search that on the openshift routes.
+        url = settings.get("threescale", {}).get("admin", {}).get("url")
+        if url:
+            return url
+
         try:
-            try:
-                return settings["threescale"]["admin"]["url"]
-            except KeyError:
-                route = self.openshift().routes.for_service("system-provider")[0]
-                return "https://" + route["spec"]["host"]
-        except OpenShiftPythonException as err:
-            oc_error = err.result.as_dict()["actions"][0]["err"]
-            raise Exception(f"(From Openshift) {oc_error}")
+            route = self.openshift().routes.for_service("system-provider")[0]
+            return "https://" + route["spec"]["host"]
+        except KeyError:
+            Exception("(From Openshift) cannot get system default route. Review your settings")
 
     def openshift(self, server="default", project="threescale") -> OpenShiftClient:
         """Creates OpenShiftClient for project"""
