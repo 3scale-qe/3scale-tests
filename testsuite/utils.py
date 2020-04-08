@@ -44,9 +44,14 @@ def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
     nodename = request.node.name
     if nodename.startswith("test_"):  # is this always true?
         nodename = nodename[5:]
-    context = nodename.lower().translate(str.maketrans("", "", "aeiou"))[:9]
+
+    whoami = getpass.getuser()
+    context = nodename.lower().split("_")[0]
+    if len(context) > 2:
+        context = context[:2] + context[2:-1].translate(str.maketrans("", "", "aiyu")) + context[-1]
     suffix = secrets.token_urlsafe(tail).lower()
-    return f"{name}-{context}-{suffix}"
+
+    return f"{name[:8]}-{whoami[:8]}-{context[:9]}-{suffix}"
 
 
 def blame_desc(request: 'FixtureRequest', text: str = None):
