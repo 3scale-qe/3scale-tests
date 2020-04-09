@@ -2,6 +2,7 @@
 This is complication of examples how to use testsuite and write tests. As such
 this is not supposed to be executed and it isn't goal to have this executable
 """
+from testsuite.gateways import SelfManagedApicastOptions, SelfManagedApicast, TemplateApicastOptions, TemplateApicast
 from testsuite.gateways.gateways import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
@@ -105,3 +106,22 @@ def service(service):
     # proxy needs to be updated to apply added mapping
     proxy.update()
     return service
+
+
+###############################################################################
+# To explicitly specify gateway for tests override staging_gateway or production_gateway
+@pytest.fixture(scope="session")
+def staging_gateway(request, configuration):
+    # Here you specify the same configuration in dict form as in the settings.yaml
+    setting_block = {
+        "deployments": {  # DeploymentConfigs
+            "staging": "selfmanaged-staging",
+            "production": "selfmanaged-production"
+        }
+    }
+    options = TemplateApicastOptions(staging=True, settings_block=setting_block, configuration=configuration)
+    gateway = TemplateApicast(requirements=options)
+    gateway.create()
+
+    request.addfinalizer(gateway.destroy)
+    return gateway

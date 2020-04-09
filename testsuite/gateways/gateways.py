@@ -1,9 +1,28 @@
-"""Module containing all baasic gateways"""
+"""Module containing all basic gateways"""
 import enum
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, TYPE_CHECKING
 
 from threescale_api.resources import Service
+from testsuite.requirements import OpenshiftRequirement
+
+if TYPE_CHECKING:
+    # pylint: disable=cyclic-import
+    from testsuite.openshift.client import OpenShiftClient
+
+
+class GatewayRequirements(OpenshiftRequirement, ABC):
+    """Requirements for running gateways"""
+
+    @property
+    @abstractmethod
+    def staging(self) -> bool:
+        """Returns if the current gateway is staging or production"""
+
+    @property
+    @abstractmethod
+    def current_openshift(self) -> "OpenShiftClient":
+        """Returns currently configured openshift"""
 
 
 class Capability(enum.Enum):
@@ -18,11 +37,6 @@ class AbstractGateway(ABC):
     """Basic gateway for use with Apicast"""
 
     CAPABILITIES: List[Capability] = []
-
-    def __init__(self, staging: bool, configuration, openshift):
-        self.is_staging = staging
-        self.configuration = configuration
-        self.openshift = openshift
 
     @abstractmethod
     def get_service_settings(self, service_settings: Dict) -> Dict:

@@ -9,13 +9,11 @@ import threescale_api
 
 import urllib3
 
-import openshift as oc
 from dynaconf import settings
 from threescale_api import client
 import testsuite.gateways as gateways
 
-from testsuite import rawobj
-from testsuite.openshift.client import OpenShiftClient
+from testsuite import rawobj, CONFIGURATION
 from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
@@ -60,7 +58,7 @@ def pytest_runtest_setup(item):
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:
             for capability in mark.args:
-                if capability not in gateways.CAPABILITIES:
+                if capability not in gateways.capabilities:
                     pytest.skip(f"Skipping test because current gateway doesn't have capability {capability}")
 
 
@@ -70,17 +68,10 @@ def pytest_report_header(config):
 
     environment = settings["env_for_dynaconf"]
     openshift = settings["openshift"]["servers"]["default"]["server_url"]
-    try:
-        project = settings["openshift"]["projects"]["threescale"]["name"]
-    except KeyError:
-        project = f"{environment} (using env value)"
 
-    threescale = "{dynamic}"
-
-    try:
-        threescale = settings["threescale"]["admin"]["url"]
-    except KeyError:
-        pass
+    project = CONFIGURATION.project
+    threescale = CONFIGURATION.url
+    token = CONFIGURATION.token
 
     return [
         "",
@@ -88,6 +79,7 @@ def pytest_report_header(config):
         f"testsuite: openshift = {openshift}",
         f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
+        f"testsuite: threescale_token = {token}",
         ""]
 
 
@@ -99,29 +91,13 @@ def logger(request, pytestconfig):
 
 
 @pytest.fixture(scope="session")
-def openshift(testconfig):
+def openshift(configuration):
     "OpenShift client generator"
-    servers = testconfig["openshift"]["servers"]
-
-    def _client(server_name: str = "default", project_name: str = "threescale") -> OpenShiftClient:
-        if server_name not in servers:
-            raise AttributeError("Server %s is not defined in configuration" % server_name)
-        try:
-            project_name = testconfig["openshift"]["projects"][project_name]["name"]
-        except KeyError:
-            if project_name != "threescale":
-                raise AttributeError("Project %s is not defined in configuration" % project_name)
-            project_name = testconfig["env_for_dynaconf"]
-
-        server = servers[server_name]
-        return OpenShiftClient(project_name=project_name,
-                               server_url=server.get("server_url", None),
-                               token=server.get("token", None))
-    return _client
+    return configuration.openshift
 
 
 @pytest.fixture(scope="module")
-def prod_client(testconfig, production_gateway, application):
+def prod_client(production_gateway, application):
     """Prepares application and service for production use and creates new production client
 
     Parameters:
@@ -146,38 +122,22 @@ def prod_client(testconfig, production_gateway, application):
 
 
 @pytest.fixture(scope="session")
+def configuration():
+    "CommonConfiguration instance"
+    return CONFIGURATION
+
+
+@pytest.fixture(scope="session")
 def testconfig():
     "testsuite configuration"
     return settings
 
 
 @pytest.fixture(scope="session")
-def threescale(testconfig, openshift):
+def threescale(configuration, testconfig):
     "Threescale client"
-
-    oc_error = None
-
-    try:
-        try:
-            token = testconfig["threescale"]["admin"]["token"]
-        except KeyError:
-            token = openshift().secrets["system-seed"]["ADMIN_ACCESS_TOKEN"]
-
-        try:
-            url = testconfig["threescale"]["admin"]["url"]
-        except KeyError:
-            route = openshift().routes.for_service("system-provider")[0]
-            url = "https://" + route["spec"]["host"]
-    except oc.OpenShiftPythonException as err:
-        oc_error = err.result.as_dict()["actions"][0]["err"]
-
-    # This is needed because pytest tracks all the tracebacks back and prints them all.
-    # Raising this from except would print much much more.
-    if oc_error:
-        raise Exception(f"(From Openshift) {oc_error}")
-
     verify = testconfig["ssl_verify"]
-    return client.ThreeScaleClient(url, token, ssl_verify=verify)
+    return client.ThreeScaleClient(configuration.url, configuration.token, ssl_verify=verify)
 
 
 @pytest.fixture(scope="session")
@@ -194,10 +154,12 @@ def account(threescale, request, testconfig):
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request, testconfig, openshift):
+def staging_gateway(request, testconfig, configuration):
     """Staging gateway"""
-    configuration = testconfig["threescale"]["gateway"]["configuration"]
-    gateway = gateways.CLASSES["staging"](configuration=configuration, openshift=openshift, staging=True)
+    options = gateways.configuration.options(staging=True,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateways.configuration.staging(options)
     gateway.create()
 
     request.addfinalizer(gateway.destroy)
@@ -205,13 +167,15 @@ def staging_gateway(request, testconfig, openshift):
 
 
 @pytest.fixture(scope="session")
-def production_gateway(request, testconfig, openshift):
+def production_gateway(request, testconfig, configuration):
     """Production gateway"""
-    configuration = testconfig["threescale"]["gateway"]["configuration"]
-    gateway = gateways.CLASSES["production"]
+    gateway = gateways.configuration.production
     if gateway is None:
         raise NotImplementedError()
-    gateway = gateway(configuration=configuration, openshift=openshift, staging=False)
+    options = gateways.configuration.options(staging=False,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateway(options=options)
     gateway.create()
 
     request.addfinalizer(gateway.destroy)

@@ -1,37 +1,46 @@
 """
 Sets up gateway defined in testsuite settings
 """
+from typing import Tuple, Optional, Dict, Type, NamedTuple
+
 from dynaconf import settings
 from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
-from testsuite.gateways.containers import ContainerizedApicast
+from testsuite.gateways.apicast.containers import ContainerizedApicast
+from testsuite.gateways.gateways import AbstractGateway
+from testsuite.gateways.options import GatewayOptions, SystemApicastOptions, SelfManagedApicastOptions, \
+    OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions
 
-GATEWAYS = {
-    "apicast": (SystemApicast, SystemApicast),
-    "apicast-container": (ContainerizedApicast, None),
-    "apicast-selfmanaged": (SelfManagedApicast, None),
-    "apicast-operator": (OperatorApicast, None),
-    "apicast-template": (TemplateApicast, TemplateApicast),
-    "apicast-tls": (TLSApicast, TLSApicast),
+Gateway = Type[AbstractGateway]
+Options = Type[GatewayOptions]
+
+GATEWAYS: Dict[str, Tuple[Gateway, Optional[Gateway], Options]] = {
+    "apicast": (SystemApicast, SystemApicast, SystemApicastOptions),
+    "apicast-container": (ContainerizedApicast, None, SelfManagedApicastOptions),
+    "apicast-selfmanaged": (SelfManagedApicast, None, SelfManagedApicastOptions),
+    "apicast-operator": (OperatorApicast, None, OperatorApicastOptions),
+    "apicast-template": (TemplateApicast, TemplateApicast, TemplateApicastOptions),
+    "apicast-tls": (TLSApicast, TLSApicast, TLSApicastOptions)
 }
 
 
-def load_gateway():
+class GatewayConfiguration(NamedTuple):
+    """Current gateway configuration for use in testsuite, this class is mostly there because of typing"""
+    staging: Gateway
+    production: Optional[Gateway]
+    options: Options
+
+
+def load_gateway() -> GatewayConfiguration:
     """Gateway that is used to run tests"""
-    global CLASS  # pylint: disable=global-statement
     gateway = settings["threescale"]["gateway"]
 
     gateway_type = gateway["type"]
     if gateway_type not in GATEWAYS:
         raise ValueError(f"Gateway {gateway_type} is not supported")
 
-    staging_gateway, production_gateway = GATEWAYS[gateway_type]
-
-    return {
-        "staging": staging_gateway,
-        "production": production_gateway
-    }
+    return GatewayConfiguration(*GATEWAYS[gateway_type])
 
 
-CLASSES = load_gateway()
-CLASS = CLASSES["staging"]
-CAPABILITIES = CLASS.CAPABILITIES
+# For this specific use case, I like the lower case names better
+configuration = load_gateway()                      # pylint: disable=invalid-name
+capabilities = configuration.staging.CAPABILITIES   # pylint: disable=invalid-name

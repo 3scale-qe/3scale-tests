@@ -3,24 +3,18 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirements
 from testsuite.gateways.gateways import AbstractApicast
 
 
 class ContainerizedApicast(AbstractApicast):
     """
     Gateway intended for use with RHEL based Apicasts deployed in containerized environments
-    For the time being its is functionally the same as SelfManagedApicast
+    For the time being it has same requirements as SelfManagedApicast
     """
-    def __init__(self, staging: bool, configuration, openshift) -> None:
-        """
-        :param staging_endpoint: Staging endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-staging.localhost:8080
-        :param production_endpoint: Production endpoint URL template with with one parameter to insert the service name
-            e.g http://%s-production.localhost:8080
-        """
-        super().__init__(staging, configuration, openshift)
-        self.staging_endpoint = configuration["sandbox_endpoint"]
-        self.production_endpoint = configuration["production_endpoint"]
+    def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
+        self.staging_endpoint = requirements.staging_endpoint
+        self.production_endpoint = requirements.production_endpoint
 
     def get_service_settings(self, service_settings: Dict) -> Dict:
         service_settings.update({
