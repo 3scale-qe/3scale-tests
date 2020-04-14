@@ -36,46 +36,35 @@ class TLSApicast(TemplateApicast):
         self.https_port = 8443
 
     @property
-    def endpoint(self):
-        """Returns gateway endpoint."""
-        return self.staging_endpoint if self.staging else self.production_endpoint
-
-    @property
     def hostname(self):
         """Returns wildcard endpoint."""
         return urlparse(self.endpoint % "*").hostname
 
-    def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
+    def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
         entity_id = service.entity_id
-        proxy_settings.update({
-            "sandbox_endpoint": self.staging_endpoint % f"{entity_id}-staging",
-            "endpoint": self.production_endpoint % f"{entity_id}-production",
+        key = "sandbox_endpoint" if self.staging else "endpoint"
+        proxy_params.update({
+            key: self.endpoint % self._route_name(entity_id)
         })
-        return proxy_settings
+        return proxy_params
 
-    def register_service(self, service: Service):
+    def on_service_create(self, service: Service):
         service_id = service.entity_id
 
-        staging_name = f"{service_id}-staging"
-        prod_name = f"{service_id}-production"
-
-        staging_endpoint = urlparse(self.staging_endpoint % staging_name).hostname
-        production_endpoint = urlparse(self.production_endpoint % prod_name).hostname
+        name = self._route_name(service_id)
+        endpoint = urlparse(self.endpoint % name).hostname
 
         LOGGER.debug('Creating routes for service "%s"', self.service_name)
 
-        self.openshift.routes.create(staging_name, Routes.Types.PASSTHROUGH,
-                                     service=self.service_name, hostname=staging_endpoint)
-        self.openshift.routes.create(prod_name, Routes.Types.PASSTHROUGH,
-                                     service=self.service_name, hostname=production_endpoint)
+        self.openshift.routes.create(name, Routes.Types.PASSTHROUGH,
+                                     service=self.service_name, hostname=endpoint)
 
-    def unregister_service(self, service: Service):
+    def on_service_delete(self, service: Service):
         service_id = service.entity_id
 
         LOGGER.debug('Deleting routes for service "%s"', self.service_name)
 
-        del self.openshift.routes[f"{service_id}-staging"]
-        del self.openshift.routes[f"{service_id}-production"]
+        del self.openshift.routes[self._route_name(service_id)]
 
     @property
     def _csr_names(self):

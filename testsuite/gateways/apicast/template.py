@@ -87,18 +87,19 @@ class TemplateApicast(SelfManagedApicast):
 
             self.openshift.apply(self._get_configuration_url_secret_resource())
 
-    def register_service(self, service: Service):
-        entity_id = service.entity_id
-        staging_url = urlparse(self.staging_endpoint % entity_id)
-        prod_url = urlparse(self.production_endpoint % entity_id)
-        self.openshift.routes.expose(name=f"{entity_id}-staging",
-                                     service=self.service_name, hostname=staging_url.hostname)
-        self.openshift.routes.expose(name=f"{entity_id}-production",
-                                     service=self.service_name, hostname=prod_url.hostname)
+    def _route_name(self, entity_id):
+        if self.staging:
+            return f"{entity_id}-staging"
+        return f"{entity_id}-production"
 
-    def unregister_service(self, service: Service):
-        del self.openshift.routes[f"{service.entity_id}-staging"]
-        del self.openshift.routes[f"{service.entity_id}-production"]
+    def on_service_create(self, service: Service):
+        entity_id = service.entity_id
+        url = urlparse(self.endpoint % entity_id)
+        self.openshift.routes.expose(name=self._route_name(entity_id),
+                                     service=self.service_name, hostname=url.hostname)
+
+    def on_service_delete(self, service: Service):
+        del self.openshift.routes[self._route_name(service.entity_id)]
 
     def set_env(self, name: str, value):
         self.openshift.environ(self.deployment)[name] = value

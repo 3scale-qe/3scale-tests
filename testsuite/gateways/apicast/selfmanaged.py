@@ -35,30 +35,31 @@ class SelfManagedApicast(AbstractApicast):
     CAPABILITIES = [Capability.APICAST]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
-        self.staging_endpoint = requirements.staging_endpoint
-        self.production_endpoint = requirements.production_endpoint
-
-        if requirements.staging:
+        # self.staging_endpoint = requirements.staging_endpoint
+        # self.production_endpoint = requirements.production_endpoint
+        self.staging = requirements.staging
+        if self.staging:
             self.deployment = requirements.staging_deployment
+            self.endpoint = requirements.staging_endpoint
         else:
             self.deployment = requirements.production_deployment
-
+            self.endpoint = requirements.production_endpoint
         # Load openshift configuration
         self.openshift = requirements.current_openshift
 
-    def get_service_settings(self, service_settings: Dict) -> Dict:
-        service_settings.update({
+    def before_service(self, service_params: Dict) -> Dict:
+        service_params.update({
             "deployment_option": "self_managed"
         })
-        return service_settings
+        return service_params
 
-    def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
+    def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
         entity_id = service.entity_id
-        proxy_settings.update({
-            "sandbox_endpoint": self.staging_endpoint % entity_id,
-            "endpoint": self.production_endpoint % entity_id
+        key = "sandbox_endpoint" if self.staging else "endpoint"
+        proxy_params.update({
+            key: self.endpoint % entity_id
         })
-        return proxy_settings
+        return proxy_params
 
     def set_env(self, name: str, value):
         self.openshift.environ(self.deployment)[name] = value

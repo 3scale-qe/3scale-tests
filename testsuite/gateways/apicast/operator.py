@@ -24,21 +24,25 @@ class OperatorApicast(SelfManagedApicast):
     """Gateway for use with Apicast deployed by operator"""
     def __init__(self, requirements: OperatorApicastRequirements) -> None:
         super().__init__(requirements)
-        self.service_staging = requirements.staging_service
-        self.service_production = requirements.production_service
+        if requirements.staging:
+            self.service = requirements.staging_service
+        else:
+            self.service = requirements.production_service
 
-    def register_service(self, service: Service):
+    def _route_name(self, entity_id):
+        if self.staging:
+            return f"{entity_id}-staging"
+        return f"{entity_id}-production"
+
+    def on_service_create(self, service: Service):
         entity_id = service.entity_id
-        staging_url = urlparse(self.staging_endpoint % entity_id)
-        prod_url = urlparse(self.production_endpoint % entity_id)
-        self.openshift.routes.create(name=f"{entity_id}-staging",
-                                     service=self.service_staging, hostname=staging_url.hostname)
-        self.openshift.routes.create(name=f"{entity_id}-production",
-                                     service=self.service_production, hostname=prod_url.hostname)
+        url = urlparse(self.endpoint % entity_id)
+        name = self._route_name(entity_id)
+        self.openshift.routes.create(name=name,
+                                     service=self.service, hostname=url.hostname)
 
-    def unregister_service(self, service: Service):
-        del self.openshift.routes[f"{service.entity_id}-staging"]
-        del self.openshift.routes[f"{service.entity_id}-production"]
+    def on_service_delete(self, service: Service):
+        del self.openshift.routes[self._route_name(service.entity_id)]
 
     def set_env(self, name: str, value):
         raise NotImplementedError()

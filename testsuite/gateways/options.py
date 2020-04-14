@@ -99,7 +99,7 @@ class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequireme
     @property
     def production_endpoint(self) -> str:
         try:
-            return super().staging_endpoint
+            return super().production_endpoint
         except KeyError:
             wildcard_domain = self.current_openshift.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
             return f"http://%s-production.{wildcard_domain}"

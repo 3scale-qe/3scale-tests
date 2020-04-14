@@ -1,10 +1,10 @@
 """Module containing all basic gateways"""
 import enum
 from abc import ABC, abstractmethod
-from typing import Dict, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
-from threescale_api.resources import Service
 from testsuite.requirements import OpenshiftRequirement
+from testsuite.lifecycle_hook import LifecycleHook
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
@@ -33,26 +33,10 @@ class Capability(enum.Enum):
     SAME_CLUSTER = "internal-cluster"
 
 
-class AbstractGateway(ABC):
+class AbstractGateway(LifecycleHook, ABC):
     """Basic gateway for use with Apicast"""
 
     CAPABILITIES: List[Capability] = []
-
-    @abstractmethod
-    def get_service_settings(self, service_settings: Dict) -> Dict:
-        """Returns finalized settings for service"""
-
-    @abstractmethod
-    def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
-        """Returns parameters for proxy"""
-
-    @abstractmethod
-    def register_service(self, service: Service):
-        """Signals gateway that a new service was created"""
-
-    @abstractmethod
-    def unregister_service(self, service: Service):
-        """Signals gateway that the service was deleted"""
 
     @abstractmethod
     def create(self):
@@ -63,7 +47,7 @@ class AbstractGateway(ABC):
         """Destroys gateway"""
 
 
-class AbstractApicast(AbstractGateway):
+class AbstractApicast(AbstractGateway, ABC):
     """Interface defining basic functionality of an Apicast gateway"""
 
     CAPABILITIES = [Capability.APICAST]
@@ -79,12 +63,6 @@ class AbstractApicast(AbstractGateway):
     @abstractmethod
     def reload(self):
         """Reloads gateway"""
-
-    def register_service(self, service: Service):
-        pass
-
-    def unregister_service(self, service: Service):
-        pass
 
     def create(self):
         pass
