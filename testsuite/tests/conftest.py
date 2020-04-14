@@ -344,7 +344,7 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
     def _custom_service(params, proxy_params=None, backends=None, autoclean=True, hooks=None, annotate=True):
         params = params.copy()
         for hook in _select_hooks("before_service", hooks):
-            params, proxy_params = hook(params, proxy_params)
+            params = hook(params)
 
         if annotate:
             params["description"] = blame_desc(request, params.get("description"))
@@ -386,8 +386,16 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
         if backends:
             for path, backend in backends.items():
                 svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
-                svc.proxy.list().update()  # You have to update proxy.list() to promote product to Staging APIcast
+            proxy_params = {}
+            for hook in _select_hooks("before_proxy", hooks):
+                proxy_params = hook(svc, proxy_params)
+
+            # You have to update proxy.list() to promote product to Staging APIcast
+            svc.proxy.list().update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
         elif proxy_params:
+            for hook in _select_hooks("before_proxy", hooks):
+                proxy_params = hook(svc, proxy_params)
+
             svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
         staging_gateway.register_service(svc)
 
