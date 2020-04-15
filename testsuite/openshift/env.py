@@ -1,6 +1,5 @@
 """Module containing classes that manipulate deployment configs environment"""
 import re
-from contextlib import ExitStack
 import typing
 
 if typing.TYPE_CHECKING:
@@ -24,9 +23,9 @@ class EnvironmentVariable:
 
     def set(self, value: str):
         """Sets value for the environment variable"""
-        with ExitStack() as stack:
-            self.openshift.prepare_context(stack)
-            self.openshift.do_action("set", ["env", "dc", self.deployment, f"{self.name}={value}"])
+        self.openshift.do_action("set", ["env", "dc", self.deployment, f"{self.name}={value}"])
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(self.deployment)
 
     def delete(self):
         """Removes environment variable"""
