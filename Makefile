@@ -1,3 +1,5 @@
+TB=short
+
 .PHONY: commit-acceptance pylint flake8 mypy all-is-package \
 	pytest tests smoke junit \
 	pipenv pipenv-dev \
@@ -15,7 +17,14 @@ all-is-package:
 	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 pytest tests: pipenv
-	pipenv run python -m pytest $(flags) testsuite
+	pipenv run python -m pytest --tb=$(TB) $(flags) testsuite
+
+test: ## Run test
+test: pytest tests
+
+debug: ## Run test  with debug flags
+debug: flags := $(flags) -s
+debug: test
 
 smoke: pipenv
 	pipenv run python -m pytest -n 6 -m smoke $(flags) testsuite
@@ -38,9 +47,13 @@ pipenv: .make-pipenv-sync
 
 pipenv-dev: .make-pipenv-sync-dev
 
-container-image:
+container-image: ## Build container image
 	docker build -t 3scale-py-testsuite .
 
-clean:
+clean: ## clean pip deps
 	rm -f Pipfile.lock .make-*
 	-pipenv --rm
+
+# Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+help: ## Print this help
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
