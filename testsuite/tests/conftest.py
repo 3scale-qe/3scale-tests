@@ -28,13 +28,6 @@ def pytest_addoption(parser):
     """Add option to include disruptive tests in testrun"""
     parser.addoption(
         "--disruptive", action="store_true", default=False, help="Run also disruptive tests (default: False)")
-    parser.addoption("--log", default="WARNING", help="Set logging devel (DEBUG, INFO, WARNING, ...)")
-
-
-def pytest_configure(config):
-    """initial configuration"""
-
-    logging.basicConfig(level=config.getoption("--log"))
 
 
 def pytest_runtest_setup(item):
@@ -73,7 +66,7 @@ def pytest_report_header(config):
 
 
 @pytest.fixture(scope="module")
-def logger(request, pytestconfig):
+def logger(request):
     """Preconfigured python logger for fixtures and tests"""
 
     return logging.getLogger(request.node.name)
