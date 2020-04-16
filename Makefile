@@ -1,10 +1,13 @@
-TB=short
-
 .PHONY: commit-acceptance pylint flake8 mypy all-is-package \
-	pytest tests smoke junit \
+	test pytest tests smoke junit \
 	pipenv pipenv-dev \
 	container-image \
 	clean
+
+TB ?= short
+LOGLEVEL ?= INFO
+
+PYTEST = pipenv run python -m pytest --tb=$(TB) --log-level=$(LOGLEVEL)
 
 commit-acceptance: pylint flake8 mypy all-is-package
 
@@ -16,21 +19,19 @@ all-is-package:
 	@echo "Searching for dirs missing __init__.py"
 	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
-pytest tests: pipenv
-	pipenv run python -m pytest --tb=$(TB) $(flags) testsuite
-
 test: ## Run test
-test: pytest tests
+test pytest tests: pipenv
+	$(PYTEST) $(flags) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
 debug: test
 
 smoke: pipenv
-	pipenv run python -m pytest -n 6 -m smoke $(flags) testsuite
+	$(PYTEST) -n6 -msmoke $(flags) testsuite
 
 junit: pipenv
-	pipenv run python -m pytest --junitxml=junit.xml $(flags) testsuite
+	$(PYTEST) --junitxml=junit.xml $(flags) testsuite
 
 Pipfile.lock: Pipfile
 	pipenv lock
