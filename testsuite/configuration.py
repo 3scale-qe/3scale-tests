@@ -11,8 +11,6 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
     """Class containing configuration of a testsuite which can be passed to other libraries"""
 
     def __init__(self) -> None:
-        self._servers = settings["openshift"]["servers"]
-        self._projects = settings["openshift"]["projects"]
         self._token = None
         self._url = None
         self._project = None
@@ -102,16 +100,19 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
 
     def openshift(self, server="default", project="threescale") -> OpenShiftClient:
         """Creates OpenShiftClient for project"""
-        if server not in self._servers:
-            raise AttributeError("Server %s is not defined in configuration" % server)
+
         try:
-            project_name = self._projects[project]["name"]
+            project_name = settings["openshift"]["projects"][project]["name"]
         except KeyError:
             if project != "threescale":
                 raise AttributeError("Project %s is not defined in configuration" % project)
             project_name = self.project
 
-        server = self._servers[server]
+        try:
+            server = settings["openshift"]["servers"][server]
+        except KeyError:
+            raise AttributeError("Server %s is not defined in configuration" % server)
+
         return OpenShiftClient(project_name=project_name,
                                server_url=server.get("server_url", None),
                                token=server.get("token", None))
