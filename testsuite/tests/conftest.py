@@ -1,7 +1,6 @@
 "top-level conftest"
 
 import logging
-import os
 import time
 
 import pytest
@@ -19,16 +18,6 @@ from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_ma
 
 if settings["ignore_insecure_ssl_warning"]:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-if settings["ssl_verify"] and "REQUESTS_CA_BUNDLE" not in os.environ:
-    for ca_bundle in (
-            "/etc/pki/tls/certs/ca-bundle.crt",
-            "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
-            "/etc/ssl/certs/ca-certificates.crt"):
-        if os.path.exists(ca_bundle):
-            os.environ["REQUESTS_CA_BUNDLE"] = ca_bundle
-            break
-
 
 # Monkey-patch for HTTP/2, needs to be fixed with  plugable api_client for application
 if settings["http2"]:
