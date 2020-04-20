@@ -54,3 +54,5 @@ development:
         server_url: "{DEVELOPMENT_OPENSHIFT_URL}"
   redis:
     url: redis://apicast-testing-redis:6379/1
+  prometheus:
+    url: "{PROMETHEUS_URL}"
