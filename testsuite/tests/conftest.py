@@ -126,7 +126,8 @@ def threescale(configuration, testconfig):
 def account(threescale, request, testconfig):
     "Preconfigured account existing over whole testing session"
     name = blame(request, "id")
-    account = dict(name=name, username=name, org_name=name)
+    account = dict(name=name, username=name, org_name=name,
+                   email=f"{name}@anything.invalid")
     account = threescale.accounts.create(params=account)
 
     if not testconfig["skip_cleanup"]:
