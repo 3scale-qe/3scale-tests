@@ -122,3 +122,20 @@ class ConfigMaps(RemoteMapping):
 
     def __getitem__(self, name):
         return super().__getitem__(name)["data"]
+
+    def __setitem__(self, name, value):
+        raise NotImplementedError()
+
+    def add(self, name, literals: typing.Dict[str, str] = None):
+        """Add new ConfigMap.
+
+        Args:
+            :param name: ConfigMap name.
+            :param literals: Speficy a key and literal value to insert in config map.
+        """
+        cmd_args = []
+
+        if literals:
+            cmd_args.extend([f"--from-literal={n}={v}" for n, v in literals.items()])
+
+        self.do_action("create", [self._resource_name, name, *cmd_args])

@@ -222,16 +222,17 @@ class OpenShiftClient:
         self.do_action("new-app", [source, opt_args])
 
     def add_volume(self, deployment_name: str, volume_name: str, mount_path: str,
-                   secret_name: str = None):
+                   secret_name: str = None, configmap_name: str = None):
         """Add volume to a given deployment.
 
         Args:
             :param deployment_name: The deployment name
             :param volume_name: The volume name
             :param mount_path: The path to be mounted
-            :param secret_name: The name of an existing secret
+            :param secret_name: The name of an existing Secret
+            :param configmap_name: The name of an existing ConfigMap
         """
-        self._manage_volume("add", deployment_name, volume_name, mount_path, secret_name)
+        self._manage_volume("add", deployment_name, volume_name, mount_path, secret_name, configmap_name)
 
     def remove_volume(self, deployment_name: str, volume_name: str):
         """Remove volume from a given deployment.
@@ -244,7 +245,8 @@ class OpenShiftClient:
 
     # pylint: disable=too-many-arguments
     def _manage_volume(self, action: str, deployment_name: str, volume_name: str,
-                       mount_path: str = None, secret_name: str = None):
+                       mount_path: str = None, secret_name: str = None,
+                       configmap_name: str = None):
         """Manage volumes for a given deployment.
 
         You can add or remove a volume by passing `add` or `remove` to :param action.
@@ -254,14 +256,21 @@ class OpenShiftClient:
             :param deployment_name: The deployment name
             :param volume_name: The volume name
             :param mount_path: The path to be mounted
-            :param secret_name: The name of an existing secret
+            :param secret_name: The name of an existing Secret
+            :param configmap_name: The name of an existing ConfigMap
         """
+        if secret_name and configmap_name:
+            raise ValueError("You must use either Secret or ConfigMap, not both.")
+
         opt_args = ["--name", volume_name]
         if mount_path:
             opt_args.extend([f"--mount-path", mount_path])
 
         if secret_name:
             opt_args.extend([f"--secret-name", secret_name])
+
+        if configmap_name:
+            opt_args.extend([f"--configmap-name", configmap_name])
 
         self.do_action("set", ["volume", f"dc/{deployment_name}", f"--{action}", opt_args])
         self._wait_for_deployment(deployment_name)
