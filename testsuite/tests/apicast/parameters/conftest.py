@@ -4,7 +4,7 @@ import pytest
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 
 
-@pytest.yield_fixture(scope="module")
+@pytest.fixture(scope="module")
 def staging_gateway(configuration):
     """Deploy template apicast gateway."""
     settings_block = {
