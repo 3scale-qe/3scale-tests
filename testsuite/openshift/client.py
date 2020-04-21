@@ -123,6 +123,30 @@ class OpenShiftClient:
         if replicas > 0:
             self._wait_for_deployment(deployment_name)
 
+    def rsync(self, deployment_name: str, source: str, dest: str):
+        """Copy files from remote pod container to local.
+
+        First container in the pod from the specified deployment will be used.
+
+        Note: For the time being, rsync is only available from remote to local.
+
+        Args:
+            :param deployment_name: DeploymentConfig name
+            :param source: Remote file-path.
+            :param dest: Local dir where the file will be copied to.
+        """
+        if not os.path.isdir(dest):
+            raise ValueError("You must provide a valid local directory to 'dest'.")
+
+        def select_pod(apiobject):
+            annotation = "openshift.io/deployment-config.latest-version"
+            lastest_version = apiobject.get_annotation(annotation)
+            return apiobject.get_label("deployment") == f"{deployment_name}-{lastest_version}"
+
+        pod = oc.selector("pods").narrow(select_pod).object().name()
+
+        self.do_action("rsync", [f"{pod}:{source}", dest])
+
     # pylint: disable=no-self-use
     def get_replicas(self, deployment_name: str):
         """
