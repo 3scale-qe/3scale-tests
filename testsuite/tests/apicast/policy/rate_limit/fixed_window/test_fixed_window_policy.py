@@ -26,11 +26,7 @@ from testsuite.gateways.gateways import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import blame
 
-
-@fixture_plus
-def service_plus(service_proxy_settings, custom_service, request):
-    """Service configured with config"""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
+from ..conftest import service_plus
 
 
 @fixture_plus
@@ -49,13 +45,6 @@ def config(service, scope, case_data, service_plus, service_plus2):
     service_plus.proxy.list().policies.append(policy_config)
     service_plus2.proxy.list().policies.append(policy_config)
     return status_code, service
-
-
-@fixture_plus
-def application(service_plus, custom_app_plan, custom_application, request):
-    """First application bound to the account and service_plus"""
-    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_plus)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
 @fixture_plus
