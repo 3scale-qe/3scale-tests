@@ -1,0 +1,59 @@
+---
+subject_templates:
+  "<test_account> from <test_group> signed up":
+      Headers: '{"unique_args":{"event_name":"Accounts::AccountCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","accounts/account_created_event"\]}'
+      Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
+      7bitDear <username>,<test_account> from <test_group> has signed-up for: .+New
+      user details:  Username: <test_account>  Email: <test_account>@<account_email_domain>New
+      account details:  Organization/Group Name: <test_group>  To view new signup
+      in your 3scale Admin Portal, follow this link: https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+You
+      are receiving this because you subscribed to this notification.View notification
+      preferences on https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences----==_mimepart_.+Content-Type:
+      text/html; charset=UTF-8Content-Transfer-Encoding: quoted-printable<!DOCTYPE
+      html><html lang=3D"en"><head><meta charset=3D"utf-8" /></head><body style=3D"font-family:
+      &#39;Lucida Grande&#39;, verdana, sans-serif;"><p>Dear <username>,</p><p><test_account>
+      from <test_group> has signed-up for: .+</p><p><b>New user details:</b></p><ul><li><b>Username:</b>
+      <test_account></li><li><b>Email:</b> <test_account>@<account_email_domain></li></ul><p><b>New
+      account details:</b></p><ul><li><b>Organization/Group Name:</b> <test_group></li></ul><p><a
+      href=3D"https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+">View
+      new signup in your 3scale Admin Portal</a></p><p>=E2=80=94<br />You are receiving
+      this because you subscribed to this notification.<br />View notification preferences
+      on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>
+      </p></body></html>----==_mimepart_(?!-).*--'
+  API signup created on <service>:
+      Headers: '{"unique_args":{"event_name":"Applications::ApplicationCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","applications/application_created_event"\]}'
+      Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
+      7bitDear <username>,A new application subscribed to the <aplan> plan on the
+      <service> service of the <test_group> account.Application details:  Name:
+      API signup  Description: API signupTo view application, follow this link: https://3scale-admin.<threescale_superdomain>/apiconfig/services/[0-9]+/applications/[0-9]+You
+      are receiving this because you subscribed to this notification.View notification
+      preferences on https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences----==_mimepart_.+Content-Type:
+      text/html; charset=UTF-8Content-Transfer-Encoding: quoted-printable<!DOCTYPE
+      html><html lang=3D"en"><head><meta charset=3D"utf-8" /></head><body style=3D"font-family:
+      &#39;Lucida Grande&#39;, verdana, sans-serif;"><p>Dear <username>,</p><p>A new
+      application subscribed to the <aplan> plan on the <service> service
+      of the <test_group> account.</p><p><b>Application details:</b></p><ul><li><b>Name:</b>
+      API signup</li><li><b>Description:</b> API signup</li></ul><p><a href=3D"https://3scale-admin.<threescale_superdomain>/apiconfig/services/[0-9]+/applications/[0-9]+">View
+      new application in your 3scale Admin Portal</a></p><p>=E2=80=94<br />You
+      are receiving this because you subscribed to this notification.<br />View notification
+      preferences on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>
+      </p></body></html>----==_mimepart_(?!-).*--'
+  "<test_group> has subscribed to your service <service>":
+      Headers: '{"unique_args":{"event_name":"ServiceContracts::ServiceContractCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","service_contracts/service_contract_created_event"\]}'
+      Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
+      7bitDear <username>,<test_group> has been subscribed to plan Default on your
+      service <service>.To view account, follow this link: https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+You
+      are receiving this because you subscribed to this notification.View notification
+      preferences on https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences----==_mimepart_.+Content-Type:
+      text/html; charset=UTF-8Content-Transfer-Encoding: quoted-printable<!DOCTYPE
+      html><html lang=3D"en"><head><meta charset=3D"utf-8" /></head><body style=3D"font-family:
+      &#39;Lucida Grande&#39;, verdana, sans-serif;"><p>Dear <username>,</p><p><test_group>
+      has been subscribed to plan Default on your service <service>.</p><p></p><p><a
+      href=3D"https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+">View
+      account</a></p><p>=E2=80=94<br />You are receiving this because you subscribed
+      to this notification.<br />View notification preferences on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>
+      </p></body></html>----==_mimepart_(?!-).*--'
+equal_templates:
+      To: '<username>@<tenant>.<threescale_superdomain>'
+      From: '"<threescale_superdomain> Notification" <no-reply@<threescale_superdomain>>'
+      Return-Path: "<no-reply@<threescale_superdomain>>"
