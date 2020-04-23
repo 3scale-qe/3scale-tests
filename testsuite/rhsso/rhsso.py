@@ -17,17 +17,20 @@ class OIDCClientAuthHook:
         self.rhsso_service_info = rhsso_service_info
         self.credentials_location = credentials_location
 
-    def before_service(self, service_params, proxy_params):
-        """Set service auth mode to OIDC, configure proxy accordingly"""
-
+    # pylint: disable=no-self-use
+    def before_service(self, service_params: dict) -> dict:
+        """Update service params"""
         service_params.update(backend_version=Service.AUTH_OIDC)
+        return service_params
 
+    # pylint: disable=unused-argument
+    def before_proxy(self, service: Service, proxy_params: dict):
+        """Update proxy params"""
         proxy_params.update(
             credentials_location="authorization",
             oidc_issuer_endpoint=self.rhsso_service_info.authorization_url(),
             oidc_issuer_type="keycloak")
-
-        return service_params, proxy_params
+        return proxy_params
 
     # pylint: disable=no-self-use
     def on_service_create(self, service):

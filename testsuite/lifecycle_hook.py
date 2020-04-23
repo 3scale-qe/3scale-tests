@@ -18,7 +18,7 @@ class LifecycleHook(abc.ABC):
     This class exists mainly for documentation purposes. Anyway it can be
     sub-classed with desired methods/hooks overwritten"""
 
-    def before_service(self, service_params: dict, proxy_params: dict) -> tuple:
+    def before_service(self, service_params: dict) -> dict:
         """Called before service is created
 
         This is allowed to modify passed service_params and proxy_params and
@@ -30,9 +30,22 @@ class LifecycleHook(abc.ABC):
             :param proxy_params: Params dict used to setup/update proxy after service creation
 
         Returns:
-            :returns: Tuple of (service_params, proxy_params)"""
+            :returns: service_params"""
 
-        return (service_params, proxy_params)
+        return service_params
+
+    # pylint: disable=unused-argument
+    def before_proxy(self, service: Service, proxy_params: dict):
+        """Called after the service is created to update its proxy configuration
+
+        Allows to modify proxy parameters that will be used in said service proxy after it has been created.
+        Args:
+            :param service: Service whose proxy is being updated
+            :param proxy_params: Params dict used to setup/update proxy after service creation
+
+        Returns:
+            :returns: proxy_params"""
+        return proxy_params
 
     def on_service_create(self, service: Service):
         """Called right after service creation.
