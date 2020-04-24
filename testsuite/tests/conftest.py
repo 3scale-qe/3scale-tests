@@ -154,7 +154,7 @@ def production_gateway(request, testconfig, configuration):
     """Production gateway"""
     gateway = gateways.configuration.production
     if gateway is None:
-        raise NotImplementedError()
+        return None
     options = gateways.configuration.options(staging=False,
                                              settings_block=testconfig["threescale"]["gateway"]["configuration"],
                                              configuration=configuration)
@@ -220,13 +220,13 @@ def service_settings(request):
 
 
 @pytest.fixture(scope="module")
-def lifecycle_hooks():
+def lifecycle_hooks(staging_gateway, production_gateway):
     """List of objects with hooks into app/svc creation and deletion
 
     Hooks should implement methods defined and documented in testsuite.lifecycle_hook.LifecycleHook
     or should inherit from that class"""
 
-    return []
+    return [staging_gateway, production_gateway]
 
 
 @pytest.fixture(scope="module")
@@ -350,7 +350,7 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
         if annotate:
             params["description"] = blame_desc(request, params.get("description"))
 
-        svc = threescale.services.create(params=staging_gateway.get_service_settings(params))
+        svc = threescale.services.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
             def finalizer():
@@ -392,13 +392,12 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
                 proxy_params = hook(svc, proxy_params)
 
             # You have to update proxy.list() to promote product to Staging APIcast
-            svc.proxy.list().update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
+            svc.proxy.list().update(params=proxy_params)
         elif proxy_params:
             for hook in _select_hooks("before_proxy", hooks):
                 proxy_params = hook(svc, proxy_params)
 
-            svc.proxy.update(params=staging_gateway.get_proxy_settings(svc, proxy_params))
-        staging_gateway.register_service(svc)
+            svc.proxy.update(params=proxy_params)
 
         for hook in _select_hooks("on_service_create", hooks):
             hook(svc)

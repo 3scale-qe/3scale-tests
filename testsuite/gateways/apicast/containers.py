@@ -16,19 +16,19 @@ class ContainerizedApicast(AbstractApicast):
         self.staging_endpoint = requirements.staging_endpoint
         self.production_endpoint = requirements.production_endpoint
 
-    def get_service_settings(self, service_settings: Dict) -> Dict:
-        service_settings.update({
+    def before_service(self, service_params: Dict) -> Dict:
+        service_params.update({
             "deployment_option": "self_managed"
         })
-        return service_settings
+        return service_params
 
-    def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
-        name = service["system_name"]
-        proxy_settings.update({
+    def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
+        name = service.entity_id
+        proxy_params.update({
             "sandbox_endpoint": self.staging_endpoint % name,
             "endpoint": self.production_endpoint % name
         })
-        return proxy_settings
+        return proxy_params
 
     def set_env(self, name: str, value):
         raise NotImplementedError()

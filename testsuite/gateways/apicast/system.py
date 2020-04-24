@@ -1,8 +1,6 @@
 """System Apicast that comes deployed with 3scale"""
 from abc import ABC, abstractmethod
-from typing import Dict, TYPE_CHECKING
-
-from threescale_api.resources import Service
+from typing import TYPE_CHECKING
 
 from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
 
@@ -38,12 +36,6 @@ class SystemApicast(AbstractApicast):
         else:
             self.deployment_name = requirements.production_deployment
         self.openshift: "OpenShiftClient" = requirements.current_openshift
-
-    def get_service_settings(self, service_settings: Dict) -> Dict:
-        return service_settings
-
-    def get_proxy_settings(self, service: Service, proxy_settings: Dict) -> Dict:
-        return proxy_settings
 
     def set_env(self, name: str, value):
         self.openshift.environ(self.deployment_name)[name] = value
