@@ -158,7 +158,7 @@ def production_gateway(request, testconfig, configuration):
     options = gateways.configuration.options(staging=False,
                                              settings_block=testconfig["threescale"]["gateway"]["configuration"],
                                              configuration=configuration)
-    gateway = gateway(options=options)
+    gateway = gateway(options)
     gateway.create()
 
     request.addfinalizer(gateway.destroy)
