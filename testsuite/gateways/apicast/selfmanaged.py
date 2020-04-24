@@ -32,7 +32,7 @@ class SelfManagedApicastRequirements(GatewayRequirements, ABC):
 class SelfManagedApicast(AbstractApicast):
     """Gateway for use with already deployed self-managed Apicast without ability to edit it"""
 
-    CAPABILITIES = [Capability.APICAST]
+    CAPABILITIES = [Capability.APICAST, Capability.CUSTOM_ENVIRONMENT]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         # self.staging_endpoint = requirements.staging_endpoint

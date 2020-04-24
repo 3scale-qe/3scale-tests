@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 class TemplateApicastRequirements(SelfManagedApicastRequirements,
                                   ThreeScaleAuthDetails,
-                                  ABC,):
+                                  ABC):
     """Requirements for TemplateApicast"""
     @property
     @abstractmethod
