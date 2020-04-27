@@ -11,7 +11,6 @@ ipdb = "*"
 
 [packages]
 pytest-xdist = "*"
-openshift = {editable = true, git = "https://github.com/michaeltcoelho/openshift-client-python.git", ref = "add-setup"}
 pytest = "*"
 pytest-cases = "*"
 requests = "*"
@@ -27,6 +26,7 @@ hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
 # 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
+openshift-client = "*"
 
 [requires]
 python_version = "3"
