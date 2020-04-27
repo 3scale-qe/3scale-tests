@@ -264,13 +264,13 @@ class OpenShiftClient:
 
         opt_args = ["--name", volume_name]
         if mount_path:
-            opt_args.extend([f"--mount-path", mount_path])
+            opt_args.extend(["--mount-path", mount_path])
 
         if secret_name:
-            opt_args.extend([f"--secret-name", secret_name])
+            opt_args.extend(["--secret-name", secret_name])
 
         if configmap_name:
-            opt_args.extend([f"--configmap-name", configmap_name])
+            opt_args.extend(["--configmap-name", configmap_name])
 
         self.do_action("set", ["volume", f"dc/{deployment_name}", f"--{action}", opt_args])
         self._wait_for_deployment(deployment_name)
