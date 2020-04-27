@@ -29,7 +29,7 @@ class MailhogClient:
         full_url = self._url + "/" + endpoint
         response = requests.request(method=method, url=full_url,
                                     params=params, verify=False)
-        assert response.status_code == 200, f'The request to mailhog failed'
+        assert response.status_code == 200, 'The request to mailhog failed'
         return response
 
     def messages(self, start: int = 0, limit: int = 25):
