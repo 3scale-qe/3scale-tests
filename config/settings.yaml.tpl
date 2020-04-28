@@ -56,3 +56,14 @@ development:
     url: redis://apicast-testing-redis:6379/1
   prometheus:
     url: "{PROMETHEUS_URL}"
+  toolbox:
+    # rpm/gem/podman; rpm = command from rpm package, gem = command from gem
+    # 'ruby_version' should be defined for "gem" option
+    # 'podman_image' should be defined for "podman" option
+    # 'podman_cert_dir' should be defined for "podman" option
+    # cmd: "rpm"
+    # cmd: "gem"
+    # ruby_version: "rh-ruby24"
+    cmd: "podman"
+    podman_cert_dir: "/var/data"
+    podman_cert_name: "ca-bundle.crt"
