@@ -7,6 +7,15 @@
 TB ?= short
 LOGLEVEL ?= INFO
 
+# This is here for compatibility with osde2e workflow (reference?)
+# It's a bit poisonous, firstly and most importantly NAMESPACE is too much
+# generic variable name. Secondly this substitution is implemented here
+# in Makefile and not in the testsuite.
+ifdef NAMESPACE
+_3SCALE_TESTS_OPENSHIFT__projects__threescale__name ?= $(NAMESPACE)
+export _3SCALE_TESTS_OPENSHIFT__projects__threescale__name
+endif
+
 PYTEST = pipenv run python -m pytest --tb=$(TB) --log-level=$(LOGLEVEL)
 
 commit-acceptance: pylint flake8 mypy all-is-package
