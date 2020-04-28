@@ -97,8 +97,10 @@ def prod_client(production_gateway, application):
         api_client (HttpClient): Api client for application
 
     """
-    def _prod_client(app=application, promote: bool = True, version: int = 1, redeploy: bool = True):
+    def _prod_client(app=application, promote: bool = True, version: int = -1, redeploy: bool = True):
         if promote:
+            if version == -1:
+                version = app.service.proxy.list().configs.latest()['version']
             app.service.proxy.list().promote(version=version)
         if redeploy:
             production_gateway.reload()
