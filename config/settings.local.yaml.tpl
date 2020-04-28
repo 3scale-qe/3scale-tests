@@ -25,3 +25,10 @@ ${ENVIRONMENT}:
     projects:
       threescale:
         name: "${OPENSHIFT_THREESCALE_PROJECT}"
+  toolbox:
+    destination_endpoint: "" # url to 3scale api
+    destination_provider_key: "" # token
+    machine_ip: "" # where the container is
+    ssh_user: "" # user at the machine where the container is
+    ssh_passwd: "" # password for above user
+    podman_image: "" # container image ID

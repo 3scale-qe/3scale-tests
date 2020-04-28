@@ -24,3 +24,7 @@ default:
       password: testUser
   redis:
     url: redis://apicast-testing-redis:6379/1
+  toolbox:
+    cmd: "podman"
+    podman_cert_dir: "/var/data"
+    podman_cert_name: "ca-bundle.crt"
