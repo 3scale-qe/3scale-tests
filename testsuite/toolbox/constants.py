@@ -2,8 +2,10 @@
 
 from dynaconf import settings
 
-THREESCALE_SRC1 = settings['threescale']['admin']['url'].\
-        replace('//', f"//{settings['threescale']['admin']['token']}@")
+import testsuite
+
+THREESCALE_SRC1 = testsuite.CONFIGURATION.url.\
+        replace('//', f"//{testsuite.CONFIGURATION.token}@")
 
 THREESCALE_DST1 = settings['toolbox']['destination_endpoint'].\
     replace('//', f"//{settings['toolbox']['destination_provider_key']}@")
