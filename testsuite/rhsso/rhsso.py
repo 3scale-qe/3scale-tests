@@ -90,6 +90,12 @@ class RHSSOUser:
         self.username = username
         self.password = password
 
+    def logout(self):
+        """
+        Logs the user out
+        """
+        self.user.logout()
+
 
 class RHSSOServiceConfiguration:
     """
