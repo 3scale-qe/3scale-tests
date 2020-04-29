@@ -5,13 +5,14 @@ import pytest
 
 from dynaconf import settings
 
+import testsuite
 import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 
 
 EMPTY_LIST = 'Empty remote list.\n'
 
-SRC1_STR = f"^source {settings['threescale']['admin']['url']} {settings['threescale']['admin']['token']}$"
+SRC1_STR = f"^source {testsuite.CONFIGURATION.url} {testsuite.CONFIGURATION.token}$"
 REGEXP_SRC1 = re.compile(SRC1_STR)
 REGEXP_DST1 = re.compile(f"^destination {settings['toolbox']['destination_endpoint']} {settings['toolbox']['destination_provider_key']}$")  # noqa: E501 # pylint: disable=line-too-long
 
