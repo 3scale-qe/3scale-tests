@@ -28,6 +28,8 @@ hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref
 cfssl = "==0.0.3b243"
 openshift-client = "*"
 paramiko = "*"
+docker = "*"
+podman = "*"
 
 [requires]
 python_version = "3"

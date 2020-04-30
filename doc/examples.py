@@ -137,3 +137,70 @@ def test_skip_apicast_retrying_on_404(application):
     client = application.api_client(session=session)
 
     assert client.get("/status/404").status_code == 404
+
+
+################################################################################
+# Example usage of DockerRuntime
+def example_docker():
+    from testsuite.containers.docker_runtime import DockerRuntime
+    from testsuite.containers.container_runtime import ContainerConfig
+    from contextlib import closing
+
+    with closing(DockerRuntime("tcp://10.0.145.159:2376")) as d:
+        cc = ContainerConfig("mysql", "latest", {"MYSQL_ROOT_PASSWORD": "root"}, {"3306": "33767"}, cmd=["ls", "-la"])
+        cc.attach_volume("/root/dkr", "/mnt")
+        c = d.run(cc)
+        print(d.logs(c))
+
+        # d.stop(c)
+        d.delete_container(c)
+
+
+###############################################################################
+# Example usage of PodmanRuntime
+def example_podman():
+    from testsuite.containers.podman_runtime import PodmanRuntime
+    from testsuite.containers.container_runtime import ContainerConfig
+    from contextlib import closing
+
+    with closing(PodmanRuntime("ssh://root@10.0.145.150/run/podman/io.podman")) as d:
+        cc = ContainerConfig("mysql", "latest", {"MYSQL_ROOT_PASSWORD": "root"}, {"3306": "33075"}, cmd=["ls"])
+        cc.attach_volume("/root/blah", "/mnt")
+        c = d.run(cc)
+        print(d.logs(c))
+        # d.stop(c)
+        d.delete_container(c)
+
+
+###############################################################################
+# Example usage of DockerRuntime
+def example_docker_no_cm():
+    from testsuite.containers.docker_runtime import DockerRuntime
+    from testsuite.containers.container_runtime import ContainerConfig
+
+    d = DockerRuntime("tcp://10.0.145.159:2376")
+    cc = ContainerConfig("mysql", "latest", {"MYSQL_ROOT_PASSWORD": "root"}, {"3306": "33767"}, cmd=["ls", "-la"])
+    cc.attach_volume("/root/dkr", "/mnt")
+    c = d.run(cc)
+    print(d.logs(c))
+
+    # d.stop(c)
+    d.delete_container(c)
+    d.close()
+
+
+###############################################################################
+# Example usage of PodmanRuntime
+def example_podman_no_cm():
+    from testsuite.containers.podman_runtime import PodmanRuntime
+    from testsuite.containers.container_runtime import ContainerConfig
+
+    d = PodmanRuntime("ssh://root@10.0.145.150/run/podman/io.podman")
+    cc = ContainerConfig("mysql", "latest", {"MYSQL_ROOT_PASSWORD": "root"}, {"3306": "33076"}, cmd=["ls"])
+    cc.attach_volume("/root/blah", "/mnt")
+    c = d.run(cc)
+    print(d.logs(c))
+    # d.stop(c)
+    d.delete_container(c)
+
+    d.close()
