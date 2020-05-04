@@ -1,11 +1,15 @@
 """
 Utility resources for RHSSO manipulation
 """
+
+import backoff
+
 from keycloak.admin.clients import Client
 from keycloak.admin.realm import Realm
 from keycloak.admin.users import User
 from keycloak.openid_connect import KeycloakOpenidConnect
 from keycloak.realm import KeycloakRealm
+from keycloak.exceptions import KeycloakClientError
 
 from threescale_api.resources import Service
 
@@ -67,6 +71,7 @@ class RHSSO:
         keycloak_realm = KeycloakRealm(server_url=self.server_url, realm_name=realm.realm)
         return KeycloakOpenidConnect(realm=keycloak_realm, client_id=client_id, client_secret=secret)
 
+    @backoff.on_exception(backoff.fibo, KeycloakClientError, max_tries=8)
     # pylint: disable=too-many-arguments
     def password_authorize(self, realm, client_id, secret, username, password):
         """Returns token retrived by password authentication"""
