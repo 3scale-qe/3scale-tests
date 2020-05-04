@@ -21,7 +21,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 def second_application(custom_application, custom_app_plan, service, lifecycle_hooks, request):
     "Create a second application"
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "CustAPlan")), service)
-    app = custom_application(rawobj.Application(blame(request, "CustApp-test"), plan), lifecycle_hooks)
+    app = custom_application(rawobj.Application(blame(request, "CustApp-test"), plan), hooks=lifecycle_hooks)
     return app
 
 
