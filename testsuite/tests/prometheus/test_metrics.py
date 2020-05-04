@@ -4,6 +4,10 @@ Test metrics provided by apicast to Prometheus.
 """
 import pytest
 
+
+pytestmark = pytest.mark.flaky
+
+
 METRICS = [
     "nginx_error_log", "nginx_http_connections",
     "nginx_metric_errors_total", "openresty_shdict_capacity",
