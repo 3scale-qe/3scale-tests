@@ -17,6 +17,7 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         self._certificate = None
         self._store = None
         self._manager = None
+        self._superdomain = None
 
     @property
     def project(self):
@@ -65,6 +66,13 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         if not self._manager:
             self._manager = CertificateManager(self.certificate, self.certificate_store)
         return self._manager
+
+    @property
+    def superdomain(self):
+        """ThreeScale superdomain"""
+        if not self._superdomain:
+            self._superdomain = self.openshift().config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
+        return self._superdomain
 
     @staticmethod
     def _load_project():

@@ -28,15 +28,13 @@ def account(account):
 
 
 @pytest.fixture
-def mail_template(openshift, account) -> dict:
+def mail_template(account, configuration) -> dict:
     """loads the mail templates and substitutes the variables"""
-    openshift = openshift()
     with open("mail_templates.yml") as stream:
         yaml_string = stream.read()
         yaml_string = yaml_string.replace("<test_account>", account.entity_name) \
             .replace("<test_group>", account.entity['org_name']) \
-            .replace("<threescale_superdomain>",
-                     openshift.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]) \
+            .replace("<threescale_superdomain>", configuration.superdomain) \
             .replace("<account_email_domain>", "anything.invalid") \
             .replace("<username>", "admin") \
             .replace("<tenant>", "3scale") \

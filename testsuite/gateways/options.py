@@ -88,21 +88,20 @@ class OperatorApicastOptions(SelfManagedApicastOptions, OperatorApicastRequireme
 
 class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequirements):
     """Implementation of TemplateApicastRequirements"""
+
     @property
     def staging_endpoint(self) -> str:
         try:
             return super().staging_endpoint
         except KeyError:
-            wildcard_domain = self.current_openshift.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
-            return f"http://%s-staging.{wildcard_domain}"
+            return f"http://%s-staging.{self.configuration.superdomain}"
 
     @property
     def production_endpoint(self) -> str:
         try:
             return super().production_endpoint
         except KeyError:
-            wildcard_domain = self.current_openshift.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
-            return f"http://%s-production.{wildcard_domain}"
+            return f"http://%s-production.{self.configuration.superdomain}"
 
     @property
     def template(self):
