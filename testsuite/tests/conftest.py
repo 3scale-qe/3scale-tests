@@ -5,7 +5,9 @@ import time
 
 import pytest
 import threescale_api
+import threescale_api.errors
 
+import backoff
 import urllib3
 
 from dynaconf import settings
@@ -384,7 +386,7 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
 
                 try:
                     if len(implicit) == 1:
-                        implicit[0].delete()
+                        _backend_delete(implicit[0])
                     else:
                         logger.debug("Unexpected count of candidates for implicit backend: %s", str(implicit))
                 except Exception as err:  # pylint: disable=broad-except
@@ -418,6 +420,13 @@ def custom_service(threescale, request, testconfig, staging_gateway, logger):
     return _custom_service
 
 
+@backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, max_tries=8)
+def _backend_delete(backend):
+    """reliable backend delete"""
+
+    backend.delete()
+
+
 @pytest.fixture(scope="module")
 def custom_backend(threescale, request, testconfig, private_base_url):
     """
@@ -445,7 +454,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
                         hook(backend)
                     except Exception:  # pylint: disable=broad-except
                         pass
-                backend.delete()
+                _backend_delete(backend)
             request.addfinalizer(finalizer)
 
         for hook in _select_hooks("on_backend_create", hooks):
