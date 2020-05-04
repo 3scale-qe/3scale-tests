@@ -121,7 +121,7 @@ def backends(backend1, backend2, backend3, backend4, proxy):
     backend1.mapping_rules.create(rawobj.Mapping(backend1_metric, "/path1/bar", last="true"))
     backend1.mapping_rules.create(rawobj.Mapping(backend1_metric, "/path1/bar/{id}"))
 
-    for backend in {backend2, backend3, backend4}:
+    for backend in (backend2, backend3, backend4):
         metric = backend.metrics.list()[0]
 
         backend.mapping_rules.create(rawobj.Mapping(metric, "/path1/{id}"))
