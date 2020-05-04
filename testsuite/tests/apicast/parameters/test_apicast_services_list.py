@@ -38,6 +38,9 @@ def listed_service_client(listed_service, listed_service_application, staging_ga
 @pytest.fixture
 def api_client(application):
     """Sets session to api client for skipping retrying feature."""
+
+    application.test_request()
+
     session = requests.Session()
     session.auth = application.authobj
     return application.api_client(session=session)
