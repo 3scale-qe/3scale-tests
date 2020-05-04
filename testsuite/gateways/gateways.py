@@ -31,6 +31,7 @@ class Capability(enum.Enum):
     APICAST = "apicast"
     CUSTOM_ENVIRONMENT = "env"
     SAME_CLUSTER = "internal-cluster"
+    SERVICE_MESH = "service-mesh"
 
 
 class AbstractGateway(LifecycleHook, ABC):

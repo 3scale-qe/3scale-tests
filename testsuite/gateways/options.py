@@ -8,6 +8,7 @@ from testsuite.gateways.apicast import SystemApicastRequirements, OperatorApicas
     TemplateApicastRequirements, TLSApicastRequirements
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirements
 from testsuite.gateways.gateways import GatewayRequirements
+from testsuite.gateways.service_mesh import ServiceMeshRequirements, ServiceMesh, Httpbin
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
@@ -142,3 +143,31 @@ class TLSApicastOptions(TemplateApicastOptions, TLSApicastRequirements):
     @property
     def manager(self) -> CertificateManager:
         return self.configuration.manager
+
+
+class ServiceMeshGatewayOptions(GatewayOptions, ServiceMeshRequirements):
+    """Options for Service mesh gateway"""
+    @property
+    def _server(self):
+        return self.setting_block["server"]
+
+    @property
+    def _credentials(self):
+        return self.setting_block["credentials"]
+
+    @property
+    def httpbin(self) -> Httpbin:
+        conf = self.setting_block.get("httpbin", {})
+        openshift = self.openshift(server=self._server, project=conf.get("project", "httpbin"))
+        return Httpbin(credentials=self._credentials,
+                       openshift=openshift,
+                       deployment=conf.get("deployment", "httpbin"),
+                       path=conf.get("path", "httpbin"))
+
+    @property
+    def mesh(self) -> ServiceMesh:
+        conf = self.setting_block.get("mesh", {})
+        openshift = self.openshift(server=self._server, project=conf.get("project", "service-mesh"))
+        return ServiceMesh(credentials=self._credentials,
+                           openshift=openshift,
+                           auth=self.configuration)

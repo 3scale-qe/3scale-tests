@@ -7,8 +7,9 @@ from dynaconf import settings
 from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
 from testsuite.gateways.apicast.containers import ContainerizedApicast
 from testsuite.gateways.gateways import AbstractGateway
+from testsuite.gateways.service_mesh import ServiceMeshGateway
 from testsuite.gateways.options import GatewayOptions, SystemApicastOptions, SelfManagedApicastOptions, \
-    OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions
+    OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions, ServiceMeshGatewayOptions
 
 Gateway = Type[AbstractGateway]
 Options = Type[GatewayOptions]
@@ -19,7 +20,8 @@ GATEWAYS: Dict[str, Tuple[Gateway, Optional[Gateway], Options]] = {
     "apicast-selfmanaged": (SelfManagedApicast, None, SelfManagedApicastOptions),
     "apicast-operator": (OperatorApicast, None, OperatorApicastOptions),
     "apicast-template": (TemplateApicast, TemplateApicast, TemplateApicastOptions),
-    "apicast-tls": (TLSApicast, TLSApicast, TLSApicastOptions)
+    "apicast-tls": (TLSApicast, TLSApicast, TLSApicastOptions),
+    "service-mesh": (ServiceMeshGateway, None, ServiceMeshGatewayOptions)
 }
 
 

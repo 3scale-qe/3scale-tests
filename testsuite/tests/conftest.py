@@ -13,6 +13,7 @@ from threescale_api import client
 import testsuite.gateways as gateways
 
 from testsuite import rawobj, CONFIGURATION
+from testsuite.gateways.gateways import Capability
 from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
@@ -47,6 +48,9 @@ def pytest_runtest_setup(item):
             for capability in mark.args:
                 if capability not in gateways.capabilities:
                     pytest.skip(f"Skipping test because current gateway doesn't have capability {capability}")
+    else:
+        if Capability.APICAST not in gateways.capabilities:
+            pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
 
 
 # pylint: disable=unused-argument
