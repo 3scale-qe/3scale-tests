@@ -16,8 +16,7 @@ def service(service, private_base_url):
     proxy.policies.append(rawobj.PolicyConfig("url_rewriting", {
         "commands": [{"op": "gsub", "regex": "hello", "replace": "get"}]}))
 
-    metric = service.metrics.create(
-        {"name": "get_metric", "friendly_name": "get_metrics", "unit": "hit"})
+    metric = service.metrics.create(rawobj.Metric("get_metric"))
 
     proxy.mapping_rules.create({
         "http_method": "GET", "pattern": "/hello",
