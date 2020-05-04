@@ -20,6 +20,10 @@ from threescale_api.resources import Service
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.utils import blame_desc
 
+
+pytestmark = pytest.mark.flaky
+
+
 DEFAULT_FLOWS = {
     "implicit_flow_enabled": False,
     "standard_flow_enabled": False,
@@ -94,6 +98,13 @@ def get_flows(rhsso_client):
     }
 
 
+@backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8)
+def realm_client_by_id(realm, client_id):
+    """Helper to have reliable sso/oauth client getter"""
+
+    return realm.clients.by_client_id(client_id)
+
+
 @pytest.mark.parametrize("flow_type,expected", [
     ("implicit_flow_enabled", (True, False, False, False)),
     ("standard_flow_enabled", (False, True, False, False)),
@@ -108,7 +119,7 @@ def test(application, rhsso_service_info, request, flow_type, expected):
     result = change_flows(application, {flow_type: True}, request)
     assert result is not None
 
-    rhsso_client = rhsso_service_info.realm.clients.by_client_id(application["client_id"])
+    rhsso_client = realm_client_by_id(rhsso_service_info.realm, application["client_id"])
     flows = get_flows(rhsso_client)
 
     assert flows['implicit_flow_enabled'] is expected[0]
