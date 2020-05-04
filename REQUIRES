@@ -1,0 +1,7 @@
+# Requirements apart from python pkgs tracked in Pipfile
+pipenv
+python-devel
+glibc-devel
+gcc
+origin-clients/openshift-clients
+openssh-clients
