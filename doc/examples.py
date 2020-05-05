@@ -131,6 +131,11 @@ def staging_gateway(request, configuration):
 ###############################################################################
 # To skip apicast retrying on 404 status code
 def test_skip_apicast_retrying_on_404(application):
+
+    # 3scale is slow, have one request with retry is often (but not everytime)
+    # desirable to ensure all is already up
+    application.test_request()
+
     session = requests.Session()
     session.auth = application.authobj
 

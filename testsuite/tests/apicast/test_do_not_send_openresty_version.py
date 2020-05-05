@@ -26,6 +26,9 @@ def api_client(application):
     As 404 is the desired outcome of one of the tests, the client is
     configured not to retry requests to avoid long time execution.
     """
+
+    application.test_request()
+
     session = requests.Session()
     session.auth = application.authobj
     return application.api_client(session=session)
