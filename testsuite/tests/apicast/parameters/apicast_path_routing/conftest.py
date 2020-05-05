@@ -44,6 +44,7 @@ def service2(request, service2_proxy_settings, custom_service):
     delete_all_mapping_rules(proxy)
 
     proxy.mapping_rules.create(rawobj.Mapping(metric, "/echo"))
+    proxy.update()
 
     return service2
 
