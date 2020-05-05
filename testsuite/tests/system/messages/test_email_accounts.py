@@ -8,10 +8,15 @@ This test can not be run in parallel, emails sent because of other tests
  will result in the failure of this one
 
 """
+
+import os
 import re
 import time
 import pytest
 import yaml
+
+
+pytestmark = pytest.mark.flaky
 
 
 @pytest.fixture(scope="module")
@@ -30,7 +35,8 @@ def account(account):
 @pytest.fixture
 def mail_template(account, configuration) -> dict:
     """loads the mail templates and substitutes the variables"""
-    with open("mail_templates.yml") as stream:
+    dirname = os.path.dirname(__file__)
+    with open(f"{dirname}/mail_templates.yml") as stream:
         yaml_string = stream.read()
         yaml_string = yaml_string.replace("<test_account>", account.entity_name) \
             .replace("<test_group>", account.entity['org_name']) \
