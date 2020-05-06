@@ -9,7 +9,7 @@ import requests
 from requests.structures import CaseInsensitiveDict
 
 
-class EchoedRequest:  # pylint: disable=too-few-public-methods
+class EchoedRequest:
     """Default wrapper over backend"""
 
     def __init__(self, response: requests.Response) -> None:

@@ -7,7 +7,6 @@ from testsuite.requirements import OpenshiftRequirement
 from testsuite.lifecycle_hook import LifecycleHook
 
 if TYPE_CHECKING:
-    # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
 
 
