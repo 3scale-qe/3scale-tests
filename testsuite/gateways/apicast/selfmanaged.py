@@ -12,13 +12,11 @@ class SelfManagedApicastRequirements(GatewayRequirements, ABC):
     @abstractmethod
     def staging_endpoint(self) -> str:
         """Returns staging endpoint"""
-        return ""
 
     @property
     @abstractmethod
     def production_endpoint(self) -> str:
         """Returns production endpoint"""
-        return ""
 
     @property
     @abstractmethod
