@@ -11,7 +11,6 @@ from testsuite.gateways.gateways import GatewayRequirements
 from testsuite.gateways.service_mesh import ServiceMeshRequirements, ServiceMesh, Httpbin
 
 if TYPE_CHECKING:
-    # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
 
 

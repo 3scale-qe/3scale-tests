@@ -44,5 +44,5 @@ def load_gateway() -> GatewayConfiguration:
 
 
 # For this specific use case, I like the lower case names better
-configuration = load_gateway()                      # pylint: disable=invalid-name
-capabilities = configuration.staging.CAPABILITIES   # pylint: disable=invalid-name
+configuration = load_gateway()
+capabilities = configuration.staging.CAPABILITIES

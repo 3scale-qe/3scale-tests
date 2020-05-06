@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Optional
 from testsuite.certificates import Certificate, CertificateStore, CertificateManager
 
 if TYPE_CHECKING:
-    # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
 
 
