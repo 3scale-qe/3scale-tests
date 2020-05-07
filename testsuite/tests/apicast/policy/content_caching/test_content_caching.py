@@ -7,6 +7,7 @@ import uuid
 import pytest
 
 from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
@@ -34,6 +35,13 @@ def service_proxy_settings(private_base_url):
     return rawobj.Proxy(private_base_url("echo-api"))
 
 
+@pytest.fixture(scope="module")
+def api_client(api_client):
+    """Apicast needs to load configuration in order to cache incomming requests"""
+    api_client.get("/")
+    return api_client
+
+
 def test_caching_working_correctly(api_client):
     "content caching is working correctly when matchs"
 
@@ -41,7 +49,6 @@ def test_caching_working_correctly(api_client):
     request = lambda: api_client.get(path, headers=dict(origin="localhost"))  # noqa: E731
     is_hit = lambda response: response.headers.get("X-Cache-Status") == "HIT"  # noqa: E731
 
-    assert not is_hit(request())
     assert not is_hit(request())
 
     for i in range(0, 10):
@@ -79,5 +86,18 @@ def test_caching_timeouts(api_client):
     assert is_expired(request())
     assert is_hit(request())
 
-# def test_caching_invalid_status_code(api_client):
-#     "testing that 404 is not cached"
+
+def test_caching_body_check(api_client):
+    """Check same body response"""
+    response = api_client.get('/test/test', headers=dict(origin="localhost"))
+    echoed_request = EchoedRequest.create(response)
+
+    assert response.status_code == 200
+    assert response.headers.get("X-Cache-Status") != "HIT"
+
+    response = api_client.get('/test/test', headers=dict(origin="localhost"))
+    echoed_request_cached = EchoedRequest.create(response)
+
+    assert response.status_code == 200
+    assert response.headers.get("X-Cache-Status") == "HIT"
+    assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']
