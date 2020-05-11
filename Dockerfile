@@ -32,7 +32,7 @@ USER default
 
 ENV WORKON_HOME=/opt/workdir/virtualenvs
 
-RUN make clean pipenv && \
+RUN make mostlyclean pipenv && \
 	rm -Rf $HOME/.cache/*
 
 ENTRYPOINT [ "make" ]

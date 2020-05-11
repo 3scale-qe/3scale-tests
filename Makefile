@@ -61,9 +61,42 @@ container-image: ## Build container image
 	docker build -t 3scale-py-testsuite .
 
 clean: ## clean pip deps
-	rm -f Pipfile.lock .make-*
+clean: mostlyclean
+	rm -f Pipfile.lock
+
+mostlyclean:
+	rm -f .make-*
 	-pipenv --rm
 
 # Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+release: ## Submit MR of new VERSION
+release: VERSION-required Pipfile.lock
+	echo $(VERSION) > VERSION
+	git checkout -b v$(VERSION)
+	git add VERSION
+	git add -f Pipfile.lock
+	git commit -m"$(VERSION)"
+	git tag -a $(VERSION) -m"$(VERSION)"
+	git rm --cached Pipfile.lock
+	git commit -m"Unfreeze Pipfile.lock after release"
+	git push --tags origin v$(VERSION)
+	git checkout -
+
+dist: ## Build distribution-ready container image
+dist: NAME ?= 3scale-py-testsuite
+dist:
+	test -e VERSION
+	git checkout `cat VERSION`
+	docker build -t $(NAME) .
+	docker tag $(NAME) $(NAME):`cat VERSION`
+	docker tag $(NAME) $(NAME):`cut -f1-2 -d. <VERSION`
+	docker tag $(NAME) $(NAME):`cut -f1 -d. <VERSION`
+	git checkout -
+
+VERSION-required:
+ifndef VERSION
+	$(error You must define VERSION=x.y.z)
+endif
