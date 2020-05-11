@@ -143,7 +143,9 @@ class OpenShiftClient:
             lastest_version = apiobject.get_annotation(annotation)
             return apiobject.get_label("deployment") == f"{deployment_name}-{lastest_version}"
 
-        pod = oc.selector("pods").narrow(select_pod).object().name()
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            pod = oc.selector("pods").narrow(select_pod).object().name()
 
         self.do_action("rsync", [f"{pod}:{source}", dest])
 
