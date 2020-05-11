@@ -34,7 +34,7 @@ import time
 import pytest
 
 from testsuite import rawobj
-from testsuite.utils import randomize
+from testsuite.utils import randomize, blame
 
 
 TOTAL_REQUESTS = 20
@@ -45,10 +45,10 @@ DATEFMT = '%a, %d %b %Y %H:%M:%S GMT'
 WAIT = 15
 
 
-def test_rate_limit_connection_no_limit(logger, api_client):
+def test_rate_limit_connection_no_limit(logger, api_client, api_client2):
     """The call not matching the condition won't be limited"""
 
-    responses = concurrent_requests(logger, api_client, limit_me="no")
+    responses = concurrent_requests(logger, api_client, api_client2, limit_me="no")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -57,7 +57,7 @@ def test_rate_limit_connection_no_limit(logger, api_client):
     assert all([i.ok for i in responses])
 
 
-def test_rate_limit_connection(logger, api_client):
+def test_rate_limit_connection(logger, api_client, api_client2):
     """
     The call matching the condition will be limited to CONNECTIONS simultaneous
     connections and additional burst of BURST will be DELAY delayed, rest will
@@ -67,8 +67,10 @@ def test_rate_limit_connection(logger, api_client):
     # does this help apicast to "cache" some data and process further requests
     # faster?
     api_client.get("/get")
+    if api_client2 is not None:
+        api_client2.get("/get")
 
-    responses = concurrent_requests(logger, api_client, limit_me="yes")
+    responses = concurrent_requests(logger, api_client, api_client2, limit_me="yes")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -87,12 +89,13 @@ def test_rate_limit_connection(logger, api_client):
     assert len([i for i in times if i - first >= delay]) == BURST
 
 
-def concurrent_requests(logger, api_client, limit_me):
+def concurrent_requests(logger, client1, client2, limit_me):
     """Make simultaneous requests
 
     Args:
         :param logger: logger to use for logging
-        :param api_client: a client to use to make requests
+        :param client1: a client to use to make requests
+        :param client2: a client of other application to use to make requests
         :param limit_me: a value for 'X-Limit-Me' header used to distinguish
             whether to apply rate_limit or not, two expected values: 'yes' or 'no'
 
@@ -101,10 +104,19 @@ def concurrent_requests(logger, api_client, limit_me):
     loop = asyncio.get_event_loop()
     responses = []
 
+    range1 = TOTAL_REQUESTS
+    range2 = 0
+    if client2 is not None:
+        range1 = TOTAL_REQUESTS // 2
+        range2 = TOTAL_REQUESTS - range1
+
     with ThreadPoolExecutor(max_workers=TOTAL_REQUESTS+1) as pool:
         futures = [
-            loop.run_in_executor(pool, get, api_client, limit_me, f"/delay/{WAIT}")
-            for _ in range(TOTAL_REQUESTS)]
+            loop.run_in_executor(pool, get, client1, limit_me, f"/delay/{WAIT}")
+            for _ in range(range1)]
+        futures += [
+            loop.run_in_executor(pool, get, client2, limit_me, f"/delay/{WAIT}")
+            for _ in range(range2)]
 
         responses = loop.run_until_complete(asyncio.gather(*futures))
 
@@ -208,3 +220,23 @@ def matching_rule(request):
     """Matching rule can either compare equality or match regular expression"""
 
     return request.param
+
+
+@pytest.fixture
+def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, request):
+    """In case of 'global' key_scope two application are needed to ensure
+    connection limiter works properly"""
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_plus)
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
+
+
+@pytest.fixture
+def api_client2(key_scope, request):
+    """A client of app2 to verify 'global' key_scope functionality"""
+
+    if key_scope == "global":
+        # this is a trick to create app2 just for 'global' scope when needed
+        app2 = request.getfixturevalue("app2")
+        return app2.api_client()
+
+    return None
