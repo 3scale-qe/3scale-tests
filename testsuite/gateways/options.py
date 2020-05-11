@@ -90,6 +90,10 @@ class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequireme
     """Implementation of TemplateApicastRequirements"""
 
     @property
+    def service_routes(self) -> bool:
+        return self.setting_block.get("service_routes", True)
+
+    @property
     def staging_endpoint(self) -> str:
         try:
             return super().staging_endpoint

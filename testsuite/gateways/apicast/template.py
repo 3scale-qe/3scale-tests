@@ -31,6 +31,11 @@ class TemplateApicastRequirements(SelfManagedApicastRequirements,
     def configuration_url(self):
         """Returns URL for configuring apicast"""
 
+    @property
+    @abstractmethod
+    def service_routes(self) -> bool:
+        """True, if apicast should creates route for every service"""
+
 
 # pylint: disable=too-many-instance-attributes
 class TemplateApicast(SelfManagedApicast):
@@ -43,6 +48,7 @@ class TemplateApicast(SelfManagedApicast):
         self.staging = requirements.staging
         self.template = requirements.template
         self.image = requirements.image
+        self.service_routes = requirements.service_routes
         self.service_name = self.deployment
         self.configuration_url_secret_name = f'{self.deployment}-config-url'
         self.routes: List[str] = []
@@ -96,11 +102,13 @@ class TemplateApicast(SelfManagedApicast):
         return f"{entity_id}-production"
 
     def on_service_create(self, service: Service):
-        entity_id = service.entity_id
-        self.add_route(entity_id, self._route_name(entity_id))
+        if self.service_routes:
+            entity_id = service.entity_id
+            self.add_route(entity_id, self._route_name(entity_id))
 
     def on_service_delete(self, service: Service):
-        self.delete_route(self._route_name(service.entity_id))
+        if self.service_routes:
+            self.delete_route(self._route_name(service.entity_id))
 
     def set_env(self, name: str, value):
         self.openshift.environ(self.deployment)[name] = value
