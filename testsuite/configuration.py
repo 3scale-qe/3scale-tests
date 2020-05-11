@@ -119,7 +119,7 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         try:
             server = settings["openshift"]["servers"][server]
         except KeyError:
-            raise AttributeError("Server %s is not defined in configuration" % server)
+            server = {}
 
         return OpenShiftClient(project_name=project_name,
                                server_url=server.get("server_url", None),
