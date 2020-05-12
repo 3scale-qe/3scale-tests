@@ -4,10 +4,13 @@ Test valid content caching options
 
 import time
 import uuid
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 
-from testsuite import rawobj
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
+
+pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 
 
 @pytest.fixture(scope="module")
