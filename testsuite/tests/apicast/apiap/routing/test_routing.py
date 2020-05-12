@@ -3,11 +3,13 @@ Test that request to product with specific paths to backends will be routed to c
 """
 import pytest
 from pytest_cases import fixture_plus, cases_data
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.apiap.routing import routing_cases
 from testsuite.utils import blame
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8.2')")
 
