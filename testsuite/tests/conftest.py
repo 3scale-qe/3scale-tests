@@ -60,7 +60,10 @@ def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
 
     environment = settings["env_for_dynaconf"]
-    openshift = settings["openshift"]["servers"]["default"]["server_url"]
+    try:
+        openshift = settings["openshift"]["servers"]["default"]["server_url"]
+    except (KeyError, TypeError):
+        openshift = "(implicit)"
 
     project = CONFIGURATION.project
     threescale = CONFIGURATION.url
