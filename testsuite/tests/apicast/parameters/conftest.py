@@ -2,15 +2,16 @@
 import pytest
 
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(configuration):
+def staging_gateway(configuration, request):
     """Deploy template apicast gateway."""
     settings_block = {
         "deployments": {
-            "staging": "openshift-tests-staging",
-            "production": "openshift-tests-production"
+            "staging": blame(request, "staging"),
+            "production": blame(request, "production")
         }
     }
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
