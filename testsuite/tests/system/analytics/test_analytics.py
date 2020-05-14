@@ -11,12 +11,14 @@ import pytest
 from testsuite import rawobj
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.required_capabilities()
+
 
 @pytest.fixture(scope="module")
-def app2(service, custom_application, custom_app_plan, request):
+def app2(service, custom_application, custom_app_plan, request, lifecycle_hooks):
     """Creates a second application"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    return custom_application(rawobj.Application(blame(request, "app2"), plan))
+    return custom_application(rawobj.Application(blame(request, "app2"), plan), hooks=lifecycle_hooks)
 
 
 def test_hits_service(application, api_client, app2):
