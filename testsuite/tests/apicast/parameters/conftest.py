@@ -6,7 +6,7 @@ from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(configuration, request):
+def staging_gateway(request, configuration):
     """Deploy template apicast gateway."""
     settings_block = {
         "deployments": {
@@ -18,6 +18,6 @@ def staging_gateway(configuration, request):
     gateway = TemplateApicast(requirements=options)
     gateway.create()
 
-    yield gateway
+    request.addfinalizer(gateway.destroy)
 
-    gateway.destroy()
+    return gateway

@@ -22,12 +22,17 @@ def test_get_route_request_returns_ok(api_client, private_base_url):
     assert echoed.headers["Host"] == urlparse(private_base_url()).hostname
 
 
-def test_not_matched_route_request_returns_not_found(application):
-    """Call to not matched mapping /anything/blah returns 404 OK."""
+def test_not_matched_route_request_returns_not_found(application2):
+    """Call to not matched mapping /echo returns 404 OK.
+
+    As both services, 1 and 2, have the same public base url, however, path routing is disabled,
+    request against service number 2 will fail because first service to match will be service number 1.
+    Service 1 has no mapping rule /echo mapped into it.
+    """
     session = requests.Session()
-    session.auth = application.authobj
+    session.auth = application2.authobj
 
     # skip retrying on 404 by passing Session instance to it
-    client = application.api_client(session=session)
+    client = application2.api_client(session=session)
 
-    assert client.get("/anything/blah").status_code == 404
+    assert client.get("/echo").status_code == 404
