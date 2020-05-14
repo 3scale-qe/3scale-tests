@@ -2,8 +2,10 @@
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.requirements import ThreeScaleAuthDetails
 
-
 # pylint: disable=too-few-public-methods
+from testsuite.rhsso.rhsso import RHSSOServiceConfiguration
+
+
 class Httpbin:
     """Class for manipulation Httpbin deployment in service mesh environment"""
 
@@ -28,6 +30,20 @@ class Httpbin:
                                   },
                              ], patch_type="json")
         self.openshift.wait_for_ready(self.deployment)
+
+    def create_policy(self, name: str, info: RHSSOServiceConfiguration):
+        """Creates new Policy, used for OIDC authorization, for specific realm setup"""
+        params = {
+            "NAME": name,
+            "TARGET": self.deployment,
+            "ISSUER": info.issuer_url(),
+            "JWKS": info.jwks_uri()
+        }
+        self.openshift.new_app("testsuite/resources/service_mesh/policy.yaml", params)
+
+    def remove_policy(self, name: str):
+        """Removes existing policy"""
+        self.openshift.delete("Policy", name)
 
 
 class ServiceMesh:
