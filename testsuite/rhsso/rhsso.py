@@ -70,7 +70,7 @@ class RHSSO:
 
     # pylint: disable=too-many-arguments
     def password_authorize(self, realm, client_id, secret, username, password):
-        """Returns token retrived by password authentication"""
+        """Returns token retrieved by password authentication"""
         oidc = self.create_oidc_client(realm, client_id, secret)
         return oidc.password_credentials(username=username, password=password)
 
@@ -105,6 +105,16 @@ class RHSSOServiceConfiguration:
         self.client = client
         self.username = user.username
         self.password = user.password
+        self._oidc_client = None
+
+    @property
+    def oidc_client(self):
+        """OIDCClient for the created client"""
+        if not self._oidc_client:
+            secret = self.client.secret["value"]
+            client_id = self.client.id
+            self._oidc_client = self.rhsso.create_oidc_client(self.realm, client_id, secret)
+        return self._oidc_client
 
     def issuer_url(self) -> str:
         """
@@ -112,10 +122,15 @@ class RHSSOServiceConfiguration:
         http(s)://<HOST>:<PORT>/auth/realms/<REALM_NAME>
         :return: url
         """
-        secret = self.client.secret["value"]
-        client_id = self.client.id
-        url = self.rhsso.create_oidc_client(self.realm, client_id, secret).get_url("issuer")
-        return url
+        return self.oidc_client.get_url("issuer")
+
+    def jwks_uri(self):
+        """
+        Returns jwks uri for 3scale in format
+        http(s)://<HOST>:<PORT>o/auth/realms/<REALM_NAME>/protocol/openid-connect/certs
+        :return: url
+        """
+        return self.oidc_client.get_url("jwks_uri")
 
     def authorization_url(self) -> str:
         """
