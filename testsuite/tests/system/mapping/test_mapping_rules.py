@@ -12,6 +12,8 @@ import pytest
 import requests
 from testsuite import rawobj
 
+pytestmark = pytest.mark.required_capabilities()
+
 
 @pytest.fixture(scope="module")
 def endpoints_and_methods():

@@ -10,6 +10,8 @@ only once.
 import pytest
 from testsuite import rawobj
 
+pytestmark = pytest.mark.required_capabilities()
+
 
 @pytest.fixture(scope="module")
 def service(service):
@@ -29,9 +31,9 @@ def service(service):
     metric_once = service.metrics.create(rawobj.Metric("metric_once"))
 
     create_mapping_rule(proxy, metric_twice, pattern="/anything/foo/")
-    create_mapping_rule(proxy, metric_twice, pattern="/anything/foo/{id}")
+    create_mapping_rule(proxy, metric_twice, pattern="/anything/foo/123")
     create_mapping_rule(proxy, metric_once, pattern="/anything/bar/", last="true")
-    create_mapping_rule(proxy, metric_once, pattern="/anything/bar/{id}")
+    create_mapping_rule(proxy, metric_once, pattern="/anything/bar/123")
 
     proxy.update()
 
