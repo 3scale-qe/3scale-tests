@@ -2,6 +2,7 @@
 import base64
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional, List
 from urllib.parse import urlparse
 
 from threescale_api.resources import Service
@@ -30,7 +31,13 @@ class TemplateApicastRequirements(SelfManagedApicastRequirements,
     def configuration_url(self):
         """Returns URL for configuring apicast"""
 
+    @property
+    @abstractmethod
+    def service_routes(self) -> bool:
+        """True, if apicast should creates route for every service"""
 
+
+# pylint: disable=too-many-instance-attributes
 class TemplateApicast(SelfManagedApicast):
     """Template-based Apicast Gateway."""
 
@@ -41,8 +48,10 @@ class TemplateApicast(SelfManagedApicast):
         self.staging = requirements.staging
         self.template = requirements.template
         self.image = requirements.image
+        self.service_routes = requirements.service_routes
         self.service_name = self.deployment
         self.configuration_url_secret_name = f'{self.deployment}-config-url'
+        self.routes: List[str] = []
 
     def get_app_params(self, **kwargs):
         """Template envs for oc new-app."""
@@ -93,19 +102,33 @@ class TemplateApicast(SelfManagedApicast):
         return f"{entity_id}-production"
 
     def on_service_create(self, service: Service):
-        entity_id = service.entity_id
-        url = urlparse(self.endpoint % entity_id)
-        self.openshift.routes.expose(name=self._route_name(entity_id),
-                                     service=self.service_name, hostname=url.hostname)
+        if self.service_routes:
+            entity_id = service.entity_id
+            self.add_route(entity_id, self._route_name(entity_id))
 
     def on_service_delete(self, service: Service):
-        del self.openshift.routes[self._route_name(service.entity_id)]
+        if self.service_routes:
+            self.delete_route(self._route_name(service.entity_id))
 
     def set_env(self, name: str, value):
         self.openshift.environ(self.deployment)[name] = value
 
     def get_env(self, name: str):
         return self.openshift.environ(self.deployment)[name]
+
+    def add_route(self, url_fragment, name: Optional[str] = None):
+        """Adds new route for this apicast"""
+        identifier = name or url_fragment
+        url = urlparse(self.endpoint % url_fragment)
+        self.openshift.routes.expose(name=identifier,
+                                     service=self.service_name, hostname=url.hostname)
+        self.routes.append(identifier)
+
+    def delete_route(self, identifier):
+        """Delete route"""
+        if identifier in self.routes and identifier in self.openshift.routes:
+            del self.openshift.routes[identifier]
+            self.routes.remove(identifier)
 
     def create(self):
         LOGGER.debug('Deploying new template-based apicast "%s". Template params: "%s"',
@@ -120,6 +143,11 @@ class TemplateApicast(SelfManagedApicast):
 
     def destroy(self):
         LOGGER.debug('Destroying template-based apicast "%s"...', self.deployment)
+
+        for route in self.routes:
+            if route in self.openshift.routes:
+                LOGGER.debug('Removing route "%s"...', route)
+                del self.openshift.routes[route]
 
         LOGGER.debug('Deleting service "%s"', self.deployment)
         self.openshift.delete("service", self.deployment)

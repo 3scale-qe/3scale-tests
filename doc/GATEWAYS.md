@@ -97,6 +97,7 @@ gateway:
     sandbox_endpoint: "http://%s-staging.localhost:8080"                                 # Optional: Wildcard address for staging address for service
     production_endpoint: "http://%s-production.localhost:8080"                           # Optional: Wildcard address for production address for service
     apicast_configuration_url: "https://<admin access token>@<3scale admin URL>"         # Optional: Apicast config. URL
+    service_routes: True                                                               # Optional: If Apicats should create automatic route for each service
 ```
 ## TLS Apicast
 *Description*: Self-managed apicast that is deployed with ssl certificates somewhere else and we only know their address
