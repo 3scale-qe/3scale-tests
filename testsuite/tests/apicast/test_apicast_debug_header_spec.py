@@ -28,6 +28,6 @@ def test_make_request(api_client, service, application):
 
     assert "X-3scale-hostname" in response.headers
 
-    assert response.headers["X-3scale-service-id"] == service["id"]
+    assert response.headers["X-3scale-service-id"] == str(service["id"])
 
     assert response.headers["X-3scale-service-name"] == service["system_name"]
