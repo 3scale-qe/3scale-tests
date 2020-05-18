@@ -14,9 +14,9 @@ if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 
 
-def randomize(name):
+def randomize(name, tail=5):
     "To avoid conflicts returns modified name with random sufffix"
-    return "%s-%s" % (name, secrets.token_urlsafe(5).translate(str.maketrans("", "", "-_")).lower())
+    return "%s-%s" % (name, secrets.token_urlsafe(tail).translate(str.maketrans("", "", "-_")).lower())
 
 
 def retry_for_session(session: requests.Session, total: int = 8):
@@ -49,9 +49,8 @@ def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
     context = nodename.lower().split("_")[0]
     if len(context) > 2:
         context = context[:2] + context[2:-1].translate(str.maketrans("", "", "aiyu")) + context[-1]
-    suffix = secrets.token_urlsafe(tail).lower()
 
-    return f"{name[:8]}-{whoami[:8]}-{context[:9]}-{suffix}"
+    return randomize(f"{name[:8]}-{whoami[:8]}-{context[:9]}", tail=tail)
 
 
 def blame_desc(request: 'FixtureRequest', text: str = None):
