@@ -42,8 +42,8 @@ def test_echo_route_request_returns_ok(api_client2, private_base_url):
     assert echoed.headers["Host"] == urlparse(private_base_url("echo-api")).hostname
 
 
-def test_not_mapped_route_returns_ok(application2):
-    """Call to not mapped route /anything/blah returns 200 OK.
+def test_not_mapped_route_returns_not_found(application2):
+    """Call to not mapped route /anything/blah returns 404 Not Found.
 
     Path-based routing fails and it fallback to the default host-based routing.
     """
@@ -53,4 +53,4 @@ def test_not_mapped_route_returns_ok(application2):
     # skip retrying on 404 by passing Session instance to it
     client = application2.api_client(session=session)
 
-    assert client.get("/anything/blah").status_code == 200
+    assert client.get("/anything/blah").status_code == 404
