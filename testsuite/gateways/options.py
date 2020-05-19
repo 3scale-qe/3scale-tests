@@ -98,14 +98,14 @@ class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequireme
         try:
             return super().staging_endpoint
         except KeyError:
-            return f"http://%s-staging.{self.configuration.superdomain}"
+            return f"https://%s-staging.{self.configuration.superdomain}"
 
     @property
     def production_endpoint(self) -> str:
         try:
             return super().production_endpoint
         except KeyError:
-            return f"http://%s-production.{self.configuration.superdomain}"
+            return f"https://%s-production.{self.configuration.superdomain}"
 
     @property
     def template(self):
