@@ -12,7 +12,9 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
 
     def __init__(self) -> None:
         self._token = None
+        self._master_token = None
         self._url = None
+        self._master_url = None
         self._project = None
         self._certificate = None
         self._store = None
@@ -33,10 +35,24 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         return self._token
 
     @property
+    def master_token(self):
+        """Threescale master token"""
+        if not self._master_token:
+            self._master_token = self._load_master_token()
+        return self._master_token
+
+    @property
     def url(self):
         if not self._url:
             self._url = self._load_url()
         return self._url
+
+    @property
+    def master_url(self):
+        """Threescale master url"""
+        if not self._master_url:
+            self._master_url = self._load_master_url()
+        return self._master_url
 
     @property
     def gateway_template(self) -> str:
@@ -93,6 +109,18 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         except KeyError:
             Exception("(From Openshift) cannot get system-seed access token. Review your settings")
 
+    def _load_master_token(self):
+        # This part is trying to get the master token, by default is saved in the
+        # system-seed openshift secret
+        token = settings.get("threescale", {}).get("master", {}).get("token")
+        if token:
+            return token
+
+        try:
+            return self.openshift().secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
+        except KeyError:
+            Exception("(From Openshift) cannot get system-seed master access token. Review your settings")
+
     def _load_url(self):
         # This is trying to get system default route. If not defined, is going to
         # search that on the openshift routes.
@@ -106,9 +134,21 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         except KeyError:
             Exception("(From Openshift) cannot get system default route. Review your settings")
 
+    def _load_master_url(self):
+        # This is trying to get system default route. If not defined, is going to
+        # search that on the openshift routes.
+        url = settings.get("threescale", {}).get("master", {}).get("url")
+        if url:
+            return url
+
+        try:
+            route = self.openshift().routes.for_service("system-master")[0]
+            return "https://" + route["spec"]["host"]
+        except KeyError:
+            Exception("(From Openshift) cannot get system default route. Review your settings")
+
     def openshift(self, server="default", project="threescale") -> OpenShiftClient:
         """Creates OpenShiftClient for project"""
-
         try:
             project_name = settings["openshift"]["projects"][project]["name"]
         except KeyError:

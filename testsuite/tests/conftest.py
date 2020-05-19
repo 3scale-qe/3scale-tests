@@ -139,6 +139,13 @@ def threescale(configuration, testconfig):
 
 
 @pytest.fixture(scope="session")
+def master_threescale(configuration, testconfig):
+    """Threesale client using master url and token"""
+    verify = testconfig["ssl_verify"]
+    return client.ThreeScaleClient(url=configuration.master_url, token=configuration.master_token, ssl_verify=verify)
+
+
+@pytest.fixture(scope="session")
 def account(threescale, request, testconfig):
     "Preconfigured account existing over whole testing session"
     name = blame(request, "id")

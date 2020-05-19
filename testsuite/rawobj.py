@@ -115,3 +115,14 @@ def ApplicationPlan(name: str,
         obj["service_id"] = service["id"]
 
     return obj
+
+
+def CustomTennant(username: str):
+    """Builder of params to create a new tenant
+    Args:
+        :param username: the username of the tenant
+        :param password: the password of the tenant
+        """
+    org_name = username  # pylint: disable=possibly-unused-variable
+    email = "anything@invalid.invalid"  # pylint: disable=possibly-unused-variable
+    return locals()
