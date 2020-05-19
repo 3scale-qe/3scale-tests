@@ -13,9 +13,13 @@ class ServiceMeshHttpClient(HttpClient):
         self.root_path = root_path
         super().__init__(app, "endpoint", session, verify)
 
-    def request(self, method: str, path: str, **kwargs) -> requests.Response:
+    # pylint: disable=too-many-locals
+    def request(self, method, path, params=None, data=None, headers=None, cookies=None, files=None, auth=None,
+                timeout=None, allow_redirects=True, proxies=None, hooks=None, stream=None, verify=None, cert=None,
+                json=None) -> requests.Response:
         path = self.root_path + "/" + path
-        return super().request(method, path, **kwargs)
+        return super().request(method, path, params, data, headers, cookies, files, auth, timeout, allow_redirects,
+                               proxies, hooks, stream, verify, cert, json)
 
     @property
     def _base_url(self) -> str:
