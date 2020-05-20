@@ -13,7 +13,7 @@ from testsuite import rawobj
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     "Dict of proxy settings to be used when service created"
-    return rawobj.Proxy(private_base_url("httpbin-nossl"))
+    return rawobj.Proxy(private_base_url("httpbin_nossl"))
 
 
 @pytest.fixture(scope="module")
@@ -39,4 +39,4 @@ def test_proxied_request(application, private_base_url):
 
     assert response.status_code == 200
     assert "Fuse-Camel-Proxy" in headers
-    assert headers["Source-Header"] == urlparse(private_base_url("httpbin-nossl")).hostname
+    assert headers["Source-Header"] == urlparse(private_base_url("httpbin_nossl")).hostname

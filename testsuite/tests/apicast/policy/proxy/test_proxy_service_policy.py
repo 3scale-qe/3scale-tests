@@ -29,7 +29,7 @@ def backends_mapping(private_base_url, custom_backend):
     Proxy service used in this test does not support HTTP over TLS (https) protocol,
     therefore http is preferred instead
     """
-    return {"/": custom_backend("netty-proxy", private_base_url("httpbin-nossl"))}
+    return {"/": custom_backend("netty-proxy", private_base_url("httpbin_nossl"))}
 
 
 def test_http_proxy_policy(api_client, private_base_url):
@@ -40,4 +40,4 @@ def test_http_proxy_policy(api_client, private_base_url):
     response = api_client.get("/headers")
     headers = response.json()["headers"]
     assert "Fuse-Camel-Proxy" in headers
-    assert headers["Source-Header"] == urlparse(private_base_url("httpbin-nossl")).hostname
+    assert headers["Source-Header"] == urlparse(private_base_url("httpbin_nossl")).hostname

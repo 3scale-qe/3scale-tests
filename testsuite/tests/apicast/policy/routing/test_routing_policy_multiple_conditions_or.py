@@ -14,7 +14,7 @@ def service(service, private_base_url):
     test_header2 = {"op": "matches", "value": "test", "match": "header", "header_name": "Test2"}
     proxy = service.proxy.list()
     proxy.policies.insert(0, rawobj.PolicyConfig("routing", {"rules": [
-        {"url": private_base_url("echo-api") + "/route",
+        {"url": private_base_url("echo_api") + "/route",
          "condition": {
              "combine_op": "or",
              "operations": [test_header1, test_header2]}}]}))
@@ -26,7 +26,7 @@ def test_routing_policy_route_testing(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to echo/route/get
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "testing"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -40,7 +40,7 @@ def test_routing_policy_route_hello(api_client, private_base_url):
     """
     Test for the request send with Test1 valid and Test2 invalid value to echo api
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "hello"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -54,7 +54,7 @@ def test_routing_policy_noroute_test(api_client, private_base_url):
     """
     Test for the request send with Test2 valid and Test1 invalid to echo api
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "noroute", "Test2": "test"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -69,7 +69,7 @@ def test_routing_policy_route(api_client, private_base_url):
     """
     Test for the request send without Test2 to echo api
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "route"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)

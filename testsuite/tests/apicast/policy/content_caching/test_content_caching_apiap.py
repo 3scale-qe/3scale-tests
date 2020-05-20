@@ -37,7 +37,7 @@ def backends_mapping(custom_backend, private_base_url):
         - path to Backend 1: "/echo-api"
         - path to Backend 2: "/httpbin"
     """
-    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo-api")),
+    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api")),
             "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin"))}
 
 

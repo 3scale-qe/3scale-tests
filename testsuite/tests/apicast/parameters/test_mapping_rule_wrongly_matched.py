@@ -57,7 +57,7 @@ def service(request, service_proxy_settings, private_base_url, custom_service, c
     route created in the gateway fixture.
     Sets mapping rule based on the tested bug.
     """
-    service_proxy_settings["api_backend"] = private_base_url("echo-api")
+    service_proxy_settings["api_backend"] = private_base_url("echo_api")
     service = custom_service({"name": blame(request, "svc"),
                               "deployment_option": "self_managed"}, service_proxy_settings)
 
@@ -82,7 +82,7 @@ def service2(request, service_proxy_settings, private_base_url, custom_service, 
     apicast path routing is used.
     Sets mapping rule based on the tested bug.
     """
-    service_proxy_settings["api_backend"] = private_base_url("echo-api")
+    service_proxy_settings["api_backend"] = private_base_url("echo_api")
     service2 = custom_service({"name": blame(request, "svc"),
                                "deployment_option": "self_managed"}, service_proxy_settings)
 

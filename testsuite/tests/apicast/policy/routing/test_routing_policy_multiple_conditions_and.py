@@ -20,7 +20,7 @@ def service(service, private_base_url):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": private_base_url("echo-api") + "/route",
+            "rules": [{"url": private_base_url("echo_api") + "/route",
                        "condition": {"combine_op": "and", "operations": [test_header1, test_header2]},
                        }]}})
 
@@ -40,7 +40,7 @@ def test_routing_policy_route_testing(api_client, private_base_url):
     """
     Test for the request send with Test1 and Test2 to /route/get
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "testing"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)

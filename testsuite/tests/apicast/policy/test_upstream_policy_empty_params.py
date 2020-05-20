@@ -21,7 +21,7 @@ def service(service, private_base_url):
     """Add upstream policy"""
     proxy = service.proxy.list()
     proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": private_base_url("echo-api"), "regex": "v1"}]}))
+        "rules": [{"url": private_base_url("echo_api"), "regex": "v1"}]}))
 
     return service
 

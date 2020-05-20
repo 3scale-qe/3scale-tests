@@ -20,9 +20,9 @@ def service(service, private_base_url):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": private_base_url("echo-api") + "/route1",
+            "rules": [{"url": private_base_url("echo_api") + "/route1",
                        "condition": test_query1},
-                      {"url": private_base_url("echo-api") + "/route2",
+                      {"url": private_base_url("echo_api") + "/route2",
                        "condition": test_query2}
                       ]}})
 
@@ -34,7 +34,7 @@ def test_routing_policy_route1(api_client, private_base_url):
     """
     Test for the request with matching path to /route1/get
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", params={"test_arg": "route1"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -47,7 +47,7 @@ def test_routing_policy_route2(api_client, private_base_url):
     """
     Test for the request with matching path to /route2/get
     """
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", params={"test_arg": "route2"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)

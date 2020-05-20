@@ -22,13 +22,13 @@ def backends_mapping(custom_backend, private_base_url):
     the dict
     """
     return {"/backpath1":
-            custom_backend("backend1", endpoint=private_base_url("echo-api")),
+            custom_backend("backend1", endpoint=private_base_url("echo_api")),
             "/backpath2/backpath21/backpath22":
-                custom_backend("backend2", endpoint=private_base_url("echo-api")),
+                custom_backend("backend2", endpoint=private_base_url("echo_api")),
             "/backpath2/backpath21":
-                custom_backend("backend3", endpoint=private_base_url("echo-api")),
+                custom_backend("backend3", endpoint=private_base_url("echo_api")),
             "/backpath2":
-                custom_backend("backend4", endpoint=private_base_url("echo-api"))}
+                custom_backend("backend4", endpoint=private_base_url("echo_api"))}
 
 
 @pytest.fixture(scope="module")
