@@ -7,6 +7,8 @@ from urllib.parse import urlparse
 
 from threescale_api.resources import Service
 from testsuite.requirements import ThreeScaleAuthDetails
+from testsuite.openshift.objects import Routes
+
 from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
 
 LOGGER = logging.getLogger(__name__)
@@ -120,8 +122,14 @@ class TemplateApicast(SelfManagedApicast):
         """Adds new route for this apicast"""
         identifier = name or url_fragment
         url = urlparse(self.endpoint % url_fragment)
-        self.openshift.routes.expose(name=identifier,
-                                     service=self.service_name, hostname=url.hostname)
+        if url.scheme == "https":
+            self.openshift.routes.create(name, Routes.Types.EDGE,
+                                         service=self.service_name, hostname=url.hostname)
+        elif url.scheme == "http":
+            self.openshift.routes.expose(name=identifier,
+                                         service=self.service_name, hostname=url.hostname)
+        else:
+            raise AttributeError(f"Unknown scheme {url.scheme} for apicast route")
         self.routes.append(identifier)
 
     def delete_route(self, identifier):

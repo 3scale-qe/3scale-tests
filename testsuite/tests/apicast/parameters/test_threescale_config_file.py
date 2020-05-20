@@ -60,16 +60,16 @@ def service(request, service, staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def service2(request, service_proxy_settings, custom_service):
+def service2(request, service_proxy_settings, custom_service, lifecycle_hooks):
     """Create service2 whose configuration will not be set to apicast."""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
-def application2(service2, custom_app_plan, custom_application, request):
+def application2(service2, custom_app_plan, custom_application, request, lifecycle_hooks):
     """Create custom application for service2."""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service2)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
 def test_request_to_service_returns_ok(api_client):
