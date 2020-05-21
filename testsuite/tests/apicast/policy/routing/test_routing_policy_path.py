@@ -11,7 +11,7 @@ def service_proxy_settings(private_base_url):
     """
     Require compatible backend to be used
     """
-    return rawobj.Proxy(private_base_url("echo-api"))
+    return rawobj.Proxy(private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

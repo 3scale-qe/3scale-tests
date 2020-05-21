@@ -23,7 +23,7 @@ def service(service, private_base_url):
         "metric_id": metric["id"], "delta": 5})
 
     # proxy needs to be updated to apply added mapping
-    proxy.update(rawobj.Proxy(private_base_url("echo-api")))
+    proxy.update(rawobj.Proxy(private_base_url("echo_api")))
 
     return service
 

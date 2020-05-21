@@ -51,7 +51,7 @@ def backends_mapping(custom_backend, private_base_url):
         - path to Backend 1: "/echo-api"
         - path to Backend 2: "/httpbin"
     """
-    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo-api")),
+    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api")),
             "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin"))}
 
 
@@ -102,7 +102,7 @@ def api_client2(application2):
 
 def test_wont_cache(api_client, private_base_url):
     """Test that redirected request (302 status code) will not be cached"""
-    payload = {'url': private_base_url("echo-api")}
+    payload = {'url': private_base_url("echo_api")}
     response = api_client.get("/httpbin/redirect-to", params=payload, headers=dict(origin="localhost"))
     echoed_request = EchoedRequest.create(response)
     # First request was redirected

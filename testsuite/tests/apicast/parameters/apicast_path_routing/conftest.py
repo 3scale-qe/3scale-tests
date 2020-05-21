@@ -64,7 +64,7 @@ def service(service, endpoint):
 @pytest.fixture(scope="module")
 def service2_proxy_settings(private_base_url):
     """Change api_backend to echo-api for service2."""
-    return rawobj.Proxy(private_base_url("echo-api"))
+    return rawobj.Proxy(private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

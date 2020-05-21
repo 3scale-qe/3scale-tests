@@ -35,7 +35,7 @@ def policy_settings():
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     "content caching endpoint to be used"
-    return rawobj.Proxy(private_base_url("echo-api"))
+    return rawobj.Proxy(private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

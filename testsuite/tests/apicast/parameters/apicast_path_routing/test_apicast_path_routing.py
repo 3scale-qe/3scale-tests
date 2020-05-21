@@ -39,7 +39,7 @@ def test_echo_route_request_returns_ok(api_client2, private_base_url):
     echoed = EchoedRequest.create(response)
 
     assert response.status_code == 200
-    assert echoed.headers["Host"] == urlparse(private_base_url("echo-api")).hostname
+    assert echoed.headers["Host"] == urlparse(private_base_url("echo_api")).hostname
 
 
 def test_not_mapped_route_returns_not_found(application2):

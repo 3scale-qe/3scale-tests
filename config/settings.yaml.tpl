@@ -12,7 +12,8 @@ default:
     service:
       backends:  # list of backend services for testing
         httpbin: https://httpbin.org:443
-        echo-api: https://echo-api.3scale.net:443
+        echo_api: https://echo-api.3scale.net:443
+        httpbin_nossl: http://httpbin.org:80
   openshift:
     projects:
       threescale:
@@ -39,7 +40,7 @@ development:
     service:
       backends:
         primary: https://httpbin.{DEVELOPMENT_TESTENV_DOMAIN}:443
-        httpbin-go: https://httpbingo.{DEVELOPMENT_TESTENV_DOMAIN}:443
+        httpbin_go: https://httpbingo.{DEVELOPMENT_TESTENV_DOMAIN}:443
   rhsso:
     # admin credentials
     username: "{DEFAULT_RHSSO_ADMIN_USERNAME}"

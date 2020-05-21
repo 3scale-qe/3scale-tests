@@ -31,7 +31,7 @@ def service_update(service, second_application, private_base_url):
     test_jwt = {"operations": [
         {"op": "==", "value": second_application["client_id"], "match": "jwt_claim", "jwt_claim_name": "azp"}]}
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("routing", {"rules": [{"url": private_base_url("echo-api"),
+    proxy.policies.insert(0, rawobj.PolicyConfig("routing", {"rules": [{"url": private_base_url("echo_api"),
                                                                         "condition": test_jwt}]}))
 
 
@@ -47,7 +47,7 @@ def test_routing_policy_jwt_httpbin(api_client, private_base_url):
 
 def test_routing_policy_jwt_echo_api(second_application, testconfig, private_base_url):
     """Test for the request send with matching value to echo api"""
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     api_client = second_application.api_client(verify=testconfig["ssl_verify"])
     response = api_client.get("/get")
     assert response.status_code == 200

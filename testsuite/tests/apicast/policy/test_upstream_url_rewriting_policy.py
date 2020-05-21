@@ -15,7 +15,7 @@ def service(service, private_base_url):
     """Add url_rewriting policy, configure metrics/mapping"""
     proxy = service.proxy.list()
     proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": private_base_url("echo-api"), "regex": "v1"},
+        "rules": [{"url": private_base_url("echo_api"), "regex": "v1"},
                   {"url": private_base_url(), "regex": "v2"}]}))
     proxy.policies.append(rawobj.PolicyConfig("url_rewriting", {
         "commands": [{"op": "sub", "regex": "httpbin/v1", "replace": "rewrite"},
@@ -35,7 +35,7 @@ def service(service, private_base_url):
 
 def test_url_rewriting_policy_v1(api_client, private_base_url):
     """must rewrite /httpbin/v1 to /rewrite and get response from new domain echo-api.3scale.net"""
-    parsed_url = urlparse(private_base_url("echo-api"))
+    parsed_url = urlparse(private_base_url("echo_api"))
     request = EchoedRequest.create(api_client.get("/httpbin/v1"))
     assert request.path == "/rewrite"
     assert request.headers["X-Forwarded-Host"] == parsed_url.hostname

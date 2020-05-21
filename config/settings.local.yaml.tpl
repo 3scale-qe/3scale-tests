@@ -13,7 +13,7 @@ ${ENVIRONMENT}:
     service:
       backends:
         primary: https://httpbin.${TESTENV_DOMAIN}:443
-        httpbin-go: https://httpbingo.${TESTENV_DOMAIN}:443
+        httpbin_go: https://httpbingo.${TESTENV_DOMAIN}:443
   rhsso:
     # admin credentials
     username: "${RHSSO_ADMIN_USERNAME}"
