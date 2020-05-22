@@ -6,3 +6,18 @@ acceptance:
     - docker
   script:
     - PIPENV_VERBOSITY=-1 make commit-acceptance
+release:
+  only:
+    - tags
+  tags:
+    - shell
+  variables:
+    DOCKER_CONFIG: "/tmp/.docker-config-$CI_CONCURRENT_ID"
+  before_script:
+    - mkdir $DOCKER_CONFIG
+    - cat "${QUAY_ROBOT_ACCOUNT}" >$DOCKER_CONFIG/config.json
+  script:
+    - make dist IMAGENAME="quay.io/rh_integration/3scale-testsuite" PUSHIMAGE=y 
+  after_script:
+    - rm -rf $DOCKER_CONFIG
+
