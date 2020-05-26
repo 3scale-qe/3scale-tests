@@ -72,29 +72,41 @@ mostlyclean:
 help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-release: ## Submit MR of new VERSION
+release: ## Push MR ready branch of new VERSION (and tag VERSION locally)
+release: GITREMOTE ?= origin
 release: VERSION-required Pipfile.lock
-	echo $(VERSION) > VERSION
-	git checkout -b v$(VERSION)
+	echo $(VERSION)-r1 > VERSION
+	git tag|grep -q $(VERSION)-r && git tag|grep $(VERSION)-r|sort -n -tr -k2|tail -1|sed -r 's/($(VERSION)-r)([0-9]+)/echo \1$$((\2+1))/e' > VERSION || :
+	git checkout -b v`cat VERSION`
 	git add VERSION
 	git add -f Pipfile.lock
-	git commit -m"$(VERSION)"
-	git tag -a $(VERSION) -m"$(VERSION)"
+	git commit -m"v`cat VERSION`"
+	git tag -a `cat VERSION` -m"v`cat VERSION`"
 	git rm --cached Pipfile.lock
 	git commit -m"Unfreeze Pipfile.lock after release"
-	git push --tags origin v$(VERSION)
-	git checkout -
+	git push $(GITREMOTE) v`cat VERSION`
+	-git checkout -
 
-dist: ## Build distribution-ready container image
-dist: NAME ?= 3scale-py-testsuite
+dist: ## Build (and push optionally) distribution-ready container image
+dist: IMAGENAME ?= 3scale-py-testsuite
 dist:
 	test -e VERSION
-	git checkout `cat VERSION`
-	docker build -t $(NAME) .
-	docker tag $(NAME) $(NAME):`cat VERSION`
-	docker tag $(NAME) $(NAME):`cut -f1-2 -d. <VERSION`
-	docker tag $(NAME) $(NAME):`cut -f1 -d. <VERSION`
-	git checkout -
+	[ -n "$$NOSWITCH" ] || git checkout `cat VERSION`
+	docker build -t $(IMAGENAME):`cat VERSION` .  # X.Y(.Z)-r#
+	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1 -d- <VERSION`  # X.Y(.Z)
+	grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+		docker tag IMAGENAME:`cat VERSION` $(IMAGENAME):`cut -f1-2 -d. <VERSION` || :  # also X.Y of X.Y.Z
+	grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+		docker tag IMAGENAME:`cat VERSION` $(IMAGENAME):latest || :  # if X.Y-r# (but not X.Y.Z-r#)
+ifdef PUSHIMAGE
+	docker push $(IMAGENAME):`cat VERSION`
+	docker push $(IMAGENAME):`cut -f1 -d- <VERSION`
+	grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+		docker push $(IMAGENAME):`cut -f1-2 -d. <VERSION` || :
+	grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+		docker push $(IMAGENAME):latest || :
+endif
+	-[ -n "$$NOSWITCH" ] || git checkout -
 
 VERSION-required:
 ifndef VERSION
