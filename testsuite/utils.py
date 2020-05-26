@@ -4,6 +4,8 @@ import getpass
 import secrets
 import time
 import typing
+from base64 import b64encode
+from os import urandom
 
 import requests
 
@@ -68,3 +70,9 @@ def blame_desc(request: 'FixtureRequest', text: str = None):
         desc = f"{text}\n\n{desc}"
 
     return desc
+
+
+def random_string(num_bytes):
+    """Generates random string for given number of bytes"""
+    random_bytes = urandom(num_bytes)
+    return b64encode(random_bytes).decode('utf-8')
