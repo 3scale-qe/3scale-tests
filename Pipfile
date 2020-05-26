@@ -30,6 +30,7 @@ openshift-client = "*"
 paramiko = "*"
 docker = "*"
 podman = "*"
+jsondiff = "*"
 
 [requires]
 python_version = "3"

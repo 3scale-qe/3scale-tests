@@ -1,7 +1,7 @@
 # pylint: disable=invalid-name
 "These are constructors to create native 3scale API objects"
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     import threescale_api.resources as resources
@@ -126,3 +126,31 @@ def CustomTennant(username: str):
     org_name = username  # pylint: disable=possibly-unused-variable
     email = "anything@invalid.invalid"  # pylint: disable=possibly-unused-variable
     return locals()
+
+
+# pylint: disable=too-many-arguments
+def ActiveDoc(name: str, body: str, description: str = '',
+              service: Optional["resources.Service"] = None, published: bool = True,
+              skip_swagger_validations: bool = False) -> dict:
+    """
+    builder of params to create an active doc.
+    Args:
+        :param name: name of the plan
+        :param service: The Service associated with this active doc
+        :param body: Active doc. content
+        :param description: description
+        :param published: should it be published?
+        :param skip_swagger_validations: should skip validation?
+    """
+    obj = {
+        'name': name,
+        'body': body,
+        'description': description,
+        'published': published,
+        'skip_swagger_validations': skip_swagger_validations,
+    }
+
+    if service is not None:
+        obj["service_id"] = service["id"]
+
+    return obj
