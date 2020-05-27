@@ -60,14 +60,10 @@ def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
 
     environment = settings["env_for_dynaconf"]
-    try:
-        openshift = settings["openshift"]["servers"]["default"]["server_url"]
-    except (KeyError, TypeError):
-        openshift = "(implicit)"
-
-    project = CONFIGURATION.project
-    threescale = CONFIGURATION.url
-    token = CONFIGURATION.token
+    openshift = settings["openshift"]["servers"]["default"]["server_url"]
+    project = settings["openshift"]["projects"]["threescale"]["name"]
+    threescale = settings["threescale"]["admin"]["url"]
+    version = settings["threescale"]["version"]
 
     return [
         "",
@@ -75,7 +71,7 @@ def pytest_report_header(config):
         f"testsuite: openshift = {openshift}",
         f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
-        f"testsuite: threescale_token = {token}",
+        f"testsuite: for version = {version}",
         ""]
 
 
@@ -132,17 +128,23 @@ def testconfig():
 
 
 @pytest.fixture(scope="session")
-def threescale(configuration, testconfig):
+def threescale(testconfig):
     "Threescale client"
-    verify = testconfig["ssl_verify"]
-    return client.ThreeScaleClient(configuration.url, configuration.token, ssl_verify=verify)
+
+    return client.ThreeScaleClient(
+        testconfig["threescale"]["admin"]["url"],
+        testconfig["threescale"]["admin"]["token"],
+        ssl_verify=testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="session")
-def master_threescale(configuration, testconfig):
-    """Threesale client using master url and token"""
-    verify = testconfig["ssl_verify"]
-    return client.ThreeScaleClient(url=configuration.master_url, token=configuration.master_token, ssl_verify=verify)
+def master_threescale(testconfig):
+    """Threescale client using master url and token"""
+
+    return client.ThreeScaleClient(
+        testconfig["threescale"]["master"]["url"],
+        testconfig["threescale"]["master"]["token"],
+        ssl_verify=testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="session")

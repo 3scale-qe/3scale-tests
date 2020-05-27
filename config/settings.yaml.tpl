@@ -9,11 +9,19 @@ default:
   http2: false # enables http/2 requests to apicast
   threescale:  # now configure threescale details
     version: "{DEFAULT_THREESCALE_VERSION}"  # tested version used for example is some tests needs to be skipped
+    superdomain: "{DEFAULT_THREESCALE_SUPERDOMAIN}"  # Threescale superdomain/wildcard_domain
     service:
       backends:  # list of backend services for testing
         httpbin: https://httpbin.org:443
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
+    gateway:
+      template: "{DEFAULT_APICAST_TEMPLATE}"
+      image: "{DEFAULT_APICAST_IMAGE}"
+      type: "apicast"
+      configuration:
+        staging_deployment: "apicast-staging"
+        production_deployment: "apicast-production"
   openshift:
     projects:
       threescale:
