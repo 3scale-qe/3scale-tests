@@ -6,14 +6,8 @@ from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration):
+def staging_gateway(request, configuration, settings_block):
     """Deploy template apicast gateway."""
-    settings_block = {
-        "deployments": {
-            "staging": blame(request, "staging"),
-            "production": blame(request, "production")
-        }
-    }
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
     gateway.create()
@@ -21,3 +15,14 @@ def staging_gateway(request, configuration):
     request.addfinalizer(gateway.destroy)
 
     return gateway
+
+
+@pytest.fixture(scope="module")
+def settings_block(request):
+    """Settings block for staging gateway"""
+    return {
+        "deployments": {
+            "staging": blame(request, "staging"),
+            "production": blame(request, "production")
+        }
+    }
