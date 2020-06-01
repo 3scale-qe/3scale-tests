@@ -22,6 +22,9 @@ default:
     test_user:
       username: testUser
       password: testUser
+  proxy:
+    http: http://tinyproxy-service.tiny-proxy.svc:8888
+    https: http://tinyproxy-service.tiny-proxy.svc:8888
 
 
 # dynaconf uses development environment by default

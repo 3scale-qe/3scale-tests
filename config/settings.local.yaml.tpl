@@ -25,6 +25,10 @@ ${ENVIRONMENT}:
     projects:
       threescale:
         name: "${OPENSHIFT_THREESCALE_PROJECT}"
+  proxy:
+    # http proxy settings
+    http: http://tinyproxy-service.tiny-proxy.svc:8888
+    https: http://tinyproxy-service.tiny-proxy.svc:8888
   toolbox:
     destination_endpoint: "" # url to 3scale api
     destination_provider_key: "" # token
