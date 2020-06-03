@@ -4,8 +4,11 @@ Test metrics provided by apicast to Prometheus.
 """
 import pytest
 
+from testsuite.gateways.gateways import Capability
 
-pytestmark = pytest.mark.flaky
+pytestmark = [pytest.mark.flaky,
+              pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY),
+              pytest.mark.disruptive]
 
 
 METRICS = [
