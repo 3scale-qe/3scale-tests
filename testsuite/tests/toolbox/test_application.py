@@ -93,7 +93,7 @@ def test_list1(empty_list, my_services, my_applications):
 
 
 @pytest.mark.toolbox
-def test_create1(my_services, my_accounts, my_app_plans):
+def test_create_app1(my_services, my_accounts, my_app_plans):
     """Run command 'create' to create first application"""
     cmd = f"{my_accounts[0]['id']} {my_services[0]['id']} {my_app_plans[0]['id']} app1 --user-key=\"123456\""
     ret = toolbox.run_cmd(create_cmd('create', cmd))
@@ -103,7 +103,7 @@ def test_create1(my_services, my_accounts, my_app_plans):
 
 
 @pytest.mark.toolbox
-def test_create2(my_services, my_accounts, my_app_plans):
+def test_create_app2(my_services, my_accounts, my_app_plans):
     # these fixtures should be created for creating
     # pylint: disable=unused-argument
     """Run command 'create' to create second application"""
@@ -132,7 +132,7 @@ def test_list2(empty_list, my_services, my_applications):
 
 
 @pytest.mark.toolbox
-def test_show1(my_services, my_accounts, my_app_plans):
+def test_show_app2(my_services, my_accounts, my_app_plans):
     """Run command 'show' to show second application"""
     # these fixtures should be created for showing
     # pylint: disable=unused-argument
@@ -149,16 +149,13 @@ def test_show1(my_services, my_accounts, my_app_plans):
 
 
 @pytest.mark.toolbox
-def test_update1(my_services, my_accounts, my_app_plans):
+def test_update_app1_1(my_services, my_accounts, my_app_plans):
     """Run command 'update' to update first application"""
     # these fixtures should be created for updating
     # pylint: disable=unused-argument
     cmd = f"{out_variables['app1']['id']} "
-#    cmd += f"--account={my_accounts[1]['id']} "
     cmd += "--description='app1 description updated' "
     cmd += "--name='app1name' "
-#    cmd += f"--plan={my_app_plans[1]['id']} "
-#    cmd += f"--service={my_services[1]['id']} "
     cmd += '--suspend '
     ret = toolbox.run_cmd(create_cmd('apply', cmd))
     assert not ret['stderr']
@@ -168,7 +165,7 @@ def test_update1(my_services, my_accounts, my_app_plans):
 
 
 @pytest.mark.toolbox
-def test_update2(my_services, my_accounts):
+def test_update_app1_2(my_services, my_accounts):
     """Run command 'update' to update first application again"""
     # these fixtures should be created for update
     # pylint: disable=unused-argument
@@ -201,7 +198,7 @@ def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applicatio
 
 
 @pytest.mark.toolbox
-def test_show2(my_applications):
+def test_show_app1(my_applications):
     """Run command 'show' to show first application"""
     # my_applications and all related fixtures should be created for showing
     # pylint: disable=unused-argument
@@ -219,7 +216,7 @@ def test_show2(my_applications):
 
 
 @pytest.mark.toolbox
-def test_delete1(my_applications):
+def test_delete_app2(my_applications):
     """Run command 'delete' to delete second application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument
@@ -229,7 +226,7 @@ def test_delete1(my_applications):
 
 
 @pytest.mark.toolbox
-def test_delete2(my_applications):
+def test_delete_app1(my_applications):
     """Run command 'delete' to delete first application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument

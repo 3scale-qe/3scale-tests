@@ -18,13 +18,12 @@ def metric_obj(request, service):
     Fixture for service with metric used in this test.
     Only metrics related to Product is supported.
     """
-    obj = service
     name = testsuite.utils.blame(request, 'metric_')
     params = {
         'friendly_name': name,
         'unit': 'Hit'}
-    metric = obj.metrics.create(params=params)
-    yield obj
+    metric = service.metrics.create(params=params)
+    yield service
     if not settings["skip_cleanup"]:
         metric.delete()
 

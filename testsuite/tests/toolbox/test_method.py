@@ -139,12 +139,12 @@ def test_list3(empty_list, service):
 
 
 @pytest.mark.toolbox
-def check_methods():
+def test_check_methods():
     """Check values of created and updated methods."""
     attr_list = constants.METRIC_METHOD_CMP_ATTRS - {'system_name'}
     toolbox.check_object(out_variables['method1'], attr_list, [
         'method1 desc', 'method1', 'method1', 'method1'])
     toolbox.check_object(out_variables['method_system'], attr_list, [
-        'method2 desc', 'method_system', 'method_system', 'method2'])
+        'method2 desc', 'method2', 'method_system', 'method_system'])
     toolbox.check_object(out_variables['method3'], attr_list, [
-        'method1 desc', 'method_system', 'method3', 'method_system'])
+        'method3 desc changed', 'method3', 'method_system', 'method_system'])
