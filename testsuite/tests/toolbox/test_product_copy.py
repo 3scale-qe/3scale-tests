@@ -83,14 +83,28 @@ def my_policy_configs():
         ]
 
 
+@pytest.fixture(scope="module", params=['service', 'product'])
+def product_service(request):
+    """Test copying of service or product"""
+    return request.param
+
+
 @pytest.fixture(scope="module")
-def my_backends_mapping(custom_backend):
+def my_backends_mapping(custom_backend, product_service):
     """
     :return: dict in format {path: backend}
     """
-    # it is possible to have
-    # just one backend because of https://issues.redhat.com/browse/THREESCALE-5035
-    return {'/test1': custom_backend('backend1')}  # , '/test2': custom_backend('backend2')}
+    if product_service == 'product':
+        return {'/test1': custom_backend('backend1'), '/test2': custom_backend('backend2')}
+    return {'/test1': custom_backend('backend1')}
+
+
+@pytest.fixture(scope="module")
+def service_settings(request, product_service):
+    # pylint: disable=unused-argument
+    # it doesn't create new product/service again
+    "dict of service settings to be used when service created"
+    return {"name": blame(request, "svc")}
 
 
 @pytest.fixture(scope="module")
@@ -129,9 +143,11 @@ def my_metrics(service, testconfig):
 
 
 @pytest.fixture(scope="module")
-def my_applications(request, service, custom_application, custom_app_plan, my_metrics, lifecycle_hooks):
+def my_applications(request, service, custom_application, custom_app_plan, my_metrics, lifecycle_hooks,
+                    product_service, private_base_url):
     "application bound to the account and service existing over whole testing session"
     # pylint: disable=too-many-arguments
+    # pylint: disable=unused-argument
     metric1, metric2 = my_metrics
     proxy = service.proxy.list()
 
@@ -175,11 +191,15 @@ def my_activedoc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def toolbox_copy(service, my_applications, my_activedoc):
+def toolbox_copy(service, my_applications, my_activedoc, product_service):
     """Toolbox copies product from one 3scale instance to another one"""
     # pylint: disable=unused-argument
-    copy_cmd = f"product copy -s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} "
-    copy_cmd += f"{service['id']}"
+    copy_cmd = ''
+    if product_service == 'product':
+        copy_cmd = 'product '
+    else:
+        copy_cmd = 'service '
+    copy_cmd += f"copy -s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} {service['id']}"
     ret = toolbox.run_cmd(copy_cmd)
     return (ret['stdout'], ret['stderr'])
 
@@ -192,7 +212,8 @@ def dst_product(toolbox_copy, dest_client):
 
 
 @pytest.mark.toolbox
-def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client, my_metrics, dst_product):
+def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client,
+              my_metrics, dst_product, product_service):
     """Test for checking copied product"""
     # pylint: disable=too-many-locals
     # pylint: disable=too-many-statements
@@ -204,14 +225,18 @@ def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client,
     assert re.findall(r'copy proxy policies', stdout)
     assert re.findall(r'copying all service ActiveDocs', stdout)
 
-    toolbox.cmp_services(service, dst_product)
+    toolbox.cmp_services(service, dst_product, product_service)
 
 
 @pytest.mark.toolbox
-def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_client, my_metrics, dst_product):
+def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_client,
+                  my_metrics, dst_product, product_service):
     """Test backends of the product."""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
+    if product_service == 'service':
+        pytest.skip("If copying 'service' one backend is copied in background.")
+
     stdout = toolbox_copy[0]
 
     my_service_backend_usages_list = service.backend_usages.list()
@@ -220,7 +245,7 @@ def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_cli
         re.findall(r'source backend ID: (\d+) system_name: (\w+)', stdout)
     }
     for back_use in my_service_backend_usages_list:
-        assert int(back_use['backend_id']) in src_backends.keys()
+        assert int(back_use['backend_id']) in [int(x) for x in list(src_backends.keys())]
         assert back_use.backend['system_name'] == src_backends[int(back_use['backend_id'])]
 
     dst_backends = {
