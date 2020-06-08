@@ -10,57 +10,60 @@ THREESCALE_SRC1 = testsuite.CONFIGURATION.url.\
 THREESCALE_DST1 = settings['toolbox']['destination_endpoint'].\
     replace('//', f"//{settings['toolbox']['destination_provider_key']}@")
 
-# SERVICE_CMP_ATTRS = ('name', 'state', 'end_user_registration_required', 'backend_version',
-#         'deployment_option', 'support_email',)
-#
-# PROXY_CONFIG_CMP_ATTRS = ('environment')
-#
-# PROXY_CONFIG_CONTENT_CMP_ATTRS = (
-#   'name', 'oneline_description', 'description',
-#   'txt_api', 'txt_support', 'txt_features', 'logo_file_name',
-#   'logo_content_type', 'logo_file_size', 'state', 'intentions_required',
-#   'draft_name', 'infobar', 'terms', 'display_provider_keys',
-#   'tech_support_email', 'admin_support_email', 'credit_card_support_email',
-#   'buyers_manage_apps', 'buyers_manage_keys', 'custom_keys_enabled',
-#   'buyer_plan_change_permission', 'buyer_can_select_plan',
-#   'notification_settings', 'default_application_plan_id',
-#   'default_service_plan_id', 'default_end_user_plan_id',
-#   'end_user_registration_required', 'system_name', 'backend_version',
-#   'mandatory_app_key', 'buyer_key_regenerate_enabled', 'support_email',
-#   'referrer_filters_required', 'deployment_option',
-#   'kubernetes_service_link', 'proxiable?', 'backend_authentication_type',
-# )
-#
-# PROXY_CONFIG_CONTENT_PROXY_CMP_ATTRS = (
-#   'deployed_at', 'api_backend', 'auth_app_key', 'auth_app_id',
-#   'auth_user_key', 'credentials_location', 'error_auth_failed',
-#   'error_auth_missing', 'error_status_auth_failed', 'error_headers_auth_failed',
-#   'error_status_auth_missing', 'error_headers_auth_missing', 'error_no_match',
-#   'error_status_no_match', 'error_headers_no_match', 'hostname_rewrite',
-#   'oauth_login_url', 'api_test_path', 'api_test_success',
-#   'apicast_configuration_driven', 'oidc_issuer_endpoint', 'authentication_method',
-#   'hostname_rewrite_for_sandbox', 'endpoint_port', 'valid?',
-#   'service_backend_version',
-# )
-#
-# PROXY_POLICY_CHAIN_CMP_ATTRS = ('name', 'version')
+# 'name', 'state', 'end_user_registration_required', 'backend_version',
+# 'deployment_option', 'support_email', 'buyer_can_select_plan',
+# 'buyer_key_regenerate_enabled', 'buyer_plan_change_permission',
+# 'buyers_manage_apps', 'buyers_manage_keys', 'custom_keys_enabled','intentions_required',
+# 'mandatory_app_key', 'referrer_filters_required'
+SERVICE_CMP_ATTRS = {'created_at', 'id', 'links', 'system_name', 'updated_at'}
 
-# PROXY_RULES_CMP_ATTRS = [
-#   :http_method, :pattern, :metric_system_name, :delta, :redirect_url, :parameters,
-#   :querystring_parameters,
-# ].freeze
-#
-# PROXY_CMP_ATTRS = [
-#   :api_backend, :api_test_path, :auth_app_id, :auth_app_key, :auth_user_key,
-#   :credentials_location, :error_auth_failed, :error_auth_missing,
-#   :error_headers_auth_failed, :error_headers_auth_missing, :error_headers_no_match,
-#   :error_no_match, :error_status_auth_failed, :error_status_auth_missing,
-#   :error_status_no_match, :lock_version, :secret_token,
-# ].freeze
-#
-# PROXY_POLICY_CMP_ATTRS = [
-#   :name, :humanName, :description, :version, :enabled, :removable, :id,
-# ].freeze
+# 'admin_support_email', 'backend_authentication_type', 'backend_version',
+# 'buyer_can_select_plan', 'buyer_key_regenerate_enabled', 'buyer_plan_change_permission',
+# 'buyers_manage_apps', 'buyers_manage_keys', 'credit_card_support_email',
+# 'custom_keys_enabled', 'default_application_plan_id', 'default_end_user_plan_id',
+# 'default_service_plan_id', 'deployment_option', 'description', 'display_provider_keys',
+# 'draft_name', 'end_user_registration_required', 'infobar', 'intentions_required',
+# 'kubernetes_service_link', 'logo_content_type', 'logo_file_name', 'logo_file_size',
+# 'mandatory_app_key', 'name', 'notification_settings', 'oneline_description', 'proxiable?',
+# 'referrer_filters_required', 'state', 'support_email', 'system_name', 'tech_support_email',
+# 'terms', 'txt_api', 'txt_features', 'txt_support'
+
+PROXY_CONFIG_CONTENT_CMP_ATTRS = {
+        'account_id', 'backend_authentication_value',
+        'created_at', 'id', 'proxy', 'tenant_id', 'updated_at'}
+
+# 'api_backend', 'api_test_path', 'api_test_success', 'apicast_configuration_driven',
+# 'auth_app_id', 'auth_app_key', 'auth_user_key', 'authentication_method',
+# 'credentials_location', 'deployed_at', 'endpoint_port', 'error_auth_failed',
+# 'error_auth_missing', 'error_headers_auth_failed', 'error_headers_auth_missing',
+# 'error_headers_limits_exceeded', 'error_headers_no_match', 'error_limits_exceeded',
+# 'error_no_match', 'error_status_auth_failed', 'error_status_auth_missing',
+# 'error_status_limits_exceeded', 'error_status_no_match', 'hostname_rewrite',
+# 'hostname_rewrite_for_sandbox', 'jwt_claim_with_client_id', 'jwt_claim_with_client_id_type',
+# 'oauth_login_url', 'oidc_issuer_endpoint', 'oidc_issuer_type', 'service_backend_version',
+# 'valid?'
+PROXY_CONFIG_CONTENT_PROXY_CMP_ATTRS = {
+        'backend', 'created_at', 'endpoint', 'hosts',
+        'id', 'lock_version', 'policy_chain', 'production_domain', 'proxy_rules',
+        'sandbox_endpoint', 'secret_token', 'service_id', 'staging_domain',
+        'tenant_id', 'updated_at'}
+
+# 'delta', 'http_method', 'last', 'owner_type', 'parameters', 'pattern', 'position',
+# 'querystring_parameters', 'redirect_url'
+PROXY_RULES_CMP_ATTRS = {
+        'created_at', 'id', 'metric_id', 'metric_system_name', 'owner_id',
+        'proxy_id', 'tenant_id', 'updated_at'}
+
+# 'api_test_path', 'auth_app_id', 'auth_app_key', 'auth_user_key', 'credentials_location',
+# 'deployment_option', 'error_auth_failed', 'error_auth_missing', 'error_headers_auth_failed',
+# 'error_headers_auth_missing', 'error_headers_limits_exceeded', 'error_headers_no_match',
+# 'error_limits_exceeded', 'error_no_match', 'error_status_auth_failed',
+# 'error_status_auth_missing', 'error_status_limits_exceeded', 'error_status_no_match',
+# 'lock_version', 'oidc_issuer_endpoint', 'oidc_issuer_type', 'secret_token'
+
+PROXY_CMP_ATTRS = {
+        'api_backend', 'created_at', 'endpoint', 'links', 'lock_version', 'policies_config',
+        'sandbox_endpoint', 'service_id', 'updated_at'}
 
 # name, system_name, friendly_name, unit, description
 METRIC_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at', 'system_name'}
@@ -74,20 +77,22 @@ MAPPING_CMP_ATTRS = {'created_at', 'id', 'last', 'links', 'metric_id', 'position
 # name, system_name, description, private_endpoint
 BACKEND_CMP_ATTRS = {'id', 'account_id', 'created_at', 'updated_at', 'links'}
 
-# APP_PLANS_CMP_ATTRS = [
-#   :name, :state, :setup_fee, :cost_per_month, :trial_period_days,
-#   :cancellation_period, :default, :custom, :system_name,
-#   :end_user_required,
-# ].freeze
-#
-# PRICING_RULES_CMP_ATTRS = [
-#   :cost_per_unit, :min, :max,
-# ].freeze
-#
-# ACTIVEDOCS_CMP_ATTRS = [
-#   :name, :description, :published, :skip_swagger_validations, :body,
-# ].freeze
-#
+# 'approval_required', 'cancellation_period', 'cost_per_month', 'custom', 'default',
+# 'end_user_required', 'name', 'setup_fee', 'state', 'system_name', 'trial_period_days'
+APP_PLANS_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at'}
+
+# 'period', 'value'
+LIMITS_CMP_ATTR = {'id', 'metric_id', 'plan_id', 'created_at', 'updated_at', 'links'}
+
+# 'cost_per_unit', 'min', 'max'
+PRICING_RULES_CMP_ATTRS = {'id', 'metric_id', 'created_at', 'updated_at', 'links'}
+
+# 'system_name', 'name', 'description', 'published', 'skip_swagger_validations', 'body'
+ACTIVEDOCS_CMP_ATTRS = {'id', 'service_id', 'created_at', 'updated_at'}
+
+# 'path'
+BACKEND_USAGES_CMP_ATTRS = {'id', 'service_id', 'backend_id', 'links'}
+
 # APPLICATION_CMP_ATTRS = [
 #   :state, :enabled, :end_user_required, :name, :description,
 # ].freeze

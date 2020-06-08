@@ -145,18 +145,62 @@ def master_threescale(configuration, testconfig):
     return client.ThreeScaleClient(url=configuration.master_url, token=configuration.master_token, ssl_verify=verify)
 
 
-@pytest.fixture(scope="session")
-def account(threescale, request, testconfig):
+@pytest.fixture(scope="module")
+def account(custom_account, request, testconfig):
     "Preconfigured account existing over whole testing session"
-    name = blame(request, "id")
-    account = dict(name=name, username=name, org_name=name,
-                   email=f"{name}@anything.invalid")
-    account = threescale.accounts.create(params=account)
-
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(account.delete)
+    iname = blame(request, "id")
+    account = dict(name=iname, username=iname, org_name=iname)
+    account = custom_account(params=account)
 
     return account
+
+
+@pytest.fixture(scope="module")
+def custom_account(threescale, request, testconfig):
+    """Parametrized custom Account
+
+    Args:
+        :param params: dict for remote call, rawobj.Account should be used
+    """
+
+    def _custom_account(params, autoclean=True):
+        acc = threescale.accounts.create(params=params)
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(acc.delete())
+        return acc
+
+    return _custom_account
+
+
+@pytest.fixture(scope="session")
+def user(custom_user, account, request, testconfig, configuration):
+    "Preconfigured user existing over whole testing session"
+    username = blame(request, 'us')
+    domain = configuration.superdomain
+    usr = dict(username=username, email=f"{username}@{domain}",
+               password=blame(request, ''), account_id=account['id'])
+    usr = custom_user(account, params=usr)
+
+    return usr
+
+
+@pytest.fixture(scope="module")
+def custom_user(request, testconfig):  # pylint: disable=unused-argument
+    """Parametrized custom User
+
+    Args:
+        :param params: dict for remote call, rawobj.User should be used
+    """
+
+    def _custom_user(cus_account, params, autoclean=True):
+        usr = cus_account.users.create(params=params)
+        if autoclean and not testconfig["skip_cleanup"]:
+            def finalizer():
+                usr.delete()
+            request.addfinalizer(finalizer)
+        return usr
+
+    return _custom_user
 
 
 @pytest.fixture(scope="session")
@@ -292,6 +336,43 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
         request.addfinalizer(lambda: [item.delete() for item in plans])
 
     return _custom_app_plan
+
+
+@pytest.fixture(scope="module")
+def oas3_body(fil='testsuite/resources/oas3/petstore-expanded.json'):
+    """Loads OAS3 yaml file to string"""
+    with open(fil, 'r') as fil_oas:
+        return fil_oas.read()
+
+
+@pytest.fixture(scope="module")
+def active_doc(request, service, oas3_body, custom_active_doc):
+    """Active doc. bound to service."""
+    return custom_active_doc(
+        rawobj.ActiveDoc(blame(request, "activedoc"), oas3_body, service=service))
+
+
+@pytest.fixture(scope="module")
+def custom_active_doc(threescale, testconfig, request):
+    """Parametrized custom Active document
+
+    Args:
+        :param service: Service object for which active doc. should be created
+        :param body: OAS body - string
+    """
+
+    ads = []
+
+    def _custom_active_doc(params, autoclean=True):
+        acd = threescale.active_docs.create(params=params)
+        if autoclean:
+            ads.append(acd)
+        return acd
+
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(lambda: [item.delete() for item in ads])
+
+    return _custom_active_doc
 
 
 def _select_hooks(hook, hooks):

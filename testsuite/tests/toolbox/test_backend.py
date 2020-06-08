@@ -38,7 +38,6 @@ def my_backend_metrics(request, my_backend):
     for _ in range(5):
         name = testsuite.utils.blame(request, 'metric_')
         params = {
-            'system_name': name,
             'friendly_name': name,
             'description': testsuite.utils.blame_desc(request),
             'unit': random_string()
@@ -60,7 +59,6 @@ def my_backend_methods(request, my_backend):
     for _ in range(5):
         name = testsuite.utils.blame(request, 'method_')
         params = {
-            'system_name': name,
             'friendly_name': name,
             'description': testsuite.utils.blame_desc(request),
             'unit': random_string()
@@ -98,7 +96,7 @@ def toolbox_copy(my_backend, my_backend_metrics, my_backend_methods, my_backend_
     """Toolbox copies backend from one 3scale instance to another one"""
     # pylint: disable=unused-argument
     copy_cmd = f"backend copy -s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} "
-    copy_cmd += f"{my_backend['id']}"
+    copy_cmd += f"{my_backend['system_name']}"
     ret = toolbox.run_cmd(copy_cmd)
     return ret
 
