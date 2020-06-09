@@ -145,17 +145,17 @@ def master_threescale(configuration, testconfig):
     return client.ThreeScaleClient(url=configuration.master_url, token=configuration.master_token, ssl_verify=verify)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def account(custom_account, request, testconfig):
     "Preconfigured account existing over whole testing session"
     iname = blame(request, "id")
-    account = dict(name=iname, username=iname, org_name=iname)
+    account = dict(name=iname, username=iname, org_name=iname, email=f"{iname}@anything.invalid")
     account = custom_account(params=account)
 
     return account
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def custom_account(threescale, request, testconfig):
     """Parametrized custom Account
 
@@ -166,7 +166,7 @@ def custom_account(threescale, request, testconfig):
     def _custom_account(params, autoclean=True):
         acc = threescale.accounts.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(acc.delete())
+            request.addfinalizer(acc.delete)
         return acc
 
     return _custom_account
