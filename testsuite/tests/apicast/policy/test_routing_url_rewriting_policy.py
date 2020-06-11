@@ -1,6 +1,9 @@
 """
 Rewrite spec/functional_specs/policies/combination/routing_url_rewrite_spec.rb
 """
+
+from urllib.parse import urlparse
+
 import pytest
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
@@ -69,7 +72,7 @@ def test_routing_url_rewriting_policy_path(api_client):
     assert echoed_request.path == "/"
 
 
-def test_routing_url_rewriting_policy_path_anything(api_client, application):
+def test_routing_url_rewriting_policy_path_anything(api_client, application, private_base_url):
     """
     Test for the route to httpbin and rewrite the path anything to get
     """
@@ -78,6 +81,6 @@ def test_routing_url_rewriting_policy_path_anything(api_client, application):
     response = api_client.get("/anything")
     echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
-    assert echoed_request.headers["Host"] == "httpbin.org"
+    assert echoed_request.headers["Host"] == urlparse(private_base_url("httpbin")).hostname
     hits = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
     assert hits == old_usage + 5
