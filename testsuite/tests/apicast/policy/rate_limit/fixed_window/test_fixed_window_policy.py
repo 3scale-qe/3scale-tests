@@ -29,6 +29,9 @@ from testsuite.utils import blame
 from ..conftest import service_plus
 
 
+pytestmark = pytest.mark.flaky
+
+
 @fixture_plus
 def service_plus2(service_proxy_settings, custom_service, request):
     """Service configured with parametrized config"""
