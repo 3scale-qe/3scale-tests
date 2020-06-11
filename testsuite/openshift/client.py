@@ -4,7 +4,7 @@ import enum
 import json
 from contextlib import ExitStack
 import os
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Union, Any, Optional, Callable
 
 import openshift as oc
 
@@ -71,10 +71,25 @@ class OpenShiftClient:
 
         return ConfigMaps(self)
 
-    def environ(self, deployment_name: str):
-        """Dict-like access to environment variables of a deployment config """
+    def environ(self, name: str,
+                resource_type: Optional[str] = None,
+                wait_for_resource: Optional[Callable[[str], None]] = None):
+        """Dict-like access to environment variables
+        Args:
+            :param name: Name of the resource
+            :param resource_type: The resource type. Ex.: deploymentconfig, deployment. Defaults to dc
+            :param wait_for_resource: Callable that should be called to wait until the resource is ready
+        """
+        resource_type = resource_type or "dc"
+        wait_for_resource = wait_for_resource or self._wait_for_deployment
+        return Environ(openshift=self, name=name, resource_type=resource_type, wait_for_resource=wait_for_resource)
 
-        return Environ(openshift=self, deployment=deployment_name)
+    def deployment_environ(self, name: str):
+        """Dict-like access to environment variables of a deployment
+        Args:
+            :param name: Name of the resource
+        """
+        return self.environ(name, "deployment", self.wait_for_ready)
 
     def patch(self, resource_type: str, resource_name: str, patch, patch_type: str = None):
         """Patch the specified resource
