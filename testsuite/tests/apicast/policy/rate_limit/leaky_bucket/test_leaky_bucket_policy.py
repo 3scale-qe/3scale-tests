@@ -33,6 +33,9 @@ from testsuite.utils import blame
 TOTAL_REQUESTS = 6
 
 
+pytestmark = pytest.mark.flaky
+
+
 @fixture_plus
 def service(service_proxy_settings, custom_service, request):
     """Service configured with config"""

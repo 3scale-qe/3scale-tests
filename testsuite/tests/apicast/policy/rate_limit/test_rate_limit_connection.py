@@ -37,6 +37,9 @@ from testsuite import rawobj
 from testsuite.utils import randomize, blame
 
 
+pytestmark = pytest.mark.flaky
+
+
 TOTAL_REQUESTS = 20
 CONNECTIONS = 10
 BURST = 5
