@@ -5,11 +5,18 @@ spec/functional_specs/policies/keycloak_role_check/client_roles/keycloak_client_
 spec/functional_specs/policies/keycloak_role_check/realm_roles/keycloak_realm_combined_black_first_policy_spec.rb
 spec/functional_specs/policies/keycloak_role_check/realm_roles/keycloak_realm_combined_white_first_policy_spec.rb
 """
+
+import pytest
+
 from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
 from testsuite.utils import randomize
 
 from testsuite import rawobj
 from .conftest import get_rhsso_client, token
+
+
+# there is issue with RHSSO for prod_client (phala knows more)
+pytestmark = pytest.mark.flaky
 
 
 @fixture_plus
