@@ -24,6 +24,9 @@ default:
       password: testUser
   redis:
     url: redis://apicast-testing-redis:6379/1
+  proxy:
+    http: http://tinyproxy-service.tiny-proxy.svc:8888
+    https: http://tinyproxy-service.tiny-proxy.svc:8888
   toolbox:
     cmd: "podman"
     podman_cert_dir: "/var/data"
