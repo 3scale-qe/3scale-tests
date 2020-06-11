@@ -30,7 +30,7 @@ all-is-package:
 
 test: ## Run test
 test pytest tests: pipenv
-	$(PYTEST) $(flags) testsuite
+	$(PYTEST) -m 'not flaky' $(flags) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
@@ -38,6 +38,12 @@ debug: test
 
 smoke: pipenv
 	$(PYTEST) -n6 -msmoke $(flags) testsuite
+
+flaky: pipenv
+	$(PYTEST) -mflaky $(flags) testsuite
+
+disruptive: pipenv
+	$(PYTEST) --disruptive $(flags) testsuite
 
 junit: pipenv
 	$(PYTEST) --junitxml=junit.xml $(flags) testsuite

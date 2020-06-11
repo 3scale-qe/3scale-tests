@@ -59,16 +59,28 @@ oc get secret system-seed -o yaml -n ${PROJECT}
 ```
 
 #### Running
-Testsuite is using the ``pytest`` as a testing framework, so to run all the tests,
-we can use just:
+Testsuite is using the ``pytest`` as a testing framework, couple of make
+targets are ready
 
-```bash
-$ pipenv run ./run-testsuite
-```
+`make smoke`
+ - smoke tests, short in count, wuick in execution
 
-Or `make test` can be used
+`make test`
+ - general way to run the testsuite; troublesome tests excluded == no flaky or disruptive
 
+`make flaky`
+ - unstable tests causing false alarms
 
+`make disruptive`
+ - tests with side-effect
+
+Targets can be combined
+
+`make test flaky`
+ - to run general tests together with flaky
+
+`make -k test flaky`
+ - to ensure flaky is executed even if general test ends with failure
 
 ### Test options
 
