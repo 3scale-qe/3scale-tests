@@ -35,7 +35,7 @@ def listed_service_client(listed_service, listed_service_application, staging_ga
     return client
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def api_client(application):
     """Sets session to api client for skipping retrying feature."""
 
@@ -46,11 +46,11 @@ def api_client(application):
     return application.api_client(session=session)
 
 
-def test_listed_service_should_return_ok(listed_service_client):
-    """Call to listed service should returns 200 OK."""
-    assert listed_service_client.get("/get").status_code == 200
-
-
-def test_not_listed_service_should_return_not_found(api_client):
+# initially this was designed in two separate tests, that didn't work as there
+# was order dependency because of setup in listed_service_client, so either
+# single selected execution or parallel run were failing
+def test_apicast_services_list_param(listed_service_client, api_client):
     """Call to not listed service should returns 404 NotFound."""
+
+    assert listed_service_client.get("/get").status_code == 200
     assert api_client.get("/get").status_code == 404
