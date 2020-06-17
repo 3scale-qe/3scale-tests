@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
+from testsuite.openshift.env import Environ
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
@@ -37,11 +38,9 @@ class SystemApicast(AbstractApicast):
             self.deployment_name = requirements.production_deployment
         self.openshift: "OpenShiftClient" = requirements.current_openshift
 
-    def set_env(self, name: str, value):
-        self.openshift.environ(self.deployment_name)[name] = value
-
-    def get_env(self, name: str):
-        return self.openshift.environ(self.deployment_name)[name]
+    @property
+    def environ(self) -> Environ:
+        return self.openshift.environ(self.deployment_name)
 
     def reload(self):
         self.openshift.rollout(f"dc/{self.deployment_name}")

@@ -12,6 +12,7 @@ class ContainerizedApicast(AbstractApicast):
     Gateway intended for use with RHEL based Apicasts deployed in containerized environments
     For the time being it has same requirements as SelfManagedApicast
     """
+
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         self.staging_endpoint = requirements.staging_endpoint
         self.production_endpoint = requirements.production_endpoint
@@ -29,12 +30,6 @@ class ContainerizedApicast(AbstractApicast):
             "endpoint": self.production_endpoint % name
         })
         return proxy_params
-
-    def set_env(self, name: str, value):
-        raise NotImplementedError()
-
-    def get_env(self, name: str):
-        raise NotImplementedError()
 
     def reload(self):
         raise NotImplementedError()

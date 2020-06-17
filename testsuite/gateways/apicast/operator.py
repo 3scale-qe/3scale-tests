@@ -22,6 +22,7 @@ class OperatorApicastRequirements(SelfManagedApicastRequirements, ABC):
 
 class OperatorApicast(SelfManagedApicast):
     """Gateway for use with Apicast deployed by operator"""
+
     def __init__(self, requirements: OperatorApicastRequirements) -> None:
         super().__init__(requirements)
         if requirements.staging:
@@ -43,12 +44,6 @@ class OperatorApicast(SelfManagedApicast):
 
     def on_service_delete(self, service: Service):
         del self.openshift.routes[self._route_name(service.entity_id)]
-
-    def set_env(self, name: str, value):
-        raise NotImplementedError()
-
-    def get_env(self, name: str):
-        raise NotImplementedError()
 
     def reload(self):
         self.openshift.do_action("delete", ["pod", "--force",

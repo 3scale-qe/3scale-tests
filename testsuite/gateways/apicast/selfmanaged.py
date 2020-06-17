@@ -4,6 +4,7 @@ from typing import Dict
 from threescale_api.resources import Service
 
 from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
+from testsuite.openshift.env import Environ
 
 
 class SelfManagedApicastRequirements(GatewayRequirements, ABC):
@@ -61,11 +62,9 @@ class SelfManagedApicast(AbstractApicast):
         })
         return proxy_params
 
-    def set_env(self, name: str, value):
-        self.openshift.environ(self.deployment)[name] = value
-
-    def get_env(self, name: str):
-        return self.openshift.environ(self.deployment)[name]
+    @property
+    def environ(self) -> Environ:
+        return self.openshift.environ(self.deployment)
 
     def reload(self):
         self.openshift.rollout(self.deployment)
