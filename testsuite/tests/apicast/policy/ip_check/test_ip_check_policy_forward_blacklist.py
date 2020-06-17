@@ -6,6 +6,10 @@ import pytest
 from testsuite import rawobj
 
 
+# (obviously?) this doesn't work from container
+pytestmark = pytest.mark.flaky
+
+
 @pytest.fixture(scope="module")
 def policy_settings(ip4_addresses):
     "Update policy settings"
