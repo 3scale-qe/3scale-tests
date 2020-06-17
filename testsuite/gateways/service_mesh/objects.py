@@ -1,5 +1,6 @@
 """Helper objects for Service mesh gateway"""
 from testsuite.openshift.client import OpenShiftClient
+from testsuite.openshift.env import Environ
 from testsuite.requirements import ThreeScaleAuthDetails
 
 # pylint: disable=too-few-public-methods
@@ -80,3 +81,8 @@ class ServiceMesh:
 
             self._ingress_url = "http://" + route["spec"]["host"]
         return self._ingress_url
+
+    @property
+    def environ(self) -> Environ:
+        """Returns Environ object for manipulation adapter environment"""
+        return self.openshift.deployment_environ("3scale-istio-adapter")

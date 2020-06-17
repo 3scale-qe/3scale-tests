@@ -1,5 +1,6 @@
 """Service mesh gateway"""
 from abc import ABC, abstractmethod
+from typing import Dict
 
 from threescale_api.resources import Service, Application
 
@@ -30,6 +31,7 @@ class ServiceMeshGateway(AbstractGateway):
     def __init__(self, configuration: ServiceMeshRequirements):
         self.mesh = configuration.mesh
         self.httpbin = configuration.httpbin
+        self.env_vars: Dict[str, str] = {}
         self._ingress_url = None
 
     def before_service(self, service_params: dict) -> dict:
@@ -45,9 +47,15 @@ class ServiceMeshGateway(AbstractGateway):
 
     def create(self):
         self.mesh.patch_credentials()
+        # pylint: disable=protected-access
+        self.env_vars = {name: value.get() for name, value in self.mesh.environ._envs.items()}
 
     def destroy(self):
-        return
+        self.mesh.environ.set_many(self.env_vars)
+
+    def environ(self):
+        """Returns environ for Service Mesh Gateway"""
+        return self.mesh.environ
 
     # pylint: disable=unused-argument
     def _create_api_client(self, application, endpoint, session, verify):
