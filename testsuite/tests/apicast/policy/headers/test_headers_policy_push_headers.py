@@ -10,6 +10,13 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """Have httpbin backend due to /response-headers implementation"""
+
+    return rawobj.Proxy(private_base_url("httpbin"))
+
+
+@pytest.fixture(scope="module")
 def policy_settings():
     "configure headers in policy"
     return rawobj.PolicyConfig("headers", {

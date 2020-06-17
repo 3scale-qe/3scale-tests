@@ -10,6 +10,13 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.6')")
 
 
 @pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """Have httpbin backend due to /delay implementation"""
+
+    return rawobj.Proxy(private_base_url("httpbin"))
+
+
+@pytest.fixture(scope="module")
 def policy_settings():
     "config of upstream connection policy with read_timeout set"
     return rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5})
