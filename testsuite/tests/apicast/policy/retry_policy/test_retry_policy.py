@@ -14,6 +14,13 @@ from testsuite import rawobj
 
 
 @pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """Have httpbin backend due to /fail-request implementation"""
+
+    return rawobj.Proxy(private_base_url("httpbin"))
+
+
+@pytest.fixture(scope="module")
 def policy_settings():
     """Append the retry policy configured to 5 retries"""
     return rawobj.PolicyConfig("retry", {"retries": 5})
