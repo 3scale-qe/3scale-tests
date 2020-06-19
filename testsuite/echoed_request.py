@@ -5,6 +5,8 @@ e.g httpbin-go returns headers 'Host': ["httpbingo.org"], but httpbin returns 'H
 
 # pylint: disable=too-few-public-methods
 
+import urllib.parse
+
 import requests
 from requests.structures import CaseInsensitiveDict
 
@@ -17,6 +19,16 @@ class EchoedRequest:
         self.json = response.json()
         self.headers: CaseInsensitiveDict = CaseInsensitiveDict(data=self.json.get("headers"))
         self.params = self.json.get("args")
+
+        # non-zero length string needs to be parsed and converted to dict
+        # smells like bit of inconsistency, self.params should be of one type
+        # instead of that few conversions happen. Something to fix in future
+        if isinstance(self.params, str) and len(self.params) > 0:
+            self.params = urllib.parse.parse_qs(self.params, keep_blank_values=True)
+            for key in self.params:
+                if isinstance(self.params[key], list) and len(self.params[key]) == 1:
+                    self.params[key] = self.params[key][0]
+
         self.body = self.json.get("body")
         self.path = self.json.get("path")
 
@@ -24,10 +36,15 @@ class EchoedRequest:
     def create(response: requests.Response):
         """Factory method to create different backends"""
 
-        if "echo-api" in response.json()["headers"].get("HTTP_HOST", ""):
+        data = response.json()
+
+        if "HTTP_HOST" in data["headers"]:
             return _EchoApiRequest(response)
 
-        if "httpbingo." in response.json()["headers"].get("Host", ""):
+        if list in [type(i) for i in data["headers"].values()]:
+            return _HttpbinGoRequest(response)
+
+        if list in [type(i) for i in data["args"] if len(i) == 1]:
             return _HttpbinGoRequest(response)
 
         return EchoedRequest(response)
