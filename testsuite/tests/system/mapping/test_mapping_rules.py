@@ -37,6 +37,9 @@ def service(service, endpoints_and_methods):
 
     metric = service.metrics.create(rawobj.Metric("metric"))
 
+    # delete implicit '/' rule
+    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+
     for url, method in endpoints_and_methods:
         proxy.mapping_rules.create(
             rawobj.Mapping(metric, pattern=url,
