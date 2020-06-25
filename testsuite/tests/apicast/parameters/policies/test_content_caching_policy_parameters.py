@@ -18,11 +18,11 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway):
-    """Add env for content caching"""
-    staging_gateway.set_env("APICAST_CACHE_STATUS_CODES", "200")
-    staging_gateway.set_env("APICAST_CACHE_MAX_TIME", "30s")
-    return staging_gateway
+def gateway_environment(gateway_environment):
+    """Enable caching on gateway"""
+    gateway_environment.update({"APICAST_CACHE_STATUS_CODES": "200",
+                                "APICAST_CACHE_MAX_TIME": "30s"})
+    return gateway_environment
 
 
 @pytest.fixture(scope="module")

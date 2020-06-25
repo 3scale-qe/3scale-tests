@@ -2,7 +2,6 @@
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.utils import blame
 
 
@@ -20,24 +19,18 @@ def route_name(request):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, route_name):
+def staging_gateway(staging_gateway, route_name):
     """Deploy template apicast gateway."""
-    settings_block = {
-        "deployments": {
-            "staging": blame(request, "path-routing"),
-            "production": blame(request, "path-routing")
-        },
-        "service_routes": False,
-    }
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-    gateway.create()
+    staging_gateway.add_route(route_name)
 
-    gateway.add_route(route_name)
+    return staging_gateway
 
-    request.addfinalizer(gateway.destroy)
 
-    return gateway
+@pytest.fixture(scope="module")
+def settings_block(settings_block):
+    """Settings block for staging gateway"""
+    settings_block["service_routes"] = False
+    return settings_block
 
 
 @pytest.fixture(scope="module")

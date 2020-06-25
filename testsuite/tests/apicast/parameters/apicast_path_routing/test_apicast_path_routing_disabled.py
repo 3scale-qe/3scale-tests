@@ -13,6 +13,13 @@ from testsuite.gateways.gateways import Capability
 pytestmark = pytest.mark.required_capabilities(Capability.APICAST)
 
 
+@pytest.fixture(scope="module")
+def gateway_environment(gateway_environment):
+    """Disabled path routing on gateway"""
+    gateway_environment.update({"APICAST_PATH_ROUTING": 0})
+    return gateway_environment
+
+
 def test_get_route_request_returns_ok(api_client, private_base_url):
     """Call to mapping /get should returns 200 OK."""
     response = api_client.get("/get")

@@ -21,14 +21,14 @@ def settings_block(settings_block, configuration, protocol):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway, testconfig):
-    """Set HTTP_PROXY to staging gateway."""
+def environment(environment, testconfig):
+    """Adds HTTP proxy to the staging gateway"""
     proxy_endpoint = testconfig["proxy"]
 
-    staging_gateway.set_env("HTTP_PROXY", proxy_endpoint['http'])
-    staging_gateway.set_env("HTTPS_PROXY", proxy_endpoint['https'])
-    staging_gateway.set_env("NO_PROXY", "backend-listener,system-master")
-    return staging_gateway
+    environment.update({"HTTP_PROXY": proxy_endpoint['http'],
+                        "HTTPS_PROXY": proxy_endpoint['https'],
+                        "NO_PROXY": "backend-listener,system-master"})
+    return environment
 
 
 @pytest.fixture(scope="module")
