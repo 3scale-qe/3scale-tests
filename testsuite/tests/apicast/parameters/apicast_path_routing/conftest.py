@@ -40,14 +40,20 @@ def endpoint(staging_gateway, route_name):
 
 
 @pytest.fixture(scope="module")
-def service(service, endpoint):
+def service_mapping():
+    """Change mapping rule for service"""
+    return "/get"
+
+
+@pytest.fixture(scope="module")
+def service(service, endpoint, service_mapping):
     """Delete mapping rules and add new one from/to default service."""
     proxy = service.proxy.list()
     metric = service.metrics.list()[0]
 
     delete_all_mapping_rules(proxy)
 
-    proxy.mapping_rules.create(rawobj.Mapping(metric, "/get"))
+    proxy.mapping_rules.create(rawobj.Mapping(metric, service_mapping))
 
     proxy.update({"sandbox_endpoint": endpoint})
 
@@ -61,7 +67,14 @@ def service2_proxy_settings(private_base_url):
 
 
 @pytest.fixture(scope="module")
-def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, endpoint):
+def service2_mapping():
+    """Change mapping rule for service2"""
+    return "/echo"
+
+
+# pylint: disable=too-many-arguments
+@pytest.fixture(scope="module")
+def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, endpoint, service2_mapping):
     """Create second service and mapping rule."""
     service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings,
                               hooks=lifecycle_hooks)
@@ -70,8 +83,7 @@ def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, 
     proxy = service2.proxy.list()
 
     delete_all_mapping_rules(proxy)
-
-    proxy.mapping_rules.create(rawobj.Mapping(metric, "/echo"))
+    proxy.mapping_rules.create(rawobj.Mapping(metric, service2_mapping))
 
     proxy.update({"sandbox_endpoint": endpoint})
 

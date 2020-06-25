@@ -23,9 +23,9 @@ def gateway_environment(gateway_environment):
 def test_get_route_request_returns_ok(api_client, private_base_url):
     """Call to mapping /get should returns 200 OK."""
     response = api_client.get("/get")
-    echoed = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed = EchoedRequest.create(response)
     assert echoed.headers["Host"] == urlparse(private_base_url()).hostname
 
 

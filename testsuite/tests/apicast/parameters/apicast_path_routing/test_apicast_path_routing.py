@@ -35,9 +35,9 @@ def test_get_route_request_returns_ok(api_client, private_base_url):
 def test_echo_route_request_returns_ok(api_client2, private_base_url):
     """Call to mapping /echo returns 200 OK."""
     response = api_client2.get("/echo")
-    echoed = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed = EchoedRequest.create(response)
     assert echoed.headers["Host"] == urlparse(private_base_url("echo_api")).hostname
 
 

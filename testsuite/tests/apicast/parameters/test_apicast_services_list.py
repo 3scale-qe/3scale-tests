@@ -20,16 +20,16 @@ def gateway_environment(gateway_environment, listed_service):
 
 
 @pytest.fixture(scope="module")
-def listed_service(service_proxy_settings, custom_service, request):
+def listed_service(service_proxy_settings, custom_service, request, lifecycle_hooks):
     """Create custom service to be listed."""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
-def listed_service_application(listed_service, custom_app_plan, custom_application, request):
+def listed_service_application(listed_service, custom_app_plan, custom_application, request, lifecycle_hooks):
     """Create custom application for listed service."""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), listed_service)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
