@@ -5,7 +5,6 @@ Apicast should use all traffic through the defined proxy via HTTP_PROXY env var.
 from urllib.parse import urlparse
 
 import pytest
-import requests
 
 from testsuite import rawobj
 
@@ -27,16 +26,13 @@ def staging_gateway(staging_gateway, testconfig):
     return staging_gateway
 
 
-def test_proxied_request(application, private_base_url):
+def test_proxied_request(api_client, private_base_url):
     """Call to /headers should go through Fuse Camel proxy and return 200 OK."""
-    session = requests.Session()
-    session.auth = application.authobj
 
-    client = application.api_client(session=session)
+    response = api_client.get("/headers")
+    assert response.status_code == 200
 
-    response = client.get("/headers")
     headers = response.json()["headers"]
 
-    assert response.status_code == 200
     assert "Fuse-Camel-Proxy" in headers
     assert headers["Source-Header"] == urlparse(private_base_url("httpbin_nossl")).hostname
