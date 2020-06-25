@@ -13,11 +13,10 @@ After waiting for the time in the 'retry-after' header, the request should
 be accepted.
 """
 
-import datetime
 import time
 import pytest
 from testsuite import rawobj
-from testsuite.utils import blame
+from testsuite.utils import blame, wait_interval, wait_until_next_minute
 
 
 @pytest.fixture(scope="module")
@@ -76,28 +75,6 @@ def gold_client(application_gold):
     returns api client for silver application
     """
     return application_gold.api_client()
-
-
-def wait_interval(min_sec=15, max_sec=45):
-    """
-    The requests has to be send between the 15th and 45th second of the minute
-    When the time is outside of this interval, waits until the start of a next one
-    """
-    seconds = datetime.datetime.now().second
-    if seconds < min_sec or seconds > max_sec:
-        sleep_time = (60 - seconds + min_sec) % 60
-        time.sleep(sleep_time)
-
-
-def wait_until_next_minute(min_sec=15, max_sec=45):
-    """
-     Waits until the start of the next minute when are the limits reseted,
-     then waits until the start of the interval allowed to sent requests
-    """
-    seconds = datetime.datetime.now().second
-    time.sleep(60 - seconds)
-    if min_sec < seconds < max_sec:
-        wait_interval()
 
 
 def assert_limit_works(client, limit):

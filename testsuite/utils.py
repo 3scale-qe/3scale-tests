@@ -1,5 +1,6 @@
 "testsuite helpers"
 
+import datetime
 import getpass
 import secrets
 import time
@@ -76,3 +77,25 @@ def random_string(num_bytes):
     """Generates random string for given number of bytes"""
     random_bytes = urandom(num_bytes)
     return b64encode(random_bytes).decode('utf-8')
+
+
+def wait_interval(min_sec=15, max_sec=45):
+    """
+    The requests has to be send between the 15th and 45th second of the minute
+    When the time is outside of this interval, waits until the start of a next one
+    """
+    seconds = datetime.datetime.now().second
+    if seconds < min_sec or seconds > max_sec:
+        sleep_time = (60 - seconds + min_sec) % 60
+        time.sleep(sleep_time)
+
+
+def wait_until_next_minute(min_sec=15, max_sec=45):
+    """
+     Waits until the start of the next minute when are the limits reseted,
+     then waits until the start of the interval allowed to sent requests
+    """
+    seconds = datetime.datetime.now().second
+    time.sleep(60 - seconds)
+    if min_sec < seconds < max_sec:
+        wait_interval()
