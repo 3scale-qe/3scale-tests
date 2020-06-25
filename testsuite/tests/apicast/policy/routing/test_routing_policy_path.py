@@ -2,7 +2,9 @@
 Rewrite spec/functional_specs/policies/routing/routing_by_path_spec.rb
 """
 
-from urllib.parse import urlparse
+from socket import gethostbyname
+from urllib.parse import urlsplit, urlunsplit
+
 import pytest
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
@@ -17,14 +19,14 @@ def service_proxy_settings(private_base_url):
 
 
 @pytest.fixture(scope="module")
-def test_httpbin_host(private_base_url):
+def httpbin_host(private_base_url):
     """Custom hostname to be set via policy"""
 
-    return "test.%s" % urlparse(private_base_url("httpbin")).hostname
+    return urlsplit(private_base_url("httpbin")).hostname
 
 
 @pytest.fixture(scope="module")
-def service(service, private_base_url, test_httpbin_host):
+def service(service, private_base_url, httpbin_host):
     """
     Set policy settings
     """
@@ -32,20 +34,38 @@ def service(service, private_base_url, test_httpbin_host):
         {"op": "==", "value": "/anything", "match": "path"}]}
 
     proxy = service.proxy.list()
+
+    # let's convert URL to use IP address to have it different from Host header
+    (scheme, netloc, path, query, fragment) = urlsplit(private_base_url("httpbin"))
+
+    hostname = netloc
+    user = None
+    port = None
+    if "@" in netloc:  # is like user:passwd@fqdn(:port)
+        user, hostname = netloc.split("@", 1)
+    if ":" in hostname:  # now is like fqdn:port
+        hostname, port = hostname.split(":", 1)
+    netloc = gethostbyname(hostname)
+    if user is not None:
+        netloc = f"{user}@{netloc}"
+    if port is not None:
+        netloc = f"{netloc}:{port}"
+    url = urlunsplit((scheme, netloc, path, query, fragment))
+
     proxy.policies.insert(0, {
         "name": "routing",
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "rules": [{"url": private_base_url("httpbin"),
-                       "host_header": test_httpbin_host,
+            "rules": [{"url": url,
+                       "host_header": httpbin_host,
                        "condition": routing_policy_op}]}})
 
     return service
 
 
 @pytest.mark.smoke
-def test_routing_policy_path_anything(api_client, test_httpbin_host):
+def test_routing_policy_path_anything(api_client, httpbin_host):
     """
     Test for the request path send to /anything to httpbin.org/anything
     """
@@ -53,7 +73,7 @@ def test_routing_policy_path_anything(api_client, test_httpbin_host):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == test_httpbin_host
+    assert echoed_request.headers["Host"] == httpbin_host
 
 
 def test_routing_policy_path_alpha(api_client):
@@ -72,7 +92,7 @@ def test_routing_policy_path(api_client):
     Test for the request path send to / to echo api
     """
     response = api_client.get("/")
-    echoed_request = EchoedRequest.create(response)
 
     assert response.status_code == 200
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/"
