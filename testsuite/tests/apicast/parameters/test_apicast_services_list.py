@@ -13,6 +13,13 @@ pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CU
 
 
 @pytest.fixture(scope="module")
+def gateway_environment(gateway_environment, listed_service):
+    """Adds list of services to environment """
+    gateway_environment.update({"APICAST_SERVICES_LIST": listed_service["id"]})
+    return gateway_environment
+
+
+@pytest.fixture(scope="module")
 def listed_service(service_proxy_settings, custom_service, request):
     """Create custom service to be listed."""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
@@ -26,12 +33,9 @@ def listed_service_application(listed_service, custom_app_plan, custom_applicati
 
 
 @pytest.fixture(scope="module")
-def listed_service_client(listed_service, listed_service_application, staging_gateway):
+def listed_service_client(listed_service_application):
     """Sets listed service to apicast."""
     client = listed_service_application.api_client()
-
-    staging_gateway.set_env("APICAST_SERVICES_LIST", listed_service["id"])
-
     return client
 
 

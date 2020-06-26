@@ -14,11 +14,10 @@ pytestmark = [pytest.mark.required_capabilities(Capability.APICAST, Capability.C
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway):
-    """Enable path routing."""
-    staging_gateway.set_env("APICAST_PATH_ROUTING", 1)
-
-    return staging_gateway
+def gateway_environment(gateway_environment):
+    """Enables path routing on gateway"""
+    gateway_environment.update({"APICAST_PATH_ROUTING": 1})
+    return gateway_environment
 
 
 @pytest.fixture(scope="module")

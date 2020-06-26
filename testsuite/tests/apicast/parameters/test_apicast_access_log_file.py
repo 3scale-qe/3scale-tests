@@ -18,12 +18,10 @@ ACCESS_LOG_FILE = "access.log"
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway):
-    """Set access log filepath to gateway."""
-
-    staging_gateway.set_env("APICAST_ACCESS_LOG_FILE", f"/tmp/{ACCESS_LOG_FILE}")
-
-    return staging_gateway
+def gateway_environment(gateway_environment):
+    """Sets location of the log file on the apicast"""
+    gateway_environment.update({"APICAST_ACCESS_LOG_FILE": f"/tmp/{ACCESS_LOG_FILE}"})
+    return gateway_environment
 
 
 @pytest.fixture

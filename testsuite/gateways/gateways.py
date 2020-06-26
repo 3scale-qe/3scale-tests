@@ -3,6 +3,7 @@ import enum
 from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING
 
+from testsuite.openshift.env import Environ
 from testsuite.requirements import OpenshiftRequirement
 from testsuite.lifecycle_hook import LifecycleHook
 
@@ -38,6 +39,11 @@ class AbstractGateway(LifecycleHook, ABC):
 
     CAPABILITIES: List[Capability] = []
 
+    @property
+    def environ(self) -> Environ:
+        """Returns environ object for given gateway"""
+        raise NotImplementedError()
+
     @abstractmethod
     def create(self):
         """Starts this gateway"""
@@ -51,14 +57,6 @@ class AbstractApicast(AbstractGateway, ABC):
     """Interface defining basic functionality of an Apicast gateway"""
 
     CAPABILITIES = [Capability.APICAST]
-
-    @abstractmethod
-    def set_env(self, name: str, value):
-        """Sets the value of environmental variable"""
-
-    @abstractmethod
-    def get_env(self, name: str):
-        """Gets the value of environmental variable"""
 
     @abstractmethod
     def reload(self):

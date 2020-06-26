@@ -17,14 +17,12 @@ def service_proxy_settings(private_base_url):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway, testconfig):
+def gateway_environment(gateway_environment, testconfig):
     """Set HTTP_PROXY to staging gateway."""
-
     proxy_endpoint = testconfig["integration"]["service"]["proxy_service"]
 
-    staging_gateway.set_env("HTTP_PROXY", f"http://{proxy_endpoint}")
-
-    return staging_gateway
+    gateway_environment.update({"HTTP_PROXY": f"http://{proxy_endpoint}"})
+    return gateway_environment
 
 
 def test_proxied_request(application, private_base_url):

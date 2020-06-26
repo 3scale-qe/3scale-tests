@@ -34,7 +34,7 @@ def staging_gateway(configuration, request, custom_route):
     gateway = TemplateApicast(requirements=options)
     gateway.create()
 
-    gateway.set_env("APICAST_PATH_ROUTING", 1)
+    gateway.environ["APICAST_PATH_ROUTING"] = 1
     gateway.add_route(custom_route, "custom-route")
 
     request.addfinalizer(gateway.destroy)

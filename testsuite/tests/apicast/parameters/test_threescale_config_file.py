@@ -14,6 +14,13 @@ from testsuite.utils import blame
 pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
 
 
+@pytest.fixture(scope="module")
+def gateway_environment(gateway_environment):
+    """Sets location of the 3scale config file"""
+    gateway_environment.update({"THREESCALE_CONFIG_FILE": "/opt/config/apicast_config"})
+    return gateway_environment
+
+
 def get_apicast_config(service):
     """Returns sandbox proxy configuration.
 
@@ -40,7 +47,6 @@ def setup_apicast_configuration(service, staging_gateway, configmap_name):
     staging_gateway.openshift.config_maps.add(configmap_name, get_apicast_config(service))
     staging_gateway.openshift.add_volume(staging_gateway.deployment, "apicast-config-vol",
                                          "/opt/config", configmap_name=configmap_name)
-    staging_gateway.set_env("THREESCALE_CONFIG_FILE", "/opt/config/apicast_config")
 
 
 @pytest.fixture(scope="module")

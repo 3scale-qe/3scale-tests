@@ -10,6 +10,7 @@ from testsuite.requirements import ThreeScaleAuthDetails
 from testsuite.openshift.objects import Routes
 
 from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
+from ...openshift.env import Environ
 
 LOGGER = logging.getLogger(__name__)
 
@@ -112,11 +113,9 @@ class TemplateApicast(SelfManagedApicast):
         if self.service_routes:
             self.delete_route(self._route_name(service.entity_id))
 
-    def set_env(self, name: str, value):
-        self.openshift.environ(self.deployment)[name] = value
-
-    def get_env(self, name: str):
-        return self.openshift.environ(self.deployment)[name]
+    @property
+    def environ(self) -> Environ:
+        return self.openshift.environ(self.deployment)
 
     def add_route(self, url_fragment, name: Optional[str] = None):
         """Adds new route for this apicast"""
