@@ -51,6 +51,8 @@ def run_cmd(cmd_input):
 
         _, stdout, stderr = client.exec_command(command)
 
+        assert stdout.channel.recv_exit_status() == 0
+
         stderr = os.linesep.join(stderr.readlines())
         stdout = os.linesep.join(stdout.readlines())
         ret_value.append({'stdout': stdout, 'stderr': stderr})
