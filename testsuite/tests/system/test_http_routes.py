@@ -2,11 +2,16 @@
 Test that http routes will be created and managed by zync
 Regression test for https://issues.redhat.com/browse/THREESCALE-3545
 """
+
 from urllib.parse import urlparse
+
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.gateways.gateways import Capability
+
 
 # This test can be done only with system apicast
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
