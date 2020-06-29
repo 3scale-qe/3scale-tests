@@ -78,19 +78,20 @@ def application2(service2, custom_app_plan, custom_application, request, lifecyc
     return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-def test_request_to_service_returns_ok(api_client):
+# apicast setup happens in service fixture == setup is not global,
+# tests/asserts have order dependency -> must be in one test because of
+# parallel or single test run
+def test_threescale_config_file_param(api_client, application2):
     """Call to /get mappend on service returns 200.
 
     service configuration is available for apicast.
-    """
-    assert api_client.get("/get").status_code == 200
 
-
-def test_request_to_service2_fails(application2):
-    """Call to /get on service2 returns 404.
+    Call to /get on service2 returns 404.
 
     service2 configuration is not available for apicast.
     """
+    assert api_client.get("/get").status_code == 200
+
     session = requests.Session()
     session.auth = application2.authobj
 
