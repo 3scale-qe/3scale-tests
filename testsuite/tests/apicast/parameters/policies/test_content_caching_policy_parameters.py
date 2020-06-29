@@ -45,14 +45,14 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend, private_base_url):
+def backends_mapping(custom_backend, private_base_url, lifecycle_hooks):
     """
     Create 2 separate backends:
         - path to Backend 1: "/echo-api"
         - path to Backend 2: "/httpbin"
     """
-    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api")),
-            "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin"))}
+    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api"), hooks=lifecycle_hooks),
+            "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin_go"), hooks=lifecycle_hooks)}
 
 
 @pytest.fixture(scope="module")
@@ -104,19 +104,19 @@ def test_wont_cache(api_client, private_base_url):
     """Test that redirected request (302 status code) will not be cached"""
     payload = {'url': private_base_url("echo_api")}
     response = api_client.get("/httpbin/redirect-to", params=payload, headers=dict(origin="localhost"))
-    echoed_request = EchoedRequest.create(response)
     # First request was redirected
     assert response.history[0].status_code == 302
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
+    echoed_request = EchoedRequest.create(response)
 
     # wont cache redirect request
     response = api_client.get("/httpbin/redirect-to", params=payload, headers=dict(origin="localhost"))
-    echoed_request2 = EchoedRequest.create(response)
     # First request was redirected
     assert response.history[0].status_code == 302
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
+    echoed_request2 = EchoedRequest.create(response)
 
     # body wasn't cached
     assert echoed_request.json['uuid'] != echoed_request2.json['uuid']
@@ -141,9 +141,10 @@ def test_will_cache(api_client, api_client2):
 
     # another service wont hit the cache with the same request
     response = api_client2.get("/echo-api/testing", headers=dict(origin="localhost"))
-    echoed_request_not_cached = EchoedRequest.create(response)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
+
+    echoed_request_not_cached = EchoedRequest.create(response)
     assert echoed_request.json['uuid'] != echoed_request_not_cached.json['uuid']
 
     # Timeout is set to 30, so this should be safe
@@ -151,7 +152,8 @@ def test_will_cache(api_client, api_client2):
 
     # request expired
     response = api_client.get("/echo-api/testing", headers=dict(origin="localhost"))
-    echoed_request_new = EchoedRequest.create(response)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "EXPIRED"
+    echoed_request_new = EchoedRequest.create(response)
+
     assert echoed_request.json['uuid'] != echoed_request_new.json['uuid']

@@ -4,7 +4,6 @@ Set `APICAST_ACCESS_LOG_FILE` parameter to apicast.
 All access logs must be appended to the file set to the parameter.
 """
 import re
-import tempfile
 from typing import Tuple
 from urllib.parse import urlparse
 
@@ -36,7 +35,7 @@ def make_requests(api_client):
 
 
 @pytest.fixture
-def read_log(staging_gateway):
+def read_log(staging_gateway, tmpdir):
     """Read log from gateway by copying it to a local directory.
 
     Returns a tuple containing the content of the file and also the
@@ -46,17 +45,16 @@ def read_log(staging_gateway):
     def read(filename) -> Tuple[str, int]:
         source = f"/tmp/{filename}"
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            dest = f"{tmpdir}/{filename}"
+        dest = f"{tmpdir}/{filename}"
 
-            # copy log file from apicast to local
-            staging_gateway.openshift.rsync(staging_gateway.deployment, source, tmpdir)
+        # copy log file from apicast to local
+        staging_gateway.openshift.rsync(staging_gateway.deployment, source, tmpdir)
 
-            content = open(dest).read()
-            # last empty item of the array is ignored
-            lines = len(content.split("\n")) - 1
+        content = open(dest).read()
+        # last empty item of the array is ignored
+        lines = len(content.split("\n")) - 1
 
-            return content, lines
+        return content, lines
 
     return read
 

@@ -18,7 +18,7 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend, private_base_url, protocol):
+def backends_mapping(custom_backend, private_base_url, protocol, lifecycle_hooks):
     """
     Create 2 separate backends:
         - path to Backend 1: "/bin"
@@ -26,8 +26,8 @@ def backends_mapping(custom_backend, private_base_url, protocol):
     """
     bin_url = urlparse(private_base_url("httpbin"))
     url = f"{protocol}://{bin_url.hostname}"
-    return {"/bin": custom_backend("backend_one", endpoint=url),
-            "/bin2": custom_backend("backend_two", endpoint=url)}
+    return {"/bin": custom_backend("backend_one", endpoint=url, hooks=lifecycle_hooks),
+            "/bin2": custom_backend("backend_two", endpoint=url, hooks=lifecycle_hooks)}
 
 
 @pytest.mark.parametrize("num_bytes", [1000, 10000, 20000, 35000, 50000, 100000, 500000, 999999])
