@@ -21,9 +21,15 @@ METRICS = [
 
 
 @pytest.fixture(scope="module")
-def warmup_prod_gateway(prod_client):
+def client(prod_client):
+    """Returns prod client instance."""
+    client = prod_client(redeploy=False, promote=True)
+    return client
+
+
+@pytest.fixture(scope="module")
+def warmup_prod_gateway(client):
     """Hit production apicast so that we can have metrics from it."""
-    client = prod_client(redeploy=False)
     assert client.get("/status/200").status_code == 200
 
 
@@ -39,3 +45,26 @@ def metrics(request, warmup_prod_gateway, prometheus_client):
 def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metrics):
     """Metrics must contains expected apicast metrics defined in METRICS."""
     assert expected_metric in metrics
+
+
+def test_apicast_status_metrics(client, prometheus_client):
+    """Test apicast_status metric.
+
+    Apicast logs http status codes on prometheus as a counter.
+
+    ISSUE: https://issues.redhat.com/browse/THREESCALE-5417
+    """
+    statuses = [300, 418, 507]
+
+    for status in statuses:
+        assert client.get(f"/status/{status}").status_code == status
+
+    hits = prometheus_client.get_metric("apicast_status")
+
+    hit_metrics = {status: int(hit["value"][1])
+                   for status in statuses
+                   for hit in hits
+                   if int(hit["metric"]["status"]) == status}
+
+    assert statuses == sorted(hit_metrics.keys())
+    assert all([count > 0 for count in hit_metrics.values()])
