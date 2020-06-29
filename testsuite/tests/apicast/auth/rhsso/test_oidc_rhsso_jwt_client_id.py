@@ -6,6 +6,8 @@ this two specs ware merged in to one parametrized test
 
 import pytest
 
+from threescale_api.resources import Service
+
 
 @pytest.fixture(params=["authorization", "query", "headers"])
 def credentials_location(request):
@@ -13,7 +15,7 @@ def credentials_location(request):
     return request.param
 
 
-@pytest.fixture(params=[("azp", 200), ("foo", 403)])
+@pytest.fixture(params=[("azp", 200), ("foo", 403)], ids=("valid-claim", "invalid-claim"))
 def jwt_claim(request):
     """
     Holds parametrized information about client_ids and response codes they
@@ -22,7 +24,11 @@ def jwt_claim(request):
     return request.param
 
 
-def test_auth_client_id(application, service, credentials_location, jwt_claim):
+# an issue seems to be in pytest, rhsso_setup(autouse) isn't applied here,
+# therefore explicit dependency required.
+# (is it because of parametrisation or some function scoped fixtures?)
+# pylint: disable=unused-argument
+def test_auth_client_id(rhsso_setup, application, service, credentials_location, jwt_claim):
     """
     Test client access when service is configured with valid jwt
     Then request made with appropriate Basic auth made has to pass as expected
@@ -34,6 +40,7 @@ def test_auth_client_id(application, service, credentials_location, jwt_claim):
         "jwt_claim_with_client_id": "{{ %s }}" % claim})
 
     service.proxy.list()
+    assert service["backend_version"] == Service.AUTH_OIDC
     response = application.api_client().get("/get")
 
     assert response.status_code == status_code
