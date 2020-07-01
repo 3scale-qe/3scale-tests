@@ -99,3 +99,14 @@ def wait_until_next_minute(min_sec=15, max_sec=45):
     time.sleep(60 - seconds)
     if min_sec < seconds < max_sec:
         wait_interval()
+
+
+def wait_interval_hour(max_min, min_min=0):
+    """
+    Prevents sending the request in the beginning or at the end of an hour
+    Prevents refreshing the limits during the test
+    """
+    minutes = datetime.datetime.now().minute
+    if minutes < min_min or minutes > max_min:
+        sleep_time = ((60 - minutes + min_min) % 60) * 60 + 10
+        time.sleep(sleep_time)
