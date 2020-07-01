@@ -33,14 +33,14 @@ def account(account):
 
 
 @pytest.fixture
-def mail_template(account, configuration) -> dict:
+def mail_template(account, testconfig) -> dict:
     """loads the mail templates and substitutes the variables"""
     dirname = os.path.dirname(__file__)
     with open(f"{dirname}/mail_templates.yml") as stream:
         yaml_string = stream.read()
         yaml_string = yaml_string.replace("<test_account>", account.entity_name) \
             .replace("<test_group>", account.entity['org_name']) \
-            .replace("<threescale_superdomain>", configuration.superdomain) \
+            .replace("<threescale_superdomain>", testconfig["threescale"]["superdomain"]) \
             .replace("<account_email_domain>", "anything.invalid") \
             .replace("<username>", "admin") \
             .replace("<tenant>", "3scale") \

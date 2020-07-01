@@ -4,20 +4,12 @@ default:
   ignore_insecure_ssl_warning: true
   http2: false
   threescale:
-    version: "2.8"
     service:
       backends:
         primary: https://echo-api.3scale.net:443
         httpbin: https://httpbin.org:443
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
-    gateway:
-      template: "https://github.com/3scale/3scale-amp-openshift-templates/raw/master/apicast-gateway/apicast.yml"
-      image: "registry.redhat.io/3scale-amp2/apicast-gateway-rhel8:3scale2.8"
-      type: "apicast"
-      configuration:
-        staging_deployment: "apicast-staging"
-        production_deployment: "apicast-production"
   rhsso:
     test_user:
       username: testUser
