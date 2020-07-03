@@ -29,7 +29,7 @@ def policy_settings():
 @pytest.fixture(scope="module")
 def staging_gateway(staging_gateway):
     """Sets apicast env variable"""
-    staging_gateway.set_env("APICAST_UPSTREAM_RETRY_CASES", "http_500")
+    staging_gateway.environ["APICAST_UPSTREAM_RETRY_CASES"] = "http_500"
     return staging_gateway
 
 
@@ -56,8 +56,12 @@ def reset_httpbin_endpoint(api_client):
     api_client.get("/fail-request/0/200")
 
 
-@pytest.mark.parametrize("parameters", [([(4, 200), (5, 200), (6, 500)])])
-def test_retry_policy(api_client, parameters):
+@pytest.mark.parametrize("num_of_requests, awaited_response", [
+    pytest.param(4, 200, id="4 requests, should succeed"),
+    pytest.param(5, 200, id="5 request should succeed"),
+    pytest.param(6, 500, id="6 request, should fail")
+])
+def test_retry_policy(api_client, num_of_requests, awaited_response):
     """
     To test retry policy:
     - append the retry policy, conifgured to retry max n times
@@ -71,8 +75,7 @@ def test_retry_policy(api_client, parameters):
     - make request n+1 times (/fail-request/n+1/500)
     - test if response is 500
     """
-    for num_of_requests, awaited_response in parameters:
-        reset_httpbin_endpoint(api_client)
-        response = api_client.get(
-            "/fail-request/" + str(num_of_requests) + "/500")
-        assert response.status_code == awaited_response
+    reset_httpbin_endpoint(api_client)
+    response = api_client.get(
+        "/fail-request/" + str(num_of_requests) + "/500")
+    assert response.status_code == awaited_response
