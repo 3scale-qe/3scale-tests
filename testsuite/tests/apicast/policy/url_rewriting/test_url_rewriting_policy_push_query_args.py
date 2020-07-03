@@ -24,7 +24,8 @@ def test_url_rewriting_push_query_args(application, testconfig):
     """
     client = application.api_client(verify=testconfig["ssl_verify"])
     response = client.get("/get", params={"arg": "old_value"})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params.get('arg') == ['old_value', 'value']
     assert echoed_request.params.get('new_arg') == 'new_value'

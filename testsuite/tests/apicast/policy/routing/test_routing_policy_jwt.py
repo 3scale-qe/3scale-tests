@@ -39,8 +39,8 @@ def test_routing_policy_jwt_httpbin(api_client, private_base_url):
     """Test for the request send without matching value to httpbin"""
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
     assert response.request.headers["Authorization"].startswith("Bearer")  # RHSSO used?
 

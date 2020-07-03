@@ -84,6 +84,7 @@ def test_routing_policy_empty(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname

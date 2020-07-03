@@ -37,7 +37,7 @@ def test_routing_policy_replace_path(api_client):
     Test that checks if the first anything part is removed
     """
     response = api_client.get("/anything/anything")
-    echoed_request = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/anything"

@@ -26,8 +26,8 @@ def test_url_rewriting_add_query_args(application):
     """
     client = application.api_client()
     response = client.get("/get", params={"arg": "old_value"})
-    echoed_request = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params.get('arg') == ['old_value', 'value']
     assert echoed_request.params.get('new_arg') != 'new_value'

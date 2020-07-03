@@ -40,8 +40,9 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
     # Auth session needs to be None when we are testing access_token
     api_client._session.auth = None
     response = api_client.get("/get", params={'access_token': token})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params["access_token"] == token
     assert "X-RESPONSE-CUSTOM-JWT" in response.headers
     assert response.headers["X-RESPONSE-CUSTOM-JWT"] == echoed_request.headers["X-Request-Custom-Jwt"]

@@ -57,8 +57,9 @@ def test_routing_url_rewriting_policy_path_alpha(api_client):
     Test for the request path send to /alpha to echo api
     """
     response = api_client.get("/alpha")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/alpha"
 
 
@@ -67,8 +68,9 @@ def test_routing_url_rewriting_policy_path(api_client):
     Test for the request path send to / to echo api
     """
     response = api_client.get("/")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/"
 
 
@@ -79,8 +81,9 @@ def test_routing_url_rewriting_policy_path_anything(api_client, application, pri
     analytics = application.threescale_client.analytics
     old_usage = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
     response = api_client.get("/anything")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == urlparse(private_base_url("httpbin")).hostname
     hits = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
     assert hits == old_usage + 5

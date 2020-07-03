@@ -31,8 +31,9 @@ def test_routing_policy_with_header(api_client, service, private_base_url):
     Test for the request send with Test-Header and matching value
     """
     response = api_client.get("/get", headers={"Test-Header": str(service["id"])})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == urlparse(private_base_url("httpbin")).hostname
 
 
@@ -42,8 +43,9 @@ def test_routing_policy_with_header_without_id(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test-Header": "Not-Service-ID"})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
@@ -53,6 +55,7 @@ def test_routing_policy_without_header(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname

@@ -55,8 +55,9 @@ def test_access_token(token):
 def test_token_in_query(client, token):
     """Test checks if the request with access token in query params will succeed on both apicasts."""
     response = client.get("/get", params={'access_token': token})
-    echoed_response = EchoedRequest(response)
     assert response.status_code == 200
+
+    echoed_response = EchoedRequest(response)
     assert echoed_response.json["args"].get("access_token", "") == token
 
 
@@ -64,8 +65,9 @@ def test_token_in_query(client, token):
 def test_token_in_header(client, token):
     """Test checks if the request with access token in headers will succeed on both apicasts."""
     response = client.get("/get", headers={'authorization': "Bearer " + token})
-    echoed_response = EchoedRequest(response)
     assert response.status_code == 200
+
+    echoed_response = EchoedRequest(response)
     assert echoed_response.json["headers"].get("Authorization", "") == f"Bearer {token}"
 
 

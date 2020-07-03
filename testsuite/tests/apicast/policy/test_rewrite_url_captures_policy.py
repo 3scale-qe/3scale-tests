@@ -27,7 +27,8 @@ def policy_settings():
 def test_rewrite_url_captures(api_client):
     """must match first rule and rewrite path /hello/get to /get?my_arg=hello"""
     response = api_client.get("/hello/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params["my_arg"] == "hello"
     assert echoed_request.path == "/get"
