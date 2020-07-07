@@ -53,6 +53,7 @@ class ServiceMeshGateway(AbstractGateway):
     def destroy(self):
         self.mesh.environ.set_many(self.env_vars)
 
+    @property
     def environ(self):
         """Returns environ for Service Mesh Gateway"""
         return self.mesh.environ
