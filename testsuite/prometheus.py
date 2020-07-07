@@ -1,4 +1,6 @@
 """Provide a small client for interacting with Prometheus REST API."""
+from typing import Optional
+
 import requests
 
 
@@ -24,3 +26,20 @@ class PrometheusClient:
         response = requests.get(f"{self.endpoint}/api/v1/targets/metadata", params=params)
         response.raise_for_status()
         return response.json()
+
+    def get_metric(self, metric: str, timestamp: Optional[str] = None) -> dict:
+        """Get a metric byt metric name.
+
+        Args:
+          :param metric: Metric name.
+          :param timestamp: Evaluation timestamp in rfc3339 or unix_timestamp
+        """
+        params = {
+            "query": metric,
+        }
+        if timestamp:
+            params["time"] = timestamp
+
+        response = requests.get(f"{self.endpoint}/api/v1/query", params=params)
+        response.raise_for_status()
+        return response.json()["data"]["result"]
