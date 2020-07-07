@@ -12,7 +12,7 @@ def staging_gateway(staging_gateway):
 def setup_gateway(staging_gateway, gateway_environment):
     """Sets environment variables for gateway"""
     if len(gateway_environment) > 0:
-        staging_gateway.environ().set_many(gateway_environment)
+        staging_gateway.environ.set_many(gateway_environment)
 
 
 @pytest.fixture(scope="module")
