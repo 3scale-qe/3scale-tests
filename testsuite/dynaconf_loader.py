@@ -20,6 +20,8 @@ load() is doubled.
 
 import os
 
+from packaging.version import Version, InvalidVersion
+
 import yaml
 
 from testsuite.openshift.client import OpenShiftClient
@@ -42,12 +44,12 @@ def _guess_version(ocp):
 
     try:
         version = lookup["name"]
-        float(version)
-    except (KeyError, ValueError):
-        version = lookup["from"]["name"].split(":")[1].replace("3scale", "")
-        float(version)
+        Version(version)
+    except (KeyError, InvalidVersion):
+        version = lookup["from"]["name"].split(":", 1)[1].replace("3scale", "")
+        Version(version)
 
-    return version
+    return str(version)
 
 
 def _apicast_image(ocp):
