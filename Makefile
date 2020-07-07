@@ -92,16 +92,18 @@ dist:
 	docker build -t $(IMAGENAME):`cat VERSION` .  # X.Y(.Z)-r#
 	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1 -d- <VERSION`  # X.Y(.Z)
 	grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
-		docker tag IMAGENAME:`cat VERSION` $(IMAGENAME):`cut -f1-2 -d. <VERSION` || :  # also X.Y of X.Y.Z
-	grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
-		docker tag IMAGENAME:`cat VERSION` $(IMAGENAME):latest || :  # if X.Y-r# (but not X.Y.Z-r#)
+		docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1-2 -d. <VERSION` || :  # also X.Y of X.Y.Z
+	# Don't tag/push latest for now, if 2.(n-1) gets tagged latest will be wrong
+	# in theory this should not happen, but there is no check for this
+	#grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+	#	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):latest || :  # if X.Y-r# (but not X.Y.Z-r#)
 ifdef PUSHIMAGE
 	docker push $(IMAGENAME):`cat VERSION`
 	docker push $(IMAGENAME):`cut -f1 -d- <VERSION`
 	grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
 		docker push $(IMAGENAME):`cut -f1-2 -d. <VERSION` || :
-	grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
-		docker push $(IMAGENAME):latest || :
+	#grep -q '^[0-9]\+\.[0-9]\+-r[0-9]\+' VERSION && \
+	#	docker push $(IMAGENAME):latest || :
 endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
