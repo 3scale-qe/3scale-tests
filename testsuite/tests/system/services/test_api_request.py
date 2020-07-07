@@ -45,7 +45,7 @@ def test_first_service(api_client, user_key):
     assert response.status_code == 200
 
     echoed_response = EchoedRequest(response)
-    assert echoed_response.json['args'].get('user_key') == user_key
+    assert echoed_response.params.get('user_key') == user_key
 
 
 def test_second_service(application2, user_key2):
@@ -59,4 +59,4 @@ def test_second_service(application2, user_key2):
     assert response.status_code == 200
 
     echoed_response = EchoedRequest(response)
-    assert echoed_response.json['args'].get('user_key') == user_key2
+    assert echoed_response.params.get('user_key') == user_key2
