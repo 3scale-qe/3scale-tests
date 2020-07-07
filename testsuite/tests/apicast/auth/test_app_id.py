@@ -107,9 +107,9 @@ def app_key2(application2):
 def test_successful_requests(test_client, application_id, key):
     """Test checks if applications with correct auth params will return 200"""
     response = test_client.get('/get', params={"app_id": application_id, "app_key": key})
-    echoed_request = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params['app_key'] == key
     assert echoed_request.params['app_id'] == application_id
 

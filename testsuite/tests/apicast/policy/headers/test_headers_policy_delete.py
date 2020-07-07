@@ -27,6 +27,7 @@ def test_headers_policy_delete_response(api_client):
 def test_headers_policy_delete_request(api_client):
     """Test if it delete header from request"""
     response = api_client.get("/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert "Accept" not in echoed_request.headers

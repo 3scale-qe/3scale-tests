@@ -43,6 +43,7 @@ def test_routing_policy_route_testing(api_client, private_base_url):
     parsed_url = urlparse(private_base_url("echo_api"))
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "testing"})
     assert response.status_code == 200
+
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
     assert echoed_request.path == "/route/get"
@@ -54,8 +55,9 @@ def test_routing_policy_route_hello(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "route", "Test2": "hello"})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
@@ -65,8 +67,9 @@ def test_routing_policy_noroute_test(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "noroute", "Test2": "test"})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
@@ -76,8 +79,9 @@ def test_routing_policy_route(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get", headers={"Test1": "route"})
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname
 
 
@@ -87,6 +91,7 @@ def test_routing_policy_empty(api_client, private_base_url):
     """
     parsed_url = urlparse(private_base_url())
     response = api_client.get("/get")
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.headers["Host"] == parsed_url.hostname

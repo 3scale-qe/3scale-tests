@@ -49,9 +49,9 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     analytics = application.threescale_client.analytics
     old_usage = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     response = api_client.get("/anything/anything")
-    request = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    request = EchoedRequest.create(response)
     assert request.headers["Host"] == parsed_url.hostname
 
     hits = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]

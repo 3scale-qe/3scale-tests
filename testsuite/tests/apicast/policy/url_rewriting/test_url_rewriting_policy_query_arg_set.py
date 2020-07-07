@@ -19,8 +19,8 @@ def policy_settings():
 def test_url_rewriting_policy_query_set_args(api_client):
     """Args should be rewritten for the request"""
     response = api_client.get("/get", params=dict(arg="old_value"))
-    echoed_request = EchoedRequest.create(response)
-
     assert response.status_code == 200
+
+    echoed_request = EchoedRequest.create(response)
     assert echoed_request.params["arg"] == "value"
     assert echoed_request.params["new_arg"] == "new_value"

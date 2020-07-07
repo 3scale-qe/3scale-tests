@@ -93,14 +93,13 @@ def test_caching_timeouts(api_client):
 def test_caching_body_check(api_client):
     """Check same body response"""
     response = api_client.get('/test/test', headers=dict(origin="localhost"))
-    echoed_request = EchoedRequest.create(response)
-
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
+    echoed_request = EchoedRequest.create(response)
 
     response = api_client.get('/test/test', headers=dict(origin="localhost"))
-    echoed_request_cached = EchoedRequest.create(response)
-
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
+
+    echoed_request_cached = EchoedRequest.create(response)
     assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']

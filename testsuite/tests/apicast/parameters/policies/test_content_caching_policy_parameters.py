@@ -127,14 +127,14 @@ def test_will_cache(api_client, api_client2):
     Test that requests will be cached with status code 200 and the cache will expire after 30 seconds
     """
     response = api_client.get("/echo-api/testing", headers=dict(origin="localhost"))
-    echoed_request = EchoedRequest.create(response)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
+    echoed_request = EchoedRequest.create(response)
 
     response = api_client.get("/echo-api/testing", headers=dict(origin="localhost"))
-    echoed_request_cached = EchoedRequest.create(response)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
+    echoed_request_cached = EchoedRequest.create(response)
 
     # body was cached
     assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']
