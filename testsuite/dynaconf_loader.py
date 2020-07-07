@@ -21,6 +21,7 @@ load() is doubled.
 import os
 
 import yaml
+from openshift import OpenShiftPythonException
 
 from testsuite.openshift.client import OpenShiftClient
 
@@ -88,6 +89,13 @@ def load(obj, env=None, silent=None, key=None):
         project_name=project,
         server_url=ocp_setup.get("server_url"),
         token=ocp_setup.get("token"))
+
+    # Test fetching 3scale project
+    try:
+        ocp.do_action("get", ["project", project])
+    except OpenShiftPythonException:
+        raise ValueError(f"Openshift project {project} does not exist on the server, either project name is invalid "
+                         f"or the credentials are invalid")
 
     admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
     admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
