@@ -2,40 +2,55 @@
 Test if APIAP routing only match paths that contain whole routing path
 https://issues.redhat.com/browse/THREESCALE-4904
 """
+from urllib.parse import urlparse
+
 import pytest
 import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite.echoed_request import EchoedRequest
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
+pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8.1')")
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend):
+def backend_bin(custom_backend, private_base_url):
+    """Httpbin backend"""
+    return custom_backend("backend_bin", endpoint=private_base_url("httpbin"))
+
+
+@pytest.fixture(scope="module")
+def backend_echo(custom_backend, private_base_url):
+    """Echo-api backend"""
+    return custom_backend("backend_echo", endpoint=private_base_url("echo_api"))
+
+
+@pytest.fixture(scope="module")
+def backends_mapping(backend_bin, backend_echo):
     """
     Create 2 separate backends:
-        - path to Backend 1: "/test/bin"
-        - path to Backend 2: "/bin"
+        - path to Backend echo: "/test/bin"
+        - path to Backend httpbin: "/bin"
     """
-    return {"/test/bin": custom_backend("backend_test"), "/bin": custom_backend("backend_bin")}
+    return {"/test/bin": backend_echo, "/bin": backend_bin}
 
 
 @pytest.fixture(scope="module")
-def mapping_rules(service, threescale):
+def mapping_rules(service, backend_bin, backend_echo):
     """
-    Backend 1:
+    Backend echo:
         - Add mapping rule with path "/anything/test"
-    Backend 2:
+    Backend httpbin:
         - Add mapping rule with path "/anything/bin"
     """
-    backends = service.backend_usages.list()
-    backend_test = threescale.backends.read(backends[0]["backend_id"])
-    test_metric = backend_test.metrics.list()[0]
-    backend_bin = threescale.backends.read(backends[1]["backend_id"])
+    proxy = service.proxy.list()
+    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+
+    test_metric = backend_echo.metrics.list()[0]
     bin_metric = backend_bin.metrics.list()[0]
-    backend_test.mapping_rules.create(rawobj.Mapping(test_metric, "/anything/test"))
+    backend_echo.mapping_rules.create(rawobj.Mapping(test_metric, "/anything/test"))
     backend_bin.mapping_rules.create(rawobj.Mapping(bin_metric, "/anything/bin"))
-    service.proxy.list().update()
+    proxy.update()
 
 
 @pytest.fixture(scope="module")
@@ -55,7 +70,7 @@ def api_client(application):
 
 
 # pylint: disable=unused-argument
-def test_apiap_routing_to_backend(api_client, mapping_rules, service):
+def test_apiap_routing_to_backend(api_client, mapping_rules, service, private_base_url):
     """
     Test if:
         - request with path "/test/bin/anything/test" have status code 200
@@ -67,8 +82,12 @@ def test_apiap_routing_to_backend(api_client, mapping_rules, service):
     assert len(backends) == 2
     request = api_client.get("/test/bin/anything/test")
     assert request.status_code == 200
+    assert EchoedRequest.create(request).headers["host"] == urlparse(private_base_url("echo_api")).hostname
+
     request = api_client.get("/bin/anything/bin")
     assert request.status_code == 200
+    assert EchoedRequest.create(request).headers["host"] == urlparse(private_base_url("httpbin")).hostname
+
     request = api_client.get("/test/bin/anything/bin")
     assert request.status_code == 404
     request = api_client.get("/bin/anything/test")
