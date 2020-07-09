@@ -14,8 +14,10 @@ class MailhogClient:
                  mailhog_service_name: str = "mailhog"):
         """Initializes the client, the mailhog app has to be running in the
             same openshift as 3scale, and has to be named 'mailhog'"""
+        mailhog_routes = openshift.routes.for_service(mailhog_service_name)
+        assert len(mailhog_routes) > 0, "Mailhog is misconfigured or missing"
         self._url = \
-            "http://" + openshift.routes.for_service(mailhog_service_name)[0]["spec"]["host"]
+            "http://" + mailhog_routes[0]["spec"]["host"]
 
     @property
     def url(self) -> str:
