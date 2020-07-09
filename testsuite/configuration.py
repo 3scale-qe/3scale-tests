@@ -1,7 +1,9 @@
 """Module responsible for processing configuration"""
 from dynaconf import settings
 
-from testsuite.certificates import CertificateManager, CFSSLCertificate, TmpCertificateStore
+from testsuite.certificates import CertificateManager
+from testsuite.certificates.cfssl import CFSSLCertificate
+from testsuite.certificates.stores import TmpCertificateStore
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.requirements import ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequirement
 

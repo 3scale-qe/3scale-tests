@@ -135,6 +135,25 @@ class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequireme
 
 class TLSApicastOptions(TemplateApicastOptions, TLSApicastRequirements):
     """Implementation of TLSApicastRequirements"""
+
+    @property
+    def _default_endpoint(self):
+        return f"https://%s.{self.configuration.superdomain}"
+
+    @property
+    def staging_endpoint(self) -> str:
+        try:
+            return self.setting_block["staging_endpoint"]
+        except KeyError:
+            return self._default_endpoint
+
+    @property
+    def production_endpoint(self) -> str:
+        try:
+            return self.setting_block["production_endpoint"]
+        except KeyError:
+            return self._default_endpoint
+
     @property
     def certificate(self) -> Certificate:
         return self.configuration.certificate

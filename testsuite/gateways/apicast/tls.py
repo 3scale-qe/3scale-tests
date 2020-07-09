@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from threescale_api.resources import Service
 
-from testsuite.certificates import GetCertificateResponse, CreateCertificateResponse
+from testsuite.certificates import SSLCertificate
 from testsuite.openshift.objects import Routes
 from testsuite.requirements import CFSSLRequirement
 
@@ -36,9 +36,10 @@ class TLSApicast(TemplateApicast):
         self.https_port = 8443
 
     @property
-    def hostname(self):
-        """Returns wildcard endpoint."""
-        return urlparse(self.endpoint % "*").hostname
+    def ssl_certificate(self) -> SSLCertificate:
+        """Returns instance of SSLCertificate."""
+        return SSLCertificate(self.endpoint, self.requirements.manager,
+                              self.requirements.certificate_store)
 
     def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
         entity_id = service.entity_id
@@ -65,17 +66,6 @@ class TLSApicast(TemplateApicast):
         LOGGER.debug('Deleting routes for service "%s"', self.service_name)
 
         del self.openshift.routes[self._route_name(service_id)]
-
-    @property
-    def _csr_names(self):
-        """Returns data for Certificate Signing Request."""
-        return {
-            "O": self.hostname,
-            "OU": "IT",
-            "L": "San Francisco",
-            "ST": "California",
-            "C": "US",
-        }
 
     def get_patch_data(self) -> Dict:
         """Returns patch data for enabling https port on service."""
@@ -105,7 +95,7 @@ class TLSApicast(TemplateApicast):
     def _create_secret(self):
         LOGGER.debug('Creating tls secret "%s"...', self.secret_name)
 
-        cert = self.new_cert("server")
+        cert = self.ssl_certificate.create("server")
 
         pem = cert.certificate.encode("ascii")
         key = cert.key.encode("ascii")
@@ -123,27 +113,6 @@ class TLSApicast(TemplateApicast):
         }
 
         self.openshift.apply(resource)
-
-    def new_cert(self, label: str) -> CreateCertificateResponse:
-        """Create a new ssl certificate.
-        Args:
-            :param label: A identifier forthe certificate.
-        Returns:
-            certificate: Certificate PEM-like.
-            private_key: Key PEM-like.
-        """
-        return self.requirements.manager.create(label, self.hostname, hosts=[self.hostname],
-                                                names=[self._csr_names])
-
-    def get_cert(self, label: str) -> GetCertificateResponse:
-        """Get existent certificate.
-        Args:
-            :param label: A identifier for the certificate.
-        Returns:
-            certificate: Certificate PEM-like.
-            private_key: Key PEM-like.
-        """
-        return self.requirements.certificate_store.get(label)
 
     def create(self):
         """Deploy TLS Apicast."""
