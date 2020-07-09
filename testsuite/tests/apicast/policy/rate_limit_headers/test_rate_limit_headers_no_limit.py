@@ -17,7 +17,6 @@ def app_plan(service, custom_app_plan, request):
     return custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
 
 
-@pytest.mark.xfail
 def test_rate_limit_headers_no_limit(api_client):
     """
     Sends a request to a plan without a limit
