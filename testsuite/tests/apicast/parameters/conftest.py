@@ -6,22 +6,18 @@ from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, settings_block):
+def staging_gateway(request, configuration, settings_block, gateway_environment):
     """Deploy template apicast gateway."""
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
     gateway.create()
 
+    if len(gateway_environment) > 0:
+        gateway.environ.set_many(gateway_environment)
+
     request.addfinalizer(gateway.destroy)
 
     return gateway
-
-
-@pytest.fixture(scope="module", autouse=True)
-def setup_apicast(staging_gateway, gateway_environment):
-    """Setups environment for the apicast"""
-    if len(gateway_environment) > 0:
-        staging_gateway.environ.set_many(gateway_environment)
 
 
 @pytest.fixture(scope="module")
