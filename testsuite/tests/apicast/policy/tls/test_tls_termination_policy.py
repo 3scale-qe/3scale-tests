@@ -7,6 +7,8 @@ import requests
 from testsuite.utils import randomize, blame
 from testsuite import rawobj
 
+pytestmark = pytest.mark.flaky
+
 
 def get_embedded_data(pem: str, name: str, app: str) -> str:
     """Returns pem formatted for embedded configuration."""
