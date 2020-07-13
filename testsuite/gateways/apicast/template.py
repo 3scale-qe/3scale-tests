@@ -164,6 +164,3 @@ class TemplateApicast(SelfManagedApicast):
 
         LOGGER.debug('Deleting secret "%s"', self.configuration_url_secret_name)
         self.openshift.delete("secret", self.configuration_url_secret_name)
-
-    def reload(self):
-        self.openshift.rollout(self.deployment)
