@@ -14,6 +14,8 @@ be accepted.
 """
 
 import time
+
+import backoff
 import pytest
 from testsuite import rawobj
 from testsuite.utils import blame, wait_interval, wait_until_next_minute
@@ -127,17 +129,21 @@ def wait_until_retry_after(response):
     time.sleep(int(retry_after))
 
 
+@backoff.on_predicate(backoff.constant, lambda x: x.status_code != 429, 30)
+def make_requests(api_client):
+    """Make sure that we hit 429 status code without possible infinite loop"""
+    return api_client.get("/")
+
+
 def test_retry_after(silver_client):
     """
     The response for denied request should contain the 'retry-after' header
     After waiting the time from the 'retry-after' header, the following requests
     should be again accepted
     """
-    response = silver_client.get("/")
-    while response.status_code != 429:
-        # wait for 0.125 as the original ruby tests waits after making request
-        time.sleep(0.125)
-        response = silver_client.get("/")
+    response = make_requests(silver_client)
+
+    assert response.status_code == 429
 
     assert "retry-after" in response.headers
 
