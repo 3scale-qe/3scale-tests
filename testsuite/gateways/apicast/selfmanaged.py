@@ -33,7 +33,9 @@ class SelfManagedApicastRequirements(GatewayRequirements, ABC):
 class SelfManagedApicast(AbstractApicast):
     """Gateway for use with already deployed self-managed Apicast without ability to edit it"""
 
-    CAPABILITIES = [Capability.APICAST, Capability.CUSTOM_ENVIRONMENT]
+    CAPABILITIES = [Capability.APICAST,
+                    Capability.CUSTOM_ENVIRONMENT,
+                    Capability.PRODUCTION_GATEWAY]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         # self.staging_endpoint = requirements.staging_endpoint
@@ -67,4 +69,4 @@ class SelfManagedApicast(AbstractApicast):
         return self.openshift.environ(self.deployment)
 
     def reload(self):
-        self.openshift.rollout(self.deployment)
+        self.openshift.rollout(f"dc/{self.deployment}")
