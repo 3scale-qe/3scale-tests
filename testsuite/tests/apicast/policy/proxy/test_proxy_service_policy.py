@@ -10,6 +10,9 @@ import pytest
 from testsuite import rawobj
 
 
+pytestmark = pytest.mark.flaky
+
+
 @pytest.fixture(scope="module")
 def policy_settings(testconfig):
     """Configure API with a http_proxy policy - proxy service is a Camel route deployed in OCP"""
@@ -38,6 +41,7 @@ def test_http_proxy_policy(api_client, private_base_url):
     between Apicast and backend API
     """
     response = api_client.get("/headers")
+    assert response.status_code == 200
     headers = response.json()["headers"]
     assert "Fuse-Camel-Proxy" in headers
     assert headers["Source-Header"] == urlparse(private_base_url("httpbin_nossl")).hostname
