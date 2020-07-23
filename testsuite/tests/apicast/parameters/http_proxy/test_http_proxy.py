@@ -9,6 +9,9 @@ import pytest
 from testsuite import rawobj
 
 
+pytestmark = pytest.mark.flaky
+
+
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     "Dict of proxy settings to be used when service created"
