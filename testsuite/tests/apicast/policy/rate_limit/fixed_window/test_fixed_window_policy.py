@@ -20,13 +20,11 @@ import time
 import backoff
 import pytest
 
-from pytest_cases import fixture_plus, cases_data, parametrize_plus, fixture_ref
+from pytest_cases import fixture_plus, parametrize_with_cases
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import blame
-
-from ..conftest import service_plus
 
 
 pytestmark = pytest.mark.flaky
@@ -39,15 +37,17 @@ def service_plus2(service_proxy_settings, custom_service, request):
 
 
 @fixture_plus
-@parametrize_plus('service,scope',
-                  [(fixture_ref(service_plus), "service"), (fixture_ref(service_plus2), "global")])
-@cases_data(module=config_cases)
-def config(service, scope, case_data, service_plus, service_plus2):
+@parametrize_with_cases("case_data", cases=config_cases)
+def config(case_data, service_plus, service_plus2):
     """Configuration for rate limit policy"""
-    policy_config, status_code = case_data.get(scope)
+    policy_config, status_code, scope = case_data
     service_plus.proxy.list().policies.append(policy_config)
     service_plus2.proxy.list().policies.append(policy_config)
-    return status_code, service
+    # When scope=service we want 2 application for same service
+    if scope == 'service':
+        return status_code, service_plus
+    # when scope=global we want 1 application for each service
+    return status_code, service_plus2
 
 
 @fixture_plus

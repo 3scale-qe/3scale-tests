@@ -7,6 +7,7 @@ Every case function have parameter which can be used for both "service" and "glo
 from typing import Tuple
 
 from dynaconf import settings
+from pytest_cases import parametrize
 
 from testsuite import rawobj
 from testsuite.utils import randomize
@@ -15,69 +16,77 @@ DEFAULT_COUNT = 6
 TIME_WINDOW = 20
 
 
-def case_true_simple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_true_simple(scope: str) -> Tuple[dict, int, str]:
     """Simple case with true condition"""
     configuration = [config(condition(), scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 429
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_true_liquid_simple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_true_liquid_simple(scope: str) -> Tuple[dict, int, str]:
     """Case with true condition with liquid"""
     configuration = [config(condition(operation="matches", left="{{ uri }}", left_type="liquid", right="/.*"), scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 429
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_true_multiple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_true_multiple(scope: str) -> Tuple[dict, int, str]:
     """Case with true condition that contains multiple fixed window limiters"""
     configuration = [config(condition(), scope), config(condition(), scope, 100)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 429
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_true_prepend_multiple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_true_prepend_multiple(scope: str) -> Tuple[dict, int, str]:
     """Case with true condition that contains multiple prepend fixed window limiters"""
     configuration = [config(condition(), scope, 100), config(condition(), scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 429
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_false_simple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_false_simple(scope: str) -> Tuple[dict, int, str]:
     """Simple case with false condition"""
     configuration = [config(condition(operation="!="), scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 200
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_false_liquid_simple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_false_liquid_simple(scope: str) -> Tuple[dict, int, str]:
     """Case with false condition with liquid"""
     cond = condition(operation="matches", left="{{ uri }}", left_type="liquid", right="/does_not_exist")
     configuration = [config(cond, scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 200
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_false_multiple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_false_multiple(scope: str) -> Tuple[dict, int, str]:
     """Case with false condition that contains multiple fixed window limiters"""
     configuration = [config(condition(operation="!="), scope), config(condition(operation="!="), scope, 100)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 200
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
-def case_false_prepend_multiple(scope: str) -> Tuple[dict, int]:
+@parametrize('scope', ['service', 'global'])
+def case_false_prepend_multiple(scope: str) -> Tuple[dict, int, str]:
     """Case with false condition that contains multiple prepend fixed window limiters"""
     configuration = [config(condition(operation="!="), scope, 100), config(condition(operation="!="), scope)]
     policy_config = fixed_window_policy(configuration, redis_url(scope))
     status_code = 200
-    return policy_config, status_code
+    return policy_config, status_code, scope
 
 
 def fixed_window_policy(fixed_window_limiters, redis_url):

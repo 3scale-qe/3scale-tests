@@ -3,7 +3,7 @@ Testing the custom metric policy
 https://issues.redhat.com/browse/THREESCALE-5098
 """
 
-from pytest_cases import fixture_plus, cases_data
+from pytest_cases import fixture_plus, parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
@@ -11,7 +11,7 @@ from testsuite import rawobj
 
 
 @fixture_plus
-@cases_data(module=config_cases)
+@parametrize_with_cases("case_data", cases=config_cases)
 def config(custom_service, case_data, request, service_proxy_settings, lifecycle_hooks):
     """
     Configuration for the custom metric policy
@@ -21,7 +21,7 @@ def config(custom_service, case_data, request, service_proxy_settings, lifecycle
     """
     service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
 
-    policy_config, calls, metrics = case_data.get()
+    policy_config, calls, metrics = case_data
     proxy = service.proxy.list()
     for metric in metrics:
         service.metrics.create(rawobj.Metric(metric))

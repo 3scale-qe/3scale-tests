@@ -2,7 +2,7 @@
 Test that request to product with specific paths to backends will be routed to correct backend
 """
 import pytest
-from pytest_cases import fixture_plus, cases_data
+from pytest_cases import fixture_plus, parametrize_with_cases
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj
@@ -24,10 +24,10 @@ def service(backends_mapping, service_proxy_settings, custom_service, request, l
 
 
 @fixture_plus
-@cases_data(module=routing_cases)
+@parametrize_with_cases("case_data", cases=routing_cases)
 def paths(case_data):
     """Array of paths that are used for backend usages (for each path connect product with new backend)"""
-    return case_data.get()
+    return case_data
 
 
 @fixture_plus
