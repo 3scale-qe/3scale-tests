@@ -5,7 +5,10 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 
-@pytest.fixture(scope="module", params=["http", "https"])
+# TODO: add HTTP protocol
+#  Right now the HTTP protocol doesn't work with tinyproxy and HTTP openshift route.
+#  Workaround is to use hostname of the openshift service of HTTPBIN.
+@pytest.fixture(scope="module", params=["https"])
 def protocol(request):
     """Protocol which is used on http(s) service/proxy/backend"""
     return request.param
