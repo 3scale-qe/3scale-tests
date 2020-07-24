@@ -23,7 +23,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 import backoff
 import pytest
-from pytest_cases import fixture_plus, fixture_ref, parametrize_plus, cases_data
+from pytest_cases import fixture_plus, parametrize_with_cases
 
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
@@ -49,15 +49,17 @@ def service2(service_proxy_settings, custom_service, request):
 
 
 @fixture_plus
-@parametrize_plus('svc,scope',
-                  [(fixture_ref(service), "service"), (fixture_ref(service2), "global")])
-@cases_data(module=config_cases)
-def config(svc, scope, case_data, service, service2):
+@parametrize_with_cases('case_data', cases=config_cases)
+def config(case_data, service, service2):
     """Configuration for rate limit policy"""
-    policy_config, apply_rate_limit = case_data.get(scope)
+    policy_config, apply_rate_limit, scope = case_data
     service.proxy.list().policies.append(policy_config)
     service2.proxy.list().policies.append(policy_config)
-    return apply_rate_limit, svc
+    # When scope=service we want 2 application for same service
+    if scope == 'service':
+        return apply_rate_limit, service
+    # when scope=global we want 1 application for each service
+    return apply_rate_limit, service2
 
 
 @fixture_plus
