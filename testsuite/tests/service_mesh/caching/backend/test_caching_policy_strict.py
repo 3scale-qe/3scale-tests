@@ -8,6 +8,8 @@ from testsuite.gateways.gateways import Capability
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 
 
+# TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
+@pytest.mark.flaky
 def test_caching_policy_strict(api_client, openshift):
     """
     Test caching policy with caching mode set to Strict
