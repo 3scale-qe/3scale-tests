@@ -59,6 +59,7 @@ def pytest_runtest_setup(item):
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
 
+    testsuite_version = open("VERSION").read().strip()
     environment = settings["env_for_dynaconf"]
     openshift = settings["openshift"]["servers"]["default"]["server_url"]
     project = settings["openshift"]["projects"]["threescale"]["name"]
@@ -67,11 +68,12 @@ def pytest_report_header(config):
 
     return [
         "",
+        f"testsuite: testsuite version = {testsuite_version}",
         f"testsuite: environment = {environment}",
         f"testsuite: openshift = {openshift}",
         f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
-        f"testsuite: for version = {version}",
+        f"testsuite: for 3scale version = {version}",
         ""]
 
 
