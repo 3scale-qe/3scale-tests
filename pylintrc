@@ -140,6 +140,7 @@ disable=print-statement,
         exception-escape,
         comprehension-escape,
         duplicate-code,  # reports false alarms AND can't be disabled locally; pylint issue #214
+        fixme,  # ignore TODOs
         redefined-outer-name
 
 # Enable the message, report, category or checker with the given id(s). You can

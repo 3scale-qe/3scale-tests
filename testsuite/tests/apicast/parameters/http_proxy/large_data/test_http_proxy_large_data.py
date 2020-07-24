@@ -28,6 +28,9 @@ def test_large_data(api_client, num_bytes):
     """Test that a POST request with data of a given number of bytes will be successful when using an http(s) proxy"""
     data = random_string(num_bytes)
 
+    # requests/urllib3 doesn't retry post(); need get() to wait until all is up
+    api_client.get("/get")
+
     response = api_client.post('/post', data=data)
     assert response.status_code == 200
     assert response.json().get('data') == data

@@ -5,30 +5,33 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 
-@pytest.fixture(scope="module", params=["http", "https"])
+# TODO: add HTTP protocol
+#  Right now the HTTP protocol doesn't work with tinyproxy and HTTP openshift route.
+#  Workaround is to use hostname of the openshift service of HTTPBIN.
+@pytest.fixture(scope="module", params=["https"])
 def protocol(request):
     """Protocol which is used on http(s) service/proxy/backend"""
     return request.param
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def settings_block(settings_block, configuration, protocol):
     """Settings block with http(s) endpoints"""
     endpoints = {"staging_endpoint": f"{protocol}://%s-staging.{configuration.superdomain}",
                  "production_endpoint": f"{protocol}://%s-staging.{configuration.superdomain}"}
-    settings_block.get("deployments").update(endpoints)
+    settings_block.update(endpoints)
     return settings_block
 
 
 @pytest.fixture(scope="module")
-def environment(environment, testconfig):
+def gateway_environment(gateway_environment, testconfig):
     """Adds HTTP proxy to the staging gateway"""
     proxy_endpoint = testconfig["proxy"]
 
-    environment.update({"HTTP_PROXY": proxy_endpoint['http'],
-                        "HTTPS_PROXY": proxy_endpoint['https'],
-                        "NO_PROXY": "backend-listener,system-master"})
-    return environment
+    gateway_environment.update({"HTTP_PROXY": proxy_endpoint['http'],
+                                "HTTPS_PROXY": proxy_endpoint['https'],
+                                "NO_PROXY": "backend-listener,system-master"})
+    return gateway_environment
 
 
 @pytest.fixture(scope="module")
