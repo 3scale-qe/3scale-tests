@@ -1,6 +1,7 @@
 "top-level conftest"
 
 import logging
+import os
 import time
 
 import pytest
@@ -14,7 +15,7 @@ from dynaconf import settings
 from threescale_api import client
 import testsuite.gateways as gateways
 
-from testsuite import rawobj, CONFIGURATION
+from testsuite import rawobj, CONFIGURATION, ROOT_DIR
 from testsuite.gateways.gateways import Capability
 from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
@@ -58,8 +59,9 @@ def pytest_runtest_setup(item):
 # pylint: disable=unused-argument
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
+    version_path = os.path.join(ROOT_DIR, 'VERSION')
 
-    testsuite_version = open("VERSION").read().strip()
+    testsuite_version = open(version_path).read().strip()
     environment = settings["env_for_dynaconf"]
     openshift = settings["openshift"]["servers"]["default"]["server_url"]
     project = settings["openshift"]["projects"]["threescale"]["name"]
