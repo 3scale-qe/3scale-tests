@@ -19,6 +19,8 @@ def service(service):
 
 
 @pytest.mark.disruptive
+# TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
+@pytest.mark.flaky
 @pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
