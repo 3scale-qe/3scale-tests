@@ -44,8 +44,6 @@ def update_policies(service, application, rhsso_service_info):
     """
     Adds the token_introspection policy configured as follows
     """
-    rhsso_url = rhsso_service_info.rhsso.server_url
-    realm_name = rhsso_service_info.realm.entity["realm"]
 
     policy_setting = rawobj.PolicyConfig("token_introspection", {
         "auth-type": "client_id+client_secret",
@@ -53,8 +51,7 @@ def update_policies(service, application, rhsso_service_info):
         "max_cached_tokens": 10,
         "client_id": application["client_id"],
         "client_secret": application["client_secret"],
-        "introspection_url": f"{rhsso_url}/auth/realms/{realm_name}"
-                             f"/protocol/openid-connect/token/introspect"
+        "introspection_url": rhsso_service_info.oidc_client.get_url("token_introspection_endpoint")
     })
 
     service.proxy.list().policies.append(policy_setting)
