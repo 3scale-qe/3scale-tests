@@ -14,19 +14,16 @@ pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CU
 
 
 @pytest.fixture(scope="module")
-def gateway_environment(gateway_environment, service):
-    """Sets service configuration version environment"""
-    gateway_environment.update({f"APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION": 1})
-    return gateway_environment
+def service(service, private_base_url, staging_gateway):
+    """Forces apicast to work only with version 1 of this service's configuration.
 
-
-@pytest.fixture(scope="module")
-def service(service, private_base_url):
-    """Forces apicast to work only with version 1 of this service's configuration."""
+    Sets service configuration version environment"""
 
     proxy = service.proxy.list()
     # update proxy credentials so that we can have a version 2 of it
     proxy.update(rawobj.Proxy(private_base_url(), credentials_location="authorization"))
+
+    staging_gateway.environ[f"APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION"] = 1
 
     return service
 
