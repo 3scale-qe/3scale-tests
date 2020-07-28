@@ -1,6 +1,7 @@
 # pylint: disable=missing-module-docstring,wrong-import-position
 
 import os
+from pathlib import Path
 
 from dynaconf import settings
 
@@ -20,4 +21,5 @@ from packaging.version import Version  # noqa: E402
 from testsuite.configuration import CommonConfiguration  # noqa: E402
 
 TESTED_VERSION = Version(str(settings["threescale"]["version"]))
+ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent
 CONFIGURATION: CommonConfiguration = CommonConfiguration()
