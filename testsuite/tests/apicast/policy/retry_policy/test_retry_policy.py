@@ -56,6 +56,9 @@ def reset_httpbin_endpoint(api_client):
     api_client.get("/fail-request/0/200")
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize("num_of_requests, awaited_response", [
     pytest.param(4, 200, id="4 requests, should succeed"),
     pytest.param(5, 200, id="5 request should succeed"),

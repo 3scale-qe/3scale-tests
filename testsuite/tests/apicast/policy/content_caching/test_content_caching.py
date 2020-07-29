@@ -10,6 +10,9 @@ import pytest
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 
 

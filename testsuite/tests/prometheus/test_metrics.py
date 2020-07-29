@@ -41,6 +41,9 @@ def metrics(request, warmup_prod_gateway, prometheus_client):
     return [m["metric"] for m in metrics["data"]]
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize("expected_metric", METRICS)
 def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metrics):
     """Metrics must contains expected apicast metrics defined in METRICS."""
