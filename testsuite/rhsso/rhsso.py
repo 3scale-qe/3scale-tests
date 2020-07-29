@@ -14,7 +14,7 @@ from testsuite.rhsso.realm import RetryKeycloakRealm
 class OIDCClientAuthHook:
     """Configure rhsso auth through app hooks"""
 
-    def __init__(self, rhsso_service_info, credentials_location=None):
+    def __init__(self, rhsso_service_info, credentials_location="authorization"):
         self.rhsso_service_info = rhsso_service_info
         self.credentials_location = credentials_location
 
@@ -28,7 +28,7 @@ class OIDCClientAuthHook:
     def before_proxy(self, service: Service, proxy_params: dict):
         """Update proxy params"""
         proxy_params.update(
-            credentials_location="authorization",
+            credentials_location=self.credentials_location,
             oidc_issuer_endpoint=self.rhsso_service_info.authorization_url(),
             oidc_issuer_type="keycloak")
         return proxy_params
