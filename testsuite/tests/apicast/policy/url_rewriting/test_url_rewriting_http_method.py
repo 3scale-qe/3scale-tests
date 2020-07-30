@@ -9,7 +9,9 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite import rawobj
 from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 
-
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 
@@ -36,6 +38,9 @@ def service(service, private_base_url):
     return service
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize("method,path_after,hits", [("GET", "/anything/rewritten", 1),
                                                     ("PUT", "/anything/rewritten", 1),
                                                     ("POST", "/anything/initial", 0)])

@@ -12,6 +12,9 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 from testsuite.gateways.gateways import Capability
 from testsuite.utils import random_string
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)]
 
@@ -23,6 +26,9 @@ def service_proxy_settings(private_base_url, protocol):
     return rawobj.Proxy(f"{protocol}://{url.hostname}")
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize("num_bytes", [1000, 10000, 20000, 35000, 50000, 100000, 500000, 999999])
 def test_large_data(api_client, num_bytes):
     """Test that a POST request with data of a given number of bytes will be successful when using an http(s) proxy"""

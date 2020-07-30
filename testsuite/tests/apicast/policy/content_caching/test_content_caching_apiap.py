@@ -8,6 +8,9 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import randomize, blame
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 
 
@@ -79,6 +82,9 @@ def api_client2(application2):
     return client
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize('client', ('api_client', 'api_client2'), ids=["First service", "Second service"])
 def test_caching_working_correctly(request, client):
     """

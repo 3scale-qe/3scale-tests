@@ -13,6 +13,9 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 from testsuite.gateways.gateways import Capability
 from testsuite.tests.toolbox.test_backend import random_string
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)]
 
@@ -30,6 +33,9 @@ def backends_mapping(custom_backend, private_base_url, protocol, lifecycle_hooks
             "/bin2": custom_backend("backend_two", endpoint=url, hooks=lifecycle_hooks)}
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 @pytest.mark.parametrize("num_bytes", [1000, 10000, 20000, 35000, 50000, 100000, 500000, 999999])
 def test_large_data(api_client, num_bytes):
     """

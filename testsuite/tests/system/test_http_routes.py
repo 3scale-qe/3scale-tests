@@ -13,6 +13,9 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.gateways.gateways import Capability
 
 
+# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
+# https://github.com/pytest-dev/pytest/pull/7565
+# pylint: disable=not-callable
 # This test can be done only with system apicast
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.required_capabilities(Capability.SAME_CLUSTER, Capability.PRODUCTION_GATEWAY),
