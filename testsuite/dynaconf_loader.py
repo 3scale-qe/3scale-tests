@@ -55,8 +55,9 @@ def _guess_version(ocp):
 
 def _apicast_image(ocp):
     """Find source of amp-apicast image"""
-
-    return _docker_image(ocp, "amp-apicast")["from"]["name"]
+    lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"])
+    lookup = yaml.safe_load(lookup.out())
+    return lookup["spec"]["template"]["spec"]["containers"][0]["image"]
 
 
 def _docker_image(ocp, name):
