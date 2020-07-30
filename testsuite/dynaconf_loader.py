@@ -67,7 +67,7 @@ def _docker_image(ocp, name):
     lookup = yaml.safe_load(lookup.out())
     lookup = lookup["spec"]["tags"]
 
-    return [i for i in lookup if i.get("from", {}).get("kind") == "DockerImage"][0]
+    return [i for i in lookup if i.get("from", {}).get("kind") == "DockerImage"][-1]
 
 
 # pylint: disable=unused-argument
