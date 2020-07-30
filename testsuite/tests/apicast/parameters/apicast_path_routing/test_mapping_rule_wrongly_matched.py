@@ -5,8 +5,10 @@ https://issues.redhat.com/browse/THREESCALE-4152
 """
 import pytest
 
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 # TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
 # https://github.com/pytest-dev/pytest/pull/7565
