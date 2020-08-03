@@ -5,8 +5,10 @@ https://issues.redhat.com/browse/THREESCALE-4152
 """
 import pytest
 
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)]
