@@ -2,12 +2,16 @@
 Testing the custom metric policy
 https://issues.redhat.com/browse/THREESCALE-5098
 """
-
+import pytest
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 from pytest_cases import fixture_plus, parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
-from testsuite import rawobj
+from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+
+
+pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 
 @fixture_plus
