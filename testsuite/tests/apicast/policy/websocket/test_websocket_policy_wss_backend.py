@@ -6,9 +6,6 @@ import pytest
 from websocket import create_connection, WebSocketBadStatusException
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.8')"), pytest.mark.flaky]
 
 

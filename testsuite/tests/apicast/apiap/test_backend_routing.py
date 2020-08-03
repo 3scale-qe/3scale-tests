@@ -168,9 +168,6 @@ def hits(app, analytics):
     return analytics.list_by_service(app["service_id"], metric_name="hits")["total"]
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 @pytest.mark.parametrize("setup,expect_ok,expect_not_found", [
     (
         "isolated_backends",

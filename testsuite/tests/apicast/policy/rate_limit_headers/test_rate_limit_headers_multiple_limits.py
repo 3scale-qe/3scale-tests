@@ -10,9 +10,7 @@ from testsuite.utils import blame, wait_interval, wait_until_next_minute, wait_i
 from testsuite import rawobj
 from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
+
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 

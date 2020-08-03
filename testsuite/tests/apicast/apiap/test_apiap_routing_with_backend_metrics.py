@@ -7,9 +7,6 @@ import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 
 
@@ -166,9 +163,6 @@ def case4():
     return "/anything/test/anything/low", 200, [1, 1, 0, 1, 0, 0]
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 # pylint: disable=too-many-arguments, too-many-locals
 @pytest.mark.parametrize("case", ["case1", "case2", "case3", "case4"])
 def test_metrics_with_routing_policy(request, api_client, setup, application, backend_slash, backend_anything, case):

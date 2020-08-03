@@ -105,9 +105,6 @@ def realm_client_by_id(realm, client_id):
     return realm.clients.by_client_id(client_id)
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 @pytest.mark.parametrize("flow_type,expected", [
     ("implicit_flow_enabled", (True, False, False, False)),
     ("standard_flow_enabled", (False, True, False, False)),

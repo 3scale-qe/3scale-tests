@@ -7,9 +7,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8')")
 
 
@@ -55,9 +52,6 @@ def url_rewriting_first(service):
     proxy.update()
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 @pytest.mark.parametrize("setup", ("apicast_first", "url_rewriting_first"))
 def test(request, api_client, setup):
     """Test that url_rewriting works with APIAP as expected

@@ -28,9 +28,6 @@ def invalid_auth(service_settings):
     return {"user_key": "invalid_key"}
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 @pytest.mark.parametrize("credentials_location", ["query", "headers"])
 def test_request_with_auth(api_client, credentials_location):
     """Check valid credentials passed in query and headers, should return 200"""
@@ -41,9 +38,6 @@ def test_request_with_auth(api_client, credentials_location):
     assert response.status_code == 200
 
 
-# TODO: Remove pylint disable when pytest fixes problem, probably in 6.0.1
-# https://github.com/pytest-dev/pytest/pull/7565
-# pylint: disable=not-callable
 @pytest.mark.parametrize("credentials_location", ["params", "headers"])
 def test_request_with_wrong_auth(api_client, invalid_auth, credentials_location):
     """Check wrong credentials passed in query (params) or headers, should fail with 403 """
