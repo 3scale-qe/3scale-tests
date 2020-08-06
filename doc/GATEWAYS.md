@@ -27,18 +27,19 @@ gateway:
 
 *Has implemented reload*: Yes
 
-*Capabilities*: "APICAST, PRODUCTION_GATEWAY" 
+*Capabilities*: "APICAST, PRODUCTION_GATEWAY, CUSTOM_ENVIRONMENT" 
 ```
 gateway:
   type: "apicast-selfmanaged"
   configuration:
-    sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
-    production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
-    deployment:                                                      # DeploymentConfigs
+    endpoints:
+        sandbox: "http://%s-staging.localhost:8080"                 # Wildcard address for staging address for service
+        production: "http://%s-production.localhost:8080"           # Wildcard address for production address for service
+    deployment:                                                     # DeploymentConfigs
         staging: "selfmanaged-staging"
         production: "selfmanaged-production"
-    project: "threescale"                                            # OpenShift project containing the apicasts
-    server: "server"                                                 # OpenShift server containing the apicasts
+    project: "threescale"                                           # OpenShift project containing the apicasts
+    server: "server"                                                # OpenShift server containing the apicasts
 ```
 ## Container Apicast
 *Description*: Self-managed apicast that is deployed somewhere else and we only know their address
@@ -67,16 +68,14 @@ gateway:
 gateway:
   type: "apicast-selfmanaged"
   configuration:
-    sandbox_endpoint: "http://%s-staging.localhost:8080"             # Wildcard address for staging address for service
-    production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
-    deployments:
-        staging: "selfmanaged-staging"
-        production: "selfmanaged-production"
-    project: "threescale"
-    server: "server"
-    services:                                                         # Services that apicasts are available on
+    endpoints:
+        sandbox: "http://%s-staging.localhost:8080"                 # Wildcard address for staging address for service
+        production: "http://%s-production.localhost:8080"           # Wildcard address for production address for service
+    deployment:                                                     # Deployments names for the newly created apicasts
         staging: "apicast-staging"
-        production: "apicast-production"                                   
+        production: "apicast-production"
+    project: "threescale"
+    server: "server"                                
 ```
 
 ## Template Apicast

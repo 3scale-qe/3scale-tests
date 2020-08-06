@@ -4,6 +4,7 @@ from typing import Dict
 from threescale_api.resources import Service
 
 from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
+from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.env import Environ
 
 
@@ -31,15 +32,13 @@ class SelfManagedApicastRequirements(GatewayRequirements, ABC):
 
 
 class SelfManagedApicast(AbstractApicast):
-    """Gateway for use with already deployed self-managed Apicast without ability to edit it"""
+    """Gateway for use with already deployed self-managed Apicast in OpenShift"""
 
     CAPABILITIES = [Capability.APICAST,
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.PRODUCTION_GATEWAY]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
-        # self.staging_endpoint = requirements.staging_endpoint
-        # self.production_endpoint = requirements.production_endpoint
         self.staging = requirements.staging
         if self.staging:
             self.deployment = requirements.staging_deployment
@@ -48,7 +47,7 @@ class SelfManagedApicast(AbstractApicast):
             self.deployment = requirements.production_deployment
             self.endpoint = requirements.production_endpoint
         # Load openshift configuration
-        self.openshift = requirements.current_openshift
+        self.openshift: OpenShiftClient = requirements.current_openshift
 
     def before_service(self, service_params: Dict) -> Dict:
         service_params.update({
