@@ -49,3 +49,4 @@ class SystemApicast(AbstractApicast):
 
     def get_logs(self):
         return self.openshift.get_logs(self.deployment_name)
+
