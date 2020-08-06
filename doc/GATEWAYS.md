@@ -59,7 +59,8 @@ gateway:
     production_endpoint: "http://%s-production.localhost:8080"       # Wildcard address for production address for service
 ```
 ## Apicast Operator
-*Description*: Self-managed apicast deployed by operator
+*Description*: Self-managed apicast deployed by operator, requires project with deployed apicast-operator.
+ Testsuite will take of APIcast CRDs. Cannot be run in parallel for now.
 
 *Has production gateway*: Yes
 
