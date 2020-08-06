@@ -1,4 +1,6 @@
 """Conftest for http proxy large data tests"""
+from urllib.parse import urlparse
+
 import pytest
 
 from testsuite import rawobj
@@ -25,12 +27,21 @@ def settings_block(settings_block, configuration, protocol):
 
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment, testconfig):
-    """Adds HTTP proxy to the staging gateway"""
+    """
+    Adds HTTP proxy to the staging gateway
+
+    - We need to add rhsso url to NO_PROXY, because each HTTP request from apicast will go through proxy
+      Tinyproxy has a problem with http openshift routes
+    - Those tests will fail on 504 when 3scale has a lot of products, because configuration takes a lot of time to load
+      APICAST_LOAD_SERVICES_WHEN_NEEDED fixes the problem
+    """
+    rhsso_url = urlparse(testconfig["rhsso"]["url"]).hostname
     proxy_endpoint = testconfig["proxy"]
 
     gateway_environment.update({"HTTP_PROXY": proxy_endpoint['http'],
                                 "HTTPS_PROXY": proxy_endpoint['https'],
-                                "NO_PROXY": "backend-listener,system-master"})
+                                "NO_PROXY": f"backend-listener,system-master,system-provider,{rhsso_url}",
+                                "APICAST_LOAD_SERVICES_WHEN_NEEDED": 1})
     return gateway_environment
 
 
