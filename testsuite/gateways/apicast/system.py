@@ -29,7 +29,8 @@ class SystemApicast(AbstractApicast):
     CAPABILITIES = [Capability.SAME_CLUSTER,
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.APICAST,
-                    Capability.PRODUCTION_GATEWAY]
+                    Capability.PRODUCTION_GATEWAY,
+                    Capability.STANDARD_GATEWAY]
 
     def __init__(self, requirements: SystemApicastRequirements):
         if requirements.staging:

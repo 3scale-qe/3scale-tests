@@ -13,7 +13,7 @@ import requests
 from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module")

@@ -4,10 +4,11 @@ import base64
 import pytest
 import requests
 
+from testsuite.gateways.gateways import Capability
 from testsuite.utils import randomize, blame
 from testsuite import rawobj
 
-pytestmark = pytest.mark.flaky
+pytestmark = [pytest.mark.flaky, pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
 
 
 def get_embedded_data(pem: str, name: str, app: str) -> str:

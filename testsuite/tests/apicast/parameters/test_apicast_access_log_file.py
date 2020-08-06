@@ -11,7 +11,7 @@ import pytest
 
 from testsuite.gateways.gateways import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 ACCESS_LOG_FILE = "access.log"
 
