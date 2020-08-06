@@ -63,6 +63,10 @@ class AbstractApicast(AbstractGateway, ABC):
     def reload(self):
         """Reloads gateway"""
 
+    @abstractmethod
+    def get_logs(self):
+        """Gets the pod logs for the newest deployment"""
+
     def create(self):
         pass
 

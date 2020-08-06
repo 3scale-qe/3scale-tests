@@ -155,8 +155,8 @@ class OpenShiftClient:
 
         def select_pod(apiobject):
             annotation = "openshift.io/deployment-config.latest-version"
-            lastest_version = apiobject.get_annotation(annotation)
-            return apiobject.get_label("deployment") == f"{deployment_name}-{lastest_version}"
+            latest_version = apiobject.get_annotation(annotation)
+            return apiobject.get_label("deployment") == f"{deployment_name}-{latest_version}"
 
         with ExitStack() as stack:
             self.prepare_context(stack)
@@ -331,3 +331,20 @@ class OpenShiftClient:
             oc.selector(f"deployment/{deployment_name}").until_all(
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status
             )
+
+    def get_logs(self, deployment_name: str, tail: int = 100):
+        """
+        Get logs for the pods of the most recent deployment
+        :param deployment_name name of the pod to get the logs of
+        :param tail: how many logs to get
+        :return: logs of the pod
+        """
+        def select_pod(apiobject):
+            annotation = "openshift.io/deployment-config.latest-version"
+            latest_version = apiobject.get_annotation(annotation)
+            return apiobject.get_label("deployment") == f"{deployment_name}-{latest_version}"
+
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            logs = oc.selector("pods").narrow(select_pod).logs(tail=tail)
+            return logs

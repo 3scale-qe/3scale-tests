@@ -45,3 +45,8 @@ class SystemApicast(AbstractApicast):
 
     def reload(self):
         self.openshift.rollout(f"dc/{self.deployment_name}")
+
+    def get_logs(self):
+        logs = self.openshift.get_logs(self.deployment_name)
+        for key in logs:
+            return logs[key]

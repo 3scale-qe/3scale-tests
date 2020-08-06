@@ -69,3 +69,8 @@ class SelfManagedApicast(AbstractApicast):
 
     def reload(self):
         self.openshift.rollout(f"dc/{self.deployment}")
+
+    def get_logs(self):
+        logs = self.openshift.get_logs(self.deployment)
+        for key in logs:
+            return logs[key]
