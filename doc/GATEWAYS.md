@@ -60,7 +60,7 @@ gateway:
 ```
 ## Apicast Operator
 *Description*: Self-managed apicast deployed by operator, requires project with deployed apicast-operator.
- Testsuite will take of APIcast CRDs. Cannot be run in parallel for now.
+ Testsuite will take of APIcast CRDs. Can be run in parallel.
 
 *Has production gateway*: Yes
 

@@ -10,6 +10,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManag
 from testsuite.gateways.gateways import Capability
 from testsuite.openshift.env import Environ
 from testsuite.requirements import ThreeScaleAuthDetails
+from testsuite.utils import randomize
 
 
 class OperatorApicastRequirements(SelfManagedApicastRequirements, ABC):
@@ -27,6 +28,7 @@ class OperatorApicast(SelfManagedApicast):
     def __init__(self, requirements: OperatorApicastRequirements) -> None:
         super().__init__(requirements)
         self.auth = requirements.auth_details
+        self.deployment = randomize(self.deployment)
         self.name = f"apicast-{self.deployment}"
 
     def _route_name(self, entity_id):
