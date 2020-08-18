@@ -1,6 +1,7 @@
 """Tests for Application Plans Toolbox feature"""
 
 import re
+import logging
 
 import pytest
 
@@ -114,7 +115,9 @@ def test_show1(service):
     to_cmp += r'COST_PER_MONTH\tSETUP_FEE\tTRIAL_PERIOD_DAYS'
     assert re.findall(to_cmp, ret['stdout'])
 
-    to_cmp = fr"{out_variables['plan1'][0]}\tplan1\tplan1sysname\ttrue\tfalse\t11.1\t22.2\t33"
+    # https://issues.redhat.com/browse/THREESCALE-5542
+    to_cmp = fr"{out_variables['plan1'][0]}\tplan1\tplan1sysname\ttrue\t\(empty\)\t11.1\t22.2\t33"
+    logging.error(to_cmp)
     assert re.findall(to_cmp, ret['stdout'])
 
 
@@ -168,8 +171,8 @@ def test_check_application_plans_values(service):
 
     attr_list = constants.APP_PLANS_CMP_ATTRS
     toolbox.check_object(out_variables['plan1_entity'], attr_list, [
-        True, 0, 11.1, False, True, False, 'plan1', 22.2, 'published', 'plan1sysname', 33])
+        True, 0, 11.1, False, True, 'plan1', 22.2, 'published', 'plan1sysname', 33])
     toolbox.check_object(out_variables['plan2_entity'], attr_list, [
-        False, 0, 0, False, False, False, 'plan2', 0, 'hidden', 'plan2sysname', 0])
+        False, 0, 0, False, False, 'plan2', 0, 'hidden', 'plan2sysname', 0])
     toolbox.check_object(out_variables['plan3_entity'], attr_list, [
-        False, 0, 44, False, True, False, 'plan1', 55, 'hidden', 'plan1sysname', 66])
+        False, 0, 44, False, True, 'plan1', 55, 'hidden', 'plan1sysname', 66])
