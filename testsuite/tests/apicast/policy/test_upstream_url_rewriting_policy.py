@@ -38,9 +38,10 @@ def test_url_rewriting_policy_v1(api_client, private_base_url):
     parsed_url = urlparse(private_base_url("echo_api"))
     request = EchoedRequest.create(api_client.get("/httpbin/v1"))
     assert request.path == "/rewrite"
-    assert request.headers["X-Forwarded-Host"] == parsed_url.hostname
-    assert request.headers["X-Forwarded-Port"] == "443"
-    assert request.headers["X-Forwarded-Proto"] == "https"
+    # X-Forwarded- can contain more values
+    assert parsed_url.hostname in request.headers["X-Forwarded-Host"]
+    assert "443" in request.headers["X-Forwarded-Port"]
+    assert "https" in request.headers["X-Forwarded-Proto"]
 
 
 def test_url_rewriting_policy_v2(api_client, application, private_base_url):
