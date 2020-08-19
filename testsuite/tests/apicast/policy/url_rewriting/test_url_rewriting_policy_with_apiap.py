@@ -13,9 +13,11 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8')")
 @pytest.fixture(scope="module")
 def backends_mapping(custom_backend):
     """
-    Create custom backend with path "/bin"
+    Create custom backends with paths
+    -   "/bin"
+    -   "/"
     """
-    return {"/bin": custom_backend("backend")}
+    return {"/bin": custom_backend("backend"), "/": custom_backend("backend2")}
 
 
 @pytest.fixture(scope="module")
@@ -52,8 +54,9 @@ def url_rewriting_first(service):
     proxy.update()
 
 
-@pytest.mark.parametrize("setup", ("apicast_first", "url_rewriting_first"))
-def test(request, api_client, setup):
+@pytest.mark.parametrize("setup,prefix", [("apicast_first", "/"), ("url_rewriting_first", "/"),
+                                          ("apicast_first", "/bin/"), ("url_rewriting_first", "/bin/")])
+def test(request, api_client, setup, prefix):
     """Test that url_rewriting works with APIAP as expected
 
     url_rewriting has to work in same way like before APIAP doesn't whether
@@ -62,10 +65,10 @@ def test(request, api_client, setup):
 
     request.getfixturevalue(setup)
 
-    response = api_client.get("/bin/anything/v2/test")
+    response = api_client.get(f"{prefix}anything/v2/test")
     assert response.status_code == 200
     assert response.json()["path"] == "/anything/v2/test"
 
-    response = api_client.get("/bin/anything/v1/test")
+    response = api_client.get(f"{prefix}anything/v1/test")
     assert response.status_code == 200
     assert response.json()["path"] == "/anything/v5/test"
