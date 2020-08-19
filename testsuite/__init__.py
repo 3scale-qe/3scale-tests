@@ -21,5 +21,6 @@ from packaging.version import Version  # noqa: E402
 from testsuite.configuration import CommonConfiguration  # noqa: E402
 
 TESTED_VERSION = Version(str(settings["threescale"]["version"]))
+HTTP2 = settings.get("http2", False)
 ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent
 CONFIGURATION: CommonConfiguration = CommonConfiguration()
