@@ -9,6 +9,10 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import retry_for_session
 
 
+# CFSSL instance is necessary
+pytestmark = pytest.mark.flaky
+
+
 @pytest.fixture(scope="module")
 def policy_settings():
     """Http2 policy"""
