@@ -11,7 +11,7 @@ from testsuite.gateways.gateways import Capability
 from testsuite import rawobj
 from testsuite.utils import blame
 
-pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module")

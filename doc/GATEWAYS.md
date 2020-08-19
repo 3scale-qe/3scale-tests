@@ -1,8 +1,10 @@
 # Known Capabilities
-* `PRODUCTION_GATEWAY`: Gateway contains production gateway and can be used for calls to production.
-* `APICAST`: Gateway is of type Apicast (so far all the gateways are Apicast).
-* `CUSTOM_ENVIRONMENT`: You can set or read environmental variables for gateway.
+* `PRODUCTION_GATEWAY`: Gateway contains production gateway and can be used for calls to production. It needs to implement reload() method
+* `APICAST`: Gateway is Apicast, mutually exclusive with SERVICE_MESH
+* `SERVICE_MESH`: Gateway is Service Mesh, mutually exclusive with APICAST. 
+* `CUSTOM_ENVIRONMENT`: You can set or read environmental variables for gateway. It needs to implement environ() method
 * `SAME_CLUSTER`: Gateway is always located on the same cluster as 3scale, so it has access to internal services.
+* `STANDARD_GATEWAY`: It is standard gateway, which means tests that deploy their own Apicast can run.
 
 # Gateway type configuration
 ## Standard Apicast
@@ -12,7 +14,7 @@
 
 *Has implemented reload*: Yes
 
-*Capabilities*: "PRODUCTION_GATEWAY, APICAST, CUSTOM_ENVIRONMENT, SAME_CLUSTER" 
+*Capabilities*: "PRODUCTION_GATEWAY, APICAST, CUSTOM_ENVIRONMENT, SAME_CLUSTER, STANDARD_GATEWAY" 
 ```
 gateway:
   type: "apicast"
@@ -27,7 +29,7 @@ gateway:
 
 *Has implemented reload*: Yes
 
-*Capabilities*: "APICAST, PRODUCTION_GATEWAY" 
+*Capabilities*: "APICAST, PRODUCTION_GATEWAY, CUSTOM_ENVIRONMENT" 
 ```
 gateway:
   type: "apicast-selfmanaged"

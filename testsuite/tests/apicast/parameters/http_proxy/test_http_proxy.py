@@ -7,9 +7,9 @@ from urllib.parse import urlparse
 import pytest
 
 from testsuite import rawobj
+from testsuite.gateways.gateways import Capability
 
-
-pytestmark = pytest.mark.flaky
+pytestmark = [pytest.mark.flaky, pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
 
 
 @pytest.fixture(scope="module")

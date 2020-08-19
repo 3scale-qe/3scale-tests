@@ -27,11 +27,12 @@ class GatewayRequirements(OpenshiftRequirement, ABC):
 
 class Capability(enum.Enum):
     """Enum containing all known gateway capabilities"""
-    PRODUCTION_GATEWAY = "production"
-    APICAST = "apicast"
-    CUSTOM_ENVIRONMENT = "env"
-    SAME_CLUSTER = "internal-cluster"
-    SERVICE_MESH = "service-mesh"
+    PRODUCTION_GATEWAY = "production"           # Allows production gateway with reload() capability
+    APICAST = "apicast"                         # Is Apicast, this is mutually exclusive with Service Mesh
+    CUSTOM_ENVIRONMENT = "env"                  # Allows environment manipulation through environ() method
+    SAME_CLUSTER = "internal-cluster"           # Is always located on the same cluster as 3scale
+    SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
+    STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
 
 
 class AbstractGateway(LifecycleHook, ABC):

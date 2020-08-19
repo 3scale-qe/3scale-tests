@@ -10,7 +10,7 @@ import threescale_api.auth
 from testsuite.gateways.gateways import Capability
 from testsuite import rawobj
 
-pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module")

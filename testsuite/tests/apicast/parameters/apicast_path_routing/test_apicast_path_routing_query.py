@@ -9,7 +9,7 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
 
-pytestmark = [pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT),
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
               pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 

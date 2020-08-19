@@ -3,7 +3,10 @@
 import pytest
 
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways.gateways import Capability
 from testsuite.utils import randomize
+
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module")
