@@ -333,10 +333,10 @@ class OpenShiftClient:
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status
             )
 
-
     def get_logs(self, deployment_name: str, tail: int = -1) -> str:
         """
         Get merged logs for the pods of the most recent deployment
+
         Works only for DeploymentConfig, not for Deployment
         :param deployment_name name of the pod to get the logs of
         :param tail: how many logs to get, defaults to all
@@ -349,15 +349,14 @@ class OpenShiftClient:
             logs_merged += logs[key]
         return logs_merged
 
-
     def get_pod(self, deployment_name: str):
         """
         Gets the selector for the pods of the most recent deployment
+
         Works only for DeploymentConfig, not for Deployment
         :param deployment_name name of the pod to get
         :return: the pod of the most recent deployment
         """
-
         def select_pod(apiobject):
             annotation = "openshift.io/deployment-config.latest-version"
             latest_version = apiobject.get_annotation(annotation)
