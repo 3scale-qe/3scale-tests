@@ -31,6 +31,7 @@ class SecretTypes(enum.Enum):
 class OpenShiftClient:
     """OpenShiftClient is an interface to the official OpenShift python
     client."""
+    # pylint: disable=too-many-public-methods
 
     def __init__(self, project_name: str, server_url: str = None, token: str = None):
         self.project_name = project_name
@@ -332,12 +333,27 @@ class OpenShiftClient:
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status
             )
 
-    def get_logs(self, deployment_name: str, tail: int = 100):
+    def get_logs(self, deployment_name: str, tail: int = -1) -> str:
         """
-        Get logs for the pods of the most recent deployment
+        Get merged logs for the pods of the most recent deployment
+        Works only for DeploymentConfig, not for Deployment
         :param deployment_name name of the pod to get the logs of
-        :param tail: how many logs to get
+        :param tail: how many logs to get, defaults to all
         :return: logs of the pod
+        """
+        pod_selector = self.get_pod(deployment_name)
+        logs = pod_selector.logs(tail)
+        logs_merged = ""
+        for key in logs:
+            logs_merged += logs[key]
+        return logs_merged
+
+    def get_pod(self, deployment_name: str):
+        """
+        Gets the selector for the pods of the most recent deployment
+        Works only for DeploymentConfig, not for Deployment
+        :param deployment_name name of the pod to get
+        :return: the pod of the most recent deployment
         """
         def select_pod(apiobject):
             annotation = "openshift.io/deployment-config.latest-version"
@@ -346,5 +362,5 @@ class OpenShiftClient:
 
         with ExitStack() as stack:
             self.prepare_context(stack)
-            logs = oc.selector("pods").narrow(select_pod).logs(tail=tail)
-            return logs
+            pod_selector = oc.selector("pods").narrow(select_pod)
+            return pod_selector

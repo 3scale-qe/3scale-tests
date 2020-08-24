@@ -30,7 +30,8 @@ class SystemApicast(AbstractApicast):
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.APICAST,
                     Capability.PRODUCTION_GATEWAY,
-                    Capability.STANDARD_GATEWAY]
+                    Capability.STANDARD_GATEWAY,
+                    Capability.LOGS]
 
     def __init__(self, requirements: SystemApicastRequirements):
         if requirements.staging:
@@ -47,6 +48,4 @@ class SystemApicast(AbstractApicast):
         self.openshift.rollout(f"dc/{self.deployment_name}")
 
     def get_logs(self):
-        logs = self.openshift.get_logs(self.deployment_name)
-        for key in logs:
-            return logs[key]
+        return self.openshift.get_logs(self.deployment_name)
