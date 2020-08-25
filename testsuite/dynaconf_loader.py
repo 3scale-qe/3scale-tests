@@ -18,17 +18,18 @@ overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
 
+import logging
 import os
 
 from packaging.version import Version, InvalidVersion
 
 import yaml
-from openshift import OpenShiftPythonException
 
 from testsuite.openshift.client import OpenShiftClient
 
 
 identifier = "threescale"  # pylint: disable=invalid-name
+log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def _route2url(route):
@@ -81,72 +82,67 @@ def load(obj, env=None, silent=None, key=None):
     :return: None
     """
 
-    # openshift project: if not set use ENV_FOR_DYNACONF, env NAMESPACE overwrites everything
-    project = obj.get("env_for_dynaconf")
-    project = obj.get("openshift", {}).get("projects", {}).get("threescale", {}).get("name", project)
-    project = os.environ.get("NAMESPACE", project)
+    try:  # one large try/except block for now with logging at the end
+        # openshift project: if not set use ENV_FOR_DYNACONF, env NAMESPACE overwrites everything
+        project = obj.get("env_for_dynaconf")
+        project = obj.get("openshift", {}).get("projects", {}).get("threescale", {}).get("name", project)
+        project = os.environ.get("NAMESPACE", project)
 
-    ocp_setup = obj.get("openshift", {}).get("servers", {}).get("default", {})
+        ocp_setup = obj.get("openshift", {}).get("servers", {}).get("default", {})
 
-    ocp = OpenShiftClient(
-        project_name=project,
-        server_url=ocp_setup.get("server_url"),
-        token=ocp_setup.get("token"))
+        ocp = OpenShiftClient(
+            project_name=project,
+            server_url=ocp_setup.get("server_url"),
+            token=ocp_setup.get("token"))
 
-    # Test fetching 3scale project
-    try:
-        ocp.do_action("get", ["project", project])
-    except OpenShiftPythonException:
-        raise ValueError(f"Openshift project {project} does not exist on the server, either project name is invalid "
-                         f"or the credentials are invalid")
+        admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
+        admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
+        master_url = _route2url(ocp.routes.for_service("system-master")[0])
+        master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
 
-    admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
-    admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
-    master_url = _route2url(ocp.routes.for_service("system-master")[0])
-    master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
+        # all this or nothing
+        if None in (project, admin_url, admin_token, master_url, master_token):
+            return
 
-    # all this or nothing
-    if None in (project, admin_url, admin_token, master_url, master_token):
-        return
+        # Values gathered in this loader are just fallback defaults, current
+        # settings needs to be dumped and written again, because a) it doesn't seem
+        # to be possible to change order of builtin loaders to make this one first;
+        # b) values from file(s) are needed here anyway. Therefore dump & update
+        settings = obj.to_dict()
 
-    # Values gathered in this loader are just fallback defaults, current
-    # settings needs to be dumped and written again, because a) it doesn't seem
-    # to be possible to change order of builtin loaders to make this one first;
-    # b) values from file(s) are needed here anyway. Therefore dump & update
-    settings = obj.to_dict()
+        data = {
+            "openshift": {
+                "projects": {
+                    "threescale": {
+                        "name": project}},
+                "servers": {
+                    "default": {
+                        "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
+            "threescale": {
+                "version": _guess_version(ocp),
+                "superdomain": ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"],
+                "admin": {
+                    "url": admin_url,
+                    "token": admin_token},
+                "master": {
+                    "url": master_url,
+                    "token": master_token},
+                "gateway": {
+                    "image": _apicast_image(ocp)}}}
 
-    data = {
-        "openshift": {
-            "projects": {
-                "threescale": {
-                    "name": project}},
-            "servers": {
-                "default": {
-                    "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
-        "threescale": {
-            "version": _guess_version(ocp),
-            "superdomain": ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"],
-            "admin": {
-                "url": admin_url,
-                "token": admin_token},
-            "master": {
-                "url": master_url,
-                "token": master_token},
-            "gateway": {
-                "template": "3scale-gateway",
-                "image": _apicast_image(ocp),
-                "type": "apicast",
-                "configuration": {
-                    "staging_deployment": "apicast-staging",
-                    "production_deployment": "apicast-production"}}}}
+        # this overwrites what's already in settings to ensure NAMESPACE is propagated
+        project_data = {
+            "openshift": {
+                "projects": {
+                    "threescale": {
+                        "name": project}}}}
 
-    # this overwrites what's already in settings to ensure NAMESPACE is propagated
-    project_data = {
-        "openshift": {
-            "projects": {
-                "threescale": {
-                    "name": project}}}}
-
-    settings.update(project_data)
-    obj.update(data, loader_identifier=identifier)
-    obj.update(settings)
+        settings.update(project_data)
+        obj.update(data, loader_identifier=identifier)
+        obj.update(settings)
+        log.info("dynamic dynaconf loader successfully got data from openshift")
+    except Exception as err:
+        if silent:
+            log.debug("'%s' appeared with message: %s", type(err).__name__, err)
+            return
+        raise err
