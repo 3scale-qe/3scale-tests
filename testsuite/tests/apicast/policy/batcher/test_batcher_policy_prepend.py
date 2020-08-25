@@ -6,6 +6,9 @@ from time import sleep
 import pytest
 
 
+BATCH_REPORT_SECONDS = 50
+
+
 @pytest.fixture(scope="module")
 def service(service):
     """
@@ -17,7 +20,7 @@ def service(service):
         "version": "builtin",
         "enabled": True,
         "configuration": {
-            "batch_report_seconds": 50
+            "batch_report_seconds": BATCH_REPORT_SECONDS
         }
     })
 
@@ -34,6 +37,9 @@ def test_batcher_policy_prepend(api_client, application):
         api_client.get("/get")
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before
-    sleep(50)
+
+    # BATCH_REPORT_SECONDS needs to be big enough to execute all the requests to apicast + assert on analytics
+    sleep(BATCH_REPORT_SECONDS + 1)
+
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before + 5

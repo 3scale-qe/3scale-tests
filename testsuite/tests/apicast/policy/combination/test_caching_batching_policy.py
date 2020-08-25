@@ -10,11 +10,15 @@ from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
 
 
+BATCH_REPORT_SECONDS = 50
+
+
 @pytest.fixture(scope="module")
 def service(service):
     """Adds policies to servies"""
-    service.proxy.list().policies.append(rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": 50}),
-                                         rawobj.PolicyConfig("caching", {"caching_type": "allow"}))
+    service.proxy.list().policies.append(
+        rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS}),
+        rawobj.PolicyConfig("caching", {"caching_type": "allow"}))
     return service
 
 
@@ -51,7 +55,9 @@ def test_batcher_caching_policy(prod_client, application, openshift):
         assert usage_after == usage_before
     finally:
         openshift.scale("backend-listener", replicas)
-    sleep(50)
+
+    # BATCH_REPORT_SECONDS needs to be big enough to execute all the requests to apicast + assert on analytics
+    sleep(BATCH_REPORT_SECONDS + 1)
 
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before + 4
