@@ -11,7 +11,7 @@ from testsuite.echoed_request import EchoedRequest
 
 @pytest.fixture(scope="module")
 def policy_settings():
-    "configurates headers in policy"
+    """configurates headers in policy"""
     return rawobj.PolicyConfig("headers", {
         "response": [{"op": "set",
                       "header": "X-RESPONSE-CUSTOM-SET",
@@ -24,9 +24,9 @@ def policy_settings():
 
 
 @pytest.mark.smoke
-def test_header_policy(application, testconfig):
-    "testing custom header policy"
-    response = application.test_request(verify=testconfig["ssl_verify"])
+def test_header_policy(application):
+    """testing custom header policy"""
+    response = application.test_request()
     assert "X-Response-Custom-Set" in response.headers
     assert response.headers["X-Response-Custom-Set"] == "Response set header"
 

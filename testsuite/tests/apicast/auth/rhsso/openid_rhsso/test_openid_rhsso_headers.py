@@ -47,6 +47,7 @@ def test_token_in_query(client, token):
     response = client.get("/get", params={'access_token': token})
     assert response.status_code == 403
 
+
 # https://issues.redhat.com/browse/THREESCALE-5885
 @pytest.mark.flaky
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
