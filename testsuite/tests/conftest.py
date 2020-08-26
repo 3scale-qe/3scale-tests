@@ -216,9 +216,10 @@ def staging_gateway(request, testconfig, configuration):
                                              settings_block=testconfig["threescale"]["gateway"]["configuration"],
                                              configuration=configuration)
     gateway = gateways.configuration.staging(options)
+    request.addfinalizer(gateway.destroy)
+
     gateway.create()
 
-    request.addfinalizer(gateway.destroy)
     return gateway
 
 
@@ -232,9 +233,10 @@ def production_gateway(request, testconfig, configuration):
                                              settings_block=testconfig["threescale"]["gateway"]["configuration"],
                                              configuration=configuration)
     gateway = gateway(options)
+    request.addfinalizer(gateway.destroy)
+
     gateway.create()
 
-    request.addfinalizer(gateway.destroy)
     return gateway
 
 

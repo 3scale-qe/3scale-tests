@@ -54,12 +54,16 @@ class SelfManagedApicastOptions(GatewayOptions, SelfManagedApicastRequirements):
         return self.setting_block["deployments"]
 
     @property
+    def _endpoints(self):
+        return self.setting_block["endpoints"]
+
+    @property
     def staging_endpoint(self) -> str:
-        return self.setting_block["staging_endpoint"]
+        return self._endpoints["staging"]
 
     @property
     def production_endpoint(self) -> str:
-        return self.setting_block["production_endpoint"]
+        return self._endpoints["production"]
 
     @property
     def staging_deployment(self) -> str:

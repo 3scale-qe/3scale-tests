@@ -17,7 +17,7 @@ Options = Type[GatewayOptions]
 GATEWAYS: Dict[str, Tuple[Gateway, Optional[Gateway], Options]] = {
     "apicast": (SystemApicast, SystemApicast, SystemApicastOptions),
     "apicast-container": (ContainerizedApicast, None, SelfManagedApicastOptions),
-    "apicast-selfmanaged": (SelfManagedApicast, None, SelfManagedApicastOptions),
+    "apicast-selfmanaged": (SelfManagedApicast, SelfManagedApicast, SelfManagedApicastOptions),
     "apicast-operator": (OperatorApicast, None, OperatorApicastOptions),
     "apicast-template": (TemplateApicast, TemplateApicast, TemplateApicastOptions),
     "apicast-tls": (TLSApicast, TLSApicast, TLSApicastOptions),
