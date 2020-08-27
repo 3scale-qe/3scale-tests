@@ -1,9 +1,24 @@
 # pylint: disable=missing-module-docstring,wrong-import-position
 
+import logging
 import os
+
+if "_3SCALE_TESTS_DEBUG" in os.environ:
+    logging.basicConfig(level=logging.DEBUG)
+
 from pathlib import Path
 
 from dynaconf import settings
+
+# Monkey patching! Yes! True power of dynamic language
+# Let's modify 'BoxKeyError' to display a guidance as this is common error
+# in case of missing openshift session (or dynaconf settings)
+from box.exceptions import BoxKeyError  # pylint: disable=import-error
+
+BoxKeyError.native_str = BoxKeyError.__str__
+BoxKeyError.__str__ = lambda self: \
+    self.native_str() + \
+    "\nHINT: Don't forget, either login to openshift (and set '3scale' project) or have all required config/ set!"
 
 if settings["ssl_verify"]:
     if "REQUESTS_CA_BUNDLE" not in os.environ:
