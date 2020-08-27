@@ -15,11 +15,14 @@ import pytest
 from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
 
 from testsuite import rawobj
+from testsuite.gateways.gateways import Capability
 from .conftest import get_rhsso_client, token
 
 
 # there is issue with RHSSO for prod_client (phala knows more)
-pytestmark = pytest.mark.flaky
+pytestmark = [pytest.mark.flaky,
+              pytest.mark.disruptive,
+              pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
 @fixture_plus
