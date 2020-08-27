@@ -8,6 +8,9 @@ from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 
+BATCH_REPORT_SECONDS = 50
+
+
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
@@ -18,7 +21,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 @pytest.fixture(scope="module")
 def policy_settings():
     """Set policy settings"""
-    return rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": 50})
+    return rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS})
 
 
 @pytest.mark.slow
@@ -36,7 +39,8 @@ def test_batcher_policy_oidc(api_client, application, rhsso_service_info):
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before
 
-    sleep(50)
+    # BATCH_REPORT_SECONDS needs to be big enough to execute all the requests to apicast + assert on analytics
+    sleep(BATCH_REPORT_SECONDS + 1)
 
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before + 5
