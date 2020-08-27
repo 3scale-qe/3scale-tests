@@ -17,9 +17,7 @@ from testsuite import rawobj
 from .conftest import get_rhsso_client, token
 
 
-# there is issue with RHSSO for prod_client (phala knows more)
-pytestmark = [pytest.mark.flaky,
-              pytest.mark.disruptive,
+pytestmark = [pytest.mark.disruptive,
               pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
