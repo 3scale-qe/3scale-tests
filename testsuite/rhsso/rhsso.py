@@ -178,14 +178,16 @@ class OIDCClientAuth:
             access_token = token()
             credentials = {"access_token": access_token}
 
-            if location == "authorization":
+            loc = self.location or location
+
+            if loc == "authorization":
                 request.headers.update({'Authorization': 'Bearer ' + access_token})
-            elif location == "headers":
+            elif loc == "headers":
                 request.prepare_headers(credentials)
-            elif location == "query":
+            elif loc == "query":
                 request.prepare_url(request.url, credentials)
             else:
-                raise ValueError("Unknown credentials location '%s'" % location)
+                raise ValueError("Unknown credentials location '%s'" % loc)
             return request
 
         return _process_request
