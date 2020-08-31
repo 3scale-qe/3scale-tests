@@ -5,6 +5,7 @@ from keycloak.admin.clients import Client
 from keycloak.admin.realm import Realm
 from keycloak.admin.users import User
 from keycloak.openid_connect import KeycloakOpenidConnect
+from keycloak.exceptions import KeycloakClientError
 
 from threescale_api.resources import Service
 
@@ -56,6 +57,12 @@ class RHSSO:
         self.realm = RetryKeycloakRealm(server_url=server_url, realm_name='master')
         self.oidc = KeycloakOpenidConnect(realm=self.realm, client_id="admin-cli", client_secret=None)
         self.admin = self.realm.admin
+        self.credentials = (username, password)
+        self.refresh_token()
+
+    def refresh_token(self):
+        """Request and reset admin token"""
+        username, password = self.credentials
         self.token = self.oidc.password_credentials(username=username, password=password)
         self.admin.set_token(self.token)
 
@@ -138,7 +145,11 @@ class RHSSOServiceConfiguration:
         http(s)://<CLIENT_ID>:<CLIENT_SECRET>@<HOST>:<PORT>/auth/realms/<REALM_NAME>
         :return: url
         """
-        secret = self.client.secret["value"]
+        try:
+            secret = self.client.secret["value"]
+        except KeycloakClientError:
+            self.rhsso.refresh_token()
+            secret = self.client.secret["value"]
         client_id = self.client.id
         url = self.issuer_url()
         return url.replace("://", "://%s:%s@" % (client_id, secret), 1)
