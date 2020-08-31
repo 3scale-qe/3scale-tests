@@ -1,5 +1,6 @@
 """
 Default test for HTTP2 policy
+Regression test for: https://issues.redhat.com/browse/THREESCALE-4684
 """
 import pytest
 import requests
