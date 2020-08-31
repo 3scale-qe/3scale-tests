@@ -143,11 +143,9 @@ def my_metrics(service, testconfig):
 
 
 @pytest.fixture(scope="module")
-def my_applications(request, service, custom_application, custom_app_plan, my_metrics, lifecycle_hooks,
-                    product_service, private_base_url):
+def my_applications(request, service, custom_application, custom_app_plan, my_metrics, lifecycle_hooks):
     "application bound to the account and service existing over whole testing session"
     # pylint: disable=too-many-arguments
-    # pylint: disable=unused-argument
     metric1, metric2 = my_metrics
     proxy = service.proxy.list()
 
