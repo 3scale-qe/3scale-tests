@@ -9,6 +9,7 @@ from testsuite.gateways.apicast import SystemApicastRequirements, OperatorApicas
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirements
 from testsuite.gateways.gateways import GatewayRequirements
 from testsuite.gateways.service_mesh import ServiceMeshRequirements, ServiceMesh, Httpbin
+from testsuite.requirements import ThreeScaleAuthDetails
 
 if TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
@@ -77,17 +78,10 @@ class SelfManagedApicastOptions(GatewayOptions, SelfManagedApicastRequirements):
 # pylint: disable=too-many-ancestors
 class OperatorApicastOptions(SelfManagedApicastOptions, OperatorApicastRequirements):
     """Implementation of OperatorApicastRequirements with current testsuite"""
-    @property
-    def _services(self):
-        return self.setting_block.get("services", {})
 
     @property
-    def staging_service(self):
-        return self._services.get("staging", "apicast-staging")
-
-    @property
-    def production_service(self):
-        return self._services.get("production", "apicast-production")
+    def auth_details(self) -> ThreeScaleAuthDetails:
+        return self.configuration
 
 
 class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequirements):
