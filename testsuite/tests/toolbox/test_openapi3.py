@@ -8,6 +8,7 @@ from testsuite.config import settings
 
 import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
+from testsuite.utils import blame
 
 
 OAS3_FILE = 'testsuite/resources/oas3/petstore-expanded.yaml'
@@ -21,10 +22,11 @@ def petstore_yaml(fil=OAS3_FILE):
 
 
 @pytest.fixture(scope="module")
-def import_oas3(dest_client):
+def import_oas3(dest_client, request):
     """Import OAS3 by Toolbox"""
     import_cmd = f"import openapi -d {constants.THREESCALE_DST1} {settings['toolbox']['podman_cert_dir']}"
-    import_cmd += f"/petstore-expanded.yaml --default-credentials-userkey={USER_KEY}"
+    import_cmd += f"/petstore-expanded.yaml --default-credentials-userkey={USER_KEY} "
+    import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"
     ret = toolbox.run_cmd(import_cmd)
     (_, service_id, service_name) = re.findall(
         r'^(Created|Updated) service id: (\d+), name: (.+)$', ret['stdout'], re.MULTILINE)[0]
