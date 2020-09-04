@@ -133,6 +133,7 @@ def test_import(import_oas, oas):
             path_url = {'oas2': lambda: f"{oas['file']['basePath']}",
                         'oas3': lambda: f"{urlparse(oas['file']['servers'][0]['url']).path}"}[oas['type']]
             path_url = f"{path_url()}{path}"
+
             assert re.findall(
                 rf"^Created {method.upper()} {path_url}\$ endpoint$",
                 ret['stdout'],
