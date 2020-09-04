@@ -82,8 +82,8 @@ def oas(request):
 @pytest.fixture(scope="module")
 def import_oas(dest_client, request, oas):
     """Import OAS by Toolbox"""
-    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} "
-    import_cmd += oas['file_name']
+    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} {settings['toolbox']['podman_cert_dir']}/"
+    import_cmd += OAS_FILES[oas[0]].split('/')[-1]
     import_cmd += f" --default-credentials-userkey={USER_KEY} "
     import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"
     ret = toolbox.run_cmd(import_cmd)
@@ -134,6 +134,7 @@ def test_import(import_oas, oas):
             path_url = {'oas2': lambda: f"{oas['file']['basePath']}",
                         'oas3': lambda: f"{urlparse(oas['file']['servers'][0]['url']).path}"}[oas['type']]
             path_url = f"{path_url()}{path}"
+
             assert re.findall(
                 rf"^Created {method.upper()} {path_url}\$ endpoint$",
                 ret['stdout'],
