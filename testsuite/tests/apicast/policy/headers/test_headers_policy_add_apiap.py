@@ -7,9 +7,11 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend):
+def backends_mapping(custom_backend, private_base_url):
     """Creates custom backends with paths "/bin", "/lib"""
-    return {"/bin": custom_backend("backend"), "/lib": custom_backend("backend2")}
+    return {
+        "/bin": custom_backend("backend", private_base_url("httpbin")),
+        "/lib": custom_backend("backend2", private_base_url("httpbin"))}
 
 
 @pytest.fixture(scope="module")
