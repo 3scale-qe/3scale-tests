@@ -18,8 +18,10 @@ overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
 
+from pathlib import Path
 import logging
 import os
+import os.path
 
 from packaging.version import Version, InvalidVersion
 
@@ -38,6 +40,14 @@ def _route2url(route):
     return f"https://{route['spec']['host']}"
 
 
+def _testsuite_version():
+    """Get testsuite version string"""
+
+    path = os.path.join(Path(os.path.abspath(__file__)).parent.parent, "VERSION")
+    with open(path) as version:
+        return version.read().strip()
+
+
 def _guess_version(ocp):
     """Attempt to determine version from amp-system imagestream"""
 
@@ -49,7 +59,10 @@ def _guess_version(ocp):
         Version(version)
     except (KeyError, InvalidVersion):
         version = lookup["from"]["name"].split(":", 1)[1].replace("3scale", "")
-        Version(version)
+        try:
+            Version(version)
+        except InvalidVersion:
+            return _testsuite_version().split("-")[0]
 
     return str(version)
 
