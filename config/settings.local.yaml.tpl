@@ -36,6 +36,14 @@ ${ENVIRONMENT}:
     ssh_user: "" # user at the machine where the container is
     ssh_passwd: "" # password for above user
     podman_image: "" # container image ID
+  fixtures:
+    jaeger:
+      url: "" # route to the jaeger-query service for the querying of traces
+      config:
+        reporter:
+            localAgentHostPort: "" # route to the jaeger-agent (may be internal)
+        baggage_restrictions:
+            hostPort: "" # route to the jaeger-query (may be internal)
   hyperfoil:
     url: "" # URL for hyperfoil controller
     shared_template: #template that will be added to each hyperfoil benchmark definition
