@@ -1,0 +1,55 @@
+"""
+Test for https://issues.redhat.com/browse/THREESCALE-3626
+"""
+
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+
+import pytest
+
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+
+pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
+
+
+@pytest.fixture(scope="module")
+def service(custom_service, service_settings):
+    """
+    Create a custom service withou backend
+    """
+    return custom_service(service_settings)
+
+
+def test_proxy_config(service, private_base_url):
+    """
+    Test:
+        - Update service proxy (add 'api_backend')
+        - Assert that service has backend usage
+        - Assert that service has one proxy config
+        - Delete service backend usage
+        - Assert that service hasn't backend usage
+        - Update service proxy (change 'auth_user_key')
+        - Assert that service still has one proxy config
+        - Create service backend usage
+        - Assert that service has now two proxy configs
+    """
+    service.proxy.list().update({"api_backend": private_base_url("httpbin")})
+    usages = service.backend_usages.list()
+    assert len(usages) == 1
+
+    usage_id = usages[0]["id"]
+
+    service.backend_usages.delete(usage_id)
+    assert len(service.backend_usages.list()) == 0
+    configs = service.proxy.list().configs.list(env="sandbox")
+    assert len(configs) == 1
+
+    service.proxy.list().update({"api_backend": None, "auth_user_key": "random_key"})
+    configs = service.proxy.list().configs.list(env="sandbox")
+    assert len(configs) == 1
+
+    backend_id = usages[0]["backend_id"]
+    service.backend_usages.create({"path": "/", "backend_api_id": backend_id})
+    service.proxy.list().update()
+
+    configs = service.proxy.list().configs.list(env="sandbox")
+    assert len(configs) == 2
