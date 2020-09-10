@@ -17,7 +17,7 @@ pylint flake8 mypy: pipenv-dev
 all-is-package:
 	@echo
 	@echo "Searching for dirs missing __init__.py"
-	@! find testsuite/ -type d \! -name __pycache__ \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
+	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 test: ## Run test
 test pytest tests: pipenv
