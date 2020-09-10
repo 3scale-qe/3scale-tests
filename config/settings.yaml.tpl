@@ -52,6 +52,13 @@ development:
       backends:
         primary: https://httpbin.{DEVELOPMENT_TESTENV_DOMAIN}:443
         httpbin_go: https://httpbingo.{DEVELOPMENT_TESTENV_DOMAIN}:443
+        httpbin_go_mtls: https://httpbingo-mtls.{DEVELOPMENT_TESTENV_DOMAIN}:443
+      projects:
+        # Project which the secrets containing the certificates for mtls resides in.
+        # Usually the secrets are created in httpbin project because htttpbin go with mtls is deployed in there.
+        mtls-certificates:
+          name: httpbin
+
   rhsso:
     # admin credentials
     username: "{DEFAULT_RHSSO_ADMIN_USERNAME}"
