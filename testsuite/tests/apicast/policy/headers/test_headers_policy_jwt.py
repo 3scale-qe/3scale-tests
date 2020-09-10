@@ -25,8 +25,8 @@ def policy_settings():
     """
     Set the headers policy to add a header containing information from the JWT object
     """
-    liquid_header = "{% if jwt.typ== \'Bearer\' %}{{ jwt.exp }};{{ jwt.nbf }};{{ jwt.iat }};{{ jwt.iss }};" \
-                    "{{ jwt.aud }};{{ jwt.typ }};{{ jwt.azp }};{{ jwt.auth_time }}{% else %}invalid{% endif %}"
+    liquid_header = "{% if jwt.typ== \'Bearer\' %}{{ jwt.exp }};{{ jwt.iat }};{{ jwt.iss }};" \
+                    "{{ jwt.aud }};{{ jwt.typ }};{{ jwt.azp }}{% else %}invalid{% endif %}"
 
     return rawobj.PolicyConfig("headers", {
         "response": [{"op": "set", "header": "X-RESPONSE-CUSTOM-JWT", "value": liquid_header, "value_type": "liquid"}],
@@ -34,8 +34,6 @@ def policy_settings():
     })
 
 
-# The jwt.auth_time and jwt.nbf are not available in the liquid context variable jwt
-@pytest.mark.flaky
 def test_headers_policy_extra_headers(api_client, rhsso_service_info, application):
     """
     Assert that
@@ -58,14 +56,12 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
     assert response.headers["X-RESPONSE-CUSTOM-JWT"] == echoed_request.headers["X-Request-Custom-Jwt"]
     assert echoed_request.headers["X-Request-Custom-Jwt"] != "invalid"
 
-    exp, nbf, iat, iss, _, _, azp, auth_time = response.headers["X-RESPONSE-CUSTOM-JWT"].split(";")
+    exp, iat, iss, _, _, azp = response.headers["X-RESPONSE-CUSTOM-JWT"].split(";")
 
     # add 10 seconds to now because there can be different times
     # in Jenkins machine and machine with Apicast
     now = time.time() + 10
     assert float(exp) > now
-    assert float(nbf) <= now
     assert float(iat) <= now
-    assert float(auth_time) <= now
     assert rhsso_service_info.issuer_url() == iss
     assert azp == application["application_id"]

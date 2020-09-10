@@ -11,7 +11,7 @@ from testsuite.echoed_request import EchoedRequest
 
 @pytest.fixture(scope="module")
 def policy_settings():
-    """configurates headers in policy"""
+    """configures headers in policy"""
     return rawobj.PolicyConfig("headers", {
         "response": [{"op": "set",
                       "header": "X-RESPONSE-CUSTOM-SET",

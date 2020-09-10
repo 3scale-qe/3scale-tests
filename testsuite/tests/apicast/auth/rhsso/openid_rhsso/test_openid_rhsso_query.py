@@ -15,8 +15,6 @@ from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_client, api_client
 
 
-@parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """
