@@ -4,6 +4,8 @@ Provide a small client for interacting with Requestbin.
 import xml.etree.ElementTree as Et
 import requests
 
+import backoff
+
 
 # pylint: disable=too-few-public-methods
 class RequestBinClient:
@@ -19,6 +21,7 @@ class RequestBinClient:
         self.name = requests.post(self.api_url).json()["name"]
         self.url = f"{self.endpoint}/{self.name}"
 
+    @backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=5)
     def get_webhook(self, action: str, entity_id: str):
         """
         :return webhook for given action and entity_id
