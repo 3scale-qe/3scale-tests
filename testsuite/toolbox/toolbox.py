@@ -97,17 +97,18 @@ def find_and_cmp(list1, list2, cmp_function, id_attr=None):
         cmp_function(ent1, ent2)
 
 
-def cmp_services(svc1, svc2):
+def cmp_services(svc1, svc2, product_service):
     """
     Compare two services/products.
 
     @param [Object] First service
     @param [Object] Second service
+    @param [String] Comparing service or product?
     """
     assert len(svc1.entity.keys()) == len(svc2.entity.keys())
     cmp_ents(svc1.entity, svc2.entity, set(svc1.entity.keys()) - constants.SERVICE_CMP_ATTRS)
 
-    cmp_proxies(svc1.proxy.list(), svc2.proxy.list())
+    cmp_proxies(svc1.proxy.list(), svc2.proxy.list(), product_service)
     cmp_metrics(svc1, svc2)
     cmp_mappings(svc1, svc2)
     cmp_app_plans(svc1, svc2)
@@ -177,7 +178,7 @@ def cmp_pricing_rules(ap1, ap2):
         ['friendly_name'])
 
 
-def cmp_proxies(proxy1, proxy2):
+def cmp_proxies(proxy1, proxy2, product_service):
     """
     Compare two proxies.
 
@@ -200,10 +201,14 @@ def cmp_proxies(proxy1, proxy2):
         last_proxy1 = last_config1['proxy']
         last_proxy2 = last_config2['proxy']
         assert len(last_proxy1.keys()) == len(last_proxy2.keys())
-        cmp_ents(last_proxy1, last_proxy2, set(last_proxy1.keys()) - constants.PROXY_CONFIG_CONTENT_PROXY_CMP_ATTRS)
+        cmp_attrs = set(last_proxy1.keys()) - constants.PROXY_CONFIG_CONTENT_PROXY_CMP_ATTRS
+        if product_service == 'service':
+            cmp_attrs.remove('api_backend')
+        cmp_ents(last_proxy1, last_proxy2, cmp_attrs)
 
         # first item is policy inserted by system for backend routing
-        assert not jsondiff.diff(last_proxy1['policy_chain'][1:], last_proxy2['policy_chain'][1:])
+        if product_service == 'product':
+            assert not jsondiff.diff(last_proxy1['policy_chain'][1:], last_proxy2['policy_chain'][1:])
         for rule1, rule2 in zip(last_proxy1['proxy_rules'], last_proxy1['proxy_rules']):
             assert len(rule1.keys()) == len(rule2.keys())
             cmp_ents(rule1, rule2, set(rule1.keys()) - constants.PROXY_RULES_CMP_ATTRS)
@@ -302,3 +307,10 @@ def cmp_backend_usages(svc1, svc2):
         back2 = svc2.threescale_client.backends.read(bus2['backend_id'])
         cmp_backends(back1, back2)
     find_and_cmp(buses1, buses2, _cmp_func, ['path'])
+
+
+def check_object(obj_ent, not_check_list, vals):
+    """Check if entity object has values of keys not in 'not_check_list' equal to values 'val'."""
+    check_list = zip(sorted(obj_ent.keys() - not_check_list), vals)
+    for key, val in check_list:
+        assert obj_ent[key] == val

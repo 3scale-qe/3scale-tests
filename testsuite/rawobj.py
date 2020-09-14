@@ -154,3 +154,33 @@ def ActiveDoc(name: str, body: str, description: str = '',
         obj["service_id"] = service["id"]
 
     return obj
+
+
+def Account(org_name: str, monthly_billing_enabled: bool, monthly_charging_enabled: bool) -> dict:
+    """builder of params to create an account
+    Args:
+        :param org_name: name of the organization
+        :param monthly_billing_enabled: Is monthly billing enabled?
+        :param monthly_charging_enabled: Is monthly charging enabled?
+    """
+    tmp = {
+            "org_name": org_name,
+            "monthly_billing_enabled": monthly_billing_enabled,
+            "monthly_charging_enabled": monthly_charging_enabled}
+
+    return {k: v for k, v in tmp.items() if v is not None}
+
+
+def AccountUser(username: str, email: str, password: str) -> dict:
+    """builder of params to create an account user
+    Args:
+        :param username: name
+        :param email: email
+        :param password: password
+    """
+    obj = {
+        "username": username,
+        "email": email,
+        "password": password}
+
+    return obj

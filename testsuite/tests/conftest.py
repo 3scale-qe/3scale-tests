@@ -155,7 +155,8 @@ def master_threescale(testconfig):
 def account(custom_account, request, testconfig):
     "Preconfigured account existing over whole testing session"
     iname = blame(request, "id")
-    account = dict(name=iname, username=iname, org_name=iname, email=f"{iname}@anything.invalid")
+    account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
+    account.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
     account = custom_account(params=account)
 
     return account

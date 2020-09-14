@@ -93,6 +93,9 @@ ACTIVEDOCS_CMP_ATTRS = {'id', 'service_id', 'created_at', 'updated_at'}
 # 'path'
 BACKEND_USAGES_CMP_ATTRS = {'id', 'service_id', 'backend_id', 'links'}
 
-# APPLICATION_CMP_ATTRS = [
-#   :state, :enabled, :end_user_required, :name, :description,
-# ].freeze
+# 'description', 'enabled', 'end_user_required', 'name', 'provider_verification_key',
+# 'state', 'user_key'
+
+APPLICATION_CMP_ATTRS = {
+        'account_id', 'created_at', 'first_daily_traffic_at', 'first_traffic_at', 'id',
+        'links', 'plan_id', 'provider_verification_key', 'service_id', 'updated_at'}
