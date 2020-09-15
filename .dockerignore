@@ -1,2 +1,3 @@
 .git*
-config/.secrets.yaml
+config/.secrets.yaml*
+config/*.local.*
