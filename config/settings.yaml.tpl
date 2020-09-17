@@ -23,6 +23,9 @@ default:
         staging_deployment: "apicast-staging"
         production_deployment: "apicast-production"
   openshift:
+    servers:
+      default:
+        server_url: "{DEFAULT_OPENSHIFT_URL}"
     projects:
       threescale:
         name: "{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
