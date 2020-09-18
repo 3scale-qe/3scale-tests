@@ -35,17 +35,17 @@ class SystemApicast(AbstractApicast):
 
     def __init__(self, requirements: SystemApicastRequirements):
         if requirements.staging:
-            self.deployment_name = requirements.staging_deployment
+            self.deployment = requirements.staging_deployment
         else:
-            self.deployment_name = requirements.production_deployment
+            self.deployment = requirements.production_deployment
         self.openshift: "OpenShiftClient" = requirements.current_openshift
 
     @property
     def environ(self) -> Environ:
-        return self.openshift.environ(self.deployment_name)
+        return self.openshift.environ(self.deployment)
 
     def reload(self):
-        self.openshift.rollout(f"dc/{self.deployment_name}")
+        self.openshift.rollout(f"dc/{self.deployment}")
 
     def get_logs(self):
-        return self.openshift.get_logs(self.deployment_name)
+        return self.openshift.get_logs(self.deployment)
