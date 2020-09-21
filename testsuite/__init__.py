@@ -13,7 +13,11 @@ from dynaconf import settings
 # Monkey patching! Yes! True power of dynamic language
 # Let's modify 'BoxKeyError' to display a guidance as this is common error
 # in case of missing openshift session (or dynaconf settings)
-from box.exceptions import BoxKeyError  # pylint: disable=import-error
+try:
+    from box.exceptions import BoxKeyError  # pylint: disable=import-error
+except ImportError:
+    # pylint: disable=ungrouped-imports
+    from dynaconf.vendor.box.exceptions import BoxKeyError
 
 BoxKeyError.native_str = BoxKeyError.__str__
 BoxKeyError.__str__ = lambda self: \
