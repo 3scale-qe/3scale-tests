@@ -19,6 +19,10 @@ all-is-package:
 	@echo "Searching for dirs missing __init__.py"
 	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
+# pattern to run testfiles individually
+%.py: FORCE
+	$(PYTEST) $(flags) $@
+
 test: ## Run test
 test pytest tests: pipenv
 	$(PYTEST) -m 'not flaky' $(flags) testsuite
@@ -111,3 +115,6 @@ VERSION-required:
 ifndef VERSION
 	$(error You must define VERSION=x.y.z)
 endif
+
+# this ensures dependent target is run everytime
+FORCE:
