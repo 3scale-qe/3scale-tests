@@ -38,7 +38,7 @@ flaky: pipenv
 	$(PYTEST) -mflaky $(flags) testsuite
 
 disruptive: pipenv
-	$(PYTEST) --disruptive $(flags) testsuite
+	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite
 
 junit: pipenv
 	$(PYTEST) --junitxml=junit.xml $(flags) testsuite
