@@ -1,7 +1,7 @@
 "testsuite helpers"
 
+import os
 import datetime
-import getpass
 import secrets
 import time
 import typing
@@ -34,6 +34,17 @@ def retry_for_session(session: requests.Session, total: int = 8):
     session.mount("http://", adapter)
 
 
+def _whoami():
+    """Returns username"""
+
+    try:
+        return os.getlogin()
+    # want to catch broad exception and fallback at any circumstance
+    # pylint: disable=broad-except
+    except Exception:
+        return str(os.getuid())
+
+
 def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
     """Create 'scoped' name within given test
 
@@ -48,25 +59,23 @@ def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
     if nodename.startswith("test_"):  # is this always true?
         nodename = nodename[5:]
 
-    whoami = getpass.getuser()
     context = nodename.lower().split("_")[0]
     if len(context) > 2:
         context = context[:2] + context[2:-1].translate(str.maketrans("", "", "aiyu")) + context[-1]
 
-    return randomize(f"{name[:8]}-{whoami[:8]}-{context[:9]}", tail=tail)
+    return randomize(f"{name[:8]}-{_whoami()[:8]}-{context[:9]}", tail=tail)
 
 
 def blame_desc(request: 'FixtureRequest', text: str = None):
     """Returns string of text with details about execution suitable as description for 3scale objects"""
 
     nodename = request.node.name
-    whoami = getpass.getuser()
     now = time.asctime()
 
     # make it more unique
     tail = secrets.token_urlsafe(3).lower()
 
-    desc = f"Created for '{nodename}' executed by '{whoami}' at {now} ({tail})"
+    desc = f"Created for '{nodename}' executed by '{_whoami()}' at {now} ({tail})"
     if text not in (None, ""):
         desc = f"{text}\n\n{desc}"
 
