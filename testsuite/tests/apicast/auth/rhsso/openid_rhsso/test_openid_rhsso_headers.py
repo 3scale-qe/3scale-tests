@@ -49,7 +49,7 @@ def test_token_in_query(client, token):
 
 
 # https://issues.redhat.com/browse/THREESCALE-5885
-@pytest.mark.flaky
+@pytest.mark.xfail
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
     Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
 def test_token_basic_auth(client, token):
