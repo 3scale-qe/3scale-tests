@@ -15,6 +15,7 @@ from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 # authentization in 3scale and mapping to OAS(http://spec.openapis.org/oas/v3.0.3#security-scheme-object):
 #
@@ -47,7 +48,8 @@ POLICIES = {'policies_config': [
                    'enabled': True}]}
 
 
-@pytest.fixture(scope="module", params=['oas2', 'oas3'])
+# @pytest.fixture(scope="module", params=['oas2', 'oas3'])
+@pytest.fixture(scope="module", params=['oas3'])
 def oas(request):
     """Loads oas file"""
     fil_oas = None
@@ -147,7 +149,6 @@ def test_service(import_oas, oas):
     service = import_oas[3]
     assert service['description'] == oas['file']['info']['description']
     assert service['name'] == oas['file']['info']['title']
-
 
 def test_metrics_mappings_oas2(import_oas, oas):
     """Checks imported metrics - oas2"""
