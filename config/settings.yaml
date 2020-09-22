@@ -34,3 +34,6 @@ default:
     # obviously follwing won't work but is needed because its usage isn't lazy loading
     destination_endpoint: URL
     destination_provider_key: KEY
+  fixtures:
+    lifecycle_hooks:
+      defaults: [staging_gateway, production_gateway]
