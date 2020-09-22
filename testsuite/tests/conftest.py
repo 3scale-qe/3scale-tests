@@ -154,8 +154,8 @@ def pytest_report_header(config):
         "",
         f"testsuite: testsuite version = {testsuite_version}",
         f"testsuite: environment = {environment}",
-        f"testsuite: openshift = {openshift}",
-        f"testsuite: project = {project}",
+        #f"testsuite: openshift = {openshift}",
+        #f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
         ""]
@@ -285,7 +285,7 @@ def account(custom_account, request, testconfig):
 
 
 @pytest.fixture(scope="session")
-def custom_account(threescale, request, testconfig):
+def custom_account(request, testconfig, threescale):
     """Parametrized custom Account
 
     Args:
@@ -360,32 +360,34 @@ def custom_provider_account(request, testconfig):
 @pytest.fixture(scope="session")
 def staging_gateway(request, testconfig, configuration):
     """Staging gateway"""
-    options = gateways.configuration.options(staging=True,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateways.configuration.staging(options)
-    request.addfinalizer(gateway.destroy)
-
-    gateway.create()
-
-    return gateway
+#    options = gateways.configuration.options(staging=True,
+#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+#                                             configuration=configuration)
+#    gateway = gateways.configuration.staging(options)
+#    request.addfinalizer(gateway.destroy)
+#
+#    gateway.create()
+#
+#    return gateway
+    pass
 
 
 @pytest.fixture(scope="session")
 def production_gateway(request, testconfig, configuration):
     """Production gateway"""
-    gateway = gateways.configuration.production
-    if gateway is None:
-        return None
-    options = gateways.configuration.options(staging=False,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateway(options)
-    request.addfinalizer(gateway.destroy)
-
-    gateway.create()
-
-    return gateway
+#    gateway = gateways.configuration.production
+#    if gateway is None:
+#        return None
+#    options = gateways.configuration.options(staging=False,
+#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+#                                             configuration=configuration)
+#    gateway = gateway(options)
+#    request.addfinalizer(gateway.destroy)
+#
+#    gateway.create()
+#
+#    return gateway
+    pass
 
 
 @pytest.fixture(scope="module")
@@ -534,7 +536,7 @@ def active_doc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def custom_active_doc(threescale, testconfig, request):
+def custom_active_doc(testconfig, request, threescale):
     """Parametrized custom Active document
 
     Args:
@@ -701,7 +703,7 @@ def _backend_delete(backend):
 
 
 @pytest.fixture(scope="module")
-def custom_backend(threescale, request, testconfig, private_base_url):
+def custom_backend(request, testconfig, private_base_url, threescale):
     """
     Parametrized custom Backend
     Args:

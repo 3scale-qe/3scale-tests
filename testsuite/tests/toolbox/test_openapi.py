@@ -11,11 +11,13 @@ import pytest
 import yaml
 from dynaconf import settings
 
+from testsuite import rawobj
 import testsuite.toolbox.constants as constants
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 # authentization in 3scale and mapping to OAS(http://spec.openapis.org/oas/v3.0.3#security-scheme-object):
 #
@@ -36,9 +38,6 @@ from testsuite.utils import blame
 # https://issues.redhat.com/browse/THREESCALE-5919
 
 
-# TODO add copying of oas files into server to be able to use current version of oas file
-
-
 OAS_FILES = {'oas2': ['testsuite.resources.oas2', 'uber.json'],
              'oas3': ['testsuite.resources.oas3', 'petstore-expanded.yaml']}
 USER_KEY = '123456'
@@ -51,7 +50,8 @@ POLICIES = {'policies_config': [
                    'enabled': True}]}
 
 
-@pytest.fixture(scope="module", params=['oas2', 'oas3'])
+# @pytest.fixture(scope="module", params=['oas2', 'oas3'])
+@pytest.fixture(scope="module", params=['oas3'])
 def oas(request):
     """Loads oas file"""
     fil_oas = None
@@ -85,8 +85,8 @@ def oas(request):
 @pytest.fixture(scope="module")
 def import_oas(dest_client, request, oas):
     """Import OAS by Toolbox"""
-    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} "
-    import_cmd += oas['file_name']
+    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} {settings['toolbox']['podman_cert_dir']}/"
+    import_cmd += OAS_FILES[oas['type']].split('/')[-1]
     import_cmd += f" --default-credentials-userkey={USER_KEY} "
     import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"
     ret = toolbox.run_cmd(import_cmd)
