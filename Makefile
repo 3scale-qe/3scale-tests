@@ -7,7 +7,7 @@
 TB ?= short
 LOGLEVEL ?= INFO
 
-PYTEST = pipenv run python -m pytest --tb=$(TB) --log-level=$(LOGLEVEL)
+PYTEST = pipenv run python -m pytest --tb=$(TB)
 
 commit-acceptance: pylint flake8 mypy all-is-package
 
