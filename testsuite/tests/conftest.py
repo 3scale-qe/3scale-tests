@@ -63,8 +63,8 @@ def pytest_report_header(config):
 
     testsuite_version = open(version_path).read().strip()
     environment = settings["env_for_dynaconf"]
-    openshift = settings["openshift"]["servers"]["default"]["server_url"]
-    project = settings["openshift"]["projects"]["threescale"]["name"]
+    openshift = settings.get("openshift", {}).get("servers", {}).get("default", {}).get("server_url", "UNKNOWN")
+    project = settings.get("openshift", {}).get("projects", {}).get("threescale", {}).get("name", "UNKNOWN")
     threescale = settings["threescale"]["admin"]["url"]
     version = settings["threescale"]["version"]
 
@@ -296,13 +296,16 @@ def service_settings(request):
 
 
 @pytest.fixture(scope="module")
-def lifecycle_hooks(staging_gateway, production_gateway):
+def lifecycle_hooks(request, testconfig):
     """List of objects with hooks into app/svc creation and deletion
 
     Hooks should implement methods defined and documented in testsuite.lifecycle_hook.LifecycleHook
     or should inherit from that class"""
 
-    return [staging_gateway, production_gateway]
+    defaults = testconfig.get("fixtures", {}).get("lifecycle_hooks", {}).get("defaults")
+    if defaults is not None:
+        return [request.getfixturevalue(i) for i in defaults]
+    return []
 
 
 @pytest.fixture(scope="module")
