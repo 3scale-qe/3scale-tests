@@ -15,6 +15,10 @@ from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_client, api_client
 
 
+# a suspicion that fixture_ref + param-marks doesn't prevent fixture to instantiate
+pytestmark = pytest.mark.disruptive
+
+
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """

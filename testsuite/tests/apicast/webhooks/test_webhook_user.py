@@ -12,7 +12,10 @@ import pytest
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.utils import blame
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')")
+# webhook tests seem disruptive to requestbin as they reset it with no mercy
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')"),
+    pytest.mark.disruptive]
 
 
 @pytest.fixture(scope="module", autouse=True)
