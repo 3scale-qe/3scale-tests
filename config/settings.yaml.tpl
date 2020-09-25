@@ -35,6 +35,10 @@ default:
   proxy:
     http: http://tinyproxy-service.tiny-proxy.svc:8888
     https: http://tinyproxy-service.tiny-proxy.svc:8888
+  reporting:
+    testsuite_properties:
+      polarion_project_id: PROJECTID
+      polarion_response_myteamsname: teamname
 
 
 # dynaconf uses development environment by default

@@ -9,6 +9,7 @@ import threescale_api
 import threescale_api.errors
 
 import backoff
+from weakget import weakget
 
 from threescale_api import client
 from testsuite.config import settings
@@ -53,6 +54,60 @@ def pytest_runtest_setup(item):
 
 
 # pylint: disable=unused-argument
+def pytest_collection_modifyitems(session, config, items):
+    """
+    Add user properties to testcases for xml output
+
+    This adds issue and issue-id properties to junit output, utilizes
+    pytest.mark.issue marker.
+
+    This is copied from pytest examples to record custom properties in junit
+    https://docs.pytest.org/en/stable/usage.html
+    """
+
+    for item in items:
+        for marker in item.iter_markers(name="issue"):
+            issue = marker.args[0]
+            issue_id = issue.rstrip("/").split("/")[-1]
+            item.user_properties.append(("issue", issue))
+            item.user_properties.append(("issue-id", issue_id))
+
+
+def _oc_3scale_project():
+    """Just a one liner to not repeat really long line"""
+
+    return weakget(settings)["openshift"]["projects"]["threescale"]["name"] % "UNKNOWN"
+
+
+# Currently this doesn't work with xdist
+# https://github.com/pytest-dev/pytest/issues/7767
+# Therefore _global_property hack is present below
+@pytest.fixture(scope="session", autouse=True)
+def testsuite_properties(record_testsuite_property):
+    """Add custom testsuite properties to junit"""
+
+    title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
+    runid = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
+    projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
+    team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
+
+    record_testsuite_property("polarion-project-id", projectid)
+    record_testsuite_property("polarion-response-myteamsname", team)
+    record_testsuite_property("polarion-testrun-title", runid)
+    record_testsuite_property("polarion-lookup-method", "name")
+
+
+# pylint: disable=import-outside-toplevel,protected-access
+def _global_property(config, name, value):
+    """Temporary hack as record_global_property doesn't work with xdist"""
+
+    from _pytest.junitxml import xml_key
+    xml = config._store.get(xml_key, None)
+    if xml:
+        xml.add_global_property(name, value)
+
+
+# pylint: disable=unused-argument
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
     version_path = os.path.join(ROOT_DIR, 'VERSION')
@@ -60,9 +115,19 @@ def pytest_report_header(config):
     testsuite_version = open(version_path).read().strip()
     environment = settings["env_for_dynaconf"]
     openshift = settings.get("openshift", {}).get("servers", {}).get("default", {}).get("server_url", "UNKNOWN")
-    project = settings.get("openshift", {}).get("projects", {}).get("threescale", {}).get("name", "UNKNOWN")
+    project = _oc_3scale_project()
     threescale = settings["threescale"]["admin"]["url"]
     version = settings["threescale"]["version"]
+
+    title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
+    runid = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
+    projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
+    team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
+
+    _global_property(config, "polarion-project-id", projectid)
+    _global_property(config, "polarion-response-myteamsname", team)
+    _global_property(config, "polarion-testrun-title", runid)
+    _global_property(config, "polarion-lookup-method", "name")
 
     return [
         "",

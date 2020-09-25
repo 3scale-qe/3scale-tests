@@ -31,6 +31,7 @@ paramiko = "*"
 docker = "*"
 podman = "*"
 jsondiff = "*"
+weakget = {editable = true,git = "https://github.com/mangan/weakget.git"}
 
 [requires]
 python_version = "3"
