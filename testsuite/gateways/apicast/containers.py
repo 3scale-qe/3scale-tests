@@ -33,3 +33,6 @@ class ContainerizedApicast(AbstractApicast):
 
     def reload(self):
         raise NotImplementedError()
+
+    def get_logs(self):
+        raise NotImplementedError()

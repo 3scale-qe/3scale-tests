@@ -33,6 +33,7 @@ class Capability(enum.Enum):
     SAME_CLUSTER = "internal-cluster"           # Is always located on the same cluster as 3scale
     SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
     STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
+    LOGS = "logs"                               # Allows getting apicast logs through get_logs() method
 
 
 class AbstractGateway(LifecycleHook, ABC):
@@ -62,6 +63,10 @@ class AbstractApicast(AbstractGateway, ABC):
     @abstractmethod
     def reload(self):
         """Reloads gateway"""
+
+    @abstractmethod
+    def get_logs(self) -> str:
+        """Gets the logs of the active Apicast pod"""
 
     def create(self):
         pass

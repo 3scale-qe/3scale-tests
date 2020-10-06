@@ -36,7 +36,8 @@ class SelfManagedApicast(AbstractApicast):
 
     CAPABILITIES = [Capability.APICAST,
                     Capability.CUSTOM_ENVIRONMENT,
-                    Capability.PRODUCTION_GATEWAY]
+                    Capability.PRODUCTION_GATEWAY,
+                    Capability.LOGS]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         self.staging = requirements.staging
@@ -69,3 +70,6 @@ class SelfManagedApicast(AbstractApicast):
 
     def reload(self):
         self.openshift.rollout(f"dc/{self.deployment}")
+
+    def get_logs(self):
+        return self.openshift.get_logs(self.deployment)
