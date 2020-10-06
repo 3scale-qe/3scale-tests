@@ -90,20 +90,22 @@ release: VERSION-required Pipfile.lock
 
 dist: ## Build (and push optionally) distribution-ready container image
 dist: IMAGENAME ?= 3scale-py-testsuite
-dist:
+dist: pipenv
 	test -e VERSION
 	[ -n "$$NOSWITCH" ] || git checkout `cat VERSION`
 	docker build -t $(IMAGENAME):`cat VERSION` .  # X.Y(.Z)-r#
 	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1 -d- <VERSION`  # X.Y(.Z)
 	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1-2 -d. <VERSION` # X.Y
-	pipenv run `pwd`/scripts/latest-version `cat VERSION` && \
-		docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):latest || :
+	if pipenv run `pwd`/scripts/latest-version `cat VERSION` ; then \
+		docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):latest ; \
+	fi
 ifdef PUSHIMAGE
 	docker push $(IMAGENAME):`cat VERSION`
 	docker push $(IMAGENAME):`cut -f1 -d- <VERSION`
 	docker push $(IMAGENAME):`cut -f1-2 -d. <VERSION`
-	pipenv run `pwd`/scripts/latest-version `cat VERSION` && \
-		docker push $(IMAGENAME):latest || :
+	if pipenv run `pwd`/scripts/latest-version `cat VERSION` ; then \
+		docker push $(IMAGENAME):latest ; \
+	fi
 endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
