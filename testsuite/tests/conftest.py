@@ -11,8 +11,8 @@ import threescale_api.errors
 import backoff
 import urllib3
 
-from dynaconf import settings
 from threescale_api import client
+from testsuite.config import settings
 import testsuite.gateways as gateways
 
 from testsuite import rawobj, CONFIGURATION, ROOT_DIR

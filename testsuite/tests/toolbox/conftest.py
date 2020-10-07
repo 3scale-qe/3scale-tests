@@ -2,8 +2,8 @@
 
 import pytest
 
-from dynaconf import settings
 from threescale_api import client
+from testsuite.config import settings
 
 
 @pytest.fixture(scope="module")

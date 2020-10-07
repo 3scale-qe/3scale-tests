@@ -6,9 +6,9 @@
 """
 from typing import Tuple
 
-from dynaconf import settings
 from pytest_cases import parametrize
 
+from testsuite.config import settings
 from testsuite import rawobj
 from testsuite.utils import randomize
 

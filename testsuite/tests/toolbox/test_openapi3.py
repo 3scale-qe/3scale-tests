@@ -4,7 +4,7 @@ import re
 
 import pytest
 import yaml
-from dynaconf import settings
+from testsuite.config import settings
 
 import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
