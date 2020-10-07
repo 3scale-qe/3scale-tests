@@ -5,3 +5,4 @@ glibc-devel
 gcc
 origin-clients/openshift-clients
 openssh-clients
+make
