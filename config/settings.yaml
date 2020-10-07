@@ -1,7 +1,6 @@
 default:
   skip_cleanup: false
   ssl_verify: true
-  ignore_insecure_ssl_warning: true
   http2: false
   threescale:
     service:

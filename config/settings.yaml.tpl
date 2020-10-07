@@ -5,7 +5,6 @@
 default:
   skip_cleanup: false  # should we delete all the 3scale objects created during test?
   ssl_verify: true  # use secure connection checks, this requires all the stack (e.g. trusted CA)
-  ignore_insecure_ssl_warning: false  # ssl_verify=false produces some warnings from requests/urllib
   http2: false # enables http/2 requests to apicast
   threescale:  # now configure threescale details
     version: "{DEFAULT_THREESCALE_VERSION}"  # tested version used for example is some tests needs to be skipped

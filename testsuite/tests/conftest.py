@@ -9,7 +9,6 @@ import threescale_api
 import threescale_api.errors
 
 import backoff
-import urllib3
 
 from dynaconf import settings
 from threescale_api import client
@@ -19,9 +18,6 @@ from testsuite import rawobj, CONFIGURATION, ROOT_DIR
 from testsuite.gateways.gateways import Capability
 from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
-
-if settings["ignore_insecure_ssl_warning"]:
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Monkey-patch for HTTP/2, needs to be fixed with  plugable api_client for application
 if settings["http2"]:
