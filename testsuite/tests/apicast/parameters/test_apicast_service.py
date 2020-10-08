@@ -1,5 +1,4 @@
 """
-https://issues.redhat.com/browse/THREESCALE-1524
 Test for env variable APICAST_SERVICES_FILTER_BY_URL
 """
 import pytest
@@ -7,7 +6,9 @@ import requests
 
 from testsuite.gateways.gateways import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT)
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1524")]
 
 
 @pytest.fixture(scope="module")
@@ -41,7 +42,7 @@ def gateway_environment(gateway_environment):
 
 
 @pytest.mark.xfail
-# https://issues.redhat.com/browse/THREESCALE-5241
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5241")
 def test_filter_by_url(api_client):
     """
     Request to 'bin' backend should return 200

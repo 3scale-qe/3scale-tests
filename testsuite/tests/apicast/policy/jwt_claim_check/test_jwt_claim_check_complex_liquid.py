@@ -1,5 +1,5 @@
 """
-Regression test for https://issues.redhat.com/browse/THREESCALE-3968
+Test that invalid JWT is rejected
 """
 import pytest
 
@@ -50,6 +50,7 @@ def application_doesnt_match(service, custom_application, custom_app_plan, rhsso
     return application
 
 
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3968")
 def test_application_matching_jwt_operation(api_client, application, application_doesnt_match, rhsso_service_info):
     """
     Test application that match policy will succeed with the request

@@ -1,12 +1,14 @@
-"""Test that limit exceeded metric returns status 429
-
-https://issues.redhat.com/browse/THREESCALE-2752"""
+"""
+Test that limit exceeded metric returns status 429
+"""
 
 
 import pytest
 from testsuite import rawobj
 
-pytestmark = pytest.mark.required_capabilities()
+pytestmark = [
+    pytest.mark.required_capabilities(),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2752")]
 
 
 @pytest.fixture(scope="module")

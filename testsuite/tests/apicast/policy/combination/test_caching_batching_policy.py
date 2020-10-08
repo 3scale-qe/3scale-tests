@@ -1,6 +1,5 @@
 """
 Rewrite spec/functional_specs/policies/combination/caching_batching_policy_spec.rb
-https://issues.jboss.org/browse/THREESCALE-2705
 """
 from time import sleep
 
@@ -22,6 +21,7 @@ def service(service):
     return service
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2705")
 @pytest.mark.disruptive
 # TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
 @pytest.mark.flaky

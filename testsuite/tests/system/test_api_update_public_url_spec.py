@@ -1,11 +1,13 @@
 """
 Rewrite: ./spec/functional_specs/api_update_url_spec.rb
-https://issues.jboss.org/browse/THREESCALE-2939
 """
 
 import pytest
 from testsuite.utils import blame
 from testsuite.gateways.gateways import Capability
+
+
+pytestmark = pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2939")
 
 
 @pytest.fixture(scope="module")

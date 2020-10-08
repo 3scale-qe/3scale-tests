@@ -1,7 +1,6 @@
 """
 Tests that the rules in the url_rewriting_policy can match also against the
 http method of the request.
-https://issues.redhat.com/browse/THREESCALE-5259
 """
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
@@ -36,6 +35,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5259")
 @pytest.mark.parametrize("method,path_after,hits", [("GET", "/anything/rewritten", 1),
                                                     ("PUT", "/anything/rewritten", 1),
                                                     ("POST", "/anything/initial", 0)])

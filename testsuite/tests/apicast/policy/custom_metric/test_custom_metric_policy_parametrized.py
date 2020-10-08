@@ -1,6 +1,5 @@
 """
 Testing the custom metric policy
-https://issues.redhat.com/browse/THREESCALE-5098
 """
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
@@ -11,7 +10,9 @@ from testsuite.utils import blame
 from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
 
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
+pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 
 @fixture_plus

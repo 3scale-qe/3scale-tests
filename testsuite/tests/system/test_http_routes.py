@@ -1,6 +1,5 @@
 """
 Test that http routes will be created and managed by zync
-Regression test for https://issues.redhat.com/browse/THREESCALE-3545
 """
 
 from urllib.parse import urlparse
@@ -15,6 +14,7 @@ from testsuite.gateways.gateways import Capability
 
 # This test can be done only with system apicast
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3545"),
               pytest.mark.required_capabilities(Capability.SAME_CLUSTER, Capability.PRODUCTION_GATEWAY),
               pytest.mark.disruptive]
 

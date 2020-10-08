@@ -1,6 +1,4 @@
 """
-https://issues.redhat.com/browse/THREESCALE-5454
-
 Tests, that when using APIaaP the escaped characters in the request
 path are not escaped once again
 """
@@ -18,6 +16,7 @@ def backends_mapping(custom_backend, private_base_url):
     return {"/foo": custom_backend("backend_foo", endpoint=private_base_url("echo_api"))}
 
 
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5454")
 def test_routing_policy_path(api_client):
     """
     Send a request to the /foo/%EF%EF%EF

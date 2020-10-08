@@ -1,6 +1,5 @@
 """
 Based on spec/ui_specs/webhooks/webhooks_users_spec.rb (ruby test is via UI)
-Test for https://issues.redhat.com/browse/THREESCALE-5207
 """
 
 import xml.etree.ElementTree as Et
@@ -15,6 +14,7 @@ from testsuite.utils import blame
 # webhook tests seem disruptive to requestbin as they reset it with no mercy
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5207"),
     pytest.mark.disruptive]
 
 

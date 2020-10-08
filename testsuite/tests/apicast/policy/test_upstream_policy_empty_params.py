@@ -1,6 +1,5 @@
 """
 Rewrite spec/functional_specs/policies/upstream_rewrite/nil_added_when_empty_params_spec.rb
-Issue: https://issues.jboss.org/browse/THREESCALE-1506
 """
 import pytest
 
@@ -26,6 +25,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1506")
 def test_upstream_policy_empty_params(application, testconfig):
     """
     Test if it redirect to the echo-api without nil params
