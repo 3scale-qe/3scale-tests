@@ -3,7 +3,7 @@ Sets up gateway defined in testsuite settings
 """
 from typing import Tuple, Optional, Dict, Type, NamedTuple
 
-from dynaconf import settings
+from testsuite.config import settings
 from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
 from testsuite.gateways.apicast.containers import ContainerizedApicast
 from testsuite.gateways.gateways import AbstractGateway

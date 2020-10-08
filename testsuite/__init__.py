@@ -7,8 +7,11 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
     logging.basicConfig(level=logging.DEBUG)
 
 from pathlib import Path
+from packaging.version import Version
 
-from dynaconf import settings
+from testsuite.config import settings
+from testsuite.configuration import CommonConfiguration
+
 
 # Monkey patching! Yes! True power of dynamic language
 # Let's modify 'BoxKeyError' to display a guidance as this is common error
@@ -35,9 +38,6 @@ if settings["ssl_verify"]:
                 break
 else:
     os.environ["OPENSHIFT_CLIENT_PYTHON_DEFAULT_SKIP_TLS_VERIFY"] = "true"
-
-from packaging.version import Version  # noqa: E402
-from testsuite.configuration import CommonConfiguration  # noqa: E402
 
 TESTED_VERSION = Version(str(settings["threescale"]["version"]))
 HTTP2 = settings.get("http2", False)

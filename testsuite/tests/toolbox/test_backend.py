@@ -5,9 +5,9 @@ import random
 import string
 
 import pytest
-from dynaconf import settings
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
+from testsuite.config import settings
 import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 import testsuite.utils

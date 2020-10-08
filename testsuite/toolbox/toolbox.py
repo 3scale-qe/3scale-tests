@@ -4,8 +4,8 @@ import logging
 import os
 import jsondiff
 
-from dynaconf import settings
 import paramiko
+from testsuite.config import settings
 
 import testsuite.toolbox.constants as constants
 

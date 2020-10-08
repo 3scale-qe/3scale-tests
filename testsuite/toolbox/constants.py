@@ -1,6 +1,6 @@
 "These are constants used for Toolbox testing."
 
-from dynaconf import settings
+from testsuite.config import settings
 
 import testsuite
 

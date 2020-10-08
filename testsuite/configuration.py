@@ -1,5 +1,5 @@
 """Module responsible for processing configuration"""
-from dynaconf import settings
+from testsuite.config import settings
 
 from testsuite.certificates import CertificateManager
 from testsuite.certificates.cfssl import CFSSLCertificate
