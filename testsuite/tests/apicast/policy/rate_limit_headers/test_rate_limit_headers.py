@@ -1,6 +1,4 @@
 """
-https://issues.redhat.com/browse/THREESCALE-3795
-
 Tests that:
  - information about the remaining limits should be sent in the headers.
  - information about the limit with less remaining units should be given.
@@ -18,6 +16,7 @@ from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
     pytest.mark.flaky]
 

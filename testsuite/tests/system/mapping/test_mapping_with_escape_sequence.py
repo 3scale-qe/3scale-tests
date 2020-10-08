@@ -1,7 +1,7 @@
-"""Test that URL with escape sequence(s) is processed correctly
+"""
+Test that URL with escape sequence(s) is processed correctly
 and relevant mapping/metric is applied
-
-https://issues.jboss.org/browse/THREESCALE-3468"""
+"""
 
 
 import pytest
@@ -21,6 +21,7 @@ def service(service):
     return service
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-3468")
 def test_mapping_with_escape_sequence(api_client, application):
     """When making request to /anything/foo/bar%20%20bar/baz
     then it should pass, metric should increase"""

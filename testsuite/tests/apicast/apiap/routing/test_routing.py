@@ -11,7 +11,9 @@ from testsuite.tests.apicast.apiap.routing import routing_cases
 from testsuite.utils import blame
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.8.2')")
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.8.2')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4937")]
 
 
 @fixture_plus

@@ -1,5 +1,5 @@
 """
-Regression test for https://issues.jboss.org/browse/THREESCALE-3593
+    Test that checks if the first anything part is removed
 """
 import pytest
 from testsuite import rawobj
@@ -32,6 +32,7 @@ def service(service, private_base_url):
     return service
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-3593")
 def test_routing_policy_replace_path(api_client):
     """
     Test that checks if the first anything part is removed

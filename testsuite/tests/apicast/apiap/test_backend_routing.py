@@ -1,11 +1,13 @@
 """
 Test for product metrics combined with routing policy.
-https://issues.redhat.com/browse/THREESCALE-3623
 """
 import pytest
 import requests
 
 import testsuite.rawobj as rawobj
+
+
+pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
 
 
 @pytest.fixture(scope="module")

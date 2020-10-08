@@ -1,6 +1,5 @@
 """
 Default test for HTTP2 policy
-Regression test for: https://issues.redhat.com/browse/THREESCALE-4684
 """
 import pytest
 import requests
@@ -11,7 +10,9 @@ from testsuite.utils import retry_for_session
 
 
 # CFSSL instance is necessary
-pytestmark = pytest.mark.flaky
+pytestmark = [
+    pytest.mark.flaky,
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4684")]
 
 
 @pytest.fixture(scope="module")

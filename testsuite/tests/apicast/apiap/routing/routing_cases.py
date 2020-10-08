@@ -1,8 +1,5 @@
 """
 Test cases that are specifying paths that are used to connect product with backend
-
-There are cases that are regression test for:
-    https://issues.redhat.com/browse/THREESCALE-4937
 """
 
 

@@ -1,6 +1,5 @@
 """
 Rewrite of the spec/functional_specs/auth/rhsso/openid_rhsso_spec.rb
-JIRA: https://issues.jboss.org/browse/THREESCALE-1951
 
 When the OIDC configuration is used and the credentials location is set to headers,
 only the calls with correct credentials location will pass.
@@ -16,7 +15,9 @@ from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_
 
 
 # a suspicion that fixture_ref + param-marks doesn't prevent fixture to instantiate
-pytestmark = pytest.mark.disruptive
+pytestmark = [
+    pytest.mark.disruptive,
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951")]
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -52,7 +53,7 @@ def test_token_in_query(client, token):
     assert response.status_code == 403
 
 
-# https://issues.redhat.com/browse/THREESCALE-5885
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5885")
 @pytest.mark.xfail
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
     Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])

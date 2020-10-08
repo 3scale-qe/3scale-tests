@@ -47,12 +47,11 @@ def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metr
     assert expected_metric in metrics
 
 
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5417")
 def test_apicast_status_metrics(client, prometheus_client):
     """Test apicast_status metric.
 
     Apicast logs http status codes on prometheus as a counter.
-
-    ISSUE: https://issues.redhat.com/browse/THREESCALE-5417
     """
     statuses = [300, 418, 507]
 

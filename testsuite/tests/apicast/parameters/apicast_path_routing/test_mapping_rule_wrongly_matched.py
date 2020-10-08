@@ -1,7 +1,6 @@
 """
 Test that URL with space in a parameter will be sent to the correct service when the
 APICAST_PATH_ROUTING is in use
-https://issues.redhat.com/browse/THREESCALE-4152
 """
 import pytest
 
@@ -11,6 +10,7 @@ from testsuite.gateways.gateways import Capability
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4152"),
               pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
 
 

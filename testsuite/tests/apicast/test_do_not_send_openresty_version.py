@@ -1,8 +1,6 @@
 """
 Rewrite /spec/functional_specs/do_not_send_openresty_version_spec.rb
 
-Verifies JIRA: https://issues.jboss.org/browse/THREESCALE-1989
-
 When requesting non existing endpoint openresty version should not be sent
 in the response body or in the response header
 """
@@ -38,6 +36,7 @@ def make_requests(api_client):
     return api_client.get("/anything")
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1989")
 def test_do_not_send_openresty_version(api_client):
     """
     Make request to non existing endpoint

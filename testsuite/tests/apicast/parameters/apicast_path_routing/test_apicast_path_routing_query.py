@@ -1,5 +1,5 @@
 """
-Regression test for https://issues.redhat.com/browse/THREESCALE-5149
+Test that path based routing does match args
 """
 import pytest
 import requests
@@ -10,6 +10,7 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5149"),
               pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 

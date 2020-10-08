@@ -1,6 +1,5 @@
-"""Test proxy policies config format
-
-Issue: https://issues.redhat.com/browse/THREESCALE-1059
+"""
+Test proxy policies config format
 """
 import json
 
@@ -8,6 +7,9 @@ import pytest
 from threescale_api.errors import ApiClientError
 
 from testsuite import rawobj
+
+
+pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1059")
 
 
 @pytest.fixture

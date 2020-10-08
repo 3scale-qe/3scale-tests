@@ -1,6 +1,4 @@
 """
-https://issues.redhat.com/browse/THREESCALE-3795
-
 Tests that when an app plan has two limits with different time frame, the RateLimit information for
 the currently more constrained limit are sent.
 """
@@ -13,6 +11,7 @@ from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
     pytest.mark.flaky]
 

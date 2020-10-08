@@ -1,10 +1,6 @@
 """
 Rewrite of spec/functional_specs/auth/rhsso/openid_rhsso_flows_spec.rb
 
-JIRA: https://issues.jboss.org/browse/THREESCALE-1948
-JIRA: https://issues.jboss.org/browse/THREESCALE-1949
-JIRA: https://issues.jboss.org/browse/THREESCALE-1951
-
 The test is focused on the synchronization between 3scale system/zync components with RHSSO.
 The main idea of this test is to change each flow of the oidc 3scale service
 and check RHSSO client (client for 3scale application) if the flows are changed in the RHSSO client.
@@ -21,7 +17,11 @@ from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.utils import blame_desc
 
 
-pytestmark = pytest.mark.flaky
+pytestmark = [
+    pytest.mark.flaky,
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1948"),
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1949"),
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951")]
 
 
 DEFAULT_FLOWS = {

@@ -2,7 +2,6 @@
 A policy that allows you to reject incoming requests with a specified status code and message.
 This policy should override others and reject all requests.
 Expected: to return specified code eg 328 and message of service unavailability.
-Issue: https://issues.jboss.org/browse/THREESCALE-3189
 """
 
 import pytest
@@ -19,6 +18,7 @@ def policy_settings():
         "message": "Service Unavailable - Maintenance"})
 
 
+@pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-3189")
 def test_maintenance_mode_policy(testconfig, application):
     """Test request to service with maintenance_mode set returns appropriate message and status code"""
 

@@ -1,8 +1,6 @@
 """
 Test large data in post request when using http and https proxies
 This test will cover APIAP feature
-
-regression test for: https://issues.redhat.com/browse/THREESCALE-3863
 """
 from urllib.parse import urlparse
 
@@ -14,6 +12,7 @@ from testsuite.gateways.gateways import Capability
 from testsuite.tests.toolbox.test_backend import random_string
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3863"),
               pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
 
 

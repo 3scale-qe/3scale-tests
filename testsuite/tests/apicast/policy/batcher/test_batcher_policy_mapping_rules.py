@@ -1,6 +1,5 @@
 """
     Test checks that mapping rules are working with batcher policy
-    Regression test for https://issues.redhat.com/browse/THREESCALE-5513
 """
 
 from time import sleep
@@ -11,7 +10,9 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5513")]
 
 
 @pytest.fixture(scope="module")

@@ -1,9 +1,11 @@
 """
-https://issues.redhat.com/browse/THREESCALE-1849
 Rewrite: ./spec/functional_specs/apicast_debug_header_spec.rb
 """
 
+import pytest
 
+
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1849")
 def test_make_request(api_client, service, application):
     """
     Response containing debug header should return status code 200 and contain following headers:
