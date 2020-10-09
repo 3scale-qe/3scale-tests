@@ -27,6 +27,7 @@ hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref
 # 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
 openshift-client = "*"
+hyperfoil-client="*"
 paramiko = "*"
 docker = "*"
 podman = "*"
