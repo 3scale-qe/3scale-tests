@@ -36,3 +36,6 @@ ${ENVIRONMENT}:
     ssh_user: "" # user at the machine where the container is
     ssh_passwd: "" # password for above user
     podman_image: "" # container image ID
+  hyperfoil:
+    url: "" # URL for hyperfoil controller
+    shared_template: #template that will be added to each hyperfoil benchmark definition

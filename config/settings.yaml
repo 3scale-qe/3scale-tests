@@ -36,3 +36,8 @@ default:
   fixtures:
     lifecycle_hooks:
       defaults: [staging_gateway, production_gateway]
+  hyperfoil:
+    shared_template:
+      # We need to add agents definition for clustered hyperfoil to each test
+      agents:
+        agent-one:
