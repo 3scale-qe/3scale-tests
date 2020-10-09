@@ -32,6 +32,8 @@ def pytest_addoption(parser):
         "--toolbox", action="store_true", default=False, help="Run also toolbox tests (default: False)")
     parser.addoption(
         "--disruptive", action="store_true", default=False, help="Run also disruptive tests (default: False)")
+    parser.addoption(
+        "--performance", action="store_true", default=False, help="Run also performance tests (default: False)")
 
 
 def pytest_runtest_setup(item):
@@ -42,6 +44,8 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding disruptive tests")
     if "toolbox" in marks and not item.config.getoption("--toolbox"):
         pytest.skip("Excluding toolbox tests")
+    if "performance" in marks and not item.config.getoption("--performance"):
+        pytest.skip("Excluding performance tests")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:

@@ -43,6 +43,9 @@ disruptive: pipenv
 junit: pipenv
 	$(PYTEST) --junitxml=junit.xml $(flags) testsuite
 
+performance-smoke: pipenv
+	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
+
 Pipfile.lock: Pipfile
 	pipenv lock
 
