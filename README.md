@@ -2,95 +2,119 @@
 
 This is testsuite by 3scale QE implemented in the Python
 
-## Use the suite
-Here are the prerequisites to use the test suite.
+## Before You Run It
 
-### Required tools
-To be able to use the suite correctly you need to install all the dependencies.
-Suite is using the [pipenv](https://github.com/pypa/pipenv) to manage dependencies
-defined in the `Pipfile`.
+### Software Requirements
 
-Openshift client and logged to the correct cluster.
+[pipenv](https://github.com/pypa/pipenv) is essential tool necessary to run the
+testsuite, make sure you have it installed. Besides that also all the packages
+from [REQUIRES](REQUIRES) must be present. This file references packages as
+they are known in redhat based distributions. For other distros please make
+sure equivalent is present.
 
-### Get the suite and install dependencies
+### Openshift Login
 
-To get the suite you you can use `git clone`:
+The testsuite assumes already authorized session to the openshift with 3scale
+deployed. This can be avoided with proper configuration, however easiest and
+most convenient way is to have the session. The way through configuration is
+dedicated to special use cases.
+
+### 3scale Deployed
+
+The testsuite doesn't install 3scale itself, besides `oc login` have also
+3scale deployed.
+
+The testsuite attempts to read many options from `system-seed` secret. This
+standard part of 3scale deployment, so it is unexpected that it is not present.
+Anyway in case of troubles this can be the cause. Everything gathered there can
+be explicitly set in the configuration to omit it.
+
+### Backend APIs/Services
+
+Obviously some backend behind 3scale is needed for testing. Default
+configuration points to some publicly available services. However it is
+**highly desirable** to deploy own instance(s) of suitable service and change
+configuration to use this (through `config/settings.local.yaml`
+
+### config/.secrets.yaml
+
+**BEWARE!** If you are not blessed person with access to encrypted
+`config/.secrets.yaml` you must delete it, otherwise nothing will work.
+
+### Clone the Repo
+
+Actually this should be pretty first step:
+
 ```bash
 $ git clone git@gitlab.cee.redhat.com:3scale-qe/3scale-py-testsuite.git
-```
-
-then get to the test suite directory:
-```bash
 $ cd 3scale-py-testsuite
 ```
 
-after that you can install dependencies using the pipenv
-```bash
-$ pipenv install --dev
-```
+## Customize the Configuration
 
+The testsuite uses [dynaconf](https://dynaconf.readthedocs.io/) to manage the
+configurtion
 
-### Customize the configuration
+Default ocnfiguration is sufficient to run basic set of tests.
 
-Default configuration is stored in ``config/settings.yaml`` and
-``config/.secrets.yaml``. These files are supposed to be unchanged. To modify
-the configuration use config/settings.local.yaml file that will override the
-defaults. Consult ``config/settings.yaml.tpl`` for possible options.
+Default configuration is stored in `config/settings.yaml` and
+`config/.secrets.yaml`. These files are supposed to be unchanged. To modify the
+configuration use `config/settings.local.yaml` file that will override the
+defaults. Consult [settings.yaml.tpl](config/settings.yaml.tpl) for possible
+options.
 
-**BEWARE!*** ``config/.secrets.yaml`` contains sensitive data and it is
-encrypted thus. Due to the encypryption the format is 'invalid' and dynaconf
-can't parse the configuration properly. Either decrypt ``config/.secrets.yaml``
-(``git crypt unlock``) or delete the file and provide your own settings in
-``config/settings.local.yaml``
+As mentioned above `config/.secrets.yaml` is encrypted file. It has to be
+either unlocked with `git crypt unlock` or deleted.
 
+#### Environment Variables:
 
-### Run the tests
+It's feature of dynaconf that all the options can be set also via environment
+variables. All the options begin with `_3SCALE_TESTS_*` prefix. Please refer to
+the [documentation](https://dynaconf.readthedocs.io/) of dynaconf for more
+details.
 
-#### Before running
+Keep in mind that env variable handling in dynaconf is (partially) case
+sensitive, rather always follow (lower)case from the config file.
 
-1) Need to be logged on openshift `oc login`
-2) 3scale platform **is not deployed** within the test, so a valid instalation
-on a project is needed. This can be set on
-`config/.secrets.local#development.openshift.projects.threescale.name`
-3) Need to check that the `system-seed` secret is correctly created in the
-project
-```
-oc get secret system-seed -o yaml -n ${PROJECT}
-```
+These variables are to enable/disable some testsuite options:
 
-#### Running
-Testsuite is using the ``pytest`` as a testing framework, couple of make
-targets are ready
+- `_3SCALE_TESTS_ssl_verify(bool)`: To not verify SSL certs
 
-`make smoke`
- - smoke tests, short in count, wuick in execution
+## Run the Tests
 
-`make test`
+Testsuite is using the `pytest` as a testing framework, couple of `make`
+targets are ready for easier execution. The openshift project/namespace of
+3scale deployment should be always defined as variable `NAMESPACE`.
+Alternatively it can be set in the configuration.
+
+`make smoke NAMESPACE=3scale`
+ - smoke tests, short in count, quick in execution
+
+`make test NAMESPACE=3scale`
  - general way to run the testsuite; troublesome tests excluded == no flaky or disruptive
 
-`make flaky`
+`make flaky NAMESPACE=3scale`
  - unstable tests causing false alarms
 
-`make disruptive`
+`make disruptive NAMESPACE=3scale`
  - tests with side-effect
 
 Targets can be combined
 
-`make test flaky`
+`make test flaky NAMESPACE=3scale`
  - to run general tests together with flaky
 
-`make -k test flaky`
+`make -k test flaky NAMESPACE=3scale`
  - to ensure flaky is executed even if general test ends with failure
 
-### Test options
+`make ./testsuite/tests/apicast/auth/test_basic_auth_user_key.py NAMESPACE=3scale`
+ - to run particular test standalone
 
-#### Environment variables:
+### pytest Arguments
 
-These variables are to enable/disable some testsuite options:
+The arguments to pytest can be passed as `flags=` variable:
 
-- **_3SCALE_TESTS_IGNORE_INSECURE_SSL_WARNING(bool, default: true)**: To disable Insecure SSL warning
-- **_3SCALE_TESTS_SSL_VERIFY**(bool): To not verify SSL certs
-
+`make smoke NAMESPACE=3scale flags=--junitxml=junit.xml`
 
 ## Debugging
 
@@ -115,4 +139,4 @@ can be checked.
 TBD
 
 ## Contribute
-Refer to [CONTRIBUTE.md]
+Refer to [CONTRIBUTE.md](CONTRIBUTE.md)
