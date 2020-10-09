@@ -158,6 +158,33 @@ class RHSSOServiceConfiguration:
         """Returns token retrived by password authentication"""
         return self.rhsso.password_authorize(self.realm, client_id, secret, self.username, self.password)
 
+    def token_url(self) -> str:
+        """
+        Returns token endpoint url
+        http(s)://<HOST>:<PORT>/auth/realms/<REALM_NAME>/protocol/openid-connect/token
+        :return: url
+        """
+        return self.oidc_client.get_url("token_endpoint")
+
+    def body_for_token_creation(self, app) -> str:
+        """
+        Returns body for creation of token
+        :return: body
+        """
+        app_key = app.keys.list()["keys"][0]["key"]["value"]
+        app_id = app["client_id"]
+        return f"grant_type=password&client_id={app_id}&client_secret={app_key}" \
+               f"&username={self.username}&password={self.password}"
+
+    def access_token(self, app) -> str:
+        """
+        Returns access token for given application
+        :param app: 3scale application
+        :return: access token
+        """
+        app_key = app.keys.list()["keys"][0]["key"]["value"]
+        return self.password_authorize(app["client_id"], app_key).token['access_token']
+
 
 # pylint: disable=too-few-public-methods
 class OIDCClientAuth:
