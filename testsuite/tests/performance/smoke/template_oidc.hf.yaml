@@ -1,0 +1,67 @@
+name: managed_services_base_line
+# http endpoints will be added via test
+phases:
+  - rampUp:
+      increasingRate:
+        initialUsersPerSec: 8
+        targetUsersPerSec: 20
+        duration: 30s
+        maxDuration: 2m
+        scenario: &postLargeData
+          - sendLargeBody:
+            - randomCsvRow:
+                file: 'auth_oidc.csv'
+                skipComments: true
+                removeQuotes: true
+                columns:
+                  0: hostname
+                  1: token
+            - randomInt: randomId <- 1 .. 9999999
+            - template:
+                pattern: Bearer ${token}
+                toVar: authorization
+            - httpRequest:
+                authority:
+                  fromVar: hostname
+                POST: /anything/${randomId}
+                sync: true
+                headers:
+                  authorization:
+                    fromVar: authorization
+                body:
+                  fromFile: message_1kb.txt
+  - steadyLoad  :
+      constantRate:
+        duration: 1m
+        maxDuration: 3m
+        usersPerSec: 12
+        startAfter:
+          phase: rampUp
+        scenario: *postLargeData
+  - steadyLoadGet:
+      constantRate:
+        duration: 1m
+        usersPerSec: 12
+        startAfter:
+          phase: rampUp
+        scenario:
+          - getData:
+              - randomCsvRow:
+                  file: 'auth_oidc.csv'
+                  skipComments: true
+                  removeQuotes: true
+                  columns:
+                    0: hostname
+                    1: token
+              - randomInt: randomId <- 1 .. 9999999
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  GET: /anything/get/${randomId}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
