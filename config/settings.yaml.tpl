@@ -36,6 +36,7 @@ default:
     http: http://tinyproxy-service.tiny-proxy.svc:8888
     https: http://tinyproxy-service.tiny-proxy.svc:8888
   reporting:
+    print_app_logs: true # whether to print application logs during testing
     testsuite_properties:
       polarion_project_id: PROJECTID
       polarion_response_myteamsname: teamname

@@ -50,6 +50,7 @@ class TLSApicast(TemplateApicast):
         return proxy_params
 
     def on_service_create(self, service: Service):
+        super().on_service_create(service)
         service_id = service.entity_id
 
         name = self._route_name(service_id)
@@ -61,6 +62,7 @@ class TLSApicast(TemplateApicast):
                                      service=self.service_name, hostname=endpoint)
 
     def on_service_delete(self, service: Service):
+        super().on_service_delete(service)
         service_id = service.entity_id
 
         LOGGER.debug('Deleting routes for service "%s"', self.service_name)

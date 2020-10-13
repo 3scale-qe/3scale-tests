@@ -2,6 +2,9 @@
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
+from weakget import weakget
+
+from testsuite.config import settings
 from testsuite import CommonConfiguration
 from testsuite.certificates import CertificateManager, CertificateStore, Certificate
 from testsuite.gateways.apicast import SystemApicastRequirements, OperatorApicastRequirements, \
@@ -34,6 +37,10 @@ class GatewayOptions(GatewayRequirements):
 
     def openshift(self, server="default", project="threescale") -> "OpenShiftClient":
         return self.configuration.openshift(server, project)
+
+    @property
+    def print_logs(self) -> bool:
+        return weakget(settings)["reporting"]["print_app_logs"] % True
 
 
 class SystemApicastOptions(GatewayOptions, SystemApicastRequirements):

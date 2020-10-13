@@ -53,6 +53,7 @@ class TemplateApicast(SelfManagedApicast):
         self.image = requirements.image
         self.service_routes = requirements.service_routes
         self.service_name = self.deployment
+        self.name = self.deployment
         self.configuration_url_secret_name = f'{self.deployment}-config-url'
         self.routes: List[str] = []
 
@@ -105,11 +106,13 @@ class TemplateApicast(SelfManagedApicast):
         return f"{entity_id}-production"
 
     def on_service_create(self, service: Service):
+        super().on_service_create(service)
         if self.service_routes:
             entity_id = service.entity_id
             self.add_route(entity_id, self._route_name(entity_id))
 
     def on_service_delete(self, service: Service):
+        super().on_service_delete(service)
         if self.service_routes:
             self.delete_route(self._route_name(service.entity_id))
 

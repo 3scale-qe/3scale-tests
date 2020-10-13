@@ -45,6 +45,7 @@ class OperatorApicast(SelfManagedApicast):
         raise NotImplementedError("Operator doesn't support environment")
 
     def on_service_create(self, service: Service):
+        super().on_service_create(service)
         entity_id = service.entity_id
         url = urlparse(self.endpoint % entity_id)
         name = self._route_name(entity_id)
@@ -52,6 +53,7 @@ class OperatorApicast(SelfManagedApicast):
                                      service=self.name, hostname=url.hostname)
 
     def on_service_delete(self, service: Service):
+        super().on_service_delete(service)
         del self.openshift.routes[self._route_name(service.entity_id)]
 
     def reload(self):

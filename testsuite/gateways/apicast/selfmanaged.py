@@ -49,6 +49,7 @@ class SelfManagedApicast(AbstractApicast):
             self.endpoint = requirements.production_endpoint
         # Load openshift configuration
         self.openshift: OpenShiftClient = requirements.current_openshift
+        self.options = requirements
 
     def before_service(self, service_params: Dict) -> Dict:
         service_params.update({
