@@ -86,8 +86,11 @@ def _oc_3scale_project():
 # Currently this doesn't work with xdist
 # https://github.com/pytest-dev/pytest/issues/7767
 # Therefore _global_property hack is present below
+# **AND** therefore '_' at the beginning to avoid properties
+# doubled on single execution. Once xdist issue will be fixed
+# this will be updated
 @pytest.fixture(scope="session", autouse=True)
-def testsuite_properties(record_testsuite_property):
+def _testsuite_properties(record_testsuite_property):
     """Add custom testsuite properties to junit"""
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
@@ -124,13 +127,18 @@ def pytest_report_header(config):
     version = settings["threescale"]["version"]
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
-    runid = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
+    title = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
     projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
     team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
 
+    _global_property(config, "openshift-url", openshift)
+    _global_property(config, "openshift-namespace", project)
+    _global_property(config, "testsuite-version", testsuite_version)
     _global_property(config, "polarion-project-id", projectid)
     _global_property(config, "polarion-response-myteamsname", team)
-    _global_property(config, "polarion-testrun-title", runid)
+    _global_property(config, "polarion-testrun-title", title)
+    _global_property(config, "polarion-testrun-id", title.replace(".", "_"))
+    _global_property(config, "polarion-testrun-status-id", "inprogress")
     _global_property(config, "polarion-lookup-method", "name")
 
     return [
