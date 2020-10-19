@@ -3,7 +3,7 @@
 import re
 import pytest
 
-from dynaconf import settings
+from testsuite.config import settings
 
 import testsuite
 from testsuite import rawobj
