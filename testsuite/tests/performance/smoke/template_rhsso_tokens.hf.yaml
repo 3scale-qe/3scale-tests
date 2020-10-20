@@ -1,0 +1,77 @@
+name: rhsso_tokens
+# http endpoints will be added via test
+phases:
+  - rampUp:
+      increasingRate:
+        duration: 1m
+        maxDuration: 3m
+        initialUsersPerSec: 8
+        targetUsersPerSec: 20
+        scenario:
+          - loadCsv: &loadCsv
+            - randomCsvRow:
+                file: rhsso_auth.csv
+                skipComments: true
+                removeQuotes: true
+                columns:
+                  0: 0 #hostname
+                  1: 1 #rhsso_url
+                  2: 2 #path
+                  3: 3 #data  
+          - createToken: &createToken
+            - httpRequest:
+                  authority:
+                    fromVar: 1
+                  POST:
+                    fromVar: 2
+                  headers:
+                    Content-Type: application/x-www-form-urlencoded
+                  body:
+                    fromVar: 3
+                  handler:
+                    body:
+                     json:
+                       query: .access_token
+                       toVar: access_token
+          - postLargeData: &postLargeData
+            - template:
+                    pattern: Bearer ${access_token}
+                    toVar: authorization
+            - randomInt: randomId <- 1 .. 9999999
+            - httpRequest:
+                authority:
+                  fromVar: 0
+                POST: /anything/${randomId}
+                sync: true
+                headers:
+                  authorization:
+                    fromVar: authorization
+                body:
+                  fromFile: message_1kb.txt
+  - steadyLoad:
+      constantRate:
+        duration: 1m
+        maxDuration: 3m
+        usersPerSec: 12
+        startAfter:
+          phase: rampUp
+        scenario:
+          - loadCsv: *loadCsv
+          - createToken: *createToken
+          - postLargeData: *postLargeData
+            
+            # This will be in new version (0.10)
+#             - loop:
+#                 repeats: 10
+#                 steps:
+#                 - randomInt: randomId <- 1 .. 9999999
+#                 - httpRequest:
+#                     authority:
+#                       fromVar: hostname
+#                     POST: /anything/${randomId}
+#                     sync: true
+#                     headers:
+#                       authorization:
+#                         fromVar: authorization
+#                     body:
+#                       fromFile: message_1kb.txt
