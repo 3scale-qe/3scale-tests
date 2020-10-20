@@ -4,7 +4,9 @@ Test for env variable APICAST_SERVICES_FILTER_BY_URL
 import pytest
 import requests
 
+from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.APICAST, Capability.CUSTOM_ENVIRONMENT),
@@ -12,43 +14,59 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend, private_base_url):
-    """
-    Create custom backend with endpoint httpbin and second one with endpoint echo_api
-    """
-    return {
-        "/bin": custom_backend("bin", endpoint=private_base_url("httpbin")),
-        "/echo": custom_backend("echo", endpoint=private_base_url("echo_api"))}
+def service_pass(request, service_proxy_settings, custom_service, lifecycle_hooks):
+    """Create custom service that should pass upon request"""
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
-    """
-    Sets session to api client for skipping retrying feature.
-    """
+def application_pass(service_pass, custom_app_plan, custom_application, request, lifecycle_hooks):
+    """Create custom application for 'service_pass'"""
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_pass)
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
+
+@pytest.fixture(scope="module")
+def api_client_pass(application_pass):
+    """Create api_client for 'application_pass'"""
     session = requests.Session()
-    session.auth = application.authobj
-    return application.api_client(session=session)
+    session.auth = application_pass.authobj
+    return application_pass.api_client(session=session)
 
 
 @pytest.fixture(scope="module")
-def gateway_environment(gateway_environment):
-    """
-    Set env variable 'APICAST_SERVICES_FILTER_BY_URL' to regex that takes any httpbin url
-    """
-    gateway_environment.update({"APICAST_SERVICES_FILTER_BY_URL": ".*httpbin.*"})
-    return gateway_environment
+def service_fail(request, service_proxy_settings, custom_service, lifecycle_hooks):
+    """Create custom service that should fail upon request"""
+    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
 
 
-@pytest.mark.xfail
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5241")
-def test_filter_by_url(api_client):
+@pytest.fixture(scope="module")
+def application_fail(service_fail, custom_app_plan, custom_application, request, lifecycle_hooks):
+    """Create custom application for 'service_fail'"""
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_fail)
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
+
+
+@pytest.fixture(scope="module")
+def api_client_fail(application_fail):
+    """Create api_client for 'application_fail'"""
+    session = requests.Session()
+    session.auth = application_fail.authobj
+    return application_fail.api_client(session=session)
+
+
+def test_filter_by_url(api_client_pass, api_client_fail, staging_gateway, service_pass):
     """
-    Request to 'bin' backend should return 200
-    Request to 'echo' backend should return 404
+    Set apicast env variable 'APICAST_SERVICES_FILTER_BY_URL' to load only service_pass
+    (APICAST_SERVICES_FILTER_BY_URL = Staging public base URL of service_pass)
+    Request to 'service_pass' should return 200
+    Request to 'service_fail' should return 404
     """
-    request = api_client.get("/bin")
+    public_url = f".*{service_pass.entity_id}-staging.3scale.apps.bc.api-qe.eng.rdu2.redhat.com.*"
+    staging_gateway.environ["APICAST_SERVICES_FILTER_BY_URL"] = public_url
+
+    request = api_client_pass.get("/get")
     assert request.status_code == 200
-    request = api_client.get("/echo")
+
+    request = api_client_fail.get("/get")
     assert request.status_code == 404
