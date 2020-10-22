@@ -522,7 +522,7 @@ def backends_mapping():
 
 
 @pytest.fixture(scope="module")
-def custom_service(threescale, request, testconfig, staging_gateway, logger):
+def custom_service(threescale, request, testconfig, logger):
     """Parametrized custom Service
 
     Args:
