@@ -34,6 +34,7 @@ class Capability(enum.Enum):
     SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
     STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
     LOGS = "logs"                               # Allows getting apicast logs through get_logs() method
+    JAEGER = "jaeger"                           # Allows configuring the Apicast to send data to Jaeger
 
 
 class AbstractGateway(LifecycleHook, ABC):

@@ -37,7 +37,8 @@ class SelfManagedApicast(AbstractApicast):
     CAPABILITIES = [Capability.APICAST,
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.PRODUCTION_GATEWAY,
-                    Capability.LOGS]
+                    Capability.LOGS,
+                    Capability.JAEGER]
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         self.staging = requirements.staging
@@ -73,3 +74,20 @@ class SelfManagedApicast(AbstractApicast):
 
     def get_logs(self):
         return self.openshift.get_logs(self.deployment)
+
+    def connect_jaeger(self, jaeger, jaeger_randomized_name):
+        """
+        Modifies the apicast to send information to jaeger.
+        Creates configmap and a volume, mounts the configmap into the volume
+        Updates the required env vars
+        :param jaeger instance of the Jaeger class carrying the information about the apicast_configuration
+        :param jaeger_randomized_name: randomized name used for the name of the configmap and for
+               the identifying name of the service in jaeger
+        """
+        service_name = jaeger_randomized_name
+        config_map_name = f"{jaeger_randomized_name}.json"
+        self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, service_name))
+        self.openshift.add_volume(self.deployment, "jaeger-config-vol",
+                                  "/tmp/jaeger/", configmap_name=config_map_name)
+        self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
+                               "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
