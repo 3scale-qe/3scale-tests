@@ -40,6 +40,8 @@ class SystemApicast(AbstractApicast):
         else:
             self.deployment = requirements.production_deployment
         self.openshift: "OpenShiftClient" = requirements.current_openshift
+        self.name = self.deployment
+        self.options = requirements
 
     @property
     def environ(self) -> Environ:

@@ -1,7 +1,10 @@
 """Module containing all basic gateways"""
 import enum
+import sys
 from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING
+
+from weakget import weakget
 
 from testsuite.openshift.env import Environ
 from testsuite.requirements import OpenshiftRequirement
@@ -23,6 +26,10 @@ class GatewayRequirements(OpenshiftRequirement, ABC):
     @abstractmethod
     def current_openshift(self) -> "OpenShiftClient":
         """Returns currently configured openshift"""
+
+    @property
+    def print_logs(self) -> bool:
+        """True if app logs should be printed"""
 
 
 class Capability(enum.Enum):
@@ -74,3 +81,26 @@ class AbstractApicast(AbstractGateway, ABC):
 
     def destroy(self):
         pass
+
+    def on_service_create(self, service):
+        try:
+            if weakget(self).options.print_logs % False:
+                if not hasattr(self, "_taillog"):
+                    setattr(self, "_taillog", {})
+                getattr(self, "_taillog")[service["name"]] = len(self.get_logs())
+        except NotImplementedError:
+            return
+
+    def on_service_delete(self, service):
+        try:
+            if weakget(self).options.print_logs % False:
+                # pylint: disable=protected-access
+                cut = weakget(self)._taillog[service["name"]] % 0
+                applog = self.get_logs()[cut:].lstrip()
+                header = " %s log " % getattr(self, "name", "Unknown Gateway")
+                if len(applog) > 0:
+                    print("{:~^80}".format(header), file=sys.stderr)
+                    print(applog, file=sys.stderr)
+                    print("~" * 80, file=sys.stderr)
+        except NotImplementedError:
+            return
