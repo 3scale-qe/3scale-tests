@@ -1,4 +1,4 @@
-name: rhsso_tokens
+name: test_smoke_rhsso_tokens
 # http endpoints will be added via test
 phases:
   - rampUp:
@@ -41,7 +41,7 @@ phases:
             - httpRequest:
                 authority:
                   fromVar: 0
-                POST: /anything/${randomId}
+                POST: /0/anything/${randomId}
                 sync: true
                 headers:
                   authorization:

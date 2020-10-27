@@ -30,9 +30,8 @@ class HyperfoilUtils:
     """
     message_1kb = os.path.join(ROOT_DIR, 'testsuite/resources/performance/files/message_1kb.txt')
 
-    def __init__(self, hyperfoil_client, applications, template_filename):
+    def __init__(self, hyperfoil_client, template_filename):
         self.hyperfoil_client = hyperfoil_client
-        self.applications = applications
         self.factory = HyperfoilFactory(hyperfoil_client)
         self.benchmark = _load_benchmark(template_filename)
 
@@ -40,47 +39,64 @@ class HyperfoilUtils:
         """Hyporfoil factory opens a lot of file streams, we need to ensure that they are closed."""
         self.factory.close()
 
-    def add_hosts(self, shared_connections: int):
+    def add_hosts(self, services, shared_connections: int, **kwargs):
         """Adds hosts of all applications to the benchmark"""
-        for app in self.applications:
-            url = app.service.proxy.list()['endpoint']
-            self.benchmark.add_host(url, shared_connections)
+        for svc in services:
+            url = svc.proxy.list()['endpoint']
+            self.benchmark.add_host(url, shared_connections, **kwargs)
 
-    def add_host(self, url: str, shared_connections: int):
+    def add_host(self, url: str, shared_connections: int, **kwargs):
         """Adds specific url host to the benchmark"""
-        self.benchmark.add_host(url, shared_connections)
+        self.benchmark.add_host(url, shared_connections, **kwargs)
 
     def add_file(self, path):
         """Adds file to the benchmark"""
         filename = os.path.basename(path)
         self.factory.file(filename, open(path, 'r'))
 
-    def add_oidc_auth(self, rhsso_service_info, filename):
+    def add_user_key_auth(self, applications, filename):
+        """
+        Adds csv file to the benchmark with following columns of rows
+        [authority url, auth user key, user key]
+        :param applications: list of 3scale applications
+        :param filename: name of csv file
+        """
+        rows = []
+        for application in applications:
+            url = authority(application.service.proxy.list()['endpoint'])
+            auth_user_key = application.service.proxy.list()['auth_user_key']
+            user_key = application['user_key']
+            rows.append([url, auth_user_key, user_key])
+        self.factory.csv_data(filename, rows)
+
+    def add_oidc_auth(self, rhsso_service_info, applications, filename):
         """
         Adds csv file to the benchmark with following columns of a row:
         [authority url, access_token]
         :param rhsso_service_info: rhsso service info fixture
+        :param applications: list of 3scale applications
         :param filename: name of csv file
         """
         rows = []
-        for application in self.applications:
+        for application in applications:
             url = authority(application.service.proxy.list()['endpoint'])
             token = rhsso_service_info.access_token(application)
             rows.append([url, token])
         self.factory.csv_data(filename, rows)
 
-    def add_token_creation_data(self, rhsso_service_info, filename):
+    def add_token_creation_data(self, rhsso_service_info, applications, filename):
         """
         Adds csv file with data for access token creation. Each row consits of following columns:
         [authority url, rhsso url, rhsso path, body for token creation]
         :param rhsso_service_info: rhsso service info fixture
+        :param applications: list of 3scale applications
         :param filename: name of csv file
         :return:
         """
         rows = []
         token_url = urlparse(rhsso_service_info.token_url())
         token_port = 80 if token_url.scheme == 'http' else 443
-        for application in self.applications:
+        for application in applications:
             url = authority(application.service.proxy.list()['endpoint'])
             rows.append([url, f"{token_url.hostname}:{token_port}",
                          token_url.path, rhsso_service_info.body_for_token_creation(application)])

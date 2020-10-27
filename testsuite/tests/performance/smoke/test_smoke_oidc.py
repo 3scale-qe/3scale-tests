@@ -25,12 +25,13 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 
 
 @pytest.fixture(scope='module')
-def service(service):
+def services(services):
     """Service fixture will add '/' POST mapping rule, so we can make such requests in perf-test"""
-    metric = service.metrics.list()[0]
-    service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
-    service.proxy.list().update()
-    return service
+    for svc in services:
+        metric = svc.metrics.list()[0]
+        svc.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
+        svc.proxy.list().update()
+    return services
 
 
 @pytest.fixture(scope='module')
@@ -40,10 +41,10 @@ def template(root_path):
 
 
 @pytest.fixture(scope='module')
-def setup_benchmark(hyperfoil_utils, rhsso_service_info, shared_template):
+def setup_benchmark(hyperfoil_utils, applications, promoted_services, rhsso_service_info, shared_template):
     """Setup of benchmark. It will add necessary host connections, csv data and files."""
-    hyperfoil_utils.add_hosts(shared_connections=20)
-    hyperfoil_utils.add_oidc_auth(rhsso_service_info, 'auth_oidc.csv')
+    hyperfoil_utils.add_hosts(promoted_services, shared_connections=20)
+    hyperfoil_utils.add_oidc_auth(rhsso_service_info, applications, 'auth_oidc.csv')
     hyperfoil_utils.add_file(HyperfoilUtils.message_1kb)
     hyperfoil_utils.add_shared_template(shared_template)
     return hyperfoil_utils
@@ -55,13 +56,15 @@ def wait_run(run):
     return run.reload()
 
 
-def test_smoke_oidc(prod_client, setup_benchmark):
+def test_smoke_oidc(applications, setup_benchmark):
     """
         Test checks that application is setup correctly.
         Runs the created benchmark.
         Asserts it was successful.
     """
-    assert prod_client().get("/get").status_code == 200
+    for app in applications:
+        assert app.api_client(endpoint="endpoint").get("/0/anything").status_code == 200
+        assert app.api_client(endpoint="endpoint").post("/0/anything").status_code == 200
 
     benchmark = setup_benchmark.create_benchmark()
     run = benchmark.start()
