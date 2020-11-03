@@ -56,6 +56,7 @@ class TemplateApicast(SelfManagedApicast):
         self.name = self.deployment
         self.configuration_url_secret_name = f'{self.deployment}-config-url'
         self.routes: List[str] = []
+        self.route_type = Routes.Types.EDGE
 
     def get_app_params(self, **kwargs):
         """Template envs for oc new-app."""
@@ -125,7 +126,7 @@ class TemplateApicast(SelfManagedApicast):
         identifier = name or url_fragment
         url = urlparse(self.endpoint % url_fragment)
         if url.scheme == "https":
-            self.openshift.routes.create(name, Routes.Types.EDGE,
+            self.openshift.routes.create(name, self.route_type,
                                          service=self.service_name, hostname=url.hostname)
         elif url.scheme == "http":
             self.openshift.routes.expose(name=identifier,
