@@ -22,7 +22,7 @@ def settings_block(settings_block, configuration, protocol):
     endpoints = {
         "endpoints": {
             "staging": f"{protocol}://%s-staging.{configuration.superdomain}",
-            "production": f"{protocol}://%s-staging.{configuration.superdomain}"
+            "production": f"{protocol}://%s-production.{configuration.superdomain}"
         }}
     settings_block.update(endpoints)
     return settings_block
