@@ -129,6 +129,27 @@ def staging_gateway(request, configuration):
 
 
 ###############################################################################
+# To explicitly specify the gateway endpoints for the staging and production gateway
+
+@pytest.fixture(scope="session")
+def staging_gateway(settings_block, request, configuration):
+    """Settings block with http(s) endpoints"""
+    endpoints = {
+        "endpoints": {
+            "staging": "https://staging.custom.endpoint",
+            "production": "https://staging.custom.endpoint"
+        }}
+    settings_block.update(endpoints)
+
+    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
+    gateway = TemplateApicast(requirements=options)
+    gateway.create()
+
+    request.addfinalizer(gateway.destroy)
+    return settings_block
+
+
+###############################################################################
 # To skip apicast retrying on 404 status code
 def test_skip_apicast_retrying_on_404(application):
 
