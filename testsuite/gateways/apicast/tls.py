@@ -3,9 +3,6 @@ import base64
 import logging
 from abc import ABC
 from typing import Dict
-from urllib.parse import urlparse
-
-from threescale_api.resources import Service
 
 from testsuite.certificates import SSLCertificate
 from testsuite.openshift.objects import Routes
@@ -34,40 +31,13 @@ class TLSApicast(TemplateApicast):
         self.volume_name = f"{self.deployment}-volume"
         self.mount_path = "/var/apicast/secrets"
         self.https_port = 8443
+        self.route_type = Routes.Types.PASSTHROUGH
 
     @property
     def ssl_certificate(self) -> SSLCertificate:
         """Returns instance of SSLCertificate."""
         return SSLCertificate(self.endpoint, self.requirements.manager,
                               self.requirements.certificate_store)
-
-    def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
-        entity_id = service.entity_id
-        key = "sandbox_endpoint" if self.staging else "endpoint"
-        proxy_params.update({
-            key: self.endpoint % self._route_name(entity_id)
-        })
-        return proxy_params
-
-    def on_service_create(self, service: Service):
-        super().on_service_create(service)
-        service_id = service.entity_id
-
-        name = self._route_name(service_id)
-        endpoint = urlparse(self.endpoint % name).hostname
-
-        LOGGER.debug('Creating routes for service "%s"', self.service_name)
-
-        self.openshift.routes.create(name, Routes.Types.PASSTHROUGH,
-                                     service=self.service_name, hostname=endpoint)
-
-    def on_service_delete(self, service: Service):
-        super().on_service_delete(service)
-        service_id = service.entity_id
-
-        LOGGER.debug('Deleting routes for service "%s"', self.service_name)
-
-        del self.openshift.routes[self._route_name(service_id)]
 
     def get_patch_data(self) -> Dict:
         """Returns patch data for enabling https port on service."""
