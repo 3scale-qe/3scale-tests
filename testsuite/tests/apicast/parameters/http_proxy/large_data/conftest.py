@@ -19,8 +19,11 @@ def protocol(request):
 @pytest.fixture(scope="module")
 def settings_block(settings_block, configuration, protocol):
     """Settings block with http(s) endpoints"""
-    endpoints = {"staging_endpoint": f"{protocol}://%s-staging.{configuration.superdomain}",
-                 "production_endpoint": f"{protocol}://%s-staging.{configuration.superdomain}"}
+    endpoints = {
+        "endpoints": {
+            "staging": f"{protocol}://%s-staging.{configuration.superdomain}",
+            "production": f"{protocol}://%s-staging.{configuration.superdomain}"
+        }}
     settings_block.update(endpoints)
     return settings_block
 
