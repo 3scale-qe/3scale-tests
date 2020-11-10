@@ -137,7 +137,7 @@ def staging_gateway(settings_block, request, configuration):
     endpoints = {
         "endpoints": {
             "staging": "https://staging.custom.endpoint",
-            "production": "https://staging.custom.endpoint"
+            "production": "https://production.custom.endpoint"
         }}
     settings_block.update(endpoints)
 
