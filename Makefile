@@ -6,6 +6,11 @@
 
 TB ?= short
 LOGLEVEL ?= INFO
+resultsdir ?= .
+
+ifdef junit
+flags += --junitxml=$(resultsdir)/junit-$@.xml
+endif
 
 PYTEST = pipenv run python -m pytest --tb=$(TB)
 
@@ -39,9 +44,6 @@ flaky: pipenv
 
 disruptive: pipenv
 	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite
-
-junit: pipenv
-	$(PYTEST) --junitxml=junit.xml $(flags) testsuite
 
 performance-smoke: pipenv
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
