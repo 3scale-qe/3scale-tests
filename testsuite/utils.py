@@ -17,9 +17,14 @@ if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 
 
+def generate_tail(tail=5):
+    """Returns random suffix"""
+    return secrets.token_urlsafe(tail).translate(str.maketrans("", "", "-_")).lower()
+
+
 def randomize(name, tail=5):
     "To avoid conflicts returns modified name with random sufffix"
-    return "%s-%s" % (name, secrets.token_urlsafe(tail).translate(str.maketrans("", "", "-_")).lower())
+    return "%s-%s" % (name, generate_tail(tail))
 
 
 def retry_for_session(session: requests.Session, total: int = 8):
