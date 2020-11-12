@@ -11,7 +11,7 @@ from testsuite.gateways.apicast import SystemApicastRequirements, OperatorApicas
     TemplateApicastRequirements, TLSApicastRequirements
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirements
 from testsuite.gateways.gateways import GatewayRequirements
-from testsuite.gateways.service_mesh import ServiceMeshRequirements, ServiceMesh, Httpbin
+from testsuite.gateways.service_mesh import ServiceMeshRequirements, HttpbinFactory, ServiceMeshFactory
 from testsuite.requirements import ThreeScaleAuthDetails
 
 if TYPE_CHECKING:
@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 class GatewayOptions(GatewayRequirements):
     """Implementation of GatewayRequirements in current testsuite"""
+
     def __init__(self, staging: bool, settings_block, configuration: CommonConfiguration) -> None:
         self.setting_block = settings_block
         self.configuration = configuration
@@ -45,6 +46,7 @@ class GatewayOptions(GatewayRequirements):
 
 class SystemApicastOptions(GatewayOptions, SystemApicastRequirements):
     """Implementation of SystemApicastRequirements in current testsuite"""
+
     @property
     def staging_deployment(self) -> str:
         return self.setting_block.get("staging_deployment", "apicast-staging")
@@ -174,27 +176,21 @@ class TLSApicastOptions(TemplateApicastOptions, TLSApicastRequirements):
 
 class ServiceMeshGatewayOptions(GatewayOptions, ServiceMeshRequirements):
     """Options for Service mesh gateway"""
+
     @property
     def _server(self):
-        return self.setting_block["server"]
+        return self.setting_block.get("server", "default")
 
     @property
-    def _credentials(self):
-        return self.setting_block["credentials"]
-
-    @property
-    def httpbin(self) -> Httpbin:
+    def httpbin_factory(self) -> HttpbinFactory:
         conf = self.setting_block.get("httpbin", {})
         openshift = self.openshift(server=self._server, project=conf.get("project", "httpbin"))
-        return Httpbin(credentials=self._credentials,
-                       openshift=openshift,
-                       deployment=conf.get("deployment", "httpbin"),
-                       path=conf.get("path", "httpbin"))
+        return HttpbinFactory(openshift=openshift)
 
     @property
-    def mesh(self) -> ServiceMesh:
+    def mesh_factory(self) -> ServiceMeshFactory:
         conf = self.setting_block.get("mesh", {})
         openshift = self.openshift(server=self._server, project=conf.get("project", "service-mesh"))
-        return ServiceMesh(credentials=self._credentials,
-                           openshift=openshift,
-                           auth=self.configuration)
+        return ServiceMeshFactory(openshift=openshift,
+                                  token=self.configuration.token,
+                                  url=self.configuration.url)
