@@ -182,15 +182,17 @@ class ServiceMeshGatewayOptions(GatewayOptions, ServiceMeshRequirements):
         return self.setting_block.get("server", "default")
 
     @property
+    def _projects(self):
+        return self.setting_block.get("projects", {})
+
+    @property
     def httpbin_factory(self) -> HttpbinFactory:
-        conf = self.setting_block.get("httpbin", {})
-        openshift = self.openshift(server=self._server, project=conf.get("project", "httpbin"))
+        openshift = self.openshift(server=self._server, project=self._projects.get("httpbin", "httpbin"))
         return HttpbinFactory(openshift=openshift)
 
     @property
     def mesh_factory(self) -> ServiceMeshFactory:
-        conf = self.setting_block.get("mesh", {})
-        openshift = self.openshift(server=self._server, project=conf.get("project", "service-mesh"))
+        openshift = self.openshift(server=self._server, project=self._projects.get("service-mesh", "service-mesh"))
         return ServiceMeshFactory(openshift=openshift,
                                   token=self.configuration.token,
                                   url=self.configuration.url)
