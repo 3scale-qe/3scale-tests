@@ -23,7 +23,7 @@ METRICS = [
 @pytest.fixture(scope="module")
 def client(prod_client):
     """Returns prod client instance."""
-    client = prod_client(redeploy=False, promote=True)
+    client = prod_client()
     return client
 
 
