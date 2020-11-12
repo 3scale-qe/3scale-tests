@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+from subprocess import run, PIPE
+import sys
+
+from packaging.version import Version
+
+
+version = sys.argv[1]
+if len(version.split(".")) == 2:
+    version = f"{version}.0"
+Version(version)
+
+tags = run(["git", "tag"], check=False, encoding="utf-8", stdout=PIPE)
+tags = tags.stdout.split()
+
+revision=1
+nextver=f"{version}-r{revision}"
+while nextver in tags:
+    revision += 1
+    nextver=f"{version}-r{revision}"
+
+rc=1
+nextver=f"{version}rc{rc}-r{revision}"
+while nextver in tags:
+    rc += 1
+    nextver=f"{version}rc{rc}-r{revision}"
+
+with open("VERSION", "w") as s:
+    s.write(f"{version}-r{revision}\n")
+
+run(["git", "checkout", "-b", f"v{version}rc{rc}-r{revision}"], check=True)

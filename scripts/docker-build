@@ -1,0 +1,21 @@
+#!/bin/sh
+# docker-build image-name main-tag extra-tags...
+
+imagename=$1
+shift
+
+tag=$1
+shift
+
+image=$imagename:$tag
+
+docker build -t $image .
+
+if [ -n "$PUSHIMAGE" ]; then
+	docker push $image
+
+	for tag in "$@"; do
+		docker tag $image $imagename:$tag
+		docker push $imagename:$tag
+	done
+fi
