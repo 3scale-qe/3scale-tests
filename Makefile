@@ -8,6 +8,7 @@ TB ?= short
 LOGLEVEL ?= INFO
 
 PYTEST = pipenv run python -m pytest --tb=$(TB)
+RUNSCRIPT = pipenv run ./scripts/
 
 commit-acceptance: pylint flake8 mypy all-is-package
 
@@ -76,40 +77,22 @@ mostlyclean:
 help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-release: ## Push MR ready branch of new VERSION (and tag VERSION locally)
-release: GITREMOTE ?= origin
+release: ## Create branch of new VERSION (and tag VERSION)
 release: VERSION-required Pipfile.lock
-	echo $(VERSION)-r1 > VERSION
-	git tag|grep -q $(VERSION)-r && git tag|grep $(VERSION)-r|sort -n -tr -k2|tail -1|sed -r 's/($(VERSION)-r)([0-9]+)/echo \1$$((\2+1))/e' > VERSION || :
-	git checkout -b v`cat VERSION`
+	$(RUNSCRIPT)make-next-release $(VERSION)
 	git add VERSION
 	git add -f Pipfile.lock
-	git commit -m"v`cat VERSION`"
-	git tag -a `cat VERSION` -m"v`cat VERSION`"
+	git commit -m"`git rev-parse --abbrev-ref HEAD`"
+	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c2-`" -m"`git rev-parse --abbrev-ref HEAD`"
 	git rm --cached Pipfile.lock
 	git commit -m"Unfreeze Pipfile.lock after release"
-	git push $(GITREMOTE) v`cat VERSION`
-	-git checkout -
 
 dist: ## Build (and push optionally) distribution-ready container image
 dist: IMAGENAME ?= 3scale-py-testsuite
 dist: pipenv
+	git checkout `$(RUNSCRIPT)docker-tags -1`
 	test -e VERSION
-	[ -n "$$NOSWITCH" ] || git checkout `cat VERSION`
-	docker build -t $(IMAGENAME):`cat VERSION` .  # X.Y(.Z)-r#
-	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1 -d- <VERSION`  # X.Y(.Z)
-	docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):`cut -f1-2 -d. <VERSION` # X.Y
-	if pipenv run `pwd`/scripts/latest-version `cat VERSION` ; then \
-		docker tag $(IMAGENAME):`cat VERSION` $(IMAGENAME):latest ; \
-	fi
-ifdef PUSHIMAGE
-	docker push $(IMAGENAME):`cat VERSION`
-	docker push $(IMAGENAME):`cut -f1 -d- <VERSION`
-	docker push $(IMAGENAME):`cut -f1-2 -d. <VERSION`
-	if pipenv run `pwd`/scripts/latest-version `cat VERSION` ; then \
-		docker push $(IMAGENAME):latest ; \
-	fi
-endif
+	$(RUNSCRIPT)docker-build $(IMAGENAME) `$(RUNSCRIPT)docker-tags`
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
 VERSION-required:
