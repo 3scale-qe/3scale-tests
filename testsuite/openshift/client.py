@@ -64,6 +64,20 @@ class OpenShiftClient:
             return oc.invoke(verb, cmd_args, auto_raise=auto_raise)
 
     @property
+    def is_operator_deployment(self):
+        """
+        True, if the said namespace contains at least one APIManager resource
+        It is equivalent to 3scale being deployed by operator
+        """
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            try:
+                return len(oc.selector("apimanager").objects()) > 0
+            # If cluster doesn't know APIManager resource
+            except oc.OpenShiftPythonException:
+                return False
+
+    @property
     def secrets(self):
         """Dict-like access to secrets"""
 
