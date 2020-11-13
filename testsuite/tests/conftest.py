@@ -86,11 +86,11 @@ def _oc_3scale_project():
 # Currently this doesn't work with xdist
 # https://github.com/pytest-dev/pytest/issues/7767
 # Therefore _global_property hack is present below
-# **AND** therefore '_' at the beginning to avoid properties
+# **AND** therefore @fixture commented out to avoid properties
 # doubled on single execution. Once xdist issue will be fixed
 # this will be updated
-@pytest.fixture(scope="session", autouse=True)
-def _testsuite_properties(record_testsuite_property):
+# @pytest.fixture(scope="session", autouse=True)
+def testsuite_properties(record_testsuite_property):
     """Add custom testsuite properties to junit"""
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
@@ -127,6 +127,8 @@ def pytest_report_header(config):
     version = settings["threescale"]["version"]
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
+    if "/" in title:
+        title = title.split("/")[-1]  # this is due to possible job structure in jenkins
     title = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
     projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
     team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
