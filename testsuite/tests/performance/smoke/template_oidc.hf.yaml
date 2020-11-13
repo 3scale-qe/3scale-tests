@@ -1,4 +1,4 @@
-name: managed_services_base_line
+name: test_smoke_oidc
 # http endpoints will be added via test
 phases:
   - rampUp:
@@ -23,7 +23,7 @@ phases:
             - httpRequest:
                 authority:
                   fromVar: hostname
-                POST: /anything/${randomId}
+                POST: /0/anything/${randomId}
                 sync: true
                 headers:
                   authorization:
@@ -60,7 +60,7 @@ phases:
               - httpRequest:
                   authority:
                     fromVar: hostname
-                  GET: /anything/get/${randomId}
+                  GET: /0/anything/get/${randomId}
                   sync: true
                   headers:
                     authorization:
