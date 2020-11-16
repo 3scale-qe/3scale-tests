@@ -73,8 +73,8 @@ def setup_gateway(request, staging_gateway, mount_path, ssl_certificate):
 @pytest.fixture(scope="module")
 def tls_termination_policy_path_type(setup_gateway, mount_path):
     """Returns tls termination policy path type schema."""
-    config = dict(certificate=f"{mount_path}/tls.crt",
-                  certificate_key=f"{mount_path}/tls.key")
+    config = dict(certificate_path=f"{mount_path}/tls.crt",
+                  certificate_key_path=f"{mount_path}/tls.key")
     return rawobj.PolicyConfig("tls", {"certificates": [config]})
 
 
