@@ -618,7 +618,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         if endpoint is None:
             endpoint = private_base_url()
 
-        params = {"name": blame(request, name), "private_endpoint": endpoint}
+        params = {"name": blame(request, name, 10), "private_endpoint": endpoint}
 
         for hook in _select_hooks("before_backend", hooks):
             hook(params)
