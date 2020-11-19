@@ -10,7 +10,8 @@ from packaging.version import Version, InvalidVersion
 tags = run(["git", "tag"], check=False, encoding="utf-8", stdout=PIPE)
 tags = tags.stdout.split()
 
-version = open("VERSION").read().strip()
+version_str = open("VERSION").read().strip()
+version = Version(version_str)
 
 versions = []
 for tag in tags:
@@ -18,32 +19,41 @@ for tag in tags:
         versions.append(Version(tag))
     except InvalidVersion:
         pass
-latest = sorted(versions)[-1]
+latest = sorted(
+    versions,
+    key=lambda v: v.release + (v.post, v.pre[1] if v.pre else 20000000))[-1]
 
 just_one = "-1" in sys.argv
+
+
+def vstr(ver):
+    return f"{ver.base_version}-r{ver.post}"
+
 
 def docker_tags(version, latest, just_one):
     tags = [version]
     if just_one:
         return tags
     tags.append(version.split("-")[0])
-    tags.append(version.rsplit(".", 1)[0])
-    tags.append(version.split(".")[0])
     if latest:
+        tags.append(version.rsplit(".", 1)[0])
+        tags.append(version.split(".")[0])
         tags.append("latest")
     return tags
 
 
-if version in tags:
-    print(" ".join(docker_tags(version, latest == Version(version), just_one)))
+if version_str in tags:
+    print(" ".join(docker_tags(version_str, latest == version, just_one)))
     sys.exit(0)
 
-revision = version.split("-")[-1]
-version = Version(version).base_version
+if version_str == vstr(latest):
+    print(str(latest).replace(".post", "-r"))
+    sys.exit(0)
+
 rc = 1
-current = f"{version}rc{rc}-{revision}"
+current = f"{version.base_version}rc{rc}-r{version.post}"
 
 while current in tags:
     rc += 1
-    current = f"{version}rc{rc}-{revision}"
+    current = f"{version.base_version}rc{rc}-r{version.post}"
 print(current)
