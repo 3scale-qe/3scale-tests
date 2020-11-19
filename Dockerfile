@@ -31,9 +31,11 @@ RUN chmod -R g+w /opt/workdir/*
 USER default
 
 ENV WORKON_HOME=/opt/workdir/virtualenvs
+ENV junit=yes
+ENV resultsdir=/test-run-results
 
 RUN make mostlyclean pipenv && \
 	rm -Rf $HOME/.cache/*
 
 ENTRYPOINT [ "make" ]
-CMD [ "smoke", "flags=--junitxml=/test-run-results/junit.xml" ]
+CMD [ "smoke" ]
