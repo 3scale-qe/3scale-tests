@@ -1,6 +1,7 @@
 """SelfManaged Apicast"""
 from abc import ABC, abstractmethod
 from typing import Dict
+
 from threescale_api.resources import Service
 
 from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
@@ -92,3 +93,22 @@ class SelfManagedApicast(AbstractApicast):
                                   "/tmp/jaeger/", configmap_name=config_map_name)
         self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
                                "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+
+    def update_image_stream(self, image_stream: str, amp_release: str = "latest"):
+        """
+        Updates the image stream the deployment is using
+        :param image_stream: name of the image stream
+        :param amp_release: tag of the image stream
+        """
+        self.openshift.patch("dc", self.deployment, {"spec": {
+            "triggers": [{
+                "imageChangeParams": {
+                    "automatic": True,
+                    "containerNames": [
+                        self.deployment],
+                    "from":{
+                        "name": f"{image_stream}:{amp_release}"}},
+                    "type": "ImageChange"},
+                {"type": "ConfigChange"}]}})
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(self.deployment)

@@ -46,6 +46,11 @@ default:
       browser:
         provider: local
         webdriver: chrome
+    apicast:
+      parameters:
+        modular_apicast:
+          amp_release: "2.9"
+
   hyperfoil:
     shared_template:
       # We need to add agents definition for clustered hyperfoil to each test
