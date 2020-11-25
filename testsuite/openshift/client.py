@@ -128,6 +128,15 @@ class OpenShiftClient:
             args.append("-f")
         self.do_action("delete", [resource_type, name, args])
 
+    def delete_app(self, app: str, resources: Optional[str] = None):
+        """Removes resources belonging to certain application
+        Args:
+            :param resources: Types of resources to be deleted, defaults to "all"
+            :param app: Application to be deleted
+            """
+        resources = resources or "all"
+        self.do_action("delete", [resources, "-l", f"app={app}"])
+
     def scale(self, deployment_name: str, replicas: int):
         """
         Scale an existing version of Deployment.
@@ -154,18 +163,9 @@ class OpenShiftClient:
         if not os.path.isdir(dest):
             raise ValueError("You must provide a valid local directory to 'dest'.")
 
-        def select_pod(apiobject):
-            annotation = "openshift.io/deployment-config.latest-version"
-            latest_version = apiobject.get_annotation(annotation)
-            return apiobject.get_label("deployment") == f"{deployment_name}-{latest_version}"
-
-        with ExitStack() as stack:
-            self.prepare_context(stack)
-            pod = oc.selector("pods").narrow(select_pod).object().name()
-
+        pod = self.get_pod(deployment_name).object().name()
         self.do_action("rsync", [f"{pod}:{source}", dest])
 
-    # pylint: disable=no-self-use
     def get_replicas(self, deployment_name: str):
         """
         Return number of replicas of Deployment
@@ -301,8 +301,6 @@ class OpenShiftClient:
         """
         with ExitStack() as stack:
             self.prepare_context(stack)
-            # pylint: disable=no-member
-            # https://github.com/PyCQA/pylint/issues/3137
             stack.enter_context(oc.timeout(90))
 
             dc_data = oc.selector(f"dc/{deployment_name}").object()
@@ -326,8 +324,6 @@ class OpenShiftClient:
         """
         with ExitStack() as stack:
             self.prepare_context(stack)
-            # pylint: disable=no-member
-            # https://github.com/PyCQA/pylint/issues/3137
             stack.enter_context(oc.timeout(90))
             oc.selector(f"deployment/{deployment_name}").until_all(
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status
@@ -362,7 +358,38 @@ class OpenShiftClient:
             latest_version = apiobject.get_annotation(annotation)
             return apiobject.get_label("deployment") == f"{deployment_name}-{latest_version}"
 
+        return self.select_resource("pods", narrow_function=select_pod)
+
+    def select_resource(self,
+                        resource: str,
+                        labels: Optional[Dict[str, str]] = None,
+                        narrow_function: Optional[Callable[[oc.APIObject], bool]] = None):
+        """
+        Returns pods, that is filtered with narrow function
+        :param resource: Resource to search
+        :param labels: Labels to filter resources
+        :param narrow_function: Optional filter that takes APIObject and returns true, if it should be selected
+        :return: selector object with all selected pods
+        """
         with ExitStack() as stack:
             self.prepare_context(stack)
-            pod_selector = oc.selector("pods").narrow(select_pod)
-            return pod_selector
+            if labels:
+                selector = oc.selector(resource, labels=labels)
+            else:
+                selector = oc.selector(resource)
+
+            if narrow_function:
+                selector = selector.narrow(narrow_function)
+            return selector
+
+    def create(self, definition: str, cmd_args: Optional[List[str]] = None):
+        """
+        Creates objects from yaml/json representations
+
+        :param definition: String yaml/json definition of the objects
+        :param cmd_args: Optional list of command line arguments to pass to the command
+        :return: Selector to match creates resources
+        """
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            return oc.create(definition, cmd_args)
