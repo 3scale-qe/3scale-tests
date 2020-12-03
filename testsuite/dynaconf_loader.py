@@ -136,9 +136,13 @@ def load(obj, env=None, silent=None, key=None):
                 "superdomain": ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"],
                 "admin": {
                     "url": admin_url,
+                    "username": ocp.secrets["system-seed"]["ADMIN_USER"].decode("utf-8"),
+                    "password": ocp.secrets["system-seed"]["ADMIN_PASSWORD"].decode("utf-8"),
                     "token": admin_token},
                 "master": {
                     "url": master_url,
+                    "username": ocp.secrets["system-seed"]["MASTER_USER"].decode("utf-8"),
+                    "password": ocp.secrets["system-seed"]["MASTER_PASSWORD"].decode("utf-8"),
                     "token": master_token},
                 "gateway": {
                     "image": _apicast_image(ocp)}}}
