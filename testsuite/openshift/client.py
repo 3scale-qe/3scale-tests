@@ -28,6 +28,15 @@ class SecretTypes(enum.Enum):
     TLS = "kubernetes.io/ssl"
 
 
+class ServiceTypes(enum.Enum):
+    """Service types enum."""
+
+    CLUSTER_IP = "clusterip"
+    EXTERNAL_NAME = "externalname"
+    LOAD_BALANCER = "loadbalancer"
+    NODE_PORT = "nodeport"
+
+
 class OpenShiftClient:
     """OpenShiftClient is an interface to the official OpenShift python
     client."""
@@ -393,3 +402,13 @@ class OpenShiftClient:
         with ExitStack() as stack:
             self.prepare_context(stack)
             return oc.create(definition, cmd_args)
+
+    def create_service(self, name: str, service_type: ServiceTypes, port: int, target_port: int):
+        """Create a new secret.
+        Args:
+            :param name: Service name
+            :param service_type: Type of the service
+            :param port: Port the service listens on
+            :param target_port: Port to which the service forwards connections.
+        """
+        self.do_action("create", ["service", service_type.value, name, f"--tcp={port}:{target_port}"])
