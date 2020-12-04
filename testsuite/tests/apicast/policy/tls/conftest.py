@@ -17,8 +17,8 @@ def staging_gateway(request, configuration):
     }
     options = TLSApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TLSApicast(requirements=options)
-    gateway.create()
 
     request.addfinalizer(gateway.destroy)
+    gateway.create()
 
     return gateway

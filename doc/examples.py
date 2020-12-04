@@ -122,9 +122,10 @@ def staging_gateway(request, configuration):
     }
     options = TemplateApicastOptions(staging=True, settings_block=setting_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
-    gateway.create()
 
     request.addfinalizer(gateway.destroy)
+    gateway.create()
+
     return gateway
 
 
@@ -143,9 +144,10 @@ def staging_gateway(settings_block, request, configuration):
 
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
-    gateway.create()
 
     request.addfinalizer(gateway.destroy)
+    gateway.create()
+
     return settings_block
 
 
