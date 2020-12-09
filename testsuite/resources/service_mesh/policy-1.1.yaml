@@ -3,17 +3,18 @@ kind: Template
 metadata:
   name: 3scale-adapter-rhsso-policy
 objects:
-- apiVersion: security.istio.io/v1beta1
-  kind: RequestAuthentication
+- apiVersion: authentication.istio.io/v1alpha1
+  kind: Policy
   metadata:
     name: ${NAME}
   spec:
-    selector:
-      matchLabels:
-        app: ${TARGET}
-    jwtRules:
-    - issuer: ${ISSUER}
-      jwksUri: ${JWKS}
+    origins:
+      - jwt:
+          issuer: ${ISSUER}
+          jwksUri: ${JWKS}
+    principalBinding: USE_ORIGIN
+    targets:
+      - name: ${TARGET}
 parameters:
 - name: NAME
   description: "Name of the policy"
@@ -22,7 +23,7 @@ parameters:
   description: "Issuer url (http://keycloak-keycloak.34.242.107.254.nip.io/auth/realms/3scale-keycloak)"
   required: true
 - name: JWKS
-  description: "JWKSURL url (http://keycloak-keycloak.34.242.107.254.nip.io/auth/realms/3scale-keycloak/protocol/openid-connect/certs)"
+  description: "Issuer url (http://keycloak-keycloak.34.242.107.254.nip.io/auth/realms/3scale-keycloak/protocol/openid-connect/certs)"
   required: true
 - name: TARGET
   description: "Target of the policy"
