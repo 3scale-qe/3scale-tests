@@ -29,7 +29,7 @@ class RetryKeycloakClient(KeycloakClient):
         return self._session
 
     @staticmethod
-    def _retry_for_session(session: requests.Session, total: int = 16):
+    def _retry_for_session(session: requests.Session, total: int = 8):
         retry = Retry(
             total=total,
             backoff_factor=1,
