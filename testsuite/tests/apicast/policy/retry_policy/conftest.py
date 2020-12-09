@@ -10,7 +10,7 @@ pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(configuration):
+def staging_gateway(configuration, request):
     """Deploy template apicast gateway."""
     settings_block = {
         "deployments": {
@@ -20,8 +20,8 @@ def staging_gateway(configuration):
     }
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
+
+    request.addfinalizer(gateway.destroy)
     gateway.create()
 
-    yield gateway
-
-    gateway.destroy()
+    return gateway

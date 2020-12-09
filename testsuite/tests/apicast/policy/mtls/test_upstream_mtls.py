@@ -38,9 +38,9 @@ def staging_gateway(request, configuration):
     }
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
-    gateway.create()
 
     request.addfinalizer(gateway.destroy)
+    gateway.create()
 
     return gateway
 
