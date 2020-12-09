@@ -1,5 +1,6 @@
 """Custom KeyCloak resources for test suite"""
 import requests
+from dynaconf import settings
 from keycloak.client import KeycloakClient
 from keycloak.realm import KeycloakRealm
 from requests.adapters import HTTPAdapter
@@ -24,6 +25,7 @@ class RetryKeycloakClient(KeycloakClient):
             self._session = requests.Session()
             self._session.headers.update(self._headers)
             self._retry_for_session(session=self._session)
+            self._session.verify = settings["ssl_verify"]
         return self._session
 
     @staticmethod
