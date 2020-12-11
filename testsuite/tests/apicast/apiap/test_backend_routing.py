@@ -41,12 +41,12 @@ def api_client(application, proxy):
     used. Firstly a request with retry is made to ensure all is setup.
     """
 
-    proxy.update()
+    proxy.deploy()
 
     assert application.api_client().get("/echo/anything").status_code == 200
 
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
-    proxy.update()
+    proxy.deploy()
 
     session = requests.Session()
     session.auth = application.authobj
@@ -115,7 +115,7 @@ def isolated_backends(backend_echo, backend_quotes, proxy):
 
     backend_quotes.mapping_rules.create(rawobj.Mapping(quotes_metric, "/anything/qod"))
 
-    proxy.update()
+    proxy.deploy()
 
 
 @pytest.fixture(scope="module")
@@ -138,7 +138,7 @@ def empty_path(isolated_backends, backend_echo, proxy, backend_usages):  # pylin
 
     backend_usages[0].update({"path": "/"})
 
-    proxy.update()
+    proxy.deploy()
 
 
 @pytest.fixture(scope="module")
@@ -162,7 +162,7 @@ def path_extension(empty_path, backend_usages, backend_quotes, proxy):  # pylint
 
     backend_quotes.mapping_rules.create(rawobj.Mapping(quotes_metric, "/anything/test"))
 
-    proxy.update()
+    proxy.deploy()
 
 
 def hits(app, analytics):

@@ -43,9 +43,9 @@ def proxy(service):
 @pytest.fixture(scope="module")
 def delete_mapping(proxy):
     """Deletes all current mapping on the product level"""
-    proxy.update()
+    proxy.deploy()
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
-    proxy.update()
+    proxy.deploy()
 
 
 @pytest.fixture(scope="module")
@@ -131,7 +131,7 @@ def backends(backend1, backend2, backend3, backend4, proxy):
         backend.mapping_rules.create(rawobj.Mapping(metric, "/{id}"))
         backend.mapping_rules.create(rawobj.Mapping(metric, "/"))
 
-    proxy.update()
+    proxy.deploy()
 
 
 def hits(app):

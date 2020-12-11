@@ -58,5 +58,5 @@ def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_
                              service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
     metric = service.metrics.list()[0]
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
-    service.proxy.list().update()
+    service.proxy.deploy()
     return service

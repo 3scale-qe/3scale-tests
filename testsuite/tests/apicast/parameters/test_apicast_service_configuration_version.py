@@ -22,6 +22,7 @@ def service(service, private_base_url, staging_gateway):
     proxy = service.proxy.list()
     # update proxy credentials so that we can have a version 2 of it
     proxy.update(rawobj.Proxy(private_base_url(), credentials_location="authorization"))
+    proxy.deploy()
 
     staging_gateway.environ[f"APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION"] = 1
 

@@ -35,7 +35,7 @@ def service(service):
 
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern='/get'))
 
-    proxy.update()
+    proxy.deploy()
 
     return service
 

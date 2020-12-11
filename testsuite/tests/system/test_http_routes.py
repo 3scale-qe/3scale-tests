@@ -28,6 +28,7 @@ def service(service):
         "sandbox_endpoint": f"http://{stage_base}:80",
         "endpoint": f"http://{prod_base}:80"
     })
+    service.proxy.deploy()
     return service
 
 

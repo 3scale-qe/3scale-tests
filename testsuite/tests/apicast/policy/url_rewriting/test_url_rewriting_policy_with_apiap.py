@@ -52,7 +52,7 @@ def url_rewriting_first(service):
     policy_chain["policies_config"].reverse()
     policy_chain.update()
 
-    proxy.update()
+    proxy.deploy()
 
 
 @pytest.mark.parametrize("setup,prefix", [("apicast_first", "/"), ("url_rewriting_first", "/"),

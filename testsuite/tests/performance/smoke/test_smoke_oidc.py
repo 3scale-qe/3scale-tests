@@ -30,7 +30,7 @@ def services(services):
     for svc in services:
         metric = svc.metrics.list()[0]
         svc.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
-        svc.proxy.list().update()
+        svc.proxy.deploy()
     return services
 
 

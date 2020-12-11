@@ -39,7 +39,7 @@ def test_auth_client_id(rhsso_setup, application, service, credentials_location,
         "jwt_claim_with_client_id_type": "liquid",
         "jwt_claim_with_client_id": "{{ %s }}" % claim})
 
-    service.proxy.list()
+    service.proxy.deploy()
     assert service["backend_version"] == Service.AUTH_OIDC
     response = application.api_client().get("/get")
 

@@ -30,7 +30,7 @@ def config(custom_service, case_data, request, service_proxy_settings, lifecycle
     proxy = service.proxy.list()
     for metric in metrics:
         service.metrics.create(rawobj.Metric(metric))
-    proxy.update()
+    proxy.deploy()
 
     proxy.policies.insert(0, policy_config)
 

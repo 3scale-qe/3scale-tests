@@ -35,7 +35,7 @@ def service(service):
     create_mapping_rule(proxy, metric_once, pattern="/anything/bar/", last="true")
     create_mapping_rule(proxy, metric_once, pattern="/anything/bar/123")
 
-    proxy.update()
+    proxy.deploy()
 
     return service
 

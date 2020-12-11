@@ -36,7 +36,7 @@ def service2(service2):
 
     metric = service2.metrics.list()[0]
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/anything/foo?baz={baz}", http_method='GET'))
-    proxy.update()
+    proxy.deploy()
 
     return service2
 

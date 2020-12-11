@@ -24,6 +24,7 @@ def proxy_update(service, configuration, request):
     }
 
     service.proxy.list().update(params)
+    service.proxy.deploy()
 
     return params
 

@@ -51,7 +51,7 @@ def app_plan_backend(service, custom_app_plan, threescale, request):
     service_metric = service.metrics.create(rawobj.Metric("metric_svc"))
     proxy = service.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(service_metric, pattern="/anything/foo"))
-    proxy.update()
+    proxy.deploy()
 
     plan = custom_app_plan(
         rawobj.ApplicationPlan(blame(request, "app")), service)
@@ -82,7 +82,7 @@ def app_plan_service(service, custom_app_plan, request):
     proxy.mapping_rules.create(
         rawobj.Mapping(metric_anything_foo, pattern="/anything/foo")
     )
-    proxy.update()
+    proxy.deploy()
 
     plan = custom_app_plan(
         rawobj.ApplicationPlan(blame(request, "app")), service)

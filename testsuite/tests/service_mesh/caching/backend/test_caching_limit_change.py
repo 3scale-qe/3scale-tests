@@ -22,7 +22,7 @@ def limit(application):
     limit = service.app_plans.list()[0].limits(metric).create({
         "metric_id": metric["id"], "period": "minute", "value": 1})
 
-    proxy.update()
+    proxy.deploy()
 
     return limit
 

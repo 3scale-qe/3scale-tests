@@ -24,7 +24,7 @@ def service(service):
     """
     metric = service.metrics.create(rawobj.Metric("metric"))
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
-    service.proxy.list().update()
+    service.proxy.deploy()
 
     return service
 

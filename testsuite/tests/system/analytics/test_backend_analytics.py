@@ -39,7 +39,7 @@ def backend(threescale, backend_usages, proxy):
     backend_metric = backend.metrics.list()[0]
     backend.mapping_rules.create(rawobj.Mapping(backend_metric, "/anything/get"))
 
-    proxy.update()
+    proxy.deploy()
 
     return backend
 

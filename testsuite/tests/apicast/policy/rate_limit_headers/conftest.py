@@ -26,7 +26,7 @@ def application(service, app_plan, custom_application, request, lifecycle_hooks)
     application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan),
                                      hooks=lifecycle_hooks)
 
-    proxy.update()
+    proxy.deploy()
 
     return application
 
