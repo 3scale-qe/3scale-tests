@@ -51,7 +51,7 @@ def mapping_rules(service, backend_bin, backend_echo):
     bin_metric = backend_bin.metrics.list()[0]
     backend_echo.mapping_rules.create(rawobj.Mapping(test_metric, "/anything/test"))
     backend_bin.mapping_rules.create(rawobj.Mapping(bin_metric, "/anything/bin"))
-    proxy.update()
+    proxy.deploy()
 
 
 @pytest.fixture(scope="module")

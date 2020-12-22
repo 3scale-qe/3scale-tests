@@ -24,7 +24,7 @@ def application(application):
     service.app_plans.list()[0].limits(method).create({
         "metric_id": method["id"], "period": "eternity", "value": 0})
 
-    proxy.update()
+    proxy.deploy()
 
     return application
 

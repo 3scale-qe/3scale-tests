@@ -134,7 +134,7 @@ def my_metrics(service, testconfig):
             pattern='/test4',
             http_method='GET'))
 
-    proxy.update()
+    proxy.deploy()
 
     yield metric1, metric2
     if not testconfig["skip_cleanup"]:
@@ -172,7 +172,7 @@ def my_applications(request, service, custom_application, custom_app_plan, my_me
         "min": 1, "max": 2, "cost_per_unit": 7})
     app2 = custom_application(rawobj.Application(blame(request, "gold_app"), plan_gold), hooks=lifecycle_hooks)
 
-    proxy.update()
+    proxy.deploy()
     proxy.promote()
 
     return app1, app2

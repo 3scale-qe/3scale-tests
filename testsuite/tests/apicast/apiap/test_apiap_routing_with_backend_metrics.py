@@ -49,7 +49,7 @@ def api_client(application, service):
 
     proxy = service.proxy.list()
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
-    proxy.update()
+    proxy.deploy()
 
     session = requests.Session()
     session.auth = application.authobj
@@ -87,7 +87,7 @@ def setup(service, backend_slash, backend_anything):
     # mapping rule of anything backend
     backend_anything.mapping_rules.create(rawobj.Mapping(anything_metric, "/anything/qod"))
 
-    service.proxy.list().update()
+    service.proxy.deploy()
 
     return slash_metric, loud_method, low_method, anything_metric, test
 
@@ -135,7 +135,7 @@ def case2(service):
     :metrics: product hits, slash backend hits and loud method increase, rest didn't increase
     """
     service.backend_usages.list()[0].update({"path": "/anything/test"})
-    service.proxy.list().update()
+    service.proxy.deploy()
     return "/anything/test/anything/loud", 200, [1, 1, 1, 0, 0, 0]
 
 
@@ -150,7 +150,7 @@ def case3(service, setup, backend_anything):
     _, _, _, _, test = setup
     backend_anything.mapping_rules.create(
         {"http_method": "GET", "pattern": "/anything/test", "metric_id": test["id"], "delta": 1})
-    service.proxy.list().update()
+    service.proxy.deploy()
     return "/anything/test", 404, [0, 0, 0, 0, 0, 0]
 
 

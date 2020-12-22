@@ -19,7 +19,7 @@ def service(rhsso_setup, service_proxy_settings, custom_service, lifecycle_hooks
     proxy = service.proxy.list()
     metric = service.metrics.list()[0]
     proxy.mapping_rules.create(rawobj.Mapping(metric=metric, http_method="POST"))
-    proxy.update()
+    proxy.deploy()
 
     return service
 

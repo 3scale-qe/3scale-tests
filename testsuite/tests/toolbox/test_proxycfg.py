@@ -93,6 +93,7 @@ def test_update_staging_and_list1(service, hits, empty_list_staging):
     params['api_test_path'] = '/post'
     proxy = service.proxy.list()
     proxy.update(params)
+    proxy.deploy()
 
     # adding new policy increases cfg version
     new_policy = rawobj.PolicyConfig("headers", {

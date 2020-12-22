@@ -45,7 +45,7 @@ def service(service, endpoints_and_methods):
             rawobj.Mapping(metric, pattern=url,
                            http_method=method))
 
-    proxy.update()
+    proxy.deploy()
 
     return service
 

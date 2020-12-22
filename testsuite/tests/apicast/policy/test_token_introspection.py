@@ -55,7 +55,7 @@ def update_policies(service, application, rhsso_service_info):
     })
 
     service.proxy.list().policies.append(policy_setting)
-    service.proxy.list().update()
+    service.proxy.deploy()
 
 
 # pylint: disable=unused-argument

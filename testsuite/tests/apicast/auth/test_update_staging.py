@@ -15,6 +15,7 @@ def test_updated_auth_param(application, service):
     old_api_client = application.api_client()
     # change of the user key
     service.proxy.list().update(params={"auth_user_key": "new_key"})
+    service.proxy.deploy()
 
     new_api_client = application.api_client()
 

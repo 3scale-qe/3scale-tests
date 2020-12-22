@@ -35,6 +35,7 @@ def test_proxy_config(service, private_base_url):
         - Assert that service has now two proxy configs
     """
     service.proxy.list().update({"api_backend": private_base_url("httpbin")})
+    service.proxy.deploy()
     usages = service.backend_usages.list()
     assert len(usages) == 1
 
@@ -46,12 +47,13 @@ def test_proxy_config(service, private_base_url):
     assert len(configs) == 1
 
     service.proxy.list().update({"api_backend": None, "auth_user_key": "random_key"})
+    service.proxy.deploy()
     configs = service.proxy.list().configs.list(env="sandbox")
     assert len(configs) == 1
 
     backend_id = usages[0]["backend_id"]
     service.backend_usages.create({"path": "/", "backend_api_id": backend_id})
-    service.proxy.list().update()
+    service.proxy.deploy()
 
     configs = service.proxy.list().configs.list(env="sandbox")
     assert len(configs) == 2

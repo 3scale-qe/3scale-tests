@@ -29,6 +29,7 @@ def service(service):
             }
         }]
     }))
+    service.proxy.deploy()
     return service
 
 

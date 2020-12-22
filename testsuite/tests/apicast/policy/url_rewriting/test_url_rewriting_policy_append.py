@@ -24,6 +24,7 @@ def service(service, private_base_url):
 
     # proxy needs to be updated to apply added mapping
     proxy.update(rawobj.Proxy(private_base_url("echo_api")))
+    proxy.deploy()
 
     return service
 

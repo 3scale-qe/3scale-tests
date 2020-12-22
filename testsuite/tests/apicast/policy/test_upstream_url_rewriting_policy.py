@@ -29,7 +29,7 @@ def service(service, private_base_url):
         "metric_id": metric["id"], "delta": 1})
 
     # proxy needs to be updated to apply added mapping
-    proxy.update()
+    proxy.deploy()
     return service
 
 

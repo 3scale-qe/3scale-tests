@@ -26,7 +26,7 @@ def mapping_rules(service):
     """
     metric = service.metrics.list()[0]
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/test"))
-    service.proxy.list().update()
+    service.proxy.deploy()
 
 
 @pytest.fixture(scope="module")
@@ -43,7 +43,7 @@ def api_client(application, service):
     assert application.api_client().get("/bin/anything").status_code == 200
 
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
-    proxy.update()
+    proxy.deploy()
 
     session = requests.Session()
     session.auth = application.authobj

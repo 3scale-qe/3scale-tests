@@ -582,13 +582,13 @@ def custom_service(threescale, request, testconfig, logger):
             for hook in _select_hooks("before_proxy", hooks):
                 proxy_params = hook(svc, proxy_params)
 
-            # You have to update proxy.list() to promote product to Staging APIcast
             svc.proxy.list().update(params=proxy_params)
         elif proxy_params:
             for hook in _select_hooks("before_proxy", hooks):
                 proxy_params = hook(svc, proxy_params)
 
             svc.proxy.update(params=proxy_params)
+        svc.proxy.deploy()
 
         for hook in _select_hooks("on_service_create", hooks):
             hook(svc)

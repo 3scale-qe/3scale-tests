@@ -68,7 +68,7 @@ def services(services, create_mapping_rules):
                     loop.run_in_executor(pool, create_mapping_rules, i, be_usage)
                     for i in range(10)]
             loop.run_until_complete(asyncio.gather(*futures))
-            proxy.update()
+            proxy.deploy()
     return services
 
 

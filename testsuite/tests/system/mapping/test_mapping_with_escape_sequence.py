@@ -16,7 +16,7 @@ def service(service):
 
     proxy = service.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/anything/foo/{bar}/baz"))
-    proxy.update()
+    proxy.deploy()
 
     return service
 

@@ -40,7 +40,7 @@ def application_silver(application, custom_app_plan, custom_application, request
     application = custom_application(
         rawobj.Application(blame(request, "silver_app"), plan_silver))
 
-    proxy.update()
+    proxy.deploy()
 
     return application
 
@@ -58,7 +58,7 @@ def application_gold(application, custom_app_plan, custom_application, request):
     plan_gold = custom_app_plan(rawobj.ApplicationPlan(blame(request, "gold")), service)
     application = custom_application(rawobj.Application(blame(request, "gold_app"), plan_gold))
 
-    proxy.update()
+    proxy.deploy()
 
     return application
 
