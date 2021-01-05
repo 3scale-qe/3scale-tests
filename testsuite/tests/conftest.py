@@ -34,6 +34,9 @@ def pytest_addoption(parser):
         "--disruptive", action="store_true", default=False, help="Run also disruptive tests (default: False)")
     parser.addoption(
         "--performance", action="store_true", default=False, help="Run also performance tests (default: False)")
+    parser.addoption(
+        "--ui", action="store_true", default=False, help="Run also UI tests (default: False)"
+    )
 
 
 def pytest_runtest_setup(item):
@@ -46,6 +49,8 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding toolbox tests")
     if "performance" in marks and not item.config.getoption("--performance"):
         pytest.skip("Excluding performance tests")
+    if "ui" in marks and not item.config.getoption("--ui"):
+        pytest.skip("Excluding UI tests")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:
@@ -283,6 +288,31 @@ def custom_user(request, testconfig):  # pylint: disable=unused-argument
         return usr
 
     return _custom_user
+
+
+@pytest.fixture(scope="module")
+def provider_account(custom_provider_account, request, testconfig):
+    """Preconfigured provider account existing over whole testing session"""
+    username = blame(request, 'pa')
+    account = rawobj.AccountUser(username=username, email=f"{username}@example.com", password="123456")
+    account = custom_provider_account(account)
+
+    return account
+
+
+@pytest.fixture(scope="module")
+def custom_provider_account(request, testconfig):
+    """Parametrized custom Provider account user
+    Args:
+        :param params: dict for remote call, rawobj.AccountUser should be used
+    """
+    def _custom_account(params, autoclean=True):
+        acc = threescale.provider_accounts.create(params=params)
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(acc.delete)
+        return acc
+
+    return _custom_account
 
 
 @pytest.fixture(scope="session")

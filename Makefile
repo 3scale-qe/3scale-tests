@@ -49,6 +49,9 @@ disruptive: pipenv
 performance-smoke: pipenv
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
 
+ui: pipenv
+	$(PYTEST) --ui $(flags) testsuite/tests/ui
+
 Pipfile.lock: Pipfile
 	pipenv lock
 

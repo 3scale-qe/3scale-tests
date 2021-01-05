@@ -3,6 +3,7 @@ flake8 = "*"
 mypy = "*"
 pylint = "*"
 ipdb = "*"
+web-pdb = "*"
 # Have commented out python-language-server to make it available quickly
 # for the development
 #python-language-server = "*"
@@ -13,6 +14,7 @@ ipdb = "*"
 pytest-xdist = "*"
 pytest = "*"
 pytest-cases = "*"
+pytest-html = "*"
 requests = "*"
 3scale-api = "*"
 dynaconf = "*"
@@ -21,6 +23,10 @@ python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-clien
 backoff = "*"
 websocket_client = "*"
 hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref = "development"}
+webdriver-manager = "*"
+widgetastic-core = "*"
+widgetastic-patternfly4 = "*"
+widgetastic-patternfly = "*"
 # For developing purposes should be added 3scale-api library from source or
 # from github repository
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
