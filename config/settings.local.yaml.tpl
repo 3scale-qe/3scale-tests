@@ -1,5 +1,5 @@
 # vim: filetype=yaml
-# Example template to create local ocnfiguration with custom environment
+# Example template to create local configuration with custom environment
 # envsubst can be used to fill this
 
 ${ENVIRONMENT}:
@@ -44,6 +44,10 @@ ${ENVIRONMENT}:
             localAgentHostPort: "" # route to the jaeger-agent (may be internal)
         baggage_restrictions:
             hostPort: "" # route to the jaeger-query (may be internal)
+    ui:
+      browser:
+        provider: "" #local or remote
+        webdriver: "" #chrome or firefox
   hyperfoil:
     url: "" # URL for hyperfoil controller
     shared_template: #template that will be added to each hyperfoil benchmark definition

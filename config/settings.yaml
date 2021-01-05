@@ -42,6 +42,10 @@ default:
           localAgentHostPort: "jaeger-agent.jaeger.svc.cluster.local:6831"
         baggage_restrictions:
           hostPort: "jaeger-query.jaeger.svc.cluster.local:5778"
+    ui:
+      browser:
+        provider: local
+        webdriver: chrome
   hyperfoil:
     shared_template:
       # We need to add agents definition for clustered hyperfoil to each test
