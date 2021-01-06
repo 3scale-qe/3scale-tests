@@ -133,12 +133,8 @@ gateway:
 gateway:
   type: "service-mesh"
   configuration:
-    httpbin:
-      project: "httpbin"               # Optional: name of the httpbin openshift project
-      deployment: "httpbin"            # Optional: deployment name of the httpbin
-      path: "httpbin"                  # Optional: URL path of httpbin
-    mesh:
-      project: "service-mesh"          # Optional: name of the service mesh openshift project
+    projects:
+        httpbin: "httpbin"
+        service_mesh: "service-mesh"
     server: "istio"                    # Openshift server with Service mesh
-    credentials: "httpbin"             # Credentials name for the adapter
 ```

@@ -144,7 +144,7 @@ class OpenShiftClient:
             :param app: Application to be deleted
             """
         resources = resources or "all"
-        self.do_action("delete", [resources, "-l", f"app={app}"])
+        self.do_action("delete", [resources, "-l", f"app={app}", "--ignore-not-found"])
 
     def scale(self, deployment_name: str, replicas: int):
         """
