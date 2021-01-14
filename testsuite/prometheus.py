@@ -3,6 +3,11 @@ from typing import Optional
 
 import requests
 
+# Prometheus has configured the scrape interval to 30s,
+# the scrape interval for 3scale is configured in the
+# 3scale-scrape-configs.yml file
+PROMETHEUS_REFRESH = 31
+
 
 # pylint: disable=too-few-public-methods
 class PrometheusClient:
