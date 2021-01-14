@@ -474,8 +474,17 @@ def application(service, custom_application, custom_app_plan, lifecycle_hooks, r
 
 @pytest.fixture(scope="module")
 def api_client(application):
-    "Make calls to exposed API"
-    return application.api_client()
+    """
+    Fixture that returns api_client
+    Parameters:
+        app (Application): Application for which create the client.
+    Returns:
+        api_client (HttpClient): Api client for application
+    """
+    def _api_client(app=application, **kwargs):
+        return app.api_client(**kwargs)
+
+    return _api_client
 
 
 @pytest.fixture(scope="module")
