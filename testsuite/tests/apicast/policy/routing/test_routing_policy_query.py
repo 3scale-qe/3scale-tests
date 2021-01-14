@@ -35,7 +35,7 @@ def test_routing_policy_route1(api_client, private_base_url):
     Test for the request with matching path to /route1/get
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", params={"test_arg": "route1"})
+    response = api_client().get("/get", params={"test_arg": "route1"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
 
@@ -48,7 +48,7 @@ def test_routing_policy_route2(api_client, private_base_url):
     Test for the request with matching path to /route2/get
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", params={"test_arg": "route2"})
+    response = api_client().get("/get", params={"test_arg": "route2"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
 
@@ -61,7 +61,7 @@ def test_routing_policy_noroute(api_client, private_base_url):
     Test for the request without matching value to echo api
     """
     parsed_url = urlparse(private_base_url())
-    response = api_client.get("/get", params={"test_arg": "noroute"})
+    response = api_client().get("/get", params={"test_arg": "noroute"})
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
@@ -73,7 +73,7 @@ def test_routing_policy_empty(api_client, private_base_url):
     Test for the request without params and matching value to echo api
     """
     parsed_url = urlparse(private_base_url())
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

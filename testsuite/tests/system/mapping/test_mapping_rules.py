@@ -51,7 +51,7 @@ def service(service, endpoints_and_methods):
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(application, api_client):
     """
     Client configured not to retry requests.
 
@@ -63,10 +63,10 @@ def api_client(application):
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
-def test_mapping(api_client, endpoints_and_methods):
+def test_mapping(client, endpoints_and_methods):
     """
     Make following request calls and assert they succeed:
         - GET request call to '/ip'
@@ -83,17 +83,17 @@ def test_mapping(api_client, endpoints_and_methods):
     """
 
     for url, method in endpoints_and_methods:
-        response = api_client.request(method=method,
-                                      path=url)
+        response = client.request(method=method,
+                                  path=url)
         assert response.status_code == 200, \
             f"Unexpected status {response.status_code} from {method} request" \
             f" to {url} endpoint"
 
-    response = api_client.post("/anything/nonsense/foo")
+    response = client.post("/anything/nonsense/foo")
     assert response.status_code == 200
 
-    response = api_client.post("/ip")
+    response = client.post("/ip")
     assert response.status_code == 404
 
-    response = api_client.get("/imaginary")
+    response = client.get("/imaginary")
     assert response.status_code == 404

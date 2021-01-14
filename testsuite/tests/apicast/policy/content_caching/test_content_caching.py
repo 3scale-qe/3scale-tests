@@ -39,17 +39,18 @@ def service_proxy_settings(private_base_url):
 
 
 @pytest.fixture(scope="module")
-def api_client(api_client):
+def client(api_client):
     """Apicast needs to load configuration in order to cache incomming requests"""
-    api_client.get("/")
-    return api_client
+    client = api_client()
+    client.get("/")
+    return client
 
 
-def test_caching_working_correctly(api_client):
+def test_caching_working_correctly(client):
     "content caching is working correctly when matchs"
 
     path = "/test/{0}".format(uuid.uuid4())
-    request = lambda: api_client.get(path, headers=dict(origin="localhost"))  # noqa: E731
+    request = lambda: client.get(path, headers=dict(origin="localhost"))  # noqa: E731
     is_hit = lambda response: response.headers.get("X-Cache-Status") == "HIT"  # noqa: E731
 
     assert not is_hit(request())
@@ -58,10 +59,10 @@ def test_caching_working_correctly(api_client):
         assert is_hit(request()), "Request {} didn't hit the cache".format(i)
 
 
-def test_caching_different_urls_with_same_subpath(api_client):
+def test_caching_different_urls_with_same_subpath(client):
     "content caching is doing the right thing when path/subpaths are involved"
 
-    request = lambda path: api_client.get(path, headers=dict(origin="localhost"))  # noqa: E731
+    request = lambda path: client.get(path, headers=dict(origin="localhost"))  # noqa: E731
     is_hit = lambda response: response.headers.get("X-Cache-Status") == "HIT"  # noqa: E731
 
     assert not is_hit(request("/test/test/"))
@@ -71,12 +72,12 @@ def test_caching_different_urls_with_same_subpath(api_client):
     assert is_hit(request("/test/"))
 
 
-def test_caching_timeouts(api_client):
+def test_caching_timeouts(client):
     "Validate caching timeouts time"
 
     path = "/test/{0}".format(uuid.uuid4())
 
-    request = lambda: api_client.get(path, headers=dict(origin="localhost"))  # noqa: E731
+    request = lambda: client.get(path, headers=dict(origin="localhost"))  # noqa: E731
     is_hit = lambda response: response.headers.get("X-Cache-Status") == "HIT"  # noqa: E731
     is_expired = lambda response: response.headers.get("X-Cache-Status") == "EXPIRED"  # noqa: E731
 
@@ -90,14 +91,14 @@ def test_caching_timeouts(api_client):
     assert is_hit(request())
 
 
-def test_caching_body_check(api_client):
+def test_caching_body_check(client):
     """Check same body response"""
-    response = api_client.get('/test/test', headers=dict(origin="localhost"))
+    response = client.get('/test/test', headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request = EchoedRequest.create(response)
 
-    response = api_client.get('/test/test', headers=dict(origin="localhost"))
+    response = client.get('/test/test', headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 

@@ -107,18 +107,23 @@ def application(app_plan, custom_application, request, lifecycle_hooks):
     return application
 
 
-def test_rate_limit_headers(application):
+@fixture_plus
+def client(application):
+    """Fixture plus api client"""
+    return application.api_client()
+
+
+def test_rate_limit_headers(client):
     """
     - Sends three requests to the api.
     - Asserts that the information about limits from RateLimit headers is correct
     """
-    api_client = application.api_client()
 
     # prevents refreshing limits in the middle of the test
     wait_interval()
 
     for i in range(3):
-        response = api_client.get("/anything")
+        response = client.get("/anything")
         assert response.status_code == 200
         assert "RateLimit-Limit" in response.headers
         assert "RateLimit-Remaining" in response.headers
@@ -129,7 +134,7 @@ def test_rate_limit_headers(application):
         assert int(response.headers["RateLimit-Reset"]) <= 60
 
 
-def test_rate_limit_multiple_mapping_rules(application):
+def test_rate_limit_multiple_mapping_rules(client):
     """
     - Sends a request increasing both the foo and the anything metric
     - Asserts that the RateLimits for the foo metric (the more constrained one) are sent
@@ -142,11 +147,10 @@ def test_rate_limit_multiple_mapping_rules(application):
     - Asserts that the RateLimits for the anything metric (currently the more constrained) one are sent
 
     """
-    api_client = application.api_client()
 
     wait_interval()
 
-    response = api_client.get("/anything/foo")
+    response = client.get("/anything/foo")
 
     assert response.status_code == 200
     assert int(response.headers["RateLimit-Limit"]) == 5
@@ -154,9 +158,9 @@ def test_rate_limit_multiple_mapping_rules(application):
     assert int(response.headers["RateLimit-Reset"]) <= 60
 
     for _ in range(7):
-        assert api_client.get("/anything").status_code == 200
+        assert client.get("/anything").status_code == 200
 
-    response = api_client.get("/anything/foo")
+    response = client.get("/anything/foo")
 
     assert response.status_code == 200
     assert int(response.headers["RateLimit-Limit"]) == 10

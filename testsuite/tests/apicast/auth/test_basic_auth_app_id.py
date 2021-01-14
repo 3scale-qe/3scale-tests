@@ -26,7 +26,7 @@ def service_proxy_settings(service_proxy_settings):
 
 
 @pytest.mark.smoke
-def test_basic_auth_app_id_key(application, testconfig):
+def test_basic_auth_app_id_key(application, api_client):
     """Test client access with Basic HTTP Auth using app id and app key
 
     Configure Api/Service to use App ID / App Key Authentication
@@ -38,15 +38,15 @@ def test_basic_auth_app_id_key(application, testconfig):
     encoded = base64.b64encode(
         f"{creds['app_id']}:{creds['app_key']}".encode("utf-8")).decode("utf-8")
 
-    response = application.test_request(verify=testconfig["ssl_verify"])
+    response = api_client().get('/get')
 
     assert response.status_code == 200
     assert response.request.headers["Authorization"] == "Basic %s" % encoded
 
 
-def test_basic_auth_app_id_403_with_query(application, testconfig):
+def test_basic_auth_app_id_403_with_query(application, api_client):
     "Forbid access if credentials passed wrong way"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
     # pylint: disable=W0212  # Yes, I know what I am doing
     client._session.auth = threescale_api.auth.AppIdKeyAuth(application, "query")
 
@@ -55,9 +55,9 @@ def test_basic_auth_app_id_403_with_query(application, testconfig):
     assert response.status_code == 403
 
 
-def test_basic_auth_app_id_403_without_auth(application, testconfig):
+def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
     # pylint: disable=W0212  # Yes, I know what I am doing
     client._session.auth = None
 

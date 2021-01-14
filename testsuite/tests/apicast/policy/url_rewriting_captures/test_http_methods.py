@@ -45,7 +45,7 @@ def service(service):
 
 def test_rewrite_url_captures(api_client):
     """it will rewrite /hello/get to /get?my_arg=hello"""
-    response = api_client.get("/hello/get")
+    response = api_client().get("/hello/get")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
@@ -56,7 +56,7 @@ def test_rewrite_url_captures(api_client):
 @pytest.mark.parametrize("method", METHODS)
 def test_wont_rewrite(api_client, method):
     """It will not rewrite url of request with other HTTP methods"""
-    response = api_client.request(method, f"/anything/{method}")
+    response = api_client().request(method, f"/anything/{method}")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

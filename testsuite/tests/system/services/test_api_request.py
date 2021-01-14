@@ -41,19 +41,19 @@ def test_first_service(api_client, user_key):
     Test request has to pass and return HTTP 200 for staging client.
     Checks if user key for service matches.
     """
-    response = api_client.get('/get')
+    response = api_client().get('/get')
     assert response.status_code == 200
 
     echoed_response = EchoedRequest.create(response)
     assert echoed_response.params.get('user_key') == user_key
 
 
-def test_second_service(application2, user_key2):
+def test_second_service(application2, api_client, user_key2):
     """
     Test request has to pass and return HTTP 200 for staging client.
     Checks if user key for second service matches.
     """
-    api_client = application2.api_client()
+    api_client = api_client(application2)
 
     response = api_client.get('/get')
     assert response.status_code == 200

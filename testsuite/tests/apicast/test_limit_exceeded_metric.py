@@ -31,14 +31,15 @@ def application(application):
 
 def test_limit_exceeded(api_client):
     """Call to /anything/exceeded should returns 429 Too Many Requests."""
+    client = api_client()
 
-    assert api_client.get("/anything/exceeded").status_code == 200
+    assert client.get("/anything/exceeded").status_code == 200
     # Apicast allows more request to pass than is the actual limit, other gateway do not
-    api_client.get("/anything/exceeded")
-    assert api_client.get("/anything/exceeded").status_code == 429
+    client.get("/anything/exceeded")
+    assert client.get("/anything/exceeded").status_code == 429
 
 
 def test_anything_else_is_ok(api_client):
     """Call to /anything/else should returns 200 OK."""
 
-    assert api_client.get("/anything/else").status_code == 200
+    assert api_client().get("/anything/else").status_code == 200

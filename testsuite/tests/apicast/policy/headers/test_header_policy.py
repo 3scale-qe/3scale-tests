@@ -24,9 +24,9 @@ def policy_settings():
 
 
 @pytest.mark.smoke
-def test_header_policy(application):
+def test_header_policy(api_client):
     """testing custom header policy"""
-    response = application.test_request()
+    response = api_client().get('/get')
     assert "X-Response-Custom-Set" in response.headers
     assert response.headers["X-Response-Custom-Set"] == "Response set header"
 

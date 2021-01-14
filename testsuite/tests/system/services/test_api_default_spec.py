@@ -9,7 +9,7 @@ def test_staging(api_client):
     """
     Test request has to pass and return HTTP 200 for staging client.
     """
-    response = api_client.get('/get')
+    response = api_client().get('/get')
     assert response.status_code == 200
 
 

@@ -24,24 +24,24 @@ def service_proxy_settings(service_proxy_settings):
     return service_proxy_settings
 
 
-def test_headers_user_key(application, testconfig):
+def test_headers_user_key(application, api_client):
     """Check credentials passed in headers """
     key, value = list(application.authobj.credentials.items())[0]
-    response = application.test_request(verify=testconfig["ssl_verify"])
+    response = api_client().get('/get')
 
     assert response.status_code == 200
     assert response.request.headers[key] == value
 
     session = requests.Session()
     session.auth = threescale_api.auth.UserKeyAuth(application, "query")
-    client = application.api_client(verify=testconfig["ssl_verify"], session=session)
+    client = api_client(session=session)
     response = client.get("/get")
     assert response.status_code == 403
 
 
-def test_basic_auth_app_id_403_with_query(application, testconfig):
+def test_basic_auth_app_id_403_with_query(application, api_client):
     "Forbid access if credentials passed wrong way"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
 
     # pylint: disable=protected-access
     client._session.auth = threescale_api.auth.UserKeyAuth(application, "authorization")
@@ -51,9 +51,9 @@ def test_basic_auth_app_id_403_with_query(application, testconfig):
     assert response.status_code == 403
 
 
-def test_basic_auth_app_id_403_without_auth(application, testconfig):
+def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
     # pylint: disable=protected-access
     client._session.auth = None
     response = client.get("/get")

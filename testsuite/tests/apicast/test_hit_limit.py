@@ -64,19 +64,19 @@ def application_gold(application, custom_app_plan, custom_application, request):
 
 
 @pytest.fixture(scope="module")
-def silver_client(application_silver):
+def silver_client(application_silver, api_client):
     """
     returns api client for silver application
     """
-    return application_silver.api_client()
+    return api_client(application_silver)
 
 
 @pytest.fixture(scope="module")
-def gold_client(application_gold):
+def gold_client(application_gold, api_client):
     """
     returns api client for silver application
     """
-    return application_gold.api_client()
+    return api_client(application_gold)
 
 
 def assert_limit_works(client, limit):

@@ -107,6 +107,12 @@ def application2(request, service2, custom_app_plan, custom_application, lifecyc
 
 
 @pytest.fixture(scope="module")
-def api_client2(application2):
+def client(api_client):
+    """Client for the first application."""
+    return api_client()
+
+
+@pytest.fixture(scope="module")
+def client2(application2, api_client):
     """Client for second application."""
-    return application2.api_client()
+    return api_client(application2)

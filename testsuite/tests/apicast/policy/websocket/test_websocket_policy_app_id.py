@@ -44,5 +44,5 @@ def test_basic_websocket_403(websocket_uri, application, websocket_options):
 
 def test_basic_request_200(api_client):
     """Basic test if HTTPS works on product with websocket policy"""
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200

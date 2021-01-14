@@ -36,7 +36,7 @@ def service(service):
 
 def test_url_rewriting_hello(application, api_client):
     "/hello should be rewritten to /get, metrics should be counted"
-    echoed_request = EchoedRequest.create(api_client.get("/hello"))
+    echoed_request = EchoedRequest.create(api_client().get("/hello"))
     assert echoed_request.path == "/get"
 
     analytics = application.threescale_client.analytics
@@ -47,11 +47,11 @@ def test_url_rewriting_hello(application, api_client):
 
 def test_url_rewriting_hello_world(api_client):
     "/hello_world should be rewritten to /get_world"
-    echoed_request = EchoedRequest.create(api_client.get("/hello_world"))
+    echoed_request = EchoedRequest.create(api_client().get("/hello_world"))
     assert echoed_request.path == "/get_world"
 
 
 def test_url_rewriting_hello_hello(api_client):
     "/hello_hello should be rewritten to /get_get"
-    echoed_request = EchoedRequest.create(api_client.get("/hello_hello"))
+    echoed_request = EchoedRequest.create(api_client().get("/hello_hello"))
     assert echoed_request.path == "/get_get"

@@ -58,5 +58,5 @@ def test_apicast_deployed(create_services, api_client):
     Sends a request using the newly deployed apicast.
     Asserts that the requests passes meaning the gateway deployed correctly.
     """
-    request = api_client.get("/get")
+    request = api_client().get("/get")
     assert request.status_code == 200

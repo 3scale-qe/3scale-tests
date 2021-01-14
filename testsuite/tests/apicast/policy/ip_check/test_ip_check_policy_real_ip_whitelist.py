@@ -19,12 +19,12 @@ def policy_settings():
 def test_ip_check_policy_ip_whitelisted(api_client):
     """test must accept the request since the IP is whitelisted"""
 
-    response = api_client.get("/get", headers={"X-Real-IP": "10.10.10.10"})
+    response = api_client().get("/get", headers={"X-Real-IP": "10.10.10.10"})
     assert response.status_code == 200
 
 
 def test_ip_check_policy_ip_not_whitelisted(api_client):
     """test must reject the request since the IP is not whitelisted"""
 
-    response = api_client.get("/get", headers={"X-Real-IP": "10.10.10.11"})
+    response = api_client().get("/get", headers={"X-Real-IP": "10.10.10.11"})
     assert response.status_code == 403

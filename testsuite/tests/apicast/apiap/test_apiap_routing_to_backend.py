@@ -55,7 +55,7 @@ def mapping_rules(service, backend_bin, backend_echo):
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def api_client(application, api_client):
     """
     Client without retry attempts
 
@@ -63,11 +63,11 @@ def api_client(application):
     To avoid long time execution because of retry client without retry will be
     used. Firstly a request with retry is made to ensure all is setup.
     """
-    assert application.api_client().get("/bin/anything/bin").status_code == 200
+    assert api_client().get("/bin/anything/bin").status_code == 200
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 # pylint: disable=unused-argument

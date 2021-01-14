@@ -36,7 +36,7 @@ def service(service, private_base_url):
 def test_url_rewriting_policy_v1(api_client, private_base_url):
     """must rewrite /httpbin/v1 to /rewrite and get response from new domain echo-api.3scale.net"""
     parsed_url = urlparse(private_base_url("echo_api"))
-    request = EchoedRequest.create(api_client.get("/httpbin/v1"))
+    request = EchoedRequest.create(api_client().get("/httpbin/v1"))
     assert request.path == "/rewrite"
     # X-Forwarded- can contain more values
     assert parsed_url.hostname in request.headers["X-Forwarded-Host"]
@@ -49,7 +49,7 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     parsed_url = urlparse(private_base_url())
     analytics = application.threescale_client.analytics
     old_usage = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
-    response = api_client.get("/anything/anything")
+    response = api_client().get("/anything/anything")
     assert response.status_code == 200
 
     request = EchoedRequest.create(response)

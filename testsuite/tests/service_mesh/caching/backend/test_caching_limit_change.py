@@ -37,16 +37,17 @@ def test_limit_change(limit, api_client):
     * Wait until next period
     * Adapter should use the new limit value
     """
-    assert api_client.get("/anything/exceeded").status_code == 200
+    client = api_client()
+    assert client.get("/anything/exceeded").status_code == 200
     # Apicast allows more request to pass than is the actual limit, other gateway do not
-    api_client.get("/anything/exceeded")
-    assert api_client.get("/anything/exceeded").status_code == 429
+    client.get("/anything/exceeded")
+    assert client.get("/anything/exceeded").status_code == 429
 
     limit.update(params={"value": 5})
 
     time.sleep(120)
 
     for _ in range(5):
-        assert api_client.get("/anything/exceeded").status_code == 200
+        assert client.get("/anything/exceeded").status_code == 200
 
-    assert api_client.get("/anything/exceeded").status_code == 429
+    assert client.get("/anything/exceeded").status_code == 429

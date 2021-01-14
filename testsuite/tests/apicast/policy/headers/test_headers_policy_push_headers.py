@@ -31,9 +31,9 @@ def policy_settings():
 
 
 @pytest.mark.smoke
-def test_headers_policy_function(application, testconfig):
+def test_headers_policy_function(api_client):
     """testing custom header policy"""
-    response = application.test_request(verify=testconfig["ssl_verify"])
+    response = api_client().get('/get')
     echoed_request = EchoedRequest.create(response)
     assert "X-Response-Custom-Push" in response.headers
     assert echoed_request.headers["X-Request-Custom-Push"] == "Additional request header"
@@ -41,7 +41,7 @@ def test_headers_policy_function(application, testconfig):
 
 def test_headers_policy_push_header_to_request(api_client):
     """test if is new value pushed to request - existing one"""
-    response = api_client.get("/get", headers={"X-Request-Custom-Push": "Original header"})
+    response = api_client().get("/get", headers={"X-Request-Custom-Push": "Original header"})
     echoed_request = EchoedRequest.create(response)
 
     assert echoed_request.headers["X-Request-Custom-Push"] == "Original header,Additional request header"
@@ -49,6 +49,6 @@ def test_headers_policy_push_header_to_request(api_client):
 
 def test_headers_policy_push_header_to_response(api_client):
     """test if is new value pushed to response - existing one"""
-    response = api_client.get("/response-headers", params={"X-RESPONSE-CUSTOM-PUSH": "Original"})
+    response = api_client().get("/response-headers", params={"X-RESPONSE-CUSTOM-PUSH": "Original"})
     assert "X-Response-Custom-Push" in response.headers
     assert response.headers["X-Response-Custom-Push"] == "Original, Additional response header"

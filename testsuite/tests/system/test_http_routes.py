@@ -37,7 +37,7 @@ def test_successful_requests(api_client, prod_client, application):
     Test that apicast routes with http will be created by zync
     """
     # staging
-    response = api_client.get('/get')
+    response = api_client().get('/get')
     assert response.status_code == 200
 
     request_url = urlparse(response.url)

@@ -105,7 +105,7 @@ def retry_requests(client, client2, rate_limit_applied):
 
 
 @pytest.mark.required_capabilities(Capability.SAME_CLUSTER)
-def test_leaky_bucket(application, application2, config):
+def test_leaky_bucket(api_client, application2, config):
     """
     Test rate limit policy with leaky bucket limiters configurations.
     This test is the same for the different configuration which are specified in the config_cases.py file.
@@ -116,8 +116,8 @@ def test_leaky_bucket(application, application2, config):
     :param application2: second application
     :param config: configuration of the actual test
     """
-    client = application.api_client()
-    client2 = application2.api_client()
+    client = api_client()
+    client2 = api_client(application2)
     status_codes = retry_requests(client, client2, config[0])[1]
 
     successful = status_codes.count(200)

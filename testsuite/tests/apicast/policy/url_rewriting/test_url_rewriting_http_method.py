@@ -48,7 +48,7 @@ def test_url_rewriting_http_method(application, api_client, method, path_after, 
     analytics = application.threescale_client.analytics
     hits_before = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
 
-    echoed_request = EchoedRequest.create(api_client.request(method=method, path="/anything/initial"))
+    echoed_request = EchoedRequest.create(api_client().request(method=method, path="/anything/initial"))
     assert echoed_request.path == path_after
 
     hits_after = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]

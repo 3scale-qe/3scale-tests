@@ -40,7 +40,7 @@ def test_http_proxy_policy(api_client, private_base_url):
     Fuse proxy service should add extra Header: "Fuse-Camel-Proxy", when handling communication
     between Apicast and backend API
     """
-    response = api_client.get("/headers")
+    response = api_client().get("/headers")
     assert response.status_code == 200
     headers = response.json()["headers"]
     assert "Fuse-Camel-Proxy" in headers

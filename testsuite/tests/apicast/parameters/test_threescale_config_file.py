@@ -90,12 +90,12 @@ def test_threescale_config_file_param(api_client, application2):
 
     service2 configuration is not available for apicast.
     """
-    assert api_client.get("/get").status_code == 200
+    assert api_client().get("/get").status_code == 200
 
     session = requests.Session()
     session.auth = application2.authobj
 
     # pass session for skipping retrying on 404
-    client = application2.api_client(session=session)
+    client = api_client(application2, session=session)
 
     assert client.get("/get").status_code == 404

@@ -17,7 +17,7 @@ def service_proxy_settings():
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(application, api_client):
     """
     Client configured not to retry requests.
 
@@ -27,23 +27,23 @@ def api_client(application):
     """
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 @backoff.on_predicate(backoff.constant, lambda x: x.headers.get("server", "") != "openresty", 10)
-def make_requests(api_client):
+def make_requests(client):
     """Make sure that we get 503 apicast (backend is not available)"""
-    return api_client.get("/anything")
+    return client.get("/anything")
 
 
 @pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1989")
-def test_do_not_send_openresty_version(api_client):
+def test_do_not_send_openresty_version(client):
     """
     Make request to non existing endpoint
     Assert that the response does not contain openresty version in the headers
     Assert that the response does not contain openresty version in the body
     """
-    response = make_requests(api_client)
+    response = make_requests(client)
     assert response.status_code == 503
 
     assert "server" in response.headers

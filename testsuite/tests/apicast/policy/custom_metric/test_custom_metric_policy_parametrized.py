@@ -47,8 +47,19 @@ def application(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
+# pylint: disable=unused-argument
+@fixture_plus
+def client(staging_gateway, application):
+    """
+    Local replacement for default api_client.
+    We need it because of function scope of the application.
+    We also need dependency for staging_gateway.
+    """
+    return application.api_client()
+
+
 # pylint: disable=too-many-locals
-def test_custom_policy(application, threescale, config):
+def test_custom_policy(application, threescale, config, client):
     """
     Tests the custom policy
     For each call from the tested case
@@ -57,7 +68,6 @@ def test_custom_policy(application, threescale, config):
      - gets hits after the request
      - asserts that the hits incremented as specified
     """
-    api_client = application.api_client()
 
     analytics = threescale.analytics
     metrics = config[2]
@@ -68,7 +78,7 @@ def test_custom_policy(application, threescale, config):
         for metric in metrics:
             hits_before.append(analytics.list_by_service(application["service_id"], metric_name=metric)["total"])
 
-        response = api_client.get(endpoint, params=params)
+        response = client.get(endpoint, params=params)
         assert response.status_code == status_code
 
         hits_after = []

@@ -32,7 +32,7 @@ def proxy(service):
 
 
 @pytest.fixture(scope="module")
-def api_client(application, proxy):
+def client(api_client, application, proxy):
     """
     Client without retry attempts
 
@@ -43,14 +43,14 @@ def api_client(application, proxy):
 
     proxy.deploy()
 
-    assert application.api_client().get("/echo/anything").status_code == 200
+    assert api_client().get("/echo/anything").status_code == 200
 
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 @pytest.fixture(scope="module")
@@ -185,7 +185,7 @@ def hits(app, analytics):
         ["", "/quotes", "/quotes/test", "/quotes/anything/test"]),
 ])
 # pylint: disable=too-many-arguments
-def test(request, backend_usages, application, api_client, setup, expect_ok, expect_not_found):
+def test(request, backend_usages, application, client, setup, expect_ok, expect_not_found):
     """
     Ensure that requests against the service return appropriate value
 
@@ -201,7 +201,7 @@ def test(request, backend_usages, application, api_client, setup, expect_ok, exp
     for path in expect_ok:
         hits_before = hits(application, analytics)
 
-        response = api_client.get(path)
+        response = client.get(path)
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
         hits_after = hits(application, analytics)
@@ -210,7 +210,7 @@ def test(request, backend_usages, application, api_client, setup, expect_ok, exp
     for path in expect_not_found:
         hits_before = hits(application, analytics)
 
-        response = api_client.get(path)
+        response = client.get(path)
         assert response.status_code == 404, f"For path {path} expected status_code 400"
 
         hits_after = hits(application, analytics)

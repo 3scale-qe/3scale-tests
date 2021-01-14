@@ -23,7 +23,7 @@ def service_proxy_settings(private_base_url):
 
 def test_cors_headers_for_same_origin(api_client):
     "Standard request"
-    response = api_client.get("/get", headers=dict(origin="localhost"))
+    response = api_client().get("/get", headers=dict(origin="localhost"))
     assert response.headers.get("Access-Control-Allow-Origin") == "localhost"
     assert response.headers.get("Access-Control-Allow-Credentials") == 'true'
     assert response.headers.get("Access-Control-Allow-Methods") == "GET, POST"
@@ -31,11 +31,11 @@ def test_cors_headers_for_same_origin(api_client):
 
 def test_no_cors_headers_with_none_origin(api_client):
     "Request without origin header"
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert "Access-Control-Allow-Origin" not in response.headers
 
 
 def test_cors_headers_for_different_origin(api_client):
     "Request with different origin"
-    response = api_client.get("/get", headers=dict(origin="foo.bar.example.com"))
+    response = api_client().get("/get", headers=dict(origin="foo.bar.example.com"))
     assert "Access-Control-Allow-Origin" in response.headers

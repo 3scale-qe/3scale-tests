@@ -26,22 +26,22 @@ def service_proxy_settings(service_proxy_settings):
 
 
 @pytest.mark.smoke
-def test_should_accept_user_key_passed_by_basic_auth(application, testconfig):
+def test_should_accept_user_key_passed_by_basic_auth(application, api_client):
     """
     Check credentials passed using the basic auth.
     """
     key = list(application.authobj.credentials.values())[0]
     encoded_key = base64.b64encode(f"{key}:".encode("utf-8")).decode("utf-8")
 
-    response = application.test_request(verify=testconfig["ssl_verify"])
+    response = api_client().get('/get')
 
     assert response.status_code == 200
     assert response.request.headers["Authorization"] == "Basic %s" % encoded_key
 
 
-def test_basic_auth_app_id_403_with_query(application, testconfig):
+def test_basic_auth_app_id_403_with_query(application, api_client):
     "Forbid access if credentials passed wrong way"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
 
     # pylint: disable=protected-access
     client._session.auth = threescale_api.auth.UserKeyAuth(application, "headers")
@@ -51,9 +51,9 @@ def test_basic_auth_app_id_403_with_query(application, testconfig):
     assert response.status_code == 403
 
 
-def test_basic_auth_app_id_403_without_auth(application, testconfig):
+def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
     # pylint: disable=protected-access
     client._session.auth = None
     response = client.get("/get")

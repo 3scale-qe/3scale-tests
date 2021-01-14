@@ -38,7 +38,7 @@ def policy_settings():
 @pytest.mark.parametrize("backend", ["/bin", "/lib"])
 def test_headers_policy_doesnt_exist(api_client, backend):
     """ will not add header to the response if it does not exist"""
-    response = api_client.get(f"{backend}/get")
+    response = api_client().get(f"{backend}/get")
     echoed_request = EchoedRequest.create(response)
 
     assert "X-Response-Custom-Add" not in response.headers
@@ -48,7 +48,7 @@ def test_headers_policy_doesnt_exist(api_client, backend):
 @pytest.mark.parametrize("backend", ["/bin", "/lib"])
 def test_headers_policy_another_value_to_request(api_client, backend):
     """ must add another value to the existing header of the request """
-    response = api_client.get(f"{backend}/get", headers={'X-REQUEST-CUSTOM-ADD': 'Original header'})
+    response = api_client().get(f"{backend}/get", headers={'X-REQUEST-CUSTOM-ADD': 'Original header'})
     echoed_request = EchoedRequest.create(response)
 
     assert echoed_request.headers["X-Request-Custom-Add"] in (
@@ -59,7 +59,7 @@ def test_headers_policy_another_value_to_request(api_client, backend):
 @pytest.mark.parametrize("backend", ["/bin", "/lib"])
 def test_headers_policy_another_value_to_response(api_client, backend):
     """ must add another value to the existing header of the response """
-    response = api_client.get(f"{backend}/response-headers", params={"X-RESPONSE-CUSTOM-ADD": "Original"})
+    response = api_client().get(f"{backend}/response-headers", params={"X-RESPONSE-CUSTOM-ADD": "Original"})
 
     assert "X-Response-Custom-Add" in response.headers
     assert response.headers["X-Response-Custom-Add"] == "Original, Additional response header"

@@ -25,7 +25,7 @@ def test_rate_limit_headers_no_limit(api_client):
     Sends a request to a plan without a limit
     Assert that the RateLimit headers are not contained
     """
-    response = api_client.get("/anything")
+    response = api_client().get("/anything")
     assert response.status_code == 200
     assert "RateLimit-Limit" not in response.headers
     assert "RateLimit-Remaining" not in response.headers

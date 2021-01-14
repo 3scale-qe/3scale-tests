@@ -48,10 +48,10 @@ DATEFMT = '%a, %d %b %Y %H:%M:%S GMT'
 WAIT = 15
 
 
-def test_rate_limit_connection_no_limit(logger, api_client, api_client2):
+def test_rate_limit_connection_no_limit(logger, client, client2):
     """The call not matching the condition won't be limited"""
 
-    responses = concurrent_requests(logger, api_client, api_client2, limit_me="no")
+    responses = concurrent_requests(logger, client, client2, limit_me="no")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -60,7 +60,7 @@ def test_rate_limit_connection_no_limit(logger, api_client, api_client2):
     assert all([i.ok for i in responses])
 
 
-def test_rate_limit_connection(logger, api_client, api_client2):
+def test_rate_limit_connection(logger, client, client2):
     """
     The call matching the condition will be limited to CONNECTIONS simultaneous
     connections and additional burst of BURST will be DELAY delayed, rest will
@@ -69,11 +69,11 @@ def test_rate_limit_connection(logger, api_client, api_client2):
 
     # does this help apicast to "cache" some data and process further requests
     # faster?
-    api_client.get("/get")
-    if api_client2 is not None:
-        api_client2.get("/get")
+    client.get("/get")
+    if client2 is not None:
+        client2.get("/get")
 
-    responses = concurrent_requests(logger, api_client, api_client2, limit_me="yes")
+    responses = concurrent_requests(logger, client, client2, limit_me="yes")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -138,7 +138,7 @@ def concurrent_requests(logger, client1, client2, limit_me):
     return responses
 
 
-def get(api_client, limit_me, relpath):
+def get(client, limit_me, relpath):
     """Helper to make async request with correct Date header"""
 
     # does this help apicast to handle all the concurrent requests?
@@ -146,7 +146,7 @@ def get(api_client, limit_me, relpath):
     # will be really concurrent
     time.sleep(random.random()*(WAIT/4))
 
-    return api_client.get(
+    return client.get(
         relpath, headers={
             "X-Limit-Me": limit_me,
             "Date": datetime.utcnow().strftime(DATEFMT)})
@@ -234,12 +234,12 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 
 
 @pytest.fixture
-def api_client2(key_scope, request):
+def client2(key_scope, request, api_client):
     """A client of app2 to verify 'global' key_scope functionality"""
 
     if key_scope == "global":
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
-        return app2.api_client()
+        return api_client(app2)
 
     return None

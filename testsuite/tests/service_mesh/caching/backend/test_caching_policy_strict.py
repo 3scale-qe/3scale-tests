@@ -27,27 +27,28 @@ def test_caching_policy_strict(api_client, openshift):
 
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = api_client.get("/", params=None)
+    client = api_client()
+    response = client.get("/", params=None)
     assert response.status_code == 200
     openshift.scale("backend-listener", 0)
 
     try:
         # Test if response succeed on production calls with valid credentials
         for _ in range(3):
-            response = api_client.get("/", params=None)
+            response = client.get("/", params=None)
             assert response.status_code == 200
 
         # Test if response fails on production calls with invalid credentials
         for _ in range(3):
-            response = api_client.get("/", params={"user_key": ":user_key"})
+            response = client.get("/", params={"user_key": ":user_key"})
             assert response.status_code != 200
 
     finally:
         openshift.scale("backend-listener", replicas)
 
     # Test that adapter works after backend is back online
-    response = api_client.get("/", params={"user_key": ":user_key"})
+    response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
 
-    response = api_client.get("/", params=None)
+    response = client.get("/", params=None)
     assert response.status_code == 200

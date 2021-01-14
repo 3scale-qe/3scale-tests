@@ -33,28 +33,27 @@ def listed_service_application(listed_service, custom_app_plan, custom_applicati
 
 
 @pytest.fixture(scope="module")
-def listed_service_client(listed_service_application):
+def listed_service_client(listed_service_application, api_client):
     """Sets listed service to apicast."""
-    client = listed_service_application.api_client()
-    return client
+    return api_client(listed_service_application)
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(application, api_client):
     """Sets session to api client for skipping retrying feature."""
 
     application.test_request()
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 # initially this was designed in two separate tests, that didn't work as there
 # was order dependency because of setup in listed_service_client, so either
 # single selected execution or parallel run were failing
-def test_apicast_services_list_param(listed_service_client, api_client):
+def test_apicast_services_list_param(listed_service_client, client):
     """Call to not listed service should returns 404 NotFound."""
 
     assert listed_service_client.get("/get").status_code == 200
-    assert api_client.get("/get").status_code == 404
+    assert client.get("/get").status_code == 404

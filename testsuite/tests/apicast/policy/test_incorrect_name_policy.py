@@ -17,7 +17,7 @@ def policy_settings():
 def test_incorrect_name_policy_staging_call(api_client):
     """Calls through staging gateway should be still working"""
 
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200
 
 

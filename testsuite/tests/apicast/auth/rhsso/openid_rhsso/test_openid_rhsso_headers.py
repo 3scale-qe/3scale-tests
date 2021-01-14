@@ -11,7 +11,7 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
 
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
-from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_client, api_client
+from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_client, staging_client
 
 
 # a suspicion that fixture_ref + param-marks doesn't prevent fixture to instantiate
@@ -35,7 +35,7 @@ def test_access_token(token):
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
+    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(staging_client)])
 def test_token_headers(client, token):
     """Test checks if the request with access token using headers will succeed on both apicasts"""
     response = client.get("/get", headers={'access_token': token})
@@ -46,7 +46,7 @@ def test_token_headers(client, token):
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
+    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(staging_client)])
 def test_token_in_query(client, token):
     """Test checks if the request with access token in query params will fail on both apicasts."""
     response = client.get("/get", params={'access_token': token})
@@ -56,7 +56,7 @@ def test_token_in_query(client, token):
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5885")
 @pytest.mark.xfail
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
+    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(staging_client)])
 def test_token_basic_auth(client, token):
     """Test checks if the request with access token using basic auth will fail on both apicasts"""
     response = client.get("/get", headers={'authorization': "Bearer " + token})
@@ -64,7 +64,7 @@ def test_token_basic_auth(client, token):
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
+    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(staging_client)])
 def test_invalid_token_in_headers(client):
     """Test checks if the request with invalid access token in headers will fail on both apicasts."""
     response = client.get("/get", headers={'access_token': "NotValidAccessToken"})
@@ -72,7 +72,7 @@ def test_invalid_token_in_headers(client):
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(
-    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(api_client)])
+    Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]), fixture_ref(staging_client)])
 def test_client_id_and_secret_in_query(client, application):
     """Test checks if the request with client id and client secret in the query params will fail on both apicasts"""
     response = client.get("/get", params={"client_id": application["client_id"],

@@ -69,7 +69,7 @@ def test_routing_policy_path_anything(api_client, httpbin_host):
     """
     Test for the request path send to /anything to httpbin.org/anything
     """
-    response = api_client.get("/anything")
+    response = api_client().get("/anything")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
@@ -80,7 +80,7 @@ def test_routing_policy_path_alpha(api_client):
     """
     Test for the request path send to /alpha to echo api
     """
-    response = api_client.get("/alpha")
+    response = api_client().get("/alpha")
 
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
@@ -91,7 +91,7 @@ def test_routing_policy_path(api_client):
     """
     Test for the request path send to / to echo api
     """
-    response = api_client.get("/")
+    response = api_client().get("/")
 
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)

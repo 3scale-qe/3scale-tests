@@ -72,7 +72,7 @@ def retry_requests(client, client2):
 
 
 @pytest.mark.required_capabilities(Capability.SAME_CLUSTER)
-def test_fixed_window(api_client, api_client2, config):
+def test_fixed_window(client, client2, config):
     """
     Test global fixed window test different configurations with global scope based on configuration cases
     If the condition in the configuration is true:
@@ -82,16 +82,16 @@ def test_fixed_window(api_client, api_client2, config):
     """
     status_code = config[0]
     for _ in range(config_cases.DEFAULT_COUNT // 2):
-        assert api_client.get("/get").status_code == 200
-        assert api_client2.get("/get").status_code == 200
+        assert client.get("/get").status_code == 200
+        assert client2.get("/get").status_code == 200
 
     # skip if status_code 200 is expected
     # (condition of the policy is false and the requests should keep returning 200)
     if status_code != 200:
-        code_1, code_2 = retry_requests(api_client, api_client2)
+        code_1, code_2 = retry_requests(client, client2)
         assert code_1 == status_code
         assert code_2 == status_code
         time.sleep(config_cases.TIME_WINDOW)
 
-    assert api_client.get("/get").status_code == 200
-    assert api_client2.get("/get").status_code == 200
+    assert client.get("/get").status_code == 200
+    assert client2.get("/get").status_code == 200

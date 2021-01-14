@@ -53,7 +53,17 @@ def application(service, custom_app_plan, custom_application, lifecycle_hooks, r
     return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-def test(application, paths):
+# pylint: disable=unused-argument
+@fixture_plus
+def client(staging_gateway, application):
+    """
+    Local replacement for default api_client.
+    We need it because of function scope of the application.
+    """
+    return application.api_client()
+
+
+def test(client, paths):
     """
     Test that  for each path from paths, the request will be routed to correct backend.
     Each backend is connected to product via 'path' and has url that has suffix "/anything{i}"
@@ -62,7 +72,7 @@ def test(application, paths):
     :param paths: array of used paths
     """
     for i, path in enumerate(paths):
-        response = application.api_client().get(f"{path}")
+        response = client.get(f"{path}")
         assert response.status_code == 200, f"Path {path} was not mapped to any backend"
 
         echoed_request = EchoedRequest.create(response)

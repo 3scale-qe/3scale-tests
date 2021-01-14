@@ -22,8 +22,8 @@ def policy_settings():
     return rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5})
 
 
-def test_upstream_connection(testconfig, application):
+def test_upstream_connection(api_client):
     "test read timeout behavior"
-    verify = testconfig["ssl_verify"]
-    assert application.test_request("/delay/3", verify=verify).status_code == 200
-    assert application.test_request("/delay/9", verify=verify).status_code == 504
+    client = api_client()
+    assert client.get("/delay/3").status_code == 200
+    assert client.get("/delay/9").status_code == 504

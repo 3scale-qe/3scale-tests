@@ -18,7 +18,7 @@ def service(service):
 
 def test_headers_policy_delete_response(api_client):
     """Test if it delete header from the response"""
-    response = api_client.get("/response-headers", params={"X-RESPONSE-CUSTOM": "What ever"})
+    response = api_client().get("/response-headers", params={"X-RESPONSE-CUSTOM": "What ever"})
     assert response.status_code == 200
     assert "X-RESPONSE-CUSTOM" not in response.headers
 
@@ -26,7 +26,7 @@ def test_headers_policy_delete_response(api_client):
 @pytest.mark.smoke
 def test_headers_policy_delete_request(api_client):
     """Test if it delete header from request"""
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

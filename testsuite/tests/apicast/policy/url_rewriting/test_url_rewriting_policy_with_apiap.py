@@ -66,10 +66,10 @@ def test(request, api_client, setup, prefix):
 
     request.getfixturevalue(setup)
 
-    response = api_client.get(f"{prefix}anything/v2/test")
+    response = api_client().get(f"{prefix}anything/v2/test")
     assert response.status_code == 200
     assert response.json()["path"] == "/anything/v2/test"
 
-    response = api_client.get(f"{prefix}anything/v1/test")
+    response = api_client().get(f"{prefix}anything/v1/test")
     assert response.status_code == 200
     assert response.json()["path"] == "/anything/v5/test"

@@ -27,7 +27,7 @@ def test_routing_policy_route_testing(api_client, private_base_url):
     Test for the request send with Test1 and Test2 to echo/route/get
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", headers={"Test1": "route", "Test2": "testing"})
+    response = api_client().get("/get", headers={"Test1": "route", "Test2": "testing"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/route/get"
@@ -41,7 +41,7 @@ def test_routing_policy_route_hello(api_client, private_base_url):
     Test for the request send with Test1 valid and Test2 invalid value to echo api
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", headers={"Test1": "route", "Test2": "hello"})
+    response = api_client().get("/get", headers={"Test1": "route", "Test2": "hello"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/route/get"
@@ -55,7 +55,7 @@ def test_routing_policy_noroute_test(api_client, private_base_url):
     Test for the request send with Test2 valid and Test1 invalid to echo api
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", headers={"Test1": "noroute", "Test2": "test"})
+    response = api_client().get("/get", headers={"Test1": "noroute", "Test2": "test"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
 
@@ -70,7 +70,7 @@ def test_routing_policy_route(api_client, private_base_url):
     Test for the request send without Test2 to echo api
     """
     parsed_url = urlparse(private_base_url("echo_api"))
-    response = api_client.get("/get", headers={"Test1": "route"})
+    response = api_client().get("/get", headers={"Test1": "route"})
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/route/get"
@@ -83,7 +83,7 @@ def test_routing_policy_empty(api_client, private_base_url):
     Test for the request send without any header to / to httpbin api
     """
     parsed_url = urlparse(private_base_url())
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

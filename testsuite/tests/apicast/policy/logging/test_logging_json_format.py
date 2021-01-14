@@ -31,6 +31,6 @@ def test_logging(api_client, staging_gateway):
     """
     Tests that the logs contain the log in the json format
     """
-    api_client.get("/anything")
+    api_client().get("/anything")
     logs = staging_gateway.get_logs()
     assert JSON in logs
