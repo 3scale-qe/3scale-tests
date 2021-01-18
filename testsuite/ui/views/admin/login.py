@@ -1,5 +1,5 @@
 """ Representation of Login specific views"""
-from widgetastic.widget import TextInput, View
+from widgetastic.widget import TextInput, View, Text
 from widgetastic_patternfly4 import Button
 from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.admin.wizard import WizardIntroView
@@ -14,6 +14,7 @@ class LoginView(View):
     endpoint_path = '/p/login'
     ROOT = "/html//div[@id='pf-login-page-container']"
 
+    error_message = Text("//p[@class='pf-c-form__helper-text pf-m-error']")
     username_field = TextInput(id='session_username')
     password_field = TextInput(id='session_password')
     submit = Button(locator=".//button[@type='submit']")
@@ -38,6 +39,17 @@ class LoginView(View):
             return DashboardView(self.browser.root_browser)
         else:
             raise DestinationNotDisplayedError
+
+    @property
+    def has_content(self):
+        """
+        Method checks for required strings on Login page
+        """
+        return self.browser.title == '3scale Login' and \
+            'Log in to your account' in self.browser.selenium.page_source and \
+            'Email or Username' in self.browser.selenium.page_source and \
+            'Password' in self.browser.selenium.page_source and \
+            'Sign in' in self.browser.selenium.page_source
 
     @property
     def is_displayed(self):
