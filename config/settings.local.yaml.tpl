@@ -51,3 +51,5 @@ ${ENVIRONMENT}:
   hyperfoil:
     url: "" # URL for hyperfoil controller
     shared_template: #template that will be added to each hyperfoil benchmark definition
+  cfssl:
+    binary: "cfssl" # Path to the cfssl binary

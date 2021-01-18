@@ -4,9 +4,9 @@ from urllib.parse import urlparse
 
 from weakget import weakget
 
-from testsuite.config import settings
 from testsuite import CommonConfiguration
-from testsuite.certificates import CertificateManager, CertificateStore, Certificate
+from testsuite.certificates import CertificateManager, Certificate
+from testsuite.config import settings
 from testsuite.gateways.apicast import SystemApicastRequirements, OperatorApicastRequirements, \
     TemplateApicastRequirements, TLSApicastRequirements
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirements
@@ -144,6 +144,12 @@ class TLSApicastOptions(TemplateApicastOptions, TLSApicastRequirements):
     """Implementation of TLSApicastRequirements"""
 
     @property
+    def server_authority(self) -> Certificate:
+        wildcard_domain = "*." + self.configuration.superdomain
+        return self.configuration.manager.get_or_create_ca("server-ca",
+                                                           hosts=[wildcard_domain])
+
+    @property
     def _default_endpoint(self):
         return f"https://%s.{self.configuration.superdomain}"
 
@@ -160,14 +166,6 @@ class TLSApicastOptions(TemplateApicastOptions, TLSApicastRequirements):
             return self.setting_block["production_endpoint"]
         except KeyError:
             return self._default_endpoint
-
-    @property
-    def certificate(self) -> Certificate:
-        return self.configuration.certificate
-
-    @property
-    def certificate_store(self) -> CertificateStore:
-        return self.configuration.certificate_store
 
     @property
     def manager(self) -> CertificateManager:
