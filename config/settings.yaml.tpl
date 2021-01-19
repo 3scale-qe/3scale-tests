@@ -40,6 +40,12 @@ default:
     testsuite_properties:
       polarion_project_id: PROJECTID
       polarion_response_myteamsname: teamname
+  fixtures:
+    tools:
+      sources: [ OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
+      namespace: tools # openshift namespace/project where the testenv tools are deployed
+    private_base_url:
+      default: echo_api # tool name to be used by default for backend
 
 
 # dynaconf uses development environment by default
