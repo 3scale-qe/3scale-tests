@@ -3,10 +3,10 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
-from websocket import create_connection, WebSocketBadStatusException
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.8')"), pytest.mark.flaky]
+pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
 
 
 @pytest.fixture
@@ -20,21 +20,17 @@ def user_key(application):
 def test_basic_websocket_200(websocket_uri, user_key, websocket_options):
     """Basic test for websockets with valid user_key"""
     websocket_uri = websocket_uri + user_key
-    websocket = create_connection(websocket_uri, **websocket_options)
-    try:
-        testing_value = "Websocket testing"
-        websocket.send(testing_value)
-        response = websocket.recv()
-        assert response == testing_value
-    finally:
-        websocket.close()
+    message = "Websocket testing"
+
+    assert message == retry_sucessful(websocket_uri, message, websocket_options)
 
 
 def test_basic_websocket_403(websocket_uri, websocket_options):
     """Basic test for websocket with invalid user key"""
     websocket_uri = websocket_uri + "?user_key=123456"
-    with pytest.raises(WebSocketBadStatusException, match="Handshake status 403 Forbidden"):
-        create_connection(websocket_uri, **websocket_options)
+    expected_message_error = "Handshake status 403 Forbidden"
+
+    assert "403 Forbidden" in retry_failing(websocket_uri, expected_message_error, websocket_options)
 
 
 def test_basic_request_200(api_client):

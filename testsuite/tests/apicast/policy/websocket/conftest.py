@@ -2,7 +2,9 @@
 import ssl
 from urllib.parse import urljoin
 
+import backoff
 import pytest
+from websocket import WebSocketBadStatusException, create_connection
 
 from testsuite import rawobj
 
@@ -35,3 +37,45 @@ def websocket_options(testconfig):
     """Websocket options"""
     options = {"sslopt": {} if testconfig["ssl_verify"] else {"cert_reqs": ssl.CERT_NONE}}
     return options
+
+
+@backoff.on_predicate(backoff.expo, lambda x: not x, 60)
+def retry_sucessful(websocket_uri, message, websocket_options):
+    """
+    Retry for websocket when we expect successful message delivery.
+    :param websocket_uri: websocket uri
+    :param message: message
+    :param websocket_options: websocket options
+    :return: received message
+    """
+    websocket = None
+    try:
+        websocket = create_connection(websocket_uri, **websocket_options)
+        websocket.send(message)
+        response = websocket.recv()
+        return response
+    except WebSocketBadStatusException:
+        return None
+    finally:
+        if websocket:
+            websocket.close()
+
+
+@backoff.on_predicate(backoff.expo, lambda x: not x, 60)
+def retry_failing(websocket_uri, expected_message, websocket_options):
+    """
+    Retry for websockets when we expect specific exception message.
+    :param websocket_uri: websocket uri
+    :param expected_message expected exception message
+    :param websocket_options: websocket options
+    :return: caught exception message
+    """
+    websocket = None
+    try:
+        websocket = create_connection(websocket_uri, **websocket_options)
+        return "Connection successful"
+    except WebSocketBadStatusException as exception:
+        return exception.args[0] if expected_message in exception.args[0] else ""
+    finally:
+        if websocket:
+            websocket.close()
