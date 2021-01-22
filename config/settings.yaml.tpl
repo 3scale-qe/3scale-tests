@@ -42,6 +42,12 @@ default:
       polarion_response_myteamsname: teamname
   fixtures:
     tools:
+      # tools is a fixture to provide testenv services like echo_api, jaeger and services that are needed for testing
+      # each service is identified by a key, for compatibility reasons some keys are predefined as they have been
+      # user in threescale:services:backends of this config. OpenshiftProject implementation inroduced route based
+      # keys and some special key to add extra information. so 'httpbin+https' returns https:// url based on route
+      # to httpbin. There is also logic to define openshift service url e.g. 'httpbin+svc:8888'
+      # returns 'httpbin.{tools-namespace}.svc:8888
       sources: [ OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
       namespace: tools # openshift namespace/project where the testenv tools are deployed
     private_base_url:
