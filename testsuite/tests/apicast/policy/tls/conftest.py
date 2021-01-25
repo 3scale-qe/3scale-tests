@@ -95,17 +95,11 @@ def mount_certificate_secret(request, staging_gateway):
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service(backends_mapping, custom_service, service_settings,
+def service(request, backends_mapping, custom_service,
             service_proxy_settings, lifecycle_hooks, policy_settings):
     """Preconfigured service, which is created for each policy settings, which are often parametrized in this module"""
-    service = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
-    service.proxy.list().policies.append(policy_settings)
+    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
+                             hooks=lifecycle_hooks)
+    if policy_settings:
+        service.proxy.list().policies.append(policy_settings)
     return service
-
-
-# I need this to generate name for each service
-# pylint: disable=unused-argument
-@pytest.fixture(scope="module")
-def service_settings(request, policy_settings):
-    """dict of service settings to be used when service created"""
-    return {"name": blame(request, "svc")}

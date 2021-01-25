@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: go-httpbin
+objects:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: ${NAME}
+      name: ${NAME}
+    spec:
+      ports:
+        - name: https
+          port: 8443
+          protocol: TCP
+          targetPort: 8443
+      selector:
+        app: ${NAME}
+        deploymentconfig: ${NAME}
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: ${NAME}
+      name: ${NAME}
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        app: ${NAME}
+        deploymentconfig: ${NAME}
+      strategy:
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: ${NAME}
+            deploymentconfig: ${NAME}
+        spec:
+          containers:
+            - env:
+              - name: CA_CERT_FILE
+                value: /var/run/secrets/ca/tls.crt
+              - name: HTTPS_CERT_FILE
+                value: /var/run/secrets/tls.crt
+              - name: HTTPS_KEY_FILE
+                value: /var/run/secrets/tls.key
+              - name: PORT
+                value: '8443'
+              - name: MTLS_ENABLED
+                value: '1'
+              image: ${IMG_HTTPBIN_GOHTTPBIN}
+              imagePullPolicy: IfNotPresent
+              name: go-httpbin
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              volumeMounts:
+                - mountPath: /var/run/secrets/ca
+                  name: ca
+                - mountPath: /var/run/secrets
+                  name: certs
+          volumes:
+            - name: ca
+              secret:
+                secretName: ${NAME}-ca
+            - name: certs
+              secret:
+                secretName: ${NAME}-certificate
+      triggers:
+        - type: ConfigChange
+  - kind: Secret
+    apiVersion: v1
+    metadata:
+        name: ${NAME}-ca
+        labels:
+          app: ${NAME}
+    stringData:
+        tls.crt: ${CA_CERTIFICATE}
+  - kind: Secret
+    apiVersion: v1
+    metadata:
+        name: ${NAME}-certificate
+        labels:
+          app: ${NAME}
+    stringData:
+        tls.crt: ${CERTIFICATE}
+        tls.key: ${CERTIFICATE_KEY}
+parameters:
+- name: NAME
+  description: "Name for the resources created"
+  required: true
+- name: CERTIFICATE
+  description: "Certificate"
+  required: true
+- name: CERTIFICATE_KEY
+  description: "Private key of the certificate"
+  required: true
+- name: CA_CERTIFICATE
+  description: "Certificate Authority"
+  required: true
+- name: IMG_HTTPBIN_GOHTTPBIN
+  description: Go httpbin image to use
+  required: true
+  value: quay.io/jsmadis/go-httpbin@sha256:28aa3eeeccefe1d608756cd1d46ce2d6fa2aa2faa6b3e4b33228f0a477d2e53b
