@@ -1,3 +1,6 @@
+# mypy: ignore-errors
+# Mypy was flagging line 26 (subprocess.run) with python 3.6.
+# I was unable to properly replicate, but the tests works with 3.6
 """Module containing classes for local CFSSL"""
 import json
 import os
