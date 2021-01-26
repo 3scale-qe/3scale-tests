@@ -31,7 +31,7 @@ class SeleniumDriver:
         driver.finalize()
     """
 
-    def __init__(self, provider, driver):
+    def __init__(self, provider, driver, ssl_verify):
         """
         Initializes factory with either specified or fetched from settings values.
         :param str optional provider: Browser provider name. One of  ('local', 'remote')
@@ -39,6 +39,7 @@ class SeleniumDriver:
         """
         self.provider = provider
         self.driver = driver
+        self.ssl_verify = ssl_verify
         self._webdriver = None
         self.webdriver = None
 
@@ -95,10 +96,21 @@ class SeleniumDriver:
         :raises: ValueError: If wrong browser is specified.
         """
         if self.driver == 'chrome':
-            self._webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+            if self.ssl_verify:
+                self._webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+            else:
+                options = webdriver.ChromeOptions()
+                options.add_argument('ignore-certificate-errors')
+                self._webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install(),
+                                                   chrome_options=options)
         elif self.driver == 'firefox':
-            self._webdriver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-
+            if self.ssl_verify:
+                self._webdriver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+            else:
+                browser_profile = webdriver.FirefoxProfile()
+                browser_profile.accept_untrusted_certs = True
+                self._webdriver = webdriver.Firefox(firefox_profile=browser_profile,
+                                                    executable_path=GeckoDriverManager().install())
         if self._webdriver is None:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'
