@@ -1,22 +1,82 @@
-
 """Collection of classes for working with different ssl certificate tools."""
-import abc
-import collections
-from typing import List
-from urllib.parse import urlparse
+from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple, Dict
 
-CreateCertificateResponse = collections.namedtuple("CreateCerficateResponse", ["certificate", "key"])
-GetCertificateResponse = collections.namedtuple("GetCertificateResponse",
-                                                ["certificate", "key", "certificate_path", "key_path"])
+from testsuite.certificates.persist import TmpFilePersist
+
+# Type alias for Names field in certification csrs
+CertificateNames = List[Dict[str, str]]
 
 
-class Certificate(abc.ABC):  # pylint: disable=too-few-public-methods
-    """Certificate abstract class."""
+class Certificate(TmpFilePersist):
+    """Class representing a Certificate or a CertificateAuthority with private key and certificate"""
 
-    @abc.abstractmethod
-    def create(self, common_name: str, names: List[str] = None,
-               hosts: List[str] = None) -> CreateCertificateResponse:
-        """Create a ssl certificate.
+    def __init__(self, key, certificate) -> None:
+        super().__init__()
+        self.key = key
+        self.certificate = certificate
+
+    def persist(self):
+        return self._persist(key=self.key, certificate=self.certificate)
+
+
+class UnsignedKey(TmpFilePersist):
+    """Representing generated key that hasn't been signed yet"""
+    def __init__(self, key, csr) -> None:
+        super().__init__()
+        self.key = key
+        self.csr = csr
+
+    def persist(self):
+        return self._persist(key=self.key, csr=self.csr)
+
+
+class CertificateStore(ABC):
+    """Provide persistence for certificates across different runs."""
+
+    @abstractmethod
+    def __contains__(self, key: str):
+        """Checks if the certificate is stored in the code
+        Args:
+            :param key: name of the certificate.
+        """
+
+    @abstractmethod
+    def __setitem__(self, key: str, value: Certificate):
+        """Persist PEM-like certificate and key.
+        Args:
+            :param key: label of the certificate.
+            :param value: Certificate to be saved
+        """
+
+    @abstractmethod
+    def __getitem__(self, key: str):
+        """Get PEM-like certificate and key.
+        Args:
+            :param key: label of certificate.
+        """
+
+
+# pylint: disable=too-few-public-methods
+class SigningProvider(ABC):
+    """Provider key signing capabilities"""
+    @abstractmethod
+    def sign(self, key: UnsignedKey, certificate_authority: Optional[Certificate] = None) -> Certificate:
+        """Signs the generated key, returns final certificate.
+        Args:
+            :param key: Key to be signed
+            :param certificate_authority:  Optional argument to specify which ca to use for signing
+        """
+
+
+class KeyProvider(ABC):
+    """Class that can generate keys to be used in certificates"""
+    @abstractmethod
+    def generate_key(self,
+                     common_name: str,
+                     names: Optional[List[Dict[str, str]]] = None,
+                     hosts: Optional[List[str]] = None) -> UnsignedKey:
+        """Create a new unsigned key.
         Args:
             :param common_name: The fully qualified domain name for
                 the server. This must be an exact match.
@@ -24,88 +84,96 @@ class Certificate(abc.ABC):  # pylint: disable=too-few-public-methods
             :param hosts: Hosts to be added to the request.
         """
 
-
-class CertificateStore(abc.ABC):
-    """Provide persistency for certificates."""
-
-    @abc.abstractmethod
-    def save(self, name: str, cert: str, key: str):
-        """Persist PEM-like certificate and key.
+    @abstractmethod
+    def generate_ca(self,
+                    names: List[Dict[str, str]],
+                    hosts: List[str],
+                    ) -> Tuple[Certificate, UnsignedKey]:
+        """Creates new CA key, returns both self signed certificate and Unsigned key with CSR
+         if we want to make it a intermediate CA
         Args:
-            :param name: To label the cert and key.
-            :param cert: PEM-like certificate.
-            :param key: certificate key.
-        """
-
-    @abc.abstractmethod
-    def get(self, name: str) -> GetCertificateResponse:
-        """Get PEM-like certificate and key.
-        Args:
-            :param name: name of certificate and key.
+            :param names: Subject Information to be added to the request.
+            :param hosts: Hosts to be added to the request.
         """
 
 
-class CertificateManager:  # pylint: disable=too-few-public-methods
+class CertificateManager:
     """Certificate Manager.
 
     Provides a common interface to many certificate and storages types.
+    Certificate store is only used for final certificates, not keys
+    Certificate Authority and Certificates share the same namespace in storage
     """
 
-    def __init__(self, certificate: Certificate, store: CertificateStore):
-        self.certificate = certificate
-        self.store = store
-
-    def create(self, label: str, *args, **kwargs) -> CreateCertificateResponse:
-        """Create a new certificate.
-        Args:
-            :param label: a identifier to the certificate and key.
-        """
-        certificate = self.certificate.create(*args, **kwargs)
-        self.store.save(label, certificate.certificate, certificate.key)
-        return certificate
-
-
-class SSLCertificate:
-    """Class for working with certificate stuff for TLSAPicast."""
-
-    def __init__(self, endpoint: str, cert_manager: CertificateManager, cert_store: CertificateStore):
-        self.endpoint = endpoint
-        self._cert_manager = cert_manager
-        self._cert_store = cert_store
-
-    @property
-    def _hostname(self):
-        """Returns wildcard endpoint."""
-        return urlparse(self.endpoint % "*").hostname
-
-    @property
-    def _csr_names(self):
-        """Returns data for CSR's names field."""
-        return {
-            "O": self._hostname,
+    # Default names for the Names field in the csrs
+    DEFAULT_NAMES = [
+        {
+            "O": "Red Hat Inc.",
             "OU": "IT",
             "L": "San Francisco",
             "ST": "California",
             "C": "US",
         }
+    ]
 
-    def create(self, label: str) -> CreateCertificateResponse:
-        """Create a new ssl certificate.
-        Args:
-            :param label: Identifier for the certificate.
-        Returns:
-            certificate: Certificate PEM-like.
-            private_key: Key PEM-like.
-        """
-        return self._cert_manager.create(label, self._hostname, hosts=[self._hostname],
-                                         names=[self._csr_names])
+    def __init__(self, key_provider: KeyProvider, sign_provider: SigningProvider, store: CertificateStore):
+        self.key_provider = key_provider
+        self.sign_provider = sign_provider
+        self.store = store
 
-    def get(self, label: str) -> GetCertificateResponse:
-        """Get existent certificate.
+    # pylint: disable=too-many-arguments
+    def create(self,
+               label: str,
+               common_name: str,
+               hosts: List[str],
+               names: Optional[List[Dict[str, str]]] = None,
+               certificate_authority: Optional[Certificate] = None) -> Certificate:
+        """Create a new certificate.
         Args:
-            :param label: Identifier for the certificate.
-        Returns:
-            certificate: Certificate PEM-like.
-            private_key: Key PEM-like.
+            :param certificate_authority: Certificate Authority to be used for signing
+            :param names: Names field in the csr
+            :param hosts: Hosts field in the csr
+            :param common_name: Exact DNS match for which this certificate is valid
+            :param label: a identifier to the certificate and key.
         """
-        return self._cert_store.get(label)
+        names = names or self.DEFAULT_NAMES
+        key = self.key_provider.generate_key(common_name, names, hosts)
+        certificate = self.sign_provider.sign(key, certificate_authority=certificate_authority)
+        self.store[label] = certificate
+        return certificate
+
+    def get_or_create(self, label: str, *args, **kwargs) -> Certificate:
+        """Creates new certificate, if it doesn't already exists"""
+        if label in self.store:
+            return self.store[label]
+        return self.create(label, *args, **kwargs)
+
+    def get(self, label: str) -> Certificate:
+        """Returns already existing certificate from the store"""
+        return self.store[label]
+
+    def create_ca(self,
+                  label: str,
+                  hosts: List[str],
+                  names: Optional[List[Dict[str, str]]] = None,
+                  certificate_authority: Optional[Certificate] = None) -> Tuple[Certificate, UnsignedKey]:
+        """Create a new certificate authority, if ca is specified it will create an intermediate ca.
+        Args:
+            :param certificate_authority:
+            :param names: dict of all names
+            :param hosts: list of hosts
+            :param label: a identifier to the certificate and key.
+        """
+        names = names or self.DEFAULT_NAMES
+        certificate, key = self.key_provider.generate_ca(names, hosts)
+        if certificate_authority:
+            certificate = self.sign_provider.sign(key, certificate_authority)
+        self.store[label] = certificate
+        return certificate, key
+
+    def get_or_create_ca(self, label: str, *args, **kwargs) -> Certificate:
+        """Creates new certificate authority, if one doesn't already exists"""
+        if label in self.store:
+            return self.store[label]
+        certificate, _ = self.create_ca(label, *args, **kwargs)
+        return certificate

@@ -1,20 +1,17 @@
 """Module responsible for processing configuration"""
+from testsuite.certificates.cfssl.cli import CFSSLProviderCLI
+from testsuite.certificates.stores import InMemoryCertificateStore
 from testsuite.config import settings
-
-from testsuite.certificates import CertificateManager
-from testsuite.certificates.cfssl import CFSSLCertificate
-from testsuite.certificates.stores import TmpCertificateStore
 from testsuite.openshift.client import OpenShiftClient
-from testsuite.requirements import ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequirement
+from testsuite.requirements import ThreeScaleAuthDetails, OpenshiftRequirement, CertificateManager, \
+    CertificateManagerRequirement
 
 
 # pylint: disable=too-many-instance-attributes
-class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequirement):
+class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CertificateManagerRequirement):
     """Class containing configuration of a testsuite which can be passed to other libraries"""
 
     def __init__(self) -> None:
-        self._certificate = None
-        self._store = None
         self._manager = None
 
     @property
@@ -36,22 +33,11 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, CFSSLRequ
         return settings["threescale"]["gateway"]["image"]
 
     @property
-    def certificate(self):
-        if not self._certificate:
-            self._certificate = CFSSLCertificate(host=settings["cfssl"]["host"],
-                                                 port=settings["cfssl"]["port"])
-        return self._certificate
-
-    @property
-    def certificate_store(self):
-        if not self._store:
-            self._store = TmpCertificateStore()
-        return self._store
-
-    @property
     def manager(self):
         if not self._manager:
-            self._manager = CertificateManager(self.certificate, self.certificate_store)
+            provider = CFSSLProviderCLI(binary=settings["cfssl"]["binary"])
+            store = InMemoryCertificateStore()
+            self._manager = CertificateManager(provider, provider, store)
         return self._manager
 
     @property

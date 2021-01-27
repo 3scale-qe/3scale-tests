@@ -2,10 +2,17 @@
 
 ### Installing cfssl
 
-Install cfssl on your local machine by following the instructions in the README at https://github.com/cloudflare/cfssl
+To run tests you need CFSSL binary on your local machine.
+You can install CFSSL by following the instructions in the README at https://github.com/cloudflare/cfssl
 
-
-### Certificate Authority
+#### Configuring testsuite
+Testsuite will by default use cfssl in your path, but you can chnage this in settings.
+```yaml
+  cfssl:
+    binary: "/path/to/cfssl"
+```
+### Outdated
+#### Certificate Authority
 
 You need valid certificate authority which will be used by cfssl for signing certificates.
 
@@ -16,7 +23,7 @@ openssl genrsa -out rootCA.key 2048
 openssl req -batch -new -x509 -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
 ```
 
-### Running cfssl server
+#### Running cfssl server
 
 To have cfssl server up and running somewehere, you can execute the following command:
 
@@ -27,7 +34,7 @@ cfssl serve -address 0.0.0.0 -port 8888 -ca /var/certs/rootCA.pem -ca-key /var/c
 **OBS: Change the path of the CA key and pem with yours.**
 
 
-### Updating settings.local.yaml
+#### Updating settings.local.yaml
 
 Update `config/settings.local.yml` file appending the following snippet to it:
 

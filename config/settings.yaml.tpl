@@ -93,3 +93,5 @@ development:
     cmd: "podman"
     podman_cert_dir: "/var/data"
     podman_cert_name: "ca-bundle.crt"
+  cfssl:
+    binary: "cfssl" # Path to the cfssl binary

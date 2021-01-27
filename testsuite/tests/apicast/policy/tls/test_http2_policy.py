@@ -6,12 +6,13 @@ import requests
 
 from testsuite import rawobj, HTTP2 # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
+from testsuite.gateways.gateways import Capability
 from testsuite.utils import retry_for_session
 
 
 # CFSSL instance is necessary
 pytestmark = [
-    pytest.mark.flaky,
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4684")]
 
 

@@ -6,9 +6,9 @@ from typing import Optional, List
 from urllib.parse import urlparse
 
 from threescale_api.resources import Service
-from testsuite.requirements import ThreeScaleAuthDetails
-from testsuite.openshift.objects import Routes
 
+from testsuite.openshift.objects import Routes
+from testsuite.requirements import ThreeScaleAuthDetails
 from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
 from ...openshift.env import Environ
 
@@ -47,8 +47,6 @@ class TemplateApicast(SelfManagedApicast):
     def __init__(self, requirements: TemplateApicastRequirements) -> None:
         super().__init__(requirements)
         self.requirements = requirements
-        self.openshift = requirements.current_openshift
-        self.staging = requirements.staging
         self.template = requirements.template
         self.image = requirements.image
         self.service_routes = requirements.service_routes

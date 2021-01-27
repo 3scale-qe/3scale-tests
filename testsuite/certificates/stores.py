@@ -1,36 +1,63 @@
 """CertificateStore concrete classes."""
 import os
 import tempfile
+from abc import ABC
+from typing import Dict
 
-from testsuite.certificates import CertificateStore, GetCertificateResponse
+from testsuite.certificates import CertificateStore, Certificate
 
 
-class TmpCertificateStore(CertificateStore):
-    """Enable temporary certificate persistency in local disk."""
+def _persist(path, name: str, ext: str, content: str):
+    with open(os.path.join(path, f"{name}.{ext}"), "w") as file:
+        file.write(content)
+
+
+def _read(path, name: str, ext: str) -> str:
+    with open(os.path.join(path, f"{name}.{ext}"), "r") as file:
+        content = file.read()
+    return content
+
+
+class TmpCertificateStore(CertificateStore, ABC):
+    """
+    Enable temporary certificate persistency in local disk.
+    Obsolete as tmp files have no advantage over InMemoryStore
+    """
 
     def __init__(self):
-        self.tempdir = tempfile.gettempdir()
-        self.path = f"{self.tempdir}/certs"
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = tempfile.mkdtemp("certs")
 
-    def _read(self, name: str, ext: str) -> str:
-        with open(f"{self.path}/{name}.{ext}", "r") as file:
-            content = file.read()
-        return content
+    def _get_label_path(self, label: str):
+        return os.path.join(self.path, label)
 
-    def _persist(self, name: str, ext: str, content: str):
-        with open(f"{self.path}/{name}.{ext}", "w") as file:
-            file.write(content)
+    def __contains__(self, key: str):
+        return os.path.exists(self._get_label_path(key))
 
-    def save(self, name: str, cert: str, key: str):
-        self._persist(name, "crt", cert)
-        self._persist(name, "key", key)
+    def __setitem__(self, key: str, value: Certificate):
+        path = self._get_label_path(key)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        _persist(path, "certificate", "crt", value.certificate)
+        _persist(path, "key", "key", value.key)
 
-    def get(self, name: str) -> GetCertificateResponse:
-        return GetCertificateResponse(
-            certificate=self._read(name, "crt"),
-            key=self._read(name, "key"),
-            certificate_path=f"{self.path}/{name}.crt",
-            key_path=f"{self.path}/{name}.key",
-        )
+    def __getitem__(self, key: str):
+        path = self._get_label_path(key)
+        cert = _read(path, "certificate", "crt")
+        key = _read(path, "key", "key")
+        return Certificate(certificate=cert, key=key)
+
+
+class InMemoryCertificateStore(CertificateStore):
+    """Certificates which stores data in memory, or to be more precise, in a dict"""
+
+    def __init__(self) -> None:
+        self.data: Dict[str, Certificate] = {}
+
+    def __contains__(self, key: str):
+        return key in self.data
+
+    def __setitem__(self, key: str, value: Certificate):
+        self.data[key] = value
+
+    def __getitem__(self, key: str):
+        return self.data[key]

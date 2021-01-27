@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
-from testsuite.certificates import Certificate, CertificateStore, CertificateManager
+from testsuite.certificates import CertificateManager
 
 if TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
@@ -16,18 +16,8 @@ class OpenshiftRequirement(ABC):
         """Creates OpenShiftClient for specific project on specific server"""
 
 
-class CFSSLRequirement(ABC):
-    """Requires configured cfssl and ability to create new certificates"""
-    @property
-    @abstractmethod
-    def certificate(self) -> Certificate:
-        """Returns certificate that is currently in use"""
-
-    @property
-    @abstractmethod
-    def certificate_store(self) -> CertificateStore:
-        """Certificate Store"""
-
+class CertificateManagerRequirement(ABC):
+    """Requires configured certificate manager with ability to create new certificates"""
     @property
     @abstractmethod
     def manager(self) -> CertificateManager:

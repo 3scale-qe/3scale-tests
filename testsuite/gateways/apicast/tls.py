@@ -1,22 +1,29 @@
 """Apicast with TLS certificates configured"""
-import base64
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Dict
+from urllib.parse import urlparse
 
-from testsuite.certificates import SSLCertificate
+from threescale_api.resources import Application
+from threescale_api.utils import HttpClient
+
 from testsuite.openshift.objects import Routes
-from testsuite.requirements import CFSSLRequirement
-
 from .template import TemplateApicastRequirements, TemplateApicast
+from ...certificates import Certificate
+from ...requirements import CertificateManagerRequirement
 
 LOGGER = logging.getLogger(__name__)
 
 
 # I am 100% positive that that class is abstract and because of that it doesnt have to implement all the methods..
 # pylint: disable=abstract-method, too-many-ancestors
-class TLSApicastRequirements(CFSSLRequirement, TemplateApicastRequirements, ABC):
+class TLSApicastRequirements(CertificateManagerRequirement, TemplateApicastRequirements, ABC):
     """Requirements for running TLS Apicast"""
+
+    @property
+    @abstractmethod
+    def server_authority(self) -> Certificate:
+        """Returns certificate authority the gateway should use"""
 
 
 class TLSApicast(TemplateApicast):
@@ -34,10 +41,26 @@ class TLSApicast(TemplateApicast):
         self.route_type = Routes.Types.PASSTHROUGH
 
     @property
-    def ssl_certificate(self) -> SSLCertificate:
-        """Returns instance of SSLCertificate."""
-        return SSLCertificate(self.endpoint, self.requirements.manager,
-                              self.requirements.certificate_store)
+    def _hostname(self):
+        fragments = urlparse(self.endpoint % "*")
+        return fragments.netloc
+
+    @property
+    def server_authority(self) -> Certificate:
+        """Returns server certificate currently in-use"""
+        return self.requirements.server_authority
+
+    @property
+    def server_certificate(self) -> Certificate:
+        """Returns server certificate currently in-use"""
+        return self.requirements.manager.get_or_create("server",
+                                                       self._hostname,
+                                                       hosts=[self._hostname],
+                                                       certificate_authority=self.server_authority)
+
+    def on_application_create(self, application: Application):
+        # pylint: disable=protected-access
+        application._client_factory = self._create_api_client
 
     def get_patch_data(self) -> Dict:
         """Returns patch data for enabling https port on service."""
@@ -67,10 +90,10 @@ class TLSApicast(TemplateApicast):
     def _create_secret(self):
         LOGGER.debug('Creating tls secret "%s"...', self.secret_name)
 
-        cert = self.ssl_certificate.create("server")
+        cert = self.server_certificate
 
-        pem = cert.certificate.encode("ascii")
-        key = cert.key.encode("ascii")
+        pem = cert.certificate
+        key = cert.key
 
         resource = {
             "kind": "Secret",
@@ -78,9 +101,9 @@ class TLSApicast(TemplateApicast):
             "metadata": {
                 "name": self.secret_name,
             },
-            "data": {
-                "tls.crt": base64.b64encode(pem).decode("ascii"),
-                "tls.key": base64.b64encode(key).decode("ascii"),
+            "stringData": {
+                "tls.crt": pem,
+                "tls.key": key,
             }
         }
 
@@ -114,3 +137,10 @@ class TLSApicast(TemplateApicast):
         self.openshift.delete("secret", self.secret_name)
 
         LOGGER.debug('TLS apicast "%s" has been destroyed!', self.deployment)
+
+        self.server_authority.delete_files()
+        self.server_certificate.delete_files()
+
+    def _create_api_client(self, application, endpoint, session, _):
+        authority = self.server_authority.files["certificate"]
+        return HttpClient(application, endpoint, session, authority)

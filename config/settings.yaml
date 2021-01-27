@@ -51,3 +51,5 @@ default:
       # We need to add agents definition for clustered hyperfoil to each test
       agents:
         agent-one:
+  cfssl:
+    binary: "cfssl"
