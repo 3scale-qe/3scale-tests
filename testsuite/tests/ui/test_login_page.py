@@ -10,9 +10,7 @@ def refreshed_browser(browser):
     This fixture will reload login page to overcome problem of reseting text
     input
     """
-    url = browser.url
-    browser.url = "data:,"
-    browser.url = url  # reload to login page
+    browser.selenium.refresh()
     return browser
 
 
@@ -21,7 +19,7 @@ def test_login_page_text(browser):
     """
     Test expected strings on the Login page
     """
-    assert LoginView(browser).has_content
+    assert LoginView(browser).is_displayed
 
 
 @pytest.mark.smoke
@@ -29,8 +27,9 @@ def test_log_with_empty_password(refreshed_browser):
     """
     Test Login button is disabled if only name is filled
     """
-    LoginView(refreshed_browser).username_field.fill("username")
-    assert not LoginView(refreshed_browser).submit.is_enabled
+    login_view = LoginView(refreshed_browser)
+    login_view.username_field.fill("username")
+    assert not login_view.submit.is_enabled
 
 
 @pytest.mark.smoke
@@ -38,8 +37,9 @@ def test_log_with_empty_username(refreshed_browser):
     """
     Test Login button is disabled if only password is filled
     """
-    LoginView(refreshed_browser).password_field.fill("password")
-    assert not LoginView(refreshed_browser).submit.is_enabled
+    login_view = LoginView(refreshed_browser)
+    login_view.password_field.fill("password")
+    assert not login_view.submit.is_enabled
 
 
 @pytest.mark.smoke
@@ -47,8 +47,9 @@ def test_log_with_random_username_password(refreshed_browser):
     """
     Test Login button is enabled after filling form and expect incorrect credentials
     """
-    LoginView(refreshed_browser).username_field.fill("username")
-    LoginView(refreshed_browser).password_field.fill("password")
-    assert LoginView(refreshed_browser).submit.is_enabled
-    LoginView(refreshed_browser).submit.click()
-    assert "Incorrect email or password. Please try again" in LoginView(refreshed_browser).error_message.text
+    login_view = LoginView(refreshed_browser)
+    login_view.username_field.fill("username")
+    login_view.password_field.fill("password")
+    assert login_view.submit.is_enabled
+    login_view.submit.click()
+    assert "Incorrect email or password. Please try again" in login_view.error_message.text
