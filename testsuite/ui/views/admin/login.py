@@ -14,9 +14,12 @@ class LoginView(View):
     endpoint_path = '/p/login'
     ROOT = "/html//div[@id='pf-login-page-container']"
 
+    header = Text("//main/header/h2")
     error_message = Text("//p[@class='pf-c-form__helper-text pf-m-error']")
     username_field = TextInput(id='session_username')
+    username_label = Text('//input[@id="session_username"]/preceding-sibling::label')
     password_field = TextInput(id='session_password')
+    password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
     submit = Button(locator=".//button[@type='submit']")
     password_reset_link = Link("//a[@href='/p/password/reset']")
 
@@ -41,17 +44,8 @@ class LoginView(View):
             raise DestinationNotDisplayedError
 
     @property
-    def has_content(self):
-        """
-        Method checks for required strings on Login page
-        """
-        return self.browser.title == '3scale Login' and \
-            'Log in to your account' in self.browser.selenium.page_source and \
-            'Email or Username' in self.browser.selenium.page_source and \
-            'Password' in self.browser.selenium.page_source and \
-            'Sign in' in self.browser.selenium.page_source
-
-    @property
     def is_displayed(self):
         return self.username_field.is_displayed and self.password_field.is_displayed and \
-               self.password_reset_link.is_displayed and self.endpoint_path in self.browser.url
+               self.password_reset_link.is_displayed and self.endpoint_path in self.browser.url and \
+               self.browser.title == '3scale Login' and 'Log in to your account' in self.header.text and \
+               'Email or Username' in self.username_label.text and 'Password' in self.password_label.text
