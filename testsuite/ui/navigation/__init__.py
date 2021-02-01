@@ -64,6 +64,12 @@ class Navigator:
 
         return cls(self.browser)
 
+    def open(self, cls, **kwargs):
+        """Directly opens desired View, by inserting its `endpoint_path` in to browser"""
+        page = cls(self.browser)
+        self.browser.set_path(page.endpoint_path.format(**kwargs))
+        return page
+
     def _backtrace(self, page_cls):
         """
         Recursively constructs logical path from root to navigated element. This path is saved in queue `page_chain`

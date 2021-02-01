@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import os
+from urllib import parse
 from widgetastic.browser import Browser, DefaultPlugin
 
 
@@ -70,6 +71,10 @@ class ThreeScaleBrowser(Browser):
             plugin_class=ThreescaleBrowserPlugin,
             extra_objects=extra_objects)
         self.window_handle = selenium.current_window_handle
+
+    def set_path(self, path):
+        """Change path for the current browser.url"""
+        self.url = parse.urlparse(self.url)._replace(path=path).geturl()
 
     def take_screenshot(self, error_type):
         """
