@@ -7,9 +7,9 @@ from testsuite.config import settings
 from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
 from testsuite.gateways.apicast.containers import ContainerizedApicast
 from testsuite.gateways.gateways import AbstractGateway
-from testsuite.gateways.service_mesh import ServiceMeshGateway
 from testsuite.gateways.options import GatewayOptions, SystemApicastOptions, SelfManagedApicastOptions, \
     OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions, ServiceMeshGatewayOptions
+from testsuite.gateways.service_mesh import ServiceMeshGateway
 
 Gateway = Type[AbstractGateway]
 Options = Type[GatewayOptions]
@@ -45,4 +45,3 @@ def load_gateway() -> GatewayConfiguration:
 
 # For this specific use case, I like the lower case names better
 configuration = load_gateway()
-capabilities = configuration.staging.CAPABILITIES
