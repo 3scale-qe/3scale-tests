@@ -423,7 +423,9 @@ def service(backends_mapping, custom_service, service_settings, service_proxy_se
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
     "application bound to the account and service existing over whole testing session"
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
+    app = custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
+    service.proxy.deploy()
+    return app
 
 
 @pytest.fixture(scope="module")
