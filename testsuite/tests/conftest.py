@@ -49,7 +49,7 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding toolbox tests")
     if "performance" in marks and not item.config.getoption("--performance"):
         pytest.skip("Excluding performance tests")
-    if "ui" in marks and not item.config.getoption("--ui"):
+    if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
         pytest.skip("Excluding UI tests")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
