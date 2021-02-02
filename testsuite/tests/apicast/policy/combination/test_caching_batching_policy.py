@@ -30,7 +30,7 @@ def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    client = prod_client(application, version=2)
+    client = prod_client(application)
     response = client.get("/", params=None)
     assert response.status_code == 200
     response = client.get("/", params={"user_key": ":user_key"})

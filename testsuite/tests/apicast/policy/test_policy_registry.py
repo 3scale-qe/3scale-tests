@@ -97,7 +97,7 @@ def test_policy_registry(custom_policies, threescale, schema, service, prod_clie
     policy = service.proxy.list()["policies_config"][1]
 
     assert policy["name"] == "policy_registry"
-    assert prod_client(version=2).get("/get").status_code == 200
+    assert prod_client().get("/get").status_code == 200
 
     # Test if we are able to get custom policy by ID
     policy = threescale.policy_registry.read(policies[1].entity_id)
