@@ -32,7 +32,7 @@ def test_caching_policy_allow(prod_client, openshift):
     Scale backend-listener up to old value
     """
 
-    client = prod_client(version=2)
+    client = prod_client()
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
     response = client.get("/", params=None)
