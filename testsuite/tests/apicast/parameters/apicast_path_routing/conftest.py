@@ -20,7 +20,7 @@ def route_name(request):
 
 @pytest.fixture(scope="module")
 def staging_gateway(staging_gateway, route_name):
-    """Deploy template apicast gateway."""
+    """Deploy template apicast staging gateway."""
     staging_gateway.add_route(route_name)
 
     return staging_gateway
@@ -40,13 +40,19 @@ def endpoint(staging_gateway, route_name):
 
 
 @pytest.fixture(scope="module")
+def prod_endpoint():
+    """Returns gateway endpoint."""
+    return ""
+
+
+@pytest.fixture(scope="module")
 def service_mapping():
     """Change mapping rule for service"""
     return "/get"
 
 
 @pytest.fixture(scope="module")
-def service(service, endpoint, service_mapping):
+def service(service, endpoint, prod_endpoint, service_mapping):
     """Delete mapping rules and add new one from/to default service."""
     proxy = service.proxy.list()
     metric = service.metrics.list()[0]
@@ -56,6 +62,7 @@ def service(service, endpoint, service_mapping):
     proxy.mapping_rules.create(rawobj.Mapping(metric, service_mapping))
 
     proxy.update({"sandbox_endpoint": endpoint})
+    proxy.update({"endpoint": prod_endpoint})
 
     return service
 
@@ -74,7 +81,8 @@ def service2_mapping():
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, endpoint, service2_mapping):
+def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, endpoint, prod_endpoint,
+             service2_mapping):
     """Create second service and mapping rule."""
     service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings,
                               hooks=lifecycle_hooks)
@@ -86,6 +94,7 @@ def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, 
     proxy.mapping_rules.create(rawobj.Mapping(metric, service2_mapping))
 
     proxy.update({"sandbox_endpoint": endpoint})
+    proxy.update({"endpoint": prod_endpoint})
 
     return service2
 
