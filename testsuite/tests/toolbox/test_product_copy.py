@@ -209,7 +209,6 @@ def dst_product(toolbox_copy, dest_client):
     return dest_client.services[int(dst_product_id)]
 
 
-@pytest.mark.toolbox
 def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client,
               my_metrics, dst_product, product_service):
     """Test for checking copied product"""
@@ -226,7 +225,6 @@ def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client,
     toolbox.cmp_services(service, dst_product, product_service)
 
 
-@pytest.mark.toolbox
 def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_client,
                   my_metrics, dst_product, product_service):
     """Test backends of the product."""
@@ -257,7 +255,6 @@ def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_cli
     assert int(re.findall(r'created/upated (\d+) backends', stdout)[0]) == len(dst_product.backend_usages.list())
 
 
-@pytest.mark.toolbox
 def test_metrics_methods_maps_in_backends(
         toolbox_copy, service, my_applications, my_activedoc, dest_client,
         my_metrics, dst_product):
@@ -290,7 +287,6 @@ def test_metrics_methods_maps_in_backends(
     assert maps_cnt_txt == maps_cnt
 
 
-@pytest.mark.toolbox
 def test_metrics_methods_maps_in_product(
         toolbox_copy, service, my_applications, my_activedoc, dest_client,
         my_metrics, dst_product):
@@ -326,7 +322,6 @@ def test_metrics_methods_maps_in_product(
                           stdout, re.MULTILINE)[0]) == len(dst_product.mapping_rules.list())
 
 
-@pytest.mark.toolbox
 def test_app_plans_limits_pricing_rules(
         toolbox_copy, service, my_applications, my_activedoc, dest_client,
         my_metrics, dst_product):

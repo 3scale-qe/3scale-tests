@@ -60,7 +60,6 @@ def empty_list(metric_obj):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list1(empty_list, metric_obj):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
@@ -71,7 +70,6 @@ def test_list1(empty_list, metric_obj):
     assert re.findall(r'\d+\s+metric[^\s]*\s+metric[^\s]*\s+Hit\s+\(empty\)', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_create_metric1(metric_obj, my_app_plan):
     """Create metric1"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'create', 'metric1 --description="metric1 desc"'))
@@ -83,7 +81,6 @@ def test_create_metric1(metric_obj, my_app_plan):
     assert not disabled_metric(my_app_plan, met)
 
 
-@pytest.mark.toolbox
 def test_create_metric2(metric_obj, my_app_plan):
     """Create metric2"""
     cmd = 'metric2 --disabled --description="metric2 desc" '
@@ -98,7 +95,6 @@ def test_create_metric2(metric_obj, my_app_plan):
     assert disabled_metric(my_app_plan, met)
 
 
-@pytest.mark.toolbox
 def test_list2(empty_list, metric_obj):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
@@ -108,7 +104,6 @@ def test_list2(empty_list, metric_obj):
     assert re.findall(r'\d+\s+metric2\s+metric_system\s+apple\s+metric2 desc', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_update_metric2(metric_obj):
     """Update metric2"""
     cmd = 'metric_system --enabled --description="metric3 desc changed" '
@@ -121,7 +116,6 @@ def test_update_metric2(metric_obj):
     assert int(m_id) == int(out_variables['metric_system']['id'])
 
 
-@pytest.mark.toolbox
 def test_delete_metrics(metric_obj):
     """Delete metrics"""
     for met in ['metric1', 'metric_system']:
@@ -131,7 +125,6 @@ def test_delete_metrics(metric_obj):
         assert int(m_id) == int(out_variables[met]['id'])
 
 
-@pytest.mark.toolbox
 def test_list3(empty_list, metric_obj):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
@@ -139,7 +132,6 @@ def test_list3(empty_list, metric_obj):
     assert ret['stdout'] == empty_list
 
 
-@pytest.mark.toolbox
 def check_metrics():
     """Check values of created and updated metrics."""
     attr_list = constants.METRIC_CMP_ATTRS - {'system_name'}

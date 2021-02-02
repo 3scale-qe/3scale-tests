@@ -61,7 +61,6 @@ def empty_list(service, hits):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list1(empty_list, service):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
@@ -70,7 +69,6 @@ def test_list1(empty_list, service):
     assert re.findall(r'ID\tFRIENDLY_NAME\tSYSTEM_NAME\tDESCRIPTION', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_create_method1(service, my_app_plan, hits):
     """Create method1"""
     ret = toolbox.run_cmd(create_cmd(service, 'create', 'method1 --description="method1 desc"'))
@@ -82,7 +80,6 @@ def test_create_method1(service, my_app_plan, hits):
     assert not disabled_method(my_app_plan, met)
 
 
-@pytest.mark.toolbox
 def test_create_method2(service, my_app_plan, hits):
     """Create method2"""
     cmd = 'method2 --disabled --description="method2 desc" '
@@ -97,7 +94,6 @@ def test_create_method2(service, my_app_plan, hits):
     assert disabled_method(my_app_plan, met)
 
 
-@pytest.mark.toolbox
 def test_list2(empty_list, service):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
@@ -107,7 +103,6 @@ def test_list2(empty_list, service):
     assert re.findall(r'\d+\s+method2\s+method_system\s+method2 desc', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_update_method2(service, hits):
     """Update method2"""
     cmd = 'method_system --enabled --description="method3 desc changed" '
@@ -120,7 +115,6 @@ def test_update_method2(service, hits):
     assert int(m_id) == int(out_variables['method_system']['id'])
 
 
-@pytest.mark.toolbox
 def test_delete_methods(service):
     """Delete method"""
     for met in ['method1', 'method_system']:
@@ -130,7 +124,6 @@ def test_delete_methods(service):
         assert int(m_id) == int(out_variables[met]['id'])
 
 
-@pytest.mark.toolbox
 def test_list3(empty_list, service):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
@@ -138,7 +131,6 @@ def test_list3(empty_list, service):
     assert ret['stdout'] == empty_list
 
 
-@pytest.mark.toolbox
 def test_check_methods():
     """Check values of created and updated methods."""
     attr_list = constants.METRIC_METHOD_CMP_ATTRS - {'system_name'}

@@ -1,7 +1,6 @@
 """Tests for remote Toolbox feature"""
 
 import re
-import pytest
 
 from testsuite.config import settings
 
@@ -22,7 +21,6 @@ def create_cmd(cmd):
     return f"-c {settings['toolbox']['podman_cert_dir']}/toolbox_config.yaml remote {cmd}"
 
 
-@pytest.mark.toolbox
 def test_list1():
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -30,7 +28,6 @@ def test_list1():
     assert ret['stdout'] == EMPTY_LIST
 
 
-@pytest.mark.toolbox
 def test_add_src():
     """Run command 'add source'"""
     ret = toolbox.run_cmd(create_cmd(f"add source {constants.THREESCALE_SRC1}"))
@@ -38,7 +35,6 @@ def test_add_src():
     assert not ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_add_dst():
     """Run command 'add destination'"""
     ret = toolbox.run_cmd(create_cmd(f"add destination {constants.THREESCALE_DST1}"))
@@ -46,7 +42,6 @@ def test_add_dst():
     assert not ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list2():
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -56,7 +51,6 @@ def test_list2():
     assert REGEXP_DST1.match(lines[2]) is not None
 
 
-@pytest.mark.toolbox
 def test_rename():
     """Run command 'rename'"""
     ret = toolbox.run_cmd(create_cmd('rename source source_renamed'))
@@ -64,7 +58,6 @@ def test_rename():
     assert not ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list3():
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -74,7 +67,6 @@ def test_list3():
     assert REGEXP_DST1.match(lines[0]) is not None
 
 
-@pytest.mark.toolbox
 def test_remove1():
     """Run command 'remove'"""
     ret = toolbox.run_cmd(create_cmd('remove destination'))
@@ -82,7 +74,6 @@ def test_remove1():
     assert not ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_remove2():
     """Run command 'remove'"""
     ret = toolbox.run_cmd(create_cmd('remove source_renamed'))
@@ -90,7 +81,6 @@ def test_remove2():
     assert not ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list4():
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))

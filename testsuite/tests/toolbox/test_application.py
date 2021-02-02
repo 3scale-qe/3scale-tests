@@ -77,7 +77,6 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list1(empty_list, my_services, my_applications):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))
@@ -92,7 +91,6 @@ def test_list1(empty_list, my_services, my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_create_app1(my_services, my_accounts, my_app_plans):
     """Run command 'create' to create first application"""
     cmd = f"{my_accounts[0]['id']} {my_services[0]['id']} {my_app_plans[0]['id']} app1 --user-key=\"123456\""
@@ -102,7 +100,6 @@ def test_create_app1(my_services, my_accounts, my_app_plans):
     out_variables['app1'] = my_accounts[0].applications[int(parse_create_command_out(ret['stdout']))].entity
 
 
-@pytest.mark.toolbox
 def test_create_app2(my_services, my_accounts, my_app_plans):
     # these fixtures should be created for creating
     # pylint: disable=unused-argument
@@ -116,7 +113,6 @@ def test_create_app2(my_services, my_accounts, my_app_plans):
     out_variables['app2'] = my_accounts[1].applications[int(parse_create_command_out(ret['stdout']))].entity
 
 
-@pytest.mark.toolbox
 def test_list2(empty_list, my_services, my_applications):
     """Run command 'create' to create second application"""
     # these fixtures should be created for listing
@@ -131,7 +127,6 @@ def test_list2(empty_list, my_services, my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_app2(my_services, my_accounts, my_app_plans):
     """Run command 'show' to show second application"""
     # these fixtures should be created for showing
@@ -148,7 +143,6 @@ def test_show_app2(my_services, my_accounts, my_app_plans):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_update_app1_1(my_services, my_accounts, my_app_plans):
     """Run command 'update' to update first application"""
     # these fixtures should be created for updating
@@ -164,7 +158,6 @@ def test_update_app1_1(my_services, my_accounts, my_app_plans):
     out_variables['app3'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
 
 
-@pytest.mark.toolbox
 def test_update_app1_2(my_services, my_accounts):
     """Run command 'update' to update first application again"""
     # these fixtures should be created for update
@@ -177,7 +170,6 @@ def test_update_app1_2(my_services, my_accounts):
     out_variables['app4'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
 
 
-@pytest.mark.toolbox
 def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applications):
     """Run command 'list' applications"""
     # these fixtures should be created for listing
@@ -197,7 +189,6 @@ def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applicatio
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_app1(my_applications):
     """Run command 'show' to show first application"""
     # my_applications and all related fixtures should be created for showing
@@ -215,7 +206,6 @@ def test_show_app1(my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_delete_app2(my_applications):
     """Run command 'delete' to delete second application"""
     # my_applications and all related fixtures should be created for deletion
@@ -225,7 +215,6 @@ def test_delete_app2(my_applications):
     assert f"Application id: {out_variables['app2']['id']} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_delete_app1(my_applications):
     """Run command 'delete' to delete first application"""
     # my_applications and all related fixtures should be created for deletion
@@ -235,7 +224,6 @@ def test_delete_app1(my_applications):
     assert f"Application id: {out_variables['app1']['id']} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list4(empty_list, my_services):
     """Run command 'list' applications"""
     ret = toolbox.run_cmd(create_cmd('list', f" --service={my_services[0]['id']}"))
@@ -243,7 +231,6 @@ def test_list4(empty_list, my_services):
     assert empty_list == ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_check_applications_values(my_services, my_accounts, my_app_plans):
     """Check values of created and updated proxy applications."""
     # This comment shows clearly what attributes are checked
