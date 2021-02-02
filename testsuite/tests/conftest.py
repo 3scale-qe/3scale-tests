@@ -1,5 +1,6 @@
 "top-level conftest"
 
+import inspect
 import logging
 import os
 import time
@@ -14,6 +15,7 @@ from weakget import weakget
 from threescale_api import client
 from testsuite.config import settings
 import testsuite.gateways as gateways
+import testsuite.tools
 
 from testsuite import rawobj, CONFIGURATION, ROOT_DIR
 from testsuite.gateways.gateways import Capability
@@ -170,6 +172,44 @@ def logger(request):
 def openshift(configuration):
     "OpenShift client generator"
     return configuration.openshift
+
+
+# pylint: disable=too-few-public-methods,broad-except
+@pytest.fixture(scope="session")
+def tools(testconfig, configuration):
+    """dict-like object to provide testing environment tools"""
+
+    options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
+
+    def _init_source(klass):
+        """dynamic __init__ args introspection"""
+
+        init_args = inspect.signature(klass.__init__).parameters.keys()
+        init_args -= ['self', 'args', 'kwargs']
+        if len(init_args) == 0:
+            return klass()
+        init_args = {k: v for k, v in options.items() if k in init_args}
+        if len(init_args) == 0:
+            return klass()
+        return klass(**init_args)
+
+    class _Tools:
+        def __init__(self, sources):
+            self._sources = sources
+
+        def __getitem__(self, name):
+            for source in self._sources:
+                try:
+                    value = source[name]
+                    if value is not None:
+                        return value
+                except Exception:
+                    pass
+            raise KeyError(name)
+
+    sources = options.get("sources", ["OpenshiftProject", "Settings"])
+    sources = [_init_source(getattr(testsuite.tools, t)) for t in sources]
+    return _Tools(sources)
 
 
 @pytest.fixture(scope="module")
@@ -379,7 +419,7 @@ def service_proxy_settings(private_base_url):
 
 
 @pytest.fixture(scope="module")
-def private_base_url(testconfig):
+def private_base_url(testconfig, tools):
     """URL to API backend.
 
     This is callable fixture with parameter `kind`.
@@ -388,8 +428,12 @@ def private_base_url(testconfig):
     Args:
         :param kind: Desired type of backend; possible values 'primary' (default), 'httpbin', 'echo-api'"""
 
+    primary = weakget(testconfig)["fixtures"]["private_base_url"]["default"] % "echo_api"
+
     def _private_base_url(kind="primary"):
-        return testconfig["threescale"]["service"]["backends"][kind]
+        if kind == "primary":
+            kind = primary
+        return tools[kind]
 
     return _private_base_url
 

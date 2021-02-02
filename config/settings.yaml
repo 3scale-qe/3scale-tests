@@ -24,8 +24,8 @@ default:
   redis:
     url: redis://apicast-testing-redis:6379/1
   proxy:
-    http: http://tinyproxy-service.tools.svc:8888
-    https: http://tinyproxy-service.tools.svc:8888
+    http: "@format http://tinyproxy-service.{this.FIXTURES.tools.namespace}.svc:8888"
+    https: "@format http://tinyproxy-service.{this.FIXTURES.tools.namespace}.svc:8888"
   toolbox:
     cmd: "podman"
     podman_cert_dir: "/var/data"
@@ -34,14 +34,17 @@ default:
     destination_endpoint: URL
     destination_provider_key: KEY
   fixtures:
+    tools:
+      namespace: tools
+      sources: ["OpenshiftProject", "Settings"]
     lifecycle_hooks:
       defaults: [staging_gateway, production_gateway]
     jaeger:
       config:
         reporter:
-          localAgentHostPort: "jaeger-agent.jaeger.svc.cluster.local:6831"
+          localAgentHostPort: "@format jaeger-agent.{this.FIXTURES.tools.namespace}.svc:6831"
         baggage_restrictions:
-          hostPort: "jaeger-query.jaeger.svc.cluster.local:5778"
+          hostPort: "@format jaeger-query.{this.FIXTURES.tools.namespace}.svc:5778"
     ui:
       browser:
         provider: local

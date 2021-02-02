@@ -1,6 +1,10 @@
 """Module responsible for processing configuration"""
+
+from weakget import weakget
+
 from testsuite.certificates.cfssl.cli import CFSSLProviderCLI
 from testsuite.certificates.stores import InMemoryCertificateStore
+
 from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.requirements import ThreeScaleAuthDetails, OpenshiftRequirement, CertificateManager, \
@@ -47,7 +51,7 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, Certifica
 
     def openshift(self, server="default", project="threescale") -> OpenShiftClient:
         """Creates OpenShiftClient for project"""
-        project_name = settings["openshift"]["projects"][project]["name"]
+        project_name = weakget(settings)["openshift"]["projects"][project]["name"] % project
 
         try:
             server = settings["openshift"]["servers"][server]
