@@ -8,6 +8,7 @@ from typing import List, Dict, Union, Any, Optional, Callable
 
 import openshift as oc
 
+from testsuite.openshift.apimanager import APIManager
 from testsuite.openshift.env import Environ
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 
@@ -76,6 +77,13 @@ class OpenShiftClient:
             # If cluster doesn't know APIManager resource
             except oc.OpenShiftPythonException:
                 return False
+
+    @property
+    def api_manager(self):
+        """Returns APIManager object responsible for this deployment"""
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            return oc.selector("apimanager").objects(cls=APIManager)[0]
 
     @property
     def secrets(self):
@@ -347,6 +355,8 @@ class OpenShiftClient:
         """
         with ExitStack() as stack:
             self.prepare_context(stack)
+            # pylint: disable=no-member
+            # https://github.com/PyCQA/pylint/issues/3137
             stack.enter_context(oc.timeout(90))
             oc.selector(f"deployment/{deployment_name}").until_all(
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status

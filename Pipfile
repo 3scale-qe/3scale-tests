@@ -32,7 +32,7 @@ widgetastic-patternfly = "*"
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
 # 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
-openshift-client = "*"
+openshift-client = ">=1.0.9"
 hyperfoil-client="*"
 paramiko = "*"
 docker = "*"
