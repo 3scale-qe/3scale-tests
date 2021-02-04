@@ -126,7 +126,7 @@ class OpenShiftClient:
     def patch(self, resource_type: str, resource_name: str, patch, patch_type: str = None):
         """Patch the specified resource
         Args:
-            :param resource_type: The resource type to be deleted. Ex.: service, route, deploymentconfig
+            :param resource_type: The resource type to be patched. Ex.: service, route, deploymentconfig
             :param resource_name: The resource name to be patched
             :param patch: The patch to be applied to the resource
             :param patch_type: Optional. The type of patch being provided; one of [json merge strategic]
@@ -167,6 +167,22 @@ class OpenShiftClient:
             """
         resources = resources or "all"
         self.do_action("delete", [resources, "-l", f"app={app}", "--ignore-not-found"])
+
+    def delete_template(self, template: str, params: Dict[str, str] = None):
+        """
+        Deletes resources specified in the template after processing it with params
+        oc process -f template --param KEY=VALUE --param ... | oc delete -f -
+        :param template: template specifying the resources to delete
+        :param params: params to process the template with
+        """
+        opt_args: List[Union[List, str]] = ["-f", template]
+
+        if params:
+            opt_args.extend([f"--param={n}={v}" for n, v in params.items()])
+        processed_tmpl = json.loads(self.do_action('process', opt_args).actions().pop().out)
+
+        for resource in processed_tmpl["items"]:
+            self.delete(resource['kind'], resource['metadata']['name'])
 
     def scale(self, deployment_name: str, replicas: int):
         """
@@ -436,3 +452,9 @@ class OpenShiftClient:
             :param target_port: Port to which the service forwards connections.
         """
         self.do_action("create", ["service", service_type.value, name, f"--tcp={port}:{target_port}"])
+
+    def start_build(self, build_name):
+        """
+        Starts a build specified by the build_name
+        """
+        self.do_action("start-build", [build_name, "--wait=true"])

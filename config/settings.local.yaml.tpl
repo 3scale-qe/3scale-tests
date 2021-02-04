@@ -44,6 +44,11 @@ ${ENVIRONMENT}:
             localAgentHostPort: "" # route to the jaeger-agent (may be internal)
         baggage_restrictions:
             hostPort: "" # route to the jaeger-query (may be internal)
+    apicast:
+      parameters:
+        modular_apicast:
+          amp_release: "" # tag of the image stream, "master" for nightlies,
+                          # 3scale version otherwise
     ui:
       browser:
         provider: "" #local or remote
