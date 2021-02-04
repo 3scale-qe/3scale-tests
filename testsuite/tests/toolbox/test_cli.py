@@ -38,7 +38,6 @@ TOOLBOX_SUBCOMMANDS = {
 RE_EXPR = re.compile(r'^\s+([^\s]+)\s+.*$')
 
 
-@pytest.mark.toolbox
 def test_cli_cmd_list():
     """Check the list of commands"""
     out = toolbox.run_cmd('')
@@ -52,7 +51,6 @@ def test_cli_cmd_list():
     assert TOOLBOX_COMMANDS == toolbox_cmds
 
 
-@pytest.mark.toolbox
 def test_cli_cmd_list_help():
     """Check the help page of commands"""
     batch_cmds = []
@@ -69,7 +67,6 @@ def test_cli_cmd_list_help():
         assert cmd_set[0]['stdout'] == cmd_set[1]['stdout'] == cmd_set[2]['stdout']
 
 
-@pytest.mark.toolbox
 def test_cli_subcmd_list():
     """Check list of subcommands of commands."""
     ret_val = toolbox.run_cmd(TOOLBOX_SUBCOMMANDS.keys())
@@ -85,7 +82,6 @@ def test_cli_subcmd_list():
         assert TOOLBOX_SUBCOMMANDS[command[0]] == toolbox_cmds
 
 
-@pytest.mark.toolbox
 def test_cli_subcmd_list_help():
     """Check help page of subcommands"""
     batch_cmds = []
@@ -108,7 +104,6 @@ def test_cli_subcmd_list_help():
             index += 1
 
 
-@pytest.mark.toolbox
 def test_cli():
     """Check 'version' parameter."""
     batch_cmds = ['-v', '--version']

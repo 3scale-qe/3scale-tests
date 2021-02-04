@@ -34,7 +34,6 @@ def import_oas3(dest_client):
         service.delete()
 
 
-@pytest.mark.toolbox
 def test_import(import_oas3, petstore_yaml):
     """Checks import results"""
     (ret, service_id, service_name, service) = import_oas3
@@ -53,7 +52,6 @@ def test_import(import_oas3, petstore_yaml):
     assert re.findall(r'^Service policies updated$', ret['stdout'], re.MULTILINE)
 
 
-@pytest.mark.toolbox
 def test_service(import_oas3, petstore_yaml):
     """Checks importes service"""
     service = import_oas3[3]
@@ -61,7 +59,6 @@ def test_service(import_oas3, petstore_yaml):
     assert service['name'] == petstore_yaml['info']['title']
 
 
-@pytest.mark.toolbox
 def test_metrics_mappings(import_oas3, petstore_yaml):
     """Checks imported metrics"""
     # pylint: disable=too-many-nested-blocks
@@ -93,7 +90,6 @@ def test_metrics_mappings(import_oas3, petstore_yaml):
     assert pet_number + 1 == len(metrics)
 
 
-@pytest.mark.toolbox
 def test_activedocs(import_oas3, petstore_yaml, dest_client):
     """Checks imported activedocs"""
     service = import_oas3[3]
@@ -106,7 +102,6 @@ def test_activedocs(import_oas3, petstore_yaml, dest_client):
     assert acdoc['body']
 
 
-@pytest.mark.toolbox
 def test_anon_policy(import_oas3):
     """Checks imported ANON policy"""
     service = import_oas3[3]

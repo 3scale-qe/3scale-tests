@@ -101,7 +101,6 @@ def toolbox_copy(my_backend, my_backend_metrics, my_backend_methods, my_backend_
     return ret
 
 
-@pytest.mark.toolbox
 def test_copy(toolbox_copy, my_backend, my_backend_metrics, my_backend_methods, my_backend_mappings, dest_client):
     """Test for checking copied backend"""
     # pylint: disable=too-many-arguments

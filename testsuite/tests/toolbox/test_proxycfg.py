@@ -37,7 +37,6 @@ def hits(service):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list_staging1(service, empty_list_staging):
     """Run command 'list' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'staging'))
@@ -47,7 +46,6 @@ def test_list_staging1(service, empty_list_staging):
     assert re.findall(r'\d+\t1\tsandbox', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_list_production1(service, empty_list_production):
     """Run command 'list' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'production'))
@@ -56,7 +54,6 @@ def test_list_production1(service, empty_list_production):
     assert re.findall(r'ID\tVERSION\tENVIRONMENT', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_staging1(service):
     """Run command 'show' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'staging'))
@@ -64,7 +61,6 @@ def test_show_staging1(service):
     out_variables['staging'] = json.loads(ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_promote1(service):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
@@ -72,7 +68,6 @@ def test_promote1(service):
     assert re.findall("Proxy Configuration version 1 promoted to 'production'", ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_production1(service):
     """Run command 'show' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'production'))
@@ -80,7 +75,6 @@ def test_show_production1(service):
     out_variables['production'] = json.loads(ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_update_staging_and_list1(service, hits, empty_list_staging):
     """Update staging environment and list staging"""
     # update proxy
@@ -122,7 +116,6 @@ def test_update_staging_and_list1(service, hits, empty_list_staging):
     assert re.findall(r'\d+\t2\tsandbox', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_staging2(service):
     """Run command 'show' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'staging'))
@@ -130,7 +123,6 @@ def test_show_staging2(service):
     out_variables['staging_updated'] = json.loads(ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_promote2(service):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
@@ -138,7 +130,6 @@ def test_promote2(service):
     assert re.findall("Proxy Configuration version 3 promoted to 'production'", ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_list_production2(service, empty_list_production):
     """Run command 'list' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'production'))
@@ -148,7 +139,6 @@ def test_list_production2(service, empty_list_production):
     assert re.findall(r'\d+\t3\tproduction', ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show_production2(service):
     """Run command 'show' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'production'))
@@ -156,7 +146,6 @@ def test_show_production2(service):
     out_variables['production_updated'] = json.loads(ret['stdout'])
 
 
-@pytest.mark.toolbox
 def check_proxy_configurations():
     """Check values of created and updated proxy configurations."""
     assert out_variables['staging']['environment'] == 'sandbox'

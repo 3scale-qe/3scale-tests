@@ -47,7 +47,7 @@ def pytest_runtest_setup(item):
     marks = [i.name for i in item.iter_markers()]
     if "disruptive" in marks and not item.config.getoption("--disruptive"):
         pytest.skip("Excluding disruptive tests")
-    if "toolbox" in marks and not item.config.getoption("--toolbox"):
+    if "/toolbox/" in item.nodeid and not item.config.getoption("--toolbox"):
         pytest.skip("Excluding toolbox tests")
     if "performance" in marks and not item.config.getoption("--performance"):
         pytest.skip("Excluding performance tests")
