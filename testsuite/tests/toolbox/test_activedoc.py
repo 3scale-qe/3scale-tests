@@ -13,12 +13,6 @@ SWAGGER_LINK = 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/mast
 
 
 @pytest.fixture(scope="module")
-def service(request, custom_service):
-    """Service fixture"""
-    return custom_service({"name": blame(request, "svc")})
-
-
-@pytest.fixture(scope="module")
 def my_app_plan(request, custom_app_plan, service):
     """App. plans fixture"""
     return custom_app_plan(rawobj.ApplicationPlan(blame(request, "silver")), service)
@@ -57,7 +51,6 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list1(empty_list, service, my_app_plan, my_activedoc):
     """Run command 'list'"""
     # pylint: disable=unused-argument
@@ -72,7 +65,6 @@ def test_list1(empty_list, service, my_app_plan, my_activedoc):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_create1(threescale):
     """Run command 'create' to create first activedoc"""
     out_variables['ac1_name'] = randomize('activedoc1', 3)
@@ -83,7 +75,6 @@ def test_create1(threescale):
     out_variables['ac1_entity'] = threescale.active_docs[int(out_variables['ac1'][1])].entity
 
 
-@pytest.mark.toolbox
 def test_create2(service, threescale):
     """Run command 'create' to create second activedoc"""
     out_variables['ac2_name'] = randomize('activedoc2', 3)
@@ -97,7 +88,6 @@ def test_create2(service, threescale):
     out_variables['ac2_entity'] = threescale.active_docs[int(out_variables['ac2'][1])].entity
 
 
-@pytest.mark.toolbox
 def test_list2(empty_list, service, my_activedoc):
     """Run command 'list' active docs"""
     # pylint: disable=unused-argument
@@ -113,7 +103,6 @@ def test_list2(empty_list, service, my_activedoc):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_apply1(service, threescale):
     """Run command 'apply' to update first activedoc"""
     cmd = fr"{out_variables['ac1_entity']['system_name']} --description='updated' "
@@ -126,7 +115,6 @@ def test_apply1(service, threescale):
     out_variables['ac3_entity'] = threescale.active_docs[int(out_variables['ac3'])].entity
 
 
-@pytest.mark.toolbox
 def test_delete1():
     """Run command 'delete' to delete first active doc"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{out_variables['ac1'][1]}"))
@@ -134,7 +122,6 @@ def test_delete1():
     assert f"ActiveDocs with id: {out_variables['ac1'][1]} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_delete2():
     """Run command 'delete' to delete second active doc"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{out_variables['ac2'][1]}"))
@@ -142,7 +129,6 @@ def test_delete2():
     assert f"ActiveDocs with id: {out_variables['ac2'][1]} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list3(empty_list):
     """Run command 'list' active doc"""
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -150,7 +136,6 @@ def test_list3(empty_list):
     assert empty_list in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_check_active_docs_values():
     """Check values of created and updated active docs."""
     # This comment shows clearly what attributes are checked
