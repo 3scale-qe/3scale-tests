@@ -41,8 +41,8 @@ def test_token_basic_auth(client, token):
     response = client.get("/get", headers={'authorization': "Bearer " + token})
     assert response.status_code == 200
 
-    echoed_response = EchoedRequest(response)
-    assert echoed_response.json["headers"].get("Authorization", "") == f"Bearer {token}"
+    echoed_response = EchoedRequest.create(response)
+    assert echoed_response.headers.get("Authorization", "") == f"Bearer {token}"
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(

@@ -41,8 +41,8 @@ def test_token_headers(client, token):
     response = client.get("/get", headers={'access_token': token})
     assert response.status_code == 200
 
-    echoed_response = EchoedRequest(response)
-    assert echoed_response.json["headers"].get("Access-Token") == token
+    echoed_response = EchoedRequest.create(response)
+    assert echoed_response.headers.get("Access-Token") == token
 
 
 @parametrize_plus('client', [pytest.param(fixture_ref(production_client), marks=[pytest.mark.required_capabilities(

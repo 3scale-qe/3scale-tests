@@ -44,7 +44,7 @@ def test_first_service(api_client, user_key):
     response = api_client.get('/get')
     assert response.status_code == 200
 
-    echoed_response = EchoedRequest(response)
+    echoed_response = EchoedRequest.create(response)
     assert echoed_response.params.get('user_key') == user_key
 
 
@@ -58,5 +58,5 @@ def test_second_service(application2, user_key2):
     response = api_client.get('/get')
     assert response.status_code == 200
 
-    echoed_response = EchoedRequest(response)
+    echoed_response = EchoedRequest.create(response)
     assert echoed_response.params.get('user_key') == user_key2

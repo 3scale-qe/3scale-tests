@@ -41,8 +41,8 @@ def test_token_in_query(client, token):
     response = client.get("/get", params={'access_token': token})
     assert response.status_code == 200
 
-    echoed_response = EchoedRequest(response)
-    assert echoed_response.json["args"].get("access_token", "") == token
+    echoed_response = EchoedRequest.create(response)
+    assert echoed_response.params.get("access_token", "") == token
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5885")
