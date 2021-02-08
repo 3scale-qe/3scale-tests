@@ -51,9 +51,17 @@ def run_cmd(cmd_input):
 
         _, stdout, stderr = client.exec_command(command)
 
-        stderr = os.linesep.join(stderr.readlines())
-        stdout = os.linesep.join(stdout.readlines())
-        ret_value.append({'stdout': stdout, 'stderr': stderr})
+        stderrstr = os.linesep.join(stderr.readlines())
+        stdoutstr = os.linesep.join(stdout.readlines())
+        try:
+            errno = stdout.channel.recv_exit_status()
+            assert errno == 0
+        except AssertionError as exc:
+            error = f'Errno: {str(errno)}, stderr: {stderrstr}, stdout: {stdoutstr}'
+            logging.error(error)
+            raise exc
+
+        ret_value.append({'stdout': stdoutstr, 'stderr': stderrstr})
 
         logging.debug("Output of Toolbox command: stdout: %s; stderr: %s", stdout, stderr)
 
@@ -71,7 +79,12 @@ def cmp_ents(ent1, ent2, attrlist):
     @param [List] List of attributes which should be compared
     """
     for attr in attrlist:
-        assert ent1[attr] == ent2[attr]
+        try:
+            assert ent1[attr] == ent2[attr]
+        except AssertionError as error:
+            logging.error("key:%s, ent1:%s, ent2:%s, error:%s, attrlist:%s",
+                          str(attr), str(ent1), str(ent2), str(error), str(attrlist))
+            raise error
 
 
 def find_and_cmp(list1, list2, cmp_function, id_attr=None):
@@ -311,6 +324,14 @@ def cmp_backend_usages(svc1, svc2):
 
 def check_object(obj_ent, not_check_list, vals):
     """Check if entity object has values of keys not in 'not_check_list' equal to values 'val'."""
-    check_list = zip(sorted(obj_ent.keys() - not_check_list), vals)
-    for key, val in check_list:
-        assert obj_ent[key] == val
+    check_keys = sorted(obj_ent.keys() - not_check_list)
+    try:
+        assert len(vals) == len(check_keys)
+        check_list = zip(check_keys, vals)
+        for key, val in check_list:
+            assert obj_ent[key] == val
+    except AssertionError as error:
+        logging.error("object:%s, error:%s, check_keys:%s, obj.keys:%s, vals:%s",
+                      str(obj_ent), str(error), str(list(check_keys)),
+                      str(list(obj_ent.keys())), str(vals))
+        raise error

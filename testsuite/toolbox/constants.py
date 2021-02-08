@@ -66,10 +66,10 @@ PROXY_CMP_ATTRS = {
         'sandbox_endpoint', 'service_id', 'updated_at'}
 
 # name, system_name, friendly_name, unit, description
-METRIC_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at', 'system_name'}
+METRIC_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at', 'system_name', 'parent_id'}
 
 # name, system_name, friendly_name, description
-METRIC_METHOD_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at'}
+METRIC_METHOD_CMP_ATTRS = {'created_at', 'id', 'links', 'parent_id', 'updated_at'}
 
 # pattern, http_method, delta
 MAPPING_CMP_ATTRS = {'created_at', 'id', 'last', 'links', 'metric_id', 'position', 'updated_at'}
@@ -78,7 +78,7 @@ MAPPING_CMP_ATTRS = {'created_at', 'id', 'last', 'links', 'metric_id', 'position
 BACKEND_CMP_ATTRS = {'id', 'account_id', 'created_at', 'updated_at', 'links'}
 
 # 'approval_required', 'cancellation_period', 'cost_per_month', 'custom', 'default',
-# 'end_user_required', 'name', 'setup_fee', 'state', 'system_name', 'trial_period_days'
+# 'name', 'setup_fee', 'state', 'system_name', 'trial_period_days'
 APP_PLANS_CMP_ATTRS = {'created_at', 'id', 'links', 'updated_at'}
 
 # 'period', 'value'

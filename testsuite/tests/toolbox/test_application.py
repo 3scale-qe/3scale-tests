@@ -234,23 +234,26 @@ def test_list4(empty_list, my_services):
 def test_check_applications_values(my_services, my_accounts, my_app_plans):
     """Check values of created and updated proxy applications."""
     # This comment shows clearly what attributes are checked
-    # 'account_id', 'description', 'enabled', 'end_user_required', 'name', 'plan_id',
+    # 'account_id', 'description', 'enabled', 'name', 'org_name', 'plan_name', 'plan_id',
     # 'service_id', 'state', 'user_key'
 
     attr_list = constants.APPLICATION_CMP_ATTRS - {'account_id', 'plan_id', 'service_id'}
     toolbox.check_object(out_variables['app1'], attr_list, [
-        my_accounts[0]['id'], 'app1', True, False, 'app1', my_app_plans[0]['id'],
-        my_services[0]['id'], 'live', '123456'])
+        my_accounts[0]['id'], 'app1', True, 'app1', my_accounts[0]['org_name'],
+        my_app_plans[0]['id'], my_app_plans[0]['name'], my_services[0]['id'],
+        my_services[0]['name'], 'live', '123456'])
 
     toolbox.check_object(out_variables['app3'], attr_list, [
-        my_accounts[0]['id'], 'app1 description updated', False, False, 'app1name',
-        my_app_plans[0]['id'], my_services[0]['id'], 'suspended', '123456'])
+        my_accounts[0]['id'], 'app1 description updated', False, 'app1name',
+        my_accounts[0]['org_name'], my_app_plans[0]['id'], my_app_plans[0]['name'],
+        my_services[0]['id'], my_services[0]['name'], 'suspended', '123456'])
 
     toolbox.check_object(out_variables['app4'], attr_list, [
-        my_accounts[0]['id'], 'app1 description updated', True, False, 'app1name',
-        my_app_plans[0]['id'], my_services[0]['id'], 'live'])
+        my_accounts[0]['id'], 'app1 description updated', True, 'app1name',
+        my_accounts[0]['org_name'], my_app_plans[0]['id'], my_app_plans[0]['name'],
+        my_services[0]['id'], my_services[0]['name'], 'live', '345678'])
 
     attr_list = attr_list.union({'user_key'})
     toolbox.check_object(out_variables['app2'], attr_list, [
-        my_accounts[1]['id'], 'app 2 description', True, False, 'app2', my_app_plans[1]['id'],
-        my_services[1]['id'], 'live'])
+        my_accounts[1]['id'], 'app 2 description', True, 'app2', my_accounts[1]['org_name'],
+        my_app_plans[1]['id'], my_app_plans[1]['name'], my_services[1]['id'], my_services[1]['name'], 'live'])
