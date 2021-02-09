@@ -47,7 +47,6 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-@pytest.mark.toolbox
 def test_list1(empty_list, service, my_app_plans):
     """Run command 'list'"""
     # pylint: disable=unused-argument
@@ -63,7 +62,6 @@ def test_list1(empty_list, service, my_app_plans):
         ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_create1(service):
     """Run command 'create' to create first application plan"""
     cmd = f"{service['id']} plan1 --approval-required=true --cost-per-month=11.1 "
@@ -77,7 +75,6 @@ def test_create1(service):
     out_variables['plan1_entity'] = service.app_plans[int(out_variables['plan1'][0])].entity
 
 
-@pytest.mark.toolbox
 def test_create2(service):
     """Run command 'create' to create second application plan"""
     cmd = f"{service['id']} plan2 --approval-required=false --cost-per-month=0 "
@@ -89,7 +86,6 @@ def test_create2(service):
     out_variables['plan2_entity'] = service.app_plans[int(out_variables['plan2'][0])].entity
 
 
-@pytest.mark.toolbox
 def test_list2(empty_list, service, my_app_plans):
     """Run command 'list' application plans"""
     ret = toolbox.run_cmd(create_cmd('list', f"{service['id']}"))
@@ -104,7 +100,6 @@ def test_list2(empty_list, service, my_app_plans):
         ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_show1(service):
     """Run command 'show' to show first application"""
     # pylint: disable=unused-argument
@@ -121,7 +116,6 @@ def test_show1(service):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-@pytest.mark.toolbox
 def test_update1(service):
     """Run command 'update' to update first application plan"""
     cmd = f"{service['id']} plan1sysname --approval-required=false --cost-per-month=44 "
@@ -137,7 +131,6 @@ def test_update1(service):
     out_variables['plan3_entity'] = service.app_plans[int(out_variables['plan3'][0])].entity
 
 
-@pytest.mark.toolbox
 def test_delete1(service):
     """Run command 'delete' to delete first application plan"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{service['id']} {out_variables['plan1'][0]}"))
@@ -145,7 +138,6 @@ def test_delete1(service):
     assert f"Application plan id: {out_variables['plan1'][0]} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_delete2(service):
     """Run command 'delete' to delete second application plan"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{service['id']} {out_variables['plan2'][0]}"))
@@ -153,7 +145,6 @@ def test_delete2(service):
     assert f"Application plan id: {out_variables['plan2'][0]} deleted" in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_list3(empty_list, service):
     """Run command 'list' application plans"""
     ret = toolbox.run_cmd(create_cmd('list', f"{service['id']}"))
@@ -161,7 +152,6 @@ def test_list3(empty_list, service):
     assert empty_list in ret['stdout']
 
 
-@pytest.mark.toolbox
 def test_check_application_plans_values(service):
     """Check values of created and updated application plans."""
     # pylint: disable=unused-argument
