@@ -44,28 +44,35 @@ def custom_browser(request):
     return _custom_browser
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def custom_login(browser, request):
     """
-       Method for basic login to 3scale tenant
+       Method for basic login to 3scale tenant, fixture finalizer scope can be overridden by finalizer_request
        :param browser: browser based on UI settings
        :param request: finalizer for session cleanup
-       :return: Logged browser
+       :return: Function with logged browser
     """
-    def _login(name=None, password=None):
+    def _login(name=None, password=None, finalizer_request=None):
+        finalizer_request = finalizer_request or request
+
         def _clear_session():
             browser.selenium.delete_all_cookies()
-            browser.url = settings["threescale"]["admin"]["url"]
+            if old_session:
+                browser.selenium.add_cookie(old_session)
+                browser.refresh()
 
+        old_session = browser.selenium.get_cookie('user_session')
+        browser.selenium.delete_all_cookies()
+        browser.url = settings["threescale"]["admin"]["url"]
         login = LoginView(browser)
         login.do_login(name or settings["ui"]["username"], password or settings["ui"]["password"])
-        request.addfinalizer(_clear_session)
+        finalizer_request.addfinalizer(_clear_session)
         return browser
 
     return _login
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def login(custom_login):
     """
     Default login method called with test on start
@@ -75,7 +82,7 @@ def login(custom_login):
     return custom_login()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def navigator(browser):
     """
         Navigator for 3scale UI pages/Views

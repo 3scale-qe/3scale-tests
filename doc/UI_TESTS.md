@@ -101,7 +101,24 @@ which can be passed to View and make tweaks
 * `login` - Do basic login using `username` and `password` variable. If not provided 
 credentials from secret file will be used.
 
-* `navigation`
+* `custom_login` Do login with provided credentials.
+
+    param: `name=None` username for login
+    
+    param: `password=None` password for login
+    
+    param: `finalizer_request=None` can override default finalizer which is invoked at the end of the
+    fixture scope, if not set default scope (module) will be applied
+    
+    See example
+    
+ ```python
+def test_custom_login_example(navigator, custom_login, request):
+    custom_login(name="test@example.com", password="password", finalizer_request=request)
+    page = navigator.navigate(ExampleView)
+```
+
+* `navigator`
 
 ###Debugging
 
