@@ -33,7 +33,7 @@ class RetryKeycloakClient(KeycloakClient):
         retry = Retry(
             total=total,
             backoff_factor=1,
-            method_whitelist=False,
+            allowed_methods=False,
             status_forcelist=(503, 400, 403),
             raise_on_status=False,
             respect_retry_after_header=False
