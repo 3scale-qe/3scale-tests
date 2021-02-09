@@ -9,7 +9,7 @@ LOGLEVEL ?= INFO
 resultsdir ?= .
 
 ifdef junit
-flags += --junitxml=$(resultsdir)/junit-$@.xml
+flags += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
 endif
 
 PYTEST = pipenv run python -m pytest --tb=$(TB)
