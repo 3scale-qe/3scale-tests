@@ -4,7 +4,7 @@ Rewrite spec/functional_specs/policies/incorrect_policy_name_spec.rb
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 
 @pytest.fixture(scope="module")

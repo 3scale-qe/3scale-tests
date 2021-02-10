@@ -2,7 +2,8 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
+from testsuite.gateways.gateways import AbstractApicast, GatewayRequirements
+from testsuite.capabilities import Capability
 from testsuite.openshift.env import Environ
 
 if TYPE_CHECKING:

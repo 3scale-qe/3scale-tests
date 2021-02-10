@@ -6,7 +6,7 @@ Force apicast to use a specific configuration version by setting
 import pytest
 
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite import rawobj
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)

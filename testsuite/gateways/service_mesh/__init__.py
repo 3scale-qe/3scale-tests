@@ -4,7 +4,8 @@ from typing import Dict
 
 from threescale_api.resources import Service, Application
 
-from testsuite.gateways.gateways import AbstractGateway, GatewayRequirements, Capability
+from testsuite.gateways.gateways import AbstractGateway, GatewayRequirements
+from testsuite.capabilities import Capability
 from testsuite.gateways.service_mesh.client import ServiceMeshHttpClient
 from testsuite.gateways.service_mesh.httpbin import HttpbinFactory, Httpbin
 from testsuite.gateways.service_mesh.mesh import ServiceMeshFactory, ServiceMesh

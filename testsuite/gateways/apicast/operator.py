@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from threescale_api.resources import Service
 
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.openshift.env import Environ
 from testsuite.requirements import ThreeScaleAuthDetails
 from testsuite.utils import randomize

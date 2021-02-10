@@ -22,7 +22,7 @@ import pytest
 
 from pytest_cases import fixture_plus, parametrize_with_cases
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import blame
 

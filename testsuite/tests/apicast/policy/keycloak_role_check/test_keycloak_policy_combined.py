@@ -10,7 +10,7 @@ import pytest
 
 from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import randomize
 
 from testsuite import rawobj

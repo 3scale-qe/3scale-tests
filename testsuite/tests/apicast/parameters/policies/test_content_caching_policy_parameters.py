@@ -10,7 +10,7 @@ import pytest
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import blame, randomize
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),

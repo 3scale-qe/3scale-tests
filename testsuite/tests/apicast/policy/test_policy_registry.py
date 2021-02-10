@@ -6,7 +6,7 @@ Test if we are able to create custom policies through registers and use them.
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 
 @pytest.fixture

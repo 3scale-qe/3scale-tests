@@ -4,7 +4,7 @@ Then asserts that the gateway has been correctly deployed.
 """
 import pytest
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.openshift.client import ServiceTypes
 from testsuite.utils import blame
 

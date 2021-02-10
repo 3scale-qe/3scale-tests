@@ -2,7 +2,7 @@
 Rewrite spec/functional_specs/api_default_spec.rb
 """
 import pytest
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 
 def test_staging(api_client):

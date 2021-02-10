@@ -6,7 +6,7 @@ It is necessary to have the jaeger url config value set
 import pytest
 
 from testsuite.utils import randomize
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 CAPABILITIES = [Capability.JAEGER]
 

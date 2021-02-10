@@ -7,7 +7,7 @@ import pytest
 
 from testsuite.certificates import Certificate
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
 pytestmark = [

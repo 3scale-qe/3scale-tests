@@ -9,8 +9,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.gateways.gateways import Capability
-
+from testsuite.capabilities import Capability
 
 # This test can be done only with system apicast
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),

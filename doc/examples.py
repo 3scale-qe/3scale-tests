@@ -3,7 +3,7 @@ This is complication of examples how to use testsuite and write tests. As such
 this is not supposed to be executed and it isn't goal to have this executable
 """
 from testsuite.gateways import SelfManagedApicastOptions, SelfManagedApicast, TemplateApicastOptions, TemplateApicast
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
 import pytest

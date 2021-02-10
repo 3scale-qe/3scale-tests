@@ -2,7 +2,7 @@
 This policy checks client certificates against whitelist of certificates or CAs"""
 import pytest
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)

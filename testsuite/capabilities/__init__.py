@@ -6,8 +6,7 @@ In tests you can use it with pytest.mark.require_capabilities(capability1, capab
 Capabilities are provider by a functions annotated with @capability_provider and should return Set of capabilities
 """
 import enum
-from functools import reduce
-from typing import Set, Callable, Any, Optional
+from typing import Set, Callable, Any
 
 # Users should have access only to these public methods/decorators
 __all__ = ["CapabilityRegistry", "Capability"]
@@ -25,9 +24,18 @@ class Capability(enum.Enum):
     JAEGER = "jaeger"                           # Allows configuring the Apicast to send data to Jaeger
 
 
-class _CapabilityRegistry:
-    instance: 'Optional[_CapabilityRegistry]' = None
+class Singleton(type):
+    """Metaclass for creating Singletons"""
+    def __init__(cls, name, bases, mmbs):
+        super().__init__(name, bases, mmbs)
+        cls._instance = super().__call__()
 
+    def __call__(cls, *args, **kw):
+        return cls._instance
+
+
+class CapabilityRegistry(metaclass=Singleton):
+    """Registry for all the capabilities testsuite has"""
     def __init__(self) -> None:
         super().__init__()
         self.providers: Set[Callable[[], Set[Any]]] = set()
@@ -37,8 +45,8 @@ class _CapabilityRegistry:
     def capabilities(self):
         """Returns all capabilites"""
         if self._capabilities is None:
-            self._capabilities = set()
-            reduce(lambda result, provider: result.update(provider()), self.providers, self._capabilities)
+            sets = [provider() for provider in self.providers]
+            self._capabilities = set().union(*sets)
         return self._capabilities
 
     def register_provider(self, provider: Callable[[], Set[Any]]):
@@ -47,11 +55,3 @@ class _CapabilityRegistry:
 
     def __contains__(self, item):
         return item in self.capabilities
-
-
-# pylint: disable=invalid-name
-def CapabilityRegistry() -> _CapabilityRegistry:
-    """Returns singleton instance of CapabilityRegistry"""
-    if _CapabilityRegistry.instance is None:
-        _CapabilityRegistry.instance = _CapabilityRegistry()
-    return _CapabilityRegistry.instance

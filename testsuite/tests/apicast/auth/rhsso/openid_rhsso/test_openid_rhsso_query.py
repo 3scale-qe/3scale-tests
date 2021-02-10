@@ -8,7 +8,7 @@ import pytest
 from pytest_cases import parametrize_plus, fixture_ref
 
 from testsuite.echoed_request import EchoedRequest
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.tests.apicast.auth.rhsso.openid_rhsso.conftest import production_client, staging_client
