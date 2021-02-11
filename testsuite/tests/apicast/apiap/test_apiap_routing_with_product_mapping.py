@@ -2,7 +2,6 @@
 Test if APIAP routing only match paths that start with the routing path of the backend
 """
 import pytest
-import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
@@ -30,7 +29,7 @@ def mapping_rules(service):
 
 
 @pytest.fixture(scope="module")
-def api_client(api_client, application, service):
+def api_client(api_client, service):
     """
     Client without retry attempts
 
@@ -45,9 +44,7 @@ def api_client(api_client, application, service):
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 # pylint: disable=unused-argument

@@ -77,6 +77,22 @@ def application2(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
+@fixture_plus
+def client(application):
+    """api client for application"""
+    client = application.api_client()
+    yield client
+    client.close()
+
+
+@fixture_plus
+def client2(application2):
+    """api client for application2"""
+    client = application2.api_client()
+    yield client
+    client.close()
+
+
 @backoff.on_predicate(backoff.fibo, lambda x: x[0], 7)
 def retry_requests(client, client2, rate_limit_applied):
     """
@@ -105,19 +121,17 @@ def retry_requests(client, client2, rate_limit_applied):
 
 
 @pytest.mark.required_capabilities(Capability.SAME_CLUSTER)
-def test_leaky_bucket(api_client, application2, config):
+def test_leaky_bucket(client, client2, config):
     """
     Test rate limit policy with leaky bucket limiters configurations.
     This test is the same for the different configuration which are specified in the config_cases.py file.
     Based on the config[0] value, this test method tests:
         - True: the rate limit was applied to requests (at least one request should be rejected)
         - False: the rate limit was not applied to requests  (every requests should be successful)
-    :param application: first application
-    :param application2: second application
+    :param client: api_client for the first application
+    :param client2: api_client for the second application
     :param config: configuration of the actual test
     """
-    client = api_client()
-    client2 = api_client(application2)
     status_codes = retry_requests(client, client2, config[0])[1]
 
     successful = status_codes.count(200)

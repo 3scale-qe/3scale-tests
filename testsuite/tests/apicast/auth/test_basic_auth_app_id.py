@@ -5,7 +5,6 @@ Rewrite ./spec/functional_specs/auth/basic_auth_app_id_spec.rb
 """
 import pytest
 
-import threescale_api.auth
 from threescale_api.resources import Service
 
 from testsuite.utils import basic_auth_string
@@ -34,7 +33,7 @@ def test_basic_auth_app_id_key(application, api_client):
 
     Then request made with appropriate Basic auth made has to pass as expected"""
 
-    creds = application.authobj.credentials
+    creds = application.authobj().credentials
     expected_authorization = basic_auth_string(creds['app_id'], creds['app_key'])
 
     response = api_client().get('/get')
@@ -46,8 +45,8 @@ def test_basic_auth_app_id_key(application, api_client):
 def test_basic_auth_app_id_403_with_query(application, api_client):
     "Forbid access if credentials passed wrong way"
     client = api_client()
-    # pylint: disable=W0212  # Yes, I know what I am doing
-    client._session.auth = threescale_api.auth.AppIdKeyAuth(application, "query")
+
+    client.auth = application.authobj(location="query")
 
     response = client.get("/get")
 
@@ -57,8 +56,8 @@ def test_basic_auth_app_id_403_with_query(application, api_client):
 def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
     client = api_client()
-    # pylint: disable=W0212  # Yes, I know what I am doing
-    client._session.auth = None
+
+    client.auth = None
 
     response = client.get("/get")
 

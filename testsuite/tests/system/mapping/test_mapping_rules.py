@@ -9,7 +9,6 @@ and return 404 response code
 """
 
 import pytest
-import requests
 from testsuite import rawobj
 
 pytestmark = pytest.mark.required_capabilities()
@@ -61,9 +60,7 @@ def client(application, api_client):
     """
     application.test_request()  # this will ensure all is up
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 def test_mapping(client, endpoints_and_methods):

@@ -57,7 +57,7 @@ def test_rate_limit_connection_no_limit(logger, client, client2):
     assert len(responses) == TOTAL_REQUESTS
 
     # all responses should be ok
-    assert all(i.ok for i in responses)
+    assert all(i.status_code == 200 for i in responses)
 
 
 def test_rate_limit_connection(logger, client, client2):
@@ -79,14 +79,14 @@ def test_rate_limit_connection(logger, client, client2):
     assert len(responses) == TOTAL_REQUESTS
 
     # responses should be ok (connections limit + burst)
-    assert len([i for i in responses if i.ok]) == CONNECTIONS+BURST
+    assert len([i for i in responses if i.status_code == 200]) == CONNECTIONS+BURST
 
     # responses should receive 429 (above limit & burst)
     assert len([i for i in responses if i.status_code == 429]) == TOTAL_REQUESTS-(CONNECTIONS+BURST)
 
     # ok responses should be finished DELAY seconds later (delayed burst)
     delay = timedelta(seconds=DELAY)
-    times = sorted([datetime.strptime(i.headers["Date"], DATEFMT) for i in responses if i.ok])
+    times = sorted([datetime.strptime(i.headers["Date"], DATEFMT) for i in responses if i.status_code == 200])
     first = times[0]
     assert len([i for i in times if i - first < delay]) == CONNECTIONS
     assert len([i for i in times if i - first >= delay]) == BURST
@@ -234,12 +234,14 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 
 
 @pytest.fixture
-def client2(key_scope, request, api_client):
+def client2(key_scope, request):
     """A client of app2 to verify 'global' key_scope functionality"""
 
     if key_scope == "global":
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
-        return api_client(app2)
+        client = app2.api_client()
+        request.addfinalizer(client.close)
+        return client
 
     return None

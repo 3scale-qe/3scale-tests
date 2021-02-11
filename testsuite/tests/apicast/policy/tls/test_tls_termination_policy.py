@@ -2,8 +2,6 @@
 This policy instructs APIcast to use specific certificate for communicating with client.
 Tests both embedded and path type"""
 import pytest
-import requests
-from requests.exceptions import SSLError
 
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
@@ -46,19 +44,18 @@ def policy_settings(request):
 
 
 @pytest.fixture(scope="function")
-def client(application, api_client):
+def client(api_client):
     """Returns HttpClient instance with retrying feature skipped."""
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={503, 404})
 
 
 def test_get_should_return_ok(api_client, valid_authority):
     """Test tls termination policy with embedded type configuration."""
-    assert api_client().get("/get", verify=valid_authority.files["certificate"]).status_code == 200
+    assert api_client(verify=valid_authority.files["certificate"]).get("/get").status_code == 200
 
 
 def test_get_without_certs_should_fail(client):
     """Test tls termination policy with embedded type configuration."""
-    with pytest.raises(SSLError):
+
+    with pytest.raises(Exception, match='certificate verify failed: unable to get local issuer certificate'):
         client.get("/get")

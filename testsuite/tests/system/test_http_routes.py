@@ -40,7 +40,7 @@ def test_successful_requests(api_client, prod_client, application):
     response = api_client().get('/get')
     assert response.status_code == 200
 
-    request_url = urlparse(response.url)
+    request_url = urlparse(str(response.url))
     assert request_url.scheme == 'http'
     assert request_url.port == 80
 
@@ -48,6 +48,6 @@ def test_successful_requests(api_client, prod_client, application):
     response = prod_client(application).get('/get')
     assert response.status_code == 200
 
-    request_url = urlparse(response.url)
+    request_url = urlparse(str(response.url))
     assert request_url.scheme == 'http'
     assert request_url.port == 80

@@ -2,7 +2,6 @@
 Test for product metrics combined with routing policy.
 """
 import pytest
-import requests
 
 import testsuite.rawobj as rawobj
 
@@ -32,7 +31,7 @@ def proxy(service):
 
 
 @pytest.fixture(scope="module")
-def client(api_client, application, proxy):
+def client(api_client, proxy):
     """
     Client without retry attempts
 
@@ -48,9 +47,7 @@ def client(api_client, application, proxy):
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 @pytest.fixture(scope="module")

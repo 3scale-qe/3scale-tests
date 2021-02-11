@@ -10,7 +10,6 @@ the request matching that mapping rule is not evaluated by other mapping rules.
 """
 
 import pytest
-import requests
 
 import testsuite.rawobj as rawobj
 
@@ -61,9 +60,7 @@ def client(application, delete_mapping, api_client):
 
     application.test_request()  # ensure all is up and ready
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 @pytest.fixture(scope="module")

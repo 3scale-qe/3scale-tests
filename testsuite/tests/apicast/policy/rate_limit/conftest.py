@@ -40,25 +40,23 @@ def application(service_plus, custom_app_plan, custom_application, request):
 
 
 @fixture_plus
-def client(api_client):
+def client(application):
     """function-scoped api_client
 
     Furthermore urllib3 has to be boosted to allow enough connections"""
 
-    client = api_client()
+    client = application.api_client()
 
-    # this is hack to 'convince' urllib3 that more requests is better
-    # pylint: disable=protected-access
-    client._session.adapters["https://"].poolmanager.connection_pool_kw["maxsize"] = 500
-    # pylint: disable=protected-access
-    client._session.adapters["https://"].poolmanager.clear()
-
-    return client
+    client.extend_connection_pool(500)
+    yield client
+    client.close()
 
 
 @fixture_plus
-def client2(application2, api_client):
+def client2(application2):
     """
     Sets ssl_verify for api client
     """
-    return api_client(application2)
+    client = application2.api_client()
+    yield client
+    client.close()

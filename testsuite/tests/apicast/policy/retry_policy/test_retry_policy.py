@@ -9,7 +9,6 @@ The request will fail when:
     - the number of fail responses is greater them the max number of retries
 """
 import pytest
-import requests
 from testsuite import rawobj
 
 
@@ -45,9 +44,7 @@ def client(application, api_client):
     # this will ensure all is up
     assert application.test_request().status_code == 200
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 def reset_httpbin_endpoint(client):

@@ -3,7 +3,6 @@
 Test if apicast is able to serve requests only to listed services.
 """
 import pytest
-import requests
 
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
@@ -44,9 +43,7 @@ def client(application, api_client):
 
     application.test_request()
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 # initially this was designed in two separate tests, that didn't work as there

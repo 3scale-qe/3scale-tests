@@ -160,10 +160,7 @@ def test_skip_apicast_retrying_on_404(application, api_client):
     # desirable to ensure all is already up
     application.test_request()
 
-    session = requests.Session()
-    session.auth = application.authobj
-
-    client = api_client(session=session)
+    client = api_client(disable_retry_status_list={404})
 
     assert client.get("/status/404").status_code == 404
 

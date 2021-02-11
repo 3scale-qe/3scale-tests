@@ -15,11 +15,11 @@ class ServiceMeshHttpClient(HttpClient):
 
     # pylint: disable=too-many-locals
     def request(self, method, path, params=None, data=None, headers=None, cookies=None, files=None, auth=None,
-                timeout=None, allow_redirects=True, proxies=None, hooks=None, stream=None, verify=None, cert=None,
+                timeout=None, allow_redirects=True, proxies=None, hooks=None, stream=None,
                 json=None) -> requests.Response:
         path = self.root_path + "/" + path
         return super().request(method, path, params, data, headers, cookies, files, auth, timeout, allow_redirects,
-                               proxies, hooks, stream, verify, cert, json)
+                               proxies, hooks, stream, json)
 
     @property
     def _base_url(self) -> str:

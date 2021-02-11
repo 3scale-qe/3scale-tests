@@ -52,8 +52,7 @@ def client(application, prod_client):
     :return: production client
     """
     client = prod_client(app=application, redeploy=False)
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     return client
 
 
@@ -70,8 +69,7 @@ def client2(prod_client, application2, client):  # pylint: disable=unused-argume
     :return: production client
     """
     client = prod_client(app=application2)
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     return client
 
 

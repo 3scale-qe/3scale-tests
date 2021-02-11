@@ -49,7 +49,8 @@ def some_valid2(invalid_certificate, valid_authority):
 def test_tls_validation(certificate, api_client, certificates_and_code):
     """Test that TLS validation returns expected result when using client certificate"""
     _, code = certificates_and_code
-    response = api_client().get("/get",
-                                cert=(certificate.files["certificate"], certificate.files["key"])
-                                )
+
+    client = api_client(cert=(certificate.files["certificate"], certificate.files["key"]))
+    response = client.get("/get")
+
     assert response.status_code == code

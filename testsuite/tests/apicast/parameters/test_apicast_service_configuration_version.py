@@ -5,7 +5,6 @@ Force apicast to use a specific configuration version by setting
 """
 import pytest
 
-import threescale_api.auth
 
 from testsuite.gateways.gateways import Capability
 from testsuite import rawobj
@@ -37,7 +36,7 @@ def test_should_basic_authenticaton_returns_forbidden(api_client):
 def test_should_query_authentication_returns_ok(application, api_client):
     """Call to apicast with query credential location should return 200."""
     client = api_client()
-    # pylint: disable=protected-access
-    client._session.auth = threescale_api.auth.UserKeyAuth(application, "query")
+
+    client.auth = application.authobj(location="query")
 
     assert client.get("/get").status_code == 200

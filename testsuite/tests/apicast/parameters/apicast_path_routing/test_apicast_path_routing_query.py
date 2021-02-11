@@ -2,7 +2,6 @@
 Test that path based routing does match args
 """
 import pytest
-import requests
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
@@ -71,9 +70,6 @@ def test_non_matching_args(application2, api_client):
                     - with wrong query param will fail
                     - without query param will fail
     """
-    session = requests.Session()
-    session.auth = application2.authobj
-
-    client = api_client(application2, session=session)
+    client = api_client(application2, disable_retry_status_list={404})
     assert client.get('/anything/foo', params={'bar': 'baz'}).status_code == 404
     assert client.get('/anything/foo').status_code == 404

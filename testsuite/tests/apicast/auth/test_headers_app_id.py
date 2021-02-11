@@ -5,7 +5,6 @@ Rewrite ./spec/functional_specs/auth/headers_app_id_spec.rb
 """
 import pytest
 
-import threescale_api.auth
 from threescale_api.resources import Service
 
 
@@ -32,7 +31,7 @@ def test_auth_headers_app_id(application, api_client):
 
     Then request made with appropriate auth has to pass as expected"""
 
-    app_id = application.authobj.credentials["app_id"]
+    app_id = application.authobj().credentials["app_id"]
     response = api_client().get('/get')
 
     assert response.status_code == 200
@@ -44,7 +43,7 @@ def test_basic_auth_app_id_403_with_query(application, api_client):
     client = api_client()
 
     # pylint: disable=protected-access
-    client._session.auth = threescale_api.auth.AppIdKeyAuth(application, "query")
+    client.auth = application.authobj(location="query")
 
     response = client.get("/get")
 
@@ -54,8 +53,7 @@ def test_basic_auth_app_id_403_with_query(application, api_client):
 def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
     client = api_client()
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     response = client.get("/get")
 
     assert response.status_code == 403
