@@ -19,6 +19,7 @@ import testsuite.tools
 
 from testsuite import rawobj, CONFIGURATION, ROOT_DIR
 from testsuite.gateways.gateways import Capability
+from testsuite.requestbin import RequestBinClient
 from testsuite.utils import retry_for_session, blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
@@ -717,3 +718,11 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         return backend
 
     return _custom_backend
+
+
+@pytest.fixture(scope="module")
+def requestbin(testconfig, tools):
+    """
+    Returns an instance of RequestBin.
+    """
+    return RequestBinClient(weakget(testconfig)["requestbin"]["url"] % tools["request-bin"])
