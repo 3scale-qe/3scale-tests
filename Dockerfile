@@ -30,6 +30,7 @@ RUN chmod -R g+w /opt/workdir/*
 
 USER default
 
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 ENV WORKON_HOME=/opt/workdir/virtualenvs
 ENV junit=yes
 ENV resultsdir=/test-run-results
