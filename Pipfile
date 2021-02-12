@@ -18,7 +18,6 @@ pytest-html = "*"
 requests = "*"
 3scale-api = "*"
 dynaconf = "*"
-netifaces = "*"
 python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-client.git", editable = true}
 backoff = "*"
 websocket_client = "*"
