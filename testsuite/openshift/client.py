@@ -458,3 +458,9 @@ class OpenShiftClient:
         Starts a build specified by the build_name
         """
         self.do_action("start-build", [build_name, "--wait=true"])
+
+    def image_stream_tag(self, image_stream):
+        """
+        Gets the tag of the given imagestream
+        """
+        return self.do_action("get", ["imagestream", image_stream]).actions()[0].out.split()[7]
