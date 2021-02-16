@@ -22,14 +22,6 @@ def image_template():
 
 
 @pytest.fixture(scope="module")
-def amp_release(testconfig):
-    """
-    Returns the amp_release of the used default image stream
-    """
-    return testconfig["fixtures"]["apicast"]["parameters"]["modular_apicast"]["amp_release"]
-
-
-@pytest.fixture(scope="module")
 def image_stream_amp_apicast_custom_policy(request):
     """
     Returns the blamed name for the amp-apicast-custom-policy image stream
@@ -38,7 +30,7 @@ def image_stream_amp_apicast_custom_policy(request):
 
 
 @pytest.fixture(scope="module")
-def build_images(openshift, request, image_template, amp_release,
+def build_images(openshift, request, image_template,
                  image_stream_amp_apicast_custom_policy):
     """
     Builds images defined by a template specified in the image template applied with parameter
@@ -49,6 +41,8 @@ def build_images(openshift, request, image_template, amp_release,
     Adds finalizer to delete the created resources when the test ends.
     """
     openshift_client = openshift()
+
+    amp_release = openshift_client.image_stream_tag("amp-apicast")
     build_name_example_policy = blame(request, "apicast-example-policy")
     build_name_custom_policies = blame(request, "apicast-custom-policies")
     image_stream_apicast_policy = blame(request, "is-apicast-policy")
