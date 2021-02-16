@@ -82,7 +82,7 @@ def change_flows(application, flow_to_update, request):
 
 
 # Zync is sometimes too slow to update the RHSSO client.
-@backoff.on_predicate(backoff.constant, lambda x: x != TESTING_FLOWS, 60)
+@backoff.on_predicate(backoff.constant, lambda x: x != TESTING_FLOWS, 10)
 def get_flows(rhsso_client):
     """
     Retries until the changed flows appear on the RHSSO side.

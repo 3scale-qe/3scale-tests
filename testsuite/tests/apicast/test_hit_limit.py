@@ -129,7 +129,7 @@ def wait_until_retry_after(response):
     time.sleep(int(retry_after))
 
 
-@backoff.on_predicate(backoff.constant, lambda x: x.status_code != 429, 30)
+@backoff.on_predicate(backoff.constant, lambda x: x.status_code != 429, 10)
 def make_requests(api_client):
     """Make sure that we hit 429 status code without possible infinite loop"""
     return api_client.get("/")

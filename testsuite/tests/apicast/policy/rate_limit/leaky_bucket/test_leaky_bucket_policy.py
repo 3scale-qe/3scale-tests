@@ -77,7 +77,7 @@ def application2(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
-@backoff.on_predicate(backoff.constant, lambda x: x[0], 20)
+@backoff.on_predicate(backoff.constant, lambda x: x[0], 10)
 def retry_requests(client, client2, rate_limit_applied):
     """
     Retries requests to both clients

@@ -30,7 +30,7 @@ def api_client(application):
     return application.api_client(session=session)
 
 
-@backoff.on_predicate(backoff.constant, lambda x: x.headers.get("server", "") != "openresty", 60)
+@backoff.on_predicate(backoff.constant, lambda x: x.headers.get("server", "") != "openresty", 10)
 def make_requests(api_client):
     """Make sure that we get 503 apicast (backend is not available)"""
     return api_client.get("/anything")
