@@ -58,7 +58,7 @@ def application2(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
-@backoff.on_predicate(backoff.constant, lambda x: x[0] != 429 or x[1] != 429, config_cases.TIME_WINDOW)
+@backoff.on_predicate(backoff.constant, lambda x: x[0] != 429 or x[1] != 429, max_time=config_cases.TIME_WINDOW)
 def retry_requests(client, client2):
     """
     Retries request to get both status codes with value 429 in fixed window time
