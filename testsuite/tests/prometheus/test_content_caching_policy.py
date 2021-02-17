@@ -44,8 +44,9 @@ def prod_client(prod_client):
 @pytest.fixture(scope="module")
 def api_client(api_client):
     """Apicast needs to load configuration in order to cache incoming requests"""
-    api_client.get("/anything")
-    return api_client
+    client = api_client()
+    client.get("/anything")
+    return client
 
 
 @pytest.mark.disruptive

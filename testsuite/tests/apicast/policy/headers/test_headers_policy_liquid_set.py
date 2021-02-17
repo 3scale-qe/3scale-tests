@@ -27,16 +27,16 @@ def policy_settings():
 def test_header_policy_add_to_response_with_liquid_service_id_api_client(api_client, service):
     """must add header to response using the liquid - service id should be expanded"""
     liquid_value = f"Service_id {service.entity_id}"
-    response = api_client.get("/get")
+    response = api_client().get("/get")
 
     assert "X-response-liquid-set" in response.headers
     assert response.headers["X-response-liquid-set"] == liquid_value
 
 
-def test_header_policy_add_to_request_without_liquid_service_id(application):
+def test_header_policy_add_to_request_without_liquid_service_id(api_client):
     """must add header to request without using the liquid - service id should not be expanded"""
     value = "Service_id {{ service.id }}"
-    response = application.test_request()
+    response = api_client().get('/get')
     echoed_request = EchoedRequest.create(response)
 
     assert "X-request-no-liquid-set" in echoed_request.headers

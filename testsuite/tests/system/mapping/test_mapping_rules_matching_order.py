@@ -56,8 +56,9 @@ def test_mapping_rules_matching_order(api_client, application):
     Assert that after matching the third one with the last flag set to true,
     no other mapping has been matched, therefor the hits increased only once.
     """
+    client = api_client()
 
-    response_twice = api_client.get("/anything/foo/123")
+    response_twice = client.get("/anything/foo/123")
     assert response_twice.status_code == 200
 
     analytics = application.threescale_client.analytics
@@ -65,7 +66,7 @@ def test_mapping_rules_matching_order(api_client, application):
                                              metric_name="metric_twice")["total"]
     assert metric_twice == 2
 
-    response_once = api_client.get("/anything/bar/123")
+    response_once = client.get("/anything/bar/123")
     assert response_once.status_code == 200
 
     analytics = application.threescale_client.analytics

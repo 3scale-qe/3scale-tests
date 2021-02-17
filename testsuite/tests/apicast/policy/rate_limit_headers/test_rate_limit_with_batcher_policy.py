@@ -48,15 +48,16 @@ def test_multiple_limits(api_client):
     (The reported number is -1 of the reality, as the last request was not reported), the combination with the
     batcher policy is not aimed to be 100% accurate)
     """
+    client = api_client()
     wait_interval()
 
     for _ in range(5):
-        assert api_client.get("/anything").status_code == 200
+        assert client.get("/anything").status_code == 200
 
     # waits for the batcher policy to report
     time.sleep(2)
 
-    response = api_client.get("/anything")
+    response = client.get("/anything")
 
     assert int(response.headers["RateLimit-Limit"]) == 10
     assert int(response.headers["RateLimit-Remaining"]) == 5

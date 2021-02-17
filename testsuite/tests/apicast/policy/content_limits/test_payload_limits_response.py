@@ -28,5 +28,5 @@ def test_payload_limits_response(api_client, num_bytes, status_code):
     - if num_bytes < RESPONSE_LIMIT assert 200
     - if num bytes > RESPONSE_LIMIT assert 413
     """
-    response = api_client.get(f"/bytes/{num_bytes}")
+    response = api_client().get(f"/bytes/{num_bytes}")
     assert response.status_code == status_code

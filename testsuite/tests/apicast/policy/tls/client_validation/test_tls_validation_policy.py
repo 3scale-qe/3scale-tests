@@ -20,16 +20,16 @@ def certificates_and_code(request):
     return [request.getfixturevalue(request.param[0])], request.param[1]
 
 
-def test_tls_validation(certificate, application, certificates_and_code):
+def test_tls_validation(certificate, api_client, certificates_and_code):
     """Test that TLS validation returns expected result when using client certificate"""
     _, code = certificates_and_code
-    response = application.api_client().get("/get",
-                                            cert=(certificate.files["certificate"], certificate.files["key"])
-                                            )
+    response = api_client().get("/get",
+                                cert=(certificate.files["certificate"], certificate.files["key"])
+                                )
     assert response.status_code == code
 
 
-def test_tls_validation_no_cert(application):
+def test_tls_validation_no_cert(api_client):
     """Test that TLS validation with no client certificate"""
-    response = application.api_client().get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 400

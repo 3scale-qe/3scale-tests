@@ -23,25 +23,25 @@ def gateway_environment(gateway_environment):
     return gateway_environment
 
 
-def test_get_route_request_returns_ok(api_client, private_base_url):
+def test_get_route_request_returns_ok(client, private_base_url):
     """Call to mapping /get returns 200 OK."""
-    response = api_client.get("/get")
+    response = client.get("/get")
     echoed = EchoedRequest.create(response)
 
     assert response.status_code == 200
     assert echoed.headers["Host"] == urlparse(private_base_url()).hostname
 
 
-def test_echo_route_request_returns_ok(api_client2, private_base_url):
+def test_echo_route_request_returns_ok(client2, private_base_url):
     """Call to mapping /echo returns 200 OK."""
-    response = api_client2.get("/echo")
+    response = client2.get("/echo")
     assert response.status_code == 200
 
     echoed = EchoedRequest.create(response)
     assert echoed.headers["Host"] == urlparse(private_base_url("echo_api")).hostname
 
 
-def test_not_mapped_route_returns_not_found(application2):
+def test_not_mapped_route_returns_not_found(application2, api_client):
     """Call to not mapped route /anything/blah returns 404 Not Found.
 
     Path-based routing fails and it fallback to the default host-based routing.
@@ -50,6 +50,6 @@ def test_not_mapped_route_returns_not_found(application2):
     session.auth = application2.authobj
 
     # skip retrying on 404 by passing Session instance to it
-    client = application2.api_client(session=session)
+    client = api_client(application2, session=session)
 
     assert client.get("/anything/blah").status_code == 404

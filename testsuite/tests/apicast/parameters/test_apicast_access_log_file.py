@@ -26,10 +26,11 @@ def gateway_environment(gateway_environment):
 @pytest.fixture
 def make_requests(api_client):
     """Make hits numbers of requests against gateway."""
+    client = api_client()
 
     def run(hits):
         for _ in range(hits):
-            assert api_client.get("/get").status_code == 200
+            assert client.get("/get").status_code == 200
 
     return run
 

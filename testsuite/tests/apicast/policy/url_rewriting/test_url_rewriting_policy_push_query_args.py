@@ -18,11 +18,11 @@ def policy_settings():
                                 {"op": "push", "arg": "arg", "value": "value"}]})
 
 
-def test_url_rewriting_push_query_args(application, testconfig):
+def test_url_rewriting_push_query_args(api_client):
     """
     Check if request rewrite query args
     """
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
     response = client.get("/get", params={"arg": "old_value"})
     assert response.status_code == 200
 

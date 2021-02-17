@@ -26,7 +26,7 @@ def test_mapping_with_escape_sequence(api_client, application):
     """When making request to /anything/foo/bar%20%20bar/baz
     then it should pass, metric should increase"""
 
-    response = api_client.get("/anything/foo/bar%20%20bar/baz")
+    response = api_client().get("/anything/foo/bar%20%20bar/baz")
     assert response.status_code == 200
 
     analytics = application.threescale_client.analytics

@@ -28,7 +28,7 @@ def jwt_claim(request):
 # therefore explicit dependency required.
 # (is it because of parametrisation or some function scoped fixtures?)
 # pylint: disable=unused-argument
-def test_auth_client_id(rhsso_setup, application, service, credentials_location, jwt_claim):
+def test_auth_client_id(rhsso_setup, api_client, service, credentials_location, jwt_claim):
     """
     Test client access when service is configured with valid jwt
     Then request made with appropriate Basic auth made has to pass as expected
@@ -41,6 +41,6 @@ def test_auth_client_id(rhsso_setup, application, service, credentials_location,
 
     service.proxy.deploy()
     assert service["backend_version"] == Service.AUTH_OIDC
-    response = application.api_client().get("/get")
+    response = api_client().get("/get")
 
     assert response.status_code == status_code

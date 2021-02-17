@@ -23,7 +23,7 @@ def test_routing_policy_path(api_client):
     The /foo should be removed from the path and the following part should be left
     untouched. In particular, it should not be escaped to "%25EF%25EF%25EF"
     """
-    response = api_client.get("/foo/%EF%EF%EF")
+    response = api_client().get("/foo/%EF%EF%EF")
     echoed_request = EchoedRequest.create(response)
 
     assert response.status_code == 200

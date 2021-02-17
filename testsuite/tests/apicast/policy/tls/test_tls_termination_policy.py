@@ -46,19 +46,19 @@ def policy_settings(request):
 
 
 @pytest.fixture(scope="function")
-def api_client(application):
+def client(application, api_client):
     """Returns HttpClient instance with retrying feature skipped."""
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
-def test_get_should_return_ok(application, valid_authority):
+def test_get_should_return_ok(api_client, valid_authority):
     """Test tls termination policy with embedded type configuration."""
-    assert application.api_client().get("/get", verify=valid_authority.files["certificate"]).status_code == 200
+    assert api_client().get("/get", verify=valid_authority.files["certificate"]).status_code == 200
 
 
-def test_get_without_certs_should_fail(api_client):
+def test_get_without_certs_should_fail(client):
     """Test tls termination policy with embedded type configuration."""
     with pytest.raises(SSLError):
-        api_client.get("/get")
+        client.get("/get")

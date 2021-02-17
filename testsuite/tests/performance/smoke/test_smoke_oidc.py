@@ -56,15 +56,16 @@ def wait_run(run):
     return run.reload()
 
 
-def test_smoke_oidc(applications, setup_benchmark):
+def test_smoke_oidc(applications, setup_benchmark, prod_client):
     """
         Test checks that application is setup correctly.
         Runs the created benchmark.
         Asserts it was successful.
     """
     for app in applications:
-        assert app.api_client(endpoint="endpoint").get("/0/anything").status_code == 200
-        assert app.api_client(endpoint="endpoint").post("/0/anything").status_code == 200
+        client = prod_client(app, promote=False, redeploy=False)
+        assert client.get("/0/anything").status_code == 200
+        assert client.post("/0/anything").status_code == 200
 
     benchmark = setup_benchmark.create_benchmark()
     run = benchmark.start()

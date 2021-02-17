@@ -31,12 +31,12 @@ def service(service, private_base_url, staging_gateway):
 
 def test_should_basic_authenticaton_returns_forbidden(api_client):
     """Call to apicast with authorization credential location should return 403."""
-    assert api_client.get("/get").status_code == 403
+    assert api_client().get("/get").status_code == 403
 
 
-def test_should_query_authentication_returns_ok(application):
+def test_should_query_authentication_returns_ok(application, api_client):
     """Call to apicast with query credential location should return 200."""
-    client = application.api_client()
+    client = api_client()
     # pylint: disable=protected-access
     client._session.auth = threescale_api.auth.UserKeyAuth(application, "query")
 

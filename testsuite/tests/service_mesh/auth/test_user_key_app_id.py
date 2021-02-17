@@ -32,8 +32,9 @@ def invalid_auth(service_settings):
 def test_request_with_auth(api_client, credentials_location):
     """Check valid credentials passed in query and headers, should return 200"""
     # pylint: disable=protected-access
-    api_client._session.auth.location = credentials_location
-    response = api_client.get("/get")
+    client = api_client()
+    client._session.auth.location = credentials_location
+    response = client.get("/get")
 
     assert response.status_code == 200
 
@@ -42,10 +43,11 @@ def test_request_with_auth(api_client, credentials_location):
 def test_request_with_wrong_auth(api_client, invalid_auth, credentials_location):
     """Check wrong credentials passed in query (params) or headers, should fail with 403 """
     # pylint: disable=protected-access
-    api_client._session.auth = None
+    client = api_client()
+    client._session.auth = None
 
     auth = {credentials_location: invalid_auth}
-    response = api_client.get("/get", **auth)
+    response = client.get("/get", **auth)
 
     assert response.status_code == 403
 
@@ -53,7 +55,8 @@ def test_request_with_wrong_auth(api_client, invalid_auth, credentials_location)
 def test_request_without_auth(api_client):
     """Forbid access if no credentials are provided, should fail with 401"""
     # pylint: disable=protected-access
-    api_client._session.auth = None
-    response = api_client.get("/get")
+    client = api_client()
+    client._session.auth = None
+    response = client.get("/get")
 
     assert response.status_code == 401

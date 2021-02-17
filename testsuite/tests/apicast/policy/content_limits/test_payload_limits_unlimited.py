@@ -35,11 +35,12 @@ def test_policy_limit_passing(api_client):
     - assert response status code is 200
     """
     data = random_string(1000)
+    client = api_client()
 
     # requests/urllib3 doesn't retry post(); need get() to wait until all is up
-    api_client.get("/get")
+    client.get("/get")
 
-    response = api_client.post('/post', data=data)
+    response = client.post('/post', data=data)
     assert response.status_code == 200
 
 
@@ -49,5 +50,5 @@ def test_payload_limits_response(api_client):
       containing a body of length 1000
     - assert that the response status code is 200
     """
-    response = api_client.get("/bytes/1000")
+    response = api_client().get("/bytes/1000")
     assert response.status_code == 200

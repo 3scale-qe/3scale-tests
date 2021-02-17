@@ -96,6 +96,6 @@ def test_modular_apicast(build_images, api_client):
     Sends a request.
     Asserts that the header added by the example policy is present.
     """
-    response = api_client.get("/")
+    response = api_client().get("/")
     assert response.status_code == 200
     assert 'X-Example-Policy-Response' in response.headers

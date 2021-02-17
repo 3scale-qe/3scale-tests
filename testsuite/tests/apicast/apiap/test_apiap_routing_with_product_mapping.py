@@ -30,7 +30,7 @@ def mapping_rules(service):
 
 
 @pytest.fixture(scope="module")
-def api_client(application, service):
+def api_client(api_client, application, service):
     """
     Client without retry attempts
 
@@ -40,14 +40,14 @@ def api_client(application, service):
     """
     proxy = service.proxy.list()
 
-    assert application.api_client().get("/bin/anything").status_code == 200
+    assert api_client().get("/bin/anything").status_code == 200
 
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 # pylint: disable=unused-argument

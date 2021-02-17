@@ -34,20 +34,20 @@ def backends_mapping(custom_backend, private_base_url):
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(application, api_client):
     """Make sure that api_client is using http2"""
     session = requests.session()
     retry_for_session(session)
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
-def test_full_http2(api_client):
+def test_full_http2(client):
     """
     Test full HTTP2 traffic
     client --> apicast --> backend
     """
-    response = api_client.get("/http2/info")
+    response = client.get("/http2/info")
     # client --> apicast
     assert response.status_code == 200
     assert response.raw.version.value == "HTTP/2"
@@ -59,13 +59,13 @@ def test_full_http2(api_client):
 
 # Skip because the test is using default api_client which is overridden by HTTP2 client
 @pytest.mark.skipif("HTTP2")
-def test_http1(application):
+def test_http1(api_client):
     """
     Test successful request
     [http1] client --> apicast
     [http2] apicast --> backend
     """
-    api_client = application.api_client()
+    api_client = api_client()
 
     # client --> apicast
     response = api_client.get("/http2/info")

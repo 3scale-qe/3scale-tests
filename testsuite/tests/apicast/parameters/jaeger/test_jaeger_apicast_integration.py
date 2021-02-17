@@ -23,7 +23,7 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_randomized_name):
         "http.url" and "original_request_uri" respectively
     """
     endpoint = f"/anything/{randomize('random-endpoint')}"
-    response = api_client.get(endpoint)
+    response = api_client().get(endpoint)
     assert response.status_code == 200
 
     traces = jaeger.traces(jaeger_randomized_name, "/")

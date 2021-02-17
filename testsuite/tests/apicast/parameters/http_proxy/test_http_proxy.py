@@ -30,7 +30,7 @@ def gateway_environment(gateway_environment, testconfig):
 def test_proxied_request(api_client, private_base_url):
     """Call to /headers should go through Fuse Camel proxy and return 200 OK."""
 
-    response = api_client.get("/headers")
+    response = api_client().get("/headers")
     assert response.status_code == 200
 
     headers = response.json()["headers"]

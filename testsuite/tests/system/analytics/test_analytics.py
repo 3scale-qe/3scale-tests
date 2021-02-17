@@ -34,10 +34,11 @@ def test_hits_service(application, api_client, app2):
     requests_app = 6
     requests_app2 = 4
 
-    client2 = app2.api_client()
+    client = api_client()
+    client2 = api_client(app2)
 
     for _ in range(requests_app):
-        assert api_client.get("/get").status_code == 200
+        assert client.get("/get").status_code == 200
 
     for _ in range(requests_app2):
         assert client2.get("/get").status_code == 200

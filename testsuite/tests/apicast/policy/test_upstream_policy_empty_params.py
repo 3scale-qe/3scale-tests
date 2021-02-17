@@ -26,11 +26,12 @@ def service(service, private_base_url):
 
 
 @pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1506")
-def test_upstream_policy_empty_params(application, testconfig):
+def test_upstream_policy_empty_params(api_client):
     """
     Test if it redirect to the echo-api without nil params
     """
-    client = application.api_client(verify=testconfig["ssl_verify"])
+    client = api_client()
+
     response = client.get("/v1")
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)

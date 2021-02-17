@@ -37,7 +37,7 @@ def test_caching_policy_allow_mod(openshift, api_client, service):
     """
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = api_client.get("/")
+    response = api_client().get("/")
     assert response.status_code == 200
 
     caching_type = service.proxy.list().policies.list()
@@ -50,7 +50,7 @@ def test_caching_policy_allow_mod(openshift, api_client, service):
     openshift.scale("backend-listener", 0)
 
     try:
-        response = api_client.get("/")
+        response = api_client().get("/")
         assert response.status_code == 403
     finally:
         openshift.scale("backend-listener", replicas)

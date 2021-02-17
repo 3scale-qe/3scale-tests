@@ -41,13 +41,15 @@ def test_multiple_limits(api_client):
     - sends a request
     - asserts, that the RateLimits for the 'hour' limit are returned
     """
+    client = api_client()
+
     wait_interval()
     # prevents refreshing the hour limits in the middle of the test, and asserts the reamining seconds in the
     # hour limit will be greater then 60
     wait_interval_hour(max_min=57)
 
     for i in range(5):
-        response = api_client.get("/anything")
+        response = client.get("/anything")
         assert response.status_code == 200
         assert int(response.headers["RateLimit-Limit"]) == 5, f"The response rate limits failed on the {i} call" \
                                                               f"\nRateLimit-Remaining: " \
@@ -56,7 +58,7 @@ def test_multiple_limits(api_client):
 
     wait_until_next_minute()
 
-    response = api_client.get("/anything")
+    response = client.get("/anything")
     assert int(response.headers["RateLimit-Limit"]) == 7
     assert int(response.headers["RateLimit-Remaining"]) == 1
     assert int(response.headers["RateLimit-Reset"]) > 60

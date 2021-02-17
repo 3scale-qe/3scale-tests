@@ -19,11 +19,11 @@ def service(service):
 
 def test_ip_check_policy_ip_blacklisted(api_client):
     """test must reject the request since IP is blacklisted"""
-    response = api_client.get("/get", headers={"X-Real-IP": "10.10.10.10"})
+    response = api_client().get("/get", headers={"X-Real-IP": "10.10.10.10"})
     assert response.status_code == 403
 
 
 def test_ip_check_policy_ip_not_blacklisted(api_client):
     """test must accept the request since IP is not blacklisted"""
-    response = api_client.get("/get", headers={"X-Real-IP": "10.10.10.25"})
+    response = api_client().get("/get", headers={"X-Real-IP": "10.10.10.25"})
     assert response.status_code == 200

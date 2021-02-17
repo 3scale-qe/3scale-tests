@@ -40,12 +40,12 @@ def service_proxy_settings(private_base_url):
 
 
 # pylint: disable=unused-argument
-def test_mapping_rule_wrongly_matched(application2, api_client):
+def test_mapping_rule_wrongly_matched(application2, client):
     """
     service2 has to be created before service
 
     Makes a request to an endpoint containing a space char.
     Asserts that the response is not "no mapping rule matched"
     """
-    response = api_client.get("/foo/123 123/bar")
+    response = client.get("/foo/123 123/bar")
     assert response.status_code == 200

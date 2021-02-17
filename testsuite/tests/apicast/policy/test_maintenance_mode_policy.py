@@ -19,9 +19,9 @@ def policy_settings():
 
 
 @pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-3189")
-def test_maintenance_mode_policy(testconfig, application):
+def test_maintenance_mode_policy(api_client):
     """Test request to service with maintenance_mode set returns appropriate message and status code"""
 
-    response = application.test_request(verify=testconfig["ssl_verify"])
+    response = api_client().get('/get')
     assert response.status_code == 328
     assert response.text == "Service Unavailable - Maintenance\n"

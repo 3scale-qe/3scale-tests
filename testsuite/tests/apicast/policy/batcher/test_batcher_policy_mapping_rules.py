@@ -41,25 +41,25 @@ def service(service):
 
 
 @pytest.fixture(scope='module')
-def api_client(application):
+def client(application, api_client):
     """We are testing path that doesn't match mapping rule so we need to disable retry"""
-    assert application.api_client().get("/get").status_code == 200
+    assert api_client().get("/get").status_code == 200
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
-def test_batcher_policy_append(api_client, application):
+def test_batcher_policy_append(client, application):
     """Test if return correct number of usages of a service in batch"""
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
 
     for i in range(3):
-        response = api_client.get("/get")
+        response = client.get("/get")
         assert response.status_code == 200, f"{i}. iteration was unsuccessful"
 
-        response = api_client.get("/anything/no_mapping_rule_match")
+        response = client.get("/anything/no_mapping_rule_match")
         assert response.status_code == 404, f"{i}. iteration was unsuccessful"
 
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]

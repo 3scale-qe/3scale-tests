@@ -35,10 +35,12 @@ def test_logging(api_client, staging_gateway):
     """
     Tests that the logs contain the log only after a 200 response
     """
-    api_client.get("/status/201")
+    client = api_client()
+
+    client.get("/status/201")
     logs = staging_gateway.get_logs()
     assert LOG_MESSAGE not in logs
 
-    api_client.get("/status/200")
+    client.get("/status/200")
     logs = staging_gateway.get_logs()
     assert LOG_MESSAGE in logs

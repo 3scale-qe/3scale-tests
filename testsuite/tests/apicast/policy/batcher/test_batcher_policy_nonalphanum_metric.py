@@ -53,12 +53,13 @@ def test_batcher_policy_append(api_client, application, metric_name):
     """
     Test if the reported numbers of usages are correct
     """
+    client = api_client()
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(
         application["service_id"], metric_name=metric_name)["total"]
 
     for i in range(3):
-        response = api_client.get("/anything")
+        response = client.get("/anything")
         assert response.status_code == 200, f"{i}. iteration was unsuccessful"
 
     sleep(BATCH_REPORT_SECONDS + 1)

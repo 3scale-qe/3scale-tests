@@ -17,7 +17,7 @@ def policy_settings():
 
 def test_url_rewriting_query_liquid(api_client):
     """Test for valid and invalid liquid tag"""
-    response = api_client.get("/get")
+    response = api_client().get("/get")
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.params["valid"] == "/get"

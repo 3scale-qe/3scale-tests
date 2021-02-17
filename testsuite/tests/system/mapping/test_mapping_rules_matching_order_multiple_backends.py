@@ -50,7 +50,7 @@ def delete_mapping(proxy):
 
 @pytest.fixture(scope="module")
 # pylint: disable=unused-argument
-def api_client(application, delete_mapping):
+def client(application, delete_mapping, api_client):
     """
     Client configured not to retry requests.
 
@@ -63,7 +63,7 @@ def api_client(application, delete_mapping):
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
 @pytest.fixture(scope="module")
@@ -155,7 +155,7 @@ def hits(app):
       ("/backpath1/path1/bar", 1)])
 ])
 # pylint: disable=unused-argument
-def test(application, api_client, backend_usages, backends, expect_ok):
+def test(application, client, backend_usages, backends, expect_ok):
     """
     Make requests against all backends and mappings
     Assert that these requests return 200
@@ -171,7 +171,7 @@ def test(application, api_client, backend_usages, backends, expect_ok):
     for path, expected_hits_diff in expect_ok:
         hits_before = hits(application)
 
-        response = api_client.get(path)
+        response = client.get(path)
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
         hits_after = hits(application)

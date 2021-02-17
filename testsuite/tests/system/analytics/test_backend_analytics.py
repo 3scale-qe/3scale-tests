@@ -51,10 +51,11 @@ def test_analytics(application, api_client, backend):
     Asserts that the number of sent requests is the same as the number reported
     by analytics.
     """
+    client = api_client()
     num_requests = 5
 
     for _ in range(num_requests):
-        assert api_client.get("/anything/get").status_code == 200
+        assert client.get("/anything/get").status_code == 200
 
     backend_metric = backend.metrics.list()[0]
 

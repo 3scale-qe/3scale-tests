@@ -48,5 +48,5 @@ def test_custom_tenant(api_client):
     Makes a request using the tenant
     Asserts that the response code is 200
     """
-    response = api_client.get("/anything")
+    response = api_client().get("/anything")
     assert response.status_code == 200

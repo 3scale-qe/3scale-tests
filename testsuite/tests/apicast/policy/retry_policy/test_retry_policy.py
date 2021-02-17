@@ -34,7 +34,7 @@ def staging_gateway(staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(application, api_client):
     """
     Client configured not to retry requests.
 
@@ -47,13 +47,13 @@ def api_client(application):
 
     session = requests.Session()
     session.auth = application.authobj
-    return application.api_client(session=session)
+    return api_client(session=session)
 
 
-def reset_httpbin_endpoint(api_client):
+def reset_httpbin_endpoint(client):
     """Reset httpbin endpoint before each call by making request to
        /fail-request/0/200 endpoint"""
-    api_client.get("/fail-request/0/200")
+    client.get("/fail-request/0/200")
 
 
 @pytest.mark.parametrize("num_of_requests, awaited_response", [
@@ -61,7 +61,7 @@ def reset_httpbin_endpoint(api_client):
     pytest.param(5, 200, id="5 request should succeed"),
     pytest.param(6, 500, id="6 request, should fail")
 ])
-def test_retry_policy(api_client, num_of_requests, awaited_response):
+def test_retry_policy(client, num_of_requests, awaited_response):
     """
     To test retry policy:
     - append the retry policy, conifgured to retry max n times
@@ -75,7 +75,7 @@ def test_retry_policy(api_client, num_of_requests, awaited_response):
     - make request n+1 times (/fail-request/n+1/500)
     - test if response is 500
     """
-    reset_httpbin_endpoint(api_client)
-    response = api_client.get(
+    reset_httpbin_endpoint(client)
+    response = client.get(
         "/fail-request/" + str(num_of_requests) + "/500")
     assert response.status_code == awaited_response

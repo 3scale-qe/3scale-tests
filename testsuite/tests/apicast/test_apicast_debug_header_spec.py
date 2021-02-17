@@ -18,7 +18,7 @@ def test_make_request(api_client, service, application):
     user_key = application.authobj.credentials["user_key"]
     debug_header = service.proxy.list().configs.latest()['content']['backend_authentication_value']
 
-    response = api_client.get('/get', headers={'X-3scale-Debug': debug_header})
+    response = api_client().get('/get', headers={'X-3scale-Debug': debug_header})
 
     assert response.status_code == 200
 

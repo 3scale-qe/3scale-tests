@@ -24,7 +24,7 @@ def test_logging(api_client, staging_gateway):
     Asserts that the access log containing the randomized endpoint is not in the apicast logs
     """
     endpoint = randomize("/anything/endpoint")
-    api_client.get(endpoint)
+    api_client().get(endpoint)
 
     logs = staging_gateway.get_logs()
     logs = logs.splitlines()

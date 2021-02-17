@@ -7,15 +7,16 @@ from pytest_cases import fixture_plus
 
 
 @fixture_plus(scope="module")
-def api_client(api_client):
+def staging_client(api_client):
     """
     Staging client
     The auth of the session is set up to none in order to test different auth methods
     The auth of the request will be passed in test functions
     """
     # pylint: disable=protected-access
-    api_client._session.auth = None
-    return api_client
+    client = api_client()
+    client._session.auth = None
+    return client
 
 
 # Used for parametrize_plus, because normal fixture doesn't work with @parametrize_plus

@@ -39,16 +39,12 @@ def application_app_id_key(custom_application, custom_app_plan, service_app_id_k
     return app
 
 
-@pytest.fixture(scope="module")
-def api_client_app_id_key(application_app_id_key, testconfig):
-    "client providing access to app with default_credentials using app_id/key"
-    return application_app_id_key.api_client(verify=testconfig["ssl_verify"])
-
-
-@pytest.fixture(params=["api_client", "api_client_app_id_key"], ids=["user_key", "app_id_key"])
-def a_client(request):
+@pytest.fixture(params=["application", "application_app_id_key"], ids=["user_key", "app_id_key"])
+def a_client(request, api_client):
     "Helper to provide other fixtures as parameters"
-    client = request.getfixturevalue(request.param)
+    app = request.getfixturevalue(request.param)
+    client = api_client(app)
+
     # now disable builtin auth credentials
     client._session.auth = None  # pylint: disable=protected-access
 

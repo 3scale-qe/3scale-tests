@@ -40,9 +40,10 @@ def test_policy_limit_passing(api_client, num_bytes, status_code):
     - if num bytes > RESPONSE_LIMIT assert 413
     """
     data = random_string(num_bytes)
+    client = api_client()
 
     # requests/urllib3 doesn't retry post(); need get() to wait until all is up
-    api_client.get("/get")
+    client.get("/get")
 
-    response = api_client.post('/post', data=data)
+    response = client.post('/post', data=data)
     assert response.status_code == status_code

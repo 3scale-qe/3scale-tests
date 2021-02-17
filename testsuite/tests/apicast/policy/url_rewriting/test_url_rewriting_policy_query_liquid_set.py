@@ -108,7 +108,7 @@ def test_query_rewrite_policy_liquid_set(api_client, service, all_params):
         - for each parameter p, a liquid tag "#{p}" is added and it is not empty
     """
 
-    response = api_client.get("/get")
+    response = api_client().get("/get")
 
     assert response.status_code == 200
 

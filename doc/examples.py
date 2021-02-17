@@ -22,9 +22,10 @@ def test_basic_request(application):
 # or use api_client
 def test_another_basic_request(api_client):
     """test requests have to pass and return HTTP 200"""
-    assert api_client.get("/get").status_code == 200
-    assert api_client.get("/get", params={"arg": "value"})
-    assert api_client.post("/post", data={"arg": "value"}, headers={"X-Custom-Header": "value"})
+    client = api_client()
+    assert client.get("/get").status_code == 200
+    assert client.get("/get", params={"arg": "value"})
+    assert client.post("/post", data={"arg": "value"}, headers={"X-Custom-Header": "value"})
 
 
 ################################################################################
@@ -153,7 +154,7 @@ def staging_gateway(settings_block, request, configuration):
 
 ###############################################################################
 # To skip apicast retrying on 404 status code
-def test_skip_apicast_retrying_on_404(application):
+def test_skip_apicast_retrying_on_404(application, api_client):
 
     # 3scale is slow, have one request with retry is often (but not everytime)
     # desirable to ensure all is already up
@@ -162,7 +163,7 @@ def test_skip_apicast_retrying_on_404(application):
     session = requests.Session()
     session.auth = application.authobj
 
-    client = application.api_client(session=session)
+    client = api_client(session=session)
 
     assert client.get("/status/404").status_code == 404
 

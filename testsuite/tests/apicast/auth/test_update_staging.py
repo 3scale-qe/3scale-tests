@@ -3,7 +3,7 @@ Rewrite: 3scale-amp-tests/spec/functional_specs/update_staging_spec.rb
 """
 
 
-def test_updated_auth_param(application, service):
+def test_updated_auth_param(api_client, service):
     """
     The update of the staging configuration must be propagated immediately
 
@@ -12,12 +12,12 @@ def test_updated_auth_param(application, service):
     Request using the new_key returns 200
     """
 
-    old_api_client = application.api_client()
+    old_api_client = api_client()
     # change of the user key
     service.proxy.list().update(params={"auth_user_key": "new_key"})
     service.proxy.deploy()
 
-    new_api_client = application.api_client()
+    new_api_client = api_client()
 
     old_param_response = old_api_client.get("/anything")
     new_param_response = new_api_client.get("/anything")

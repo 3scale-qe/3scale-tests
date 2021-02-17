@@ -22,12 +22,13 @@ def backends_mapping(custom_backend):
 
 def test_batcher_policy_append(api_client, application):
     """Test if return correct number of usages of a service in batch for both backends"""
+    client = api_client()
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
 
     for _ in range(3):
-        api_client.get("/lib/get")
-        api_client.get("/bin/get")
+        client.get("/lib/get")
+        client.get("/bin/get")
 
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     assert usage_after == usage_before

@@ -28,12 +28,12 @@ def access_token(application, rhsso_service_info):
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def client(api_client):
     """
     Returns api_client without auth session set to None
     Auth session needs to be None when we are testing access_token
     """
-    api_client = application.api_client()
+    api_client = api_client()
     # pylint: disable=protected-access
     api_client._session.auth = None
     return api_client
@@ -59,7 +59,7 @@ def update_policies(service, application, rhsso_service_info):
 
 
 # pylint: disable=unused-argument
-def test_rhsso_logout(api_client, access_token, rhsso_service_info, update_policies):
+def test_rhsso_logout(client, access_token, rhsso_service_info, update_policies):
     """
     Makes a request using rhsso auth.
     Asserts that the request passed.
@@ -68,10 +68,10 @@ def test_rhsso_logout(api_client, access_token, rhsso_service_info, update_polic
     Asserts that the request fails
     """
 
-    response = api_client.get("/get", headers={"authorization": "Bearer " + access_token})
+    response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert response.status_code == 200
 
     rhsso_service_info.user.logout()
 
-    new_response = api_client.get("/get", headers={"authorization": "Bearer " + access_token})
+    new_response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert new_response.status_code == 403

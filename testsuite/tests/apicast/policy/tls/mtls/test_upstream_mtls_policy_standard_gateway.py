@@ -49,7 +49,7 @@ def policy_settings(certificate):
                                                  "certificate_key": embedded_key})
 
 
-def test_mtls_request(application, authority_and_code):
+def test_mtls_request(api_client, authority_and_code):
     """Test that mtls request returns correct status code"""
     _, code = authority_and_code
-    assert application.api_client().get("/get").status_code == code
+    assert api_client().get("/get").status_code == code

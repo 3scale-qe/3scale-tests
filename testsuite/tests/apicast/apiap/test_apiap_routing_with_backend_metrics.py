@@ -40,7 +40,7 @@ def backend_anything(backends_mapping):
 
 
 @pytest.fixture(scope="module")
-def api_client(application, service):
+def client(api_client, application, service):
     """
     1. Test if request with default session have status code 200
     2. Delete default service mapping rule
@@ -56,7 +56,7 @@ def api_client(application, service):
     session = requests.Session()
     session.auth = application.authobj
 
-    return application.api_client(session=session, verify=False)
+    return api_client(session=session, verify=False)
 
 
 @pytest.fixture(scope="module")
@@ -168,7 +168,7 @@ def case4():
 
 # pylint: disable=too-many-arguments, too-many-locals
 @pytest.mark.parametrize("case", ["case1", "case2", "case3", "case4"])
-def test_metrics_with_routing_policy(request, api_client, setup, application, backend_slash, backend_anything, case):
+def test_metrics_with_routing_policy(request, client, setup, application, backend_slash, backend_anything, case):
     """
     Test metrics counting combined with Routing Policy
     Test if:
@@ -192,7 +192,7 @@ def test_metrics_with_routing_policy(request, api_client, setup, application, ba
     (hits_before, hits_slash_before, hits_loud_method_before, hits_low_method_before, hits_anything_before,
      hits_anything_test_before) = get_analytics(application, backend_slash, backend_anything, setup)
 
-    request = api_client.get(path)
+    request = client.get(path)
 
     (hits_after, hits_slash_after, hits_loud_method_after, hits_low_method_after,
      hits_anything_after, hits_anything_test_after) = get_analytics(application, backend_slash, backend_anything,
