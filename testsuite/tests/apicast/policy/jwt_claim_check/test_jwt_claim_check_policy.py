@@ -4,8 +4,6 @@ Rewrite spec/functional_specs/policies/jwt_claim_check/jwt_claim_check_spec.rb
 import pytest
 
 from testsuite import rawobj
-from testsuite.rhsso.rhsso import OIDCClientAuth
-from testsuite.utils import blame
 
 ERROR_MESSAGE = "Invalid JWT check"
 
@@ -34,19 +32,9 @@ def add_policy(application):
 
 
 @pytest.fixture(scope="module")
-def application(rhsso_service_info, application):
+def application(application):
     """Add OIDC client authentication"""
-    application.register_auth("oidc", OIDCClientAuth(rhsso_service_info))
     add_policy(application)
-    return application
-
-
-@pytest.fixture(scope="module")
-def application_doesnt_match(service, custom_application, custom_app_plan, rhsso_service_info, request):
-    """Second application that doesn't match jwt claim check policy"""
-    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    application = custom_application(rawobj.Application(blame(request, "app"), plan))
-    application.register_auth("oidc", OIDCClientAuth(rhsso_service_info))
     return application
 
 
