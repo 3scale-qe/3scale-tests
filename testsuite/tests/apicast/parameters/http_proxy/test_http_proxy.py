@@ -2,20 +2,19 @@
 
 Apicast should use all traffic through the defined proxy via HTTP_PROXY env var.
 """
-from urllib.parse import urlparse
 
 import pytest
 
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
 
-pytestmark = [pytest.mark.flaky, pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
 
 
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     "Dict of proxy settings to be used when service created"
-    return rawobj.Proxy(private_base_url("httpbin_nossl"))
+    return rawobj.Proxy(private_base_url("httpbin_service"))
 
 
 @pytest.fixture(scope="module")
@@ -36,4 +35,4 @@ def test_proxied_request(api_client, private_base_url):
     headers = response.json()["headers"]
 
     assert "Fuse-Camel-Proxy" in headers
-    assert headers["Source-Header"] == urlparse(private_base_url("httpbin_nossl")).hostname
+    assert headers["Source-Header"] in private_base_url("httpbin_service")
