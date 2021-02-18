@@ -34,5 +34,5 @@ def test_statuscode_overwrite(upstream_code, apicast_code, api_client):
     Asserts that the response codes configured to be rewritten are rewritten and the
     response that are not configured to be rewritten are left intact.
     """
-    response = api_client.get(f"/status/{upstream_code}")
+    response = api_client().get(f"/status/{upstream_code}")
     assert response.status_code == apicast_code

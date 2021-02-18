@@ -38,5 +38,5 @@ def test_statuscode_overwrite(api_client):
     Asserts that the 413 response code produced by the payload_limits policy
     is not rewritten by the status_code_overwrite policy defined before it.
     """
-    response = api_client.get(f"/bytes/{101}")
+    response = api_client().get(f"/bytes/{101}")
     assert response.status_code == 413
