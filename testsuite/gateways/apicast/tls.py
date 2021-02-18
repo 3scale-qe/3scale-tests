@@ -5,7 +5,6 @@ from typing import Dict
 from urllib.parse import urlparse
 
 from threescale_api.resources import Application
-from threescale_api.utils import HttpClient
 
 from testsuite.openshift.objects import Routes
 from .template import TemplateApicastRequirements, TemplateApicast
@@ -59,8 +58,7 @@ class TLSApicast(TemplateApicast):
                                                        certificate_authority=self.server_authority)
 
     def on_application_create(self, application: Application):
-        # pylint: disable=protected-access
-        application._client_factory = self._create_api_client
+        application.api_client_verify = self.server_authority.files["certificate"]
 
     def get_patch_data(self) -> Dict:
         """Returns patch data for enabling https port on service."""
@@ -140,7 +138,3 @@ class TLSApicast(TemplateApicast):
 
         self.server_authority.delete_files()
         self.server_certificate.delete_files()
-
-    def _create_api_client(self, application, endpoint, session, _):
-        authority = self.server_authority.files["certificate"]
-        return HttpClient(application, endpoint, session, authority)
