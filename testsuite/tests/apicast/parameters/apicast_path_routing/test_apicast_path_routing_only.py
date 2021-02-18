@@ -49,6 +49,9 @@ def test_not_mapped_route_returns_not_found(application, api_client):
     session = requests.Session()
     session.auth = application.authobj
 
+    # wait until all is ready (retry on 503/404)
+    application.test_request()
+
     # skip retrying on 404 by passing Session instance to it
     client = api_client(session=session)
 

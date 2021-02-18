@@ -3,6 +3,7 @@
 Test apicast with configuration from config maps.
 """
 import json
+import time
 
 import pytest
 import requests
@@ -98,4 +99,12 @@ def test_threescale_config_file_param(api_client, application2):
     # pass session for skipping retrying on 404
     client = api_client(application2, session=session)
 
-    assert client.get("/get").status_code == 404
+    # and we don't have retry anymore...
+    response = None
+    for i in range(8):
+        response = client.get("/get")
+        if response.status_code != 503:
+            break
+        time.sleep(1.3**i)
+
+    assert response.status_code == 404
