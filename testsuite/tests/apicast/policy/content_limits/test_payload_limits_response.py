@@ -16,6 +16,12 @@ def policy_settings():
     return rawobj.PolicyConfig("payload_limits", {"response": 100})
 
 
+@pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """Use httpbin as backend url"""
+    return rawobj.Proxy(private_base_url("httpbin"))
+
+
 @pytest.mark.parametrize("num_bytes,status_code", [(10, 200),
                                                    (100, 200),
                                                    (101, 413)])
