@@ -1,12 +1,16 @@
 """
 Utility resources for RHSSO manipulation
 """
+
+import functools
+
 from keycloak.admin.clients import Client
 from keycloak.admin.realm import Realm
 from keycloak.admin.users import User
 from keycloak.openid_connect import KeycloakOpenidConnect
 from keycloak.exceptions import KeycloakClientError
 
+from threescale_api.auth import BaseClientAuth
 from threescale_api.resources import Service
 
 from testsuite.rhsso.realm import RetryKeycloakRealm
@@ -46,7 +50,8 @@ class OIDCClientAuthHook:
     def on_application_create(self, application):
         """Register OIDC auth object for api_client"""
 
-        application.register_auth("oidc", OIDCClientAuth(self.rhsso_service_info, self.credentials_location))
+        application.register_auth(
+            "oidc", OIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
 
 
 class RHSSO:
@@ -187,37 +192,34 @@ class RHSSOServiceConfiguration:
 
 
 # pylint: disable=too-few-public-methods
-class OIDCClientAuth:
+class OIDCClientAuth(BaseClientAuth):
     """Authentication class for  OIDC based authorization"""
 
-    def __init__(self, service_rhsso_info, location=None) -> None:
-        self.rhsso = service_rhsso_info
-        self.location = location
+    @classmethod
+    def partial(cls, service_rhsso_info, **kwargs):
+        """Returns partially "initialized instance" with interface suitable for register_auth"""
 
-    def __call__(self, application):
-        location = self.location
-        if location is None:
-            location = application.service.proxy.list().entity["credentials_location"]
-        app_key = application.keys.list()["keys"][0]["key"]["value"]
-        token = self.rhsso.password_authorize(application["client_id"], app_key)
+        return functools.partial(cls, service_rhsso_info, **kwargs)
 
-        def _process_request(request):
-            access_token = token()
-            credentials = {"access_token": access_token}
+    def __init__(self, service_rhsso_info, application, location=None) -> None:
+        super().__init__(application, location)
 
-            loc = self.location or location
+        self.app_key = application.keys.list()["keys"][0]["key"]["value"]
+        self.token = service_rhsso_info.password_authorize(application["client_id"], self.app_key)
 
-            if loc == "authorization":
-                request.headers.update({'Authorization': 'Bearer ' + access_token})
-            elif loc == "headers":
-                request.prepare_headers(credentials)
-            elif loc == "query":
-                request.prepare_url(request.url, credentials)
-            else:
-                raise ValueError("Unknown credentials location '%s'" % loc)
-            return request
+    def __call__(self, request):
+        access_token = self.token()
+        credentials = {"access_token": access_token}
 
-        return _process_request
+        if self.location == "authorization":
+            request.headers.update({'Authorization': 'Bearer ' + access_token})
+        elif self.location == "headers":
+            request.prepare_headers(credentials)
+        elif self.location == "query":
+            request.prepare_url(request.url, credentials)
+        else:
+            raise ValueError("Unknown credentials location '%s'" % self.location)
+        return request
 
 
 def add_realm_management_role(role_name, client, realm):

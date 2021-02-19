@@ -45,7 +45,7 @@ def service(service):
 @pytest.fixture(scope="module")
 def application(rhsso_service_info, application):
     """Add OIDC client authentication"""
-    application.register_auth("oidc", OIDCClientAuth(rhsso_service_info))
+    application.register_auth("oidc", OIDCClientAuth.partial(rhsso_service_info))
     return application
 
 

@@ -11,15 +11,10 @@ from testsuite.rhsso.rhsso import OIDCClientAuthHook, OIDCClientAuth
 class ServiceMeshOIDCClientAuth(OIDCClientAuth):
     """Authentication class for OIDC based authorization for ServiceMesh"""
 
-    def __call__(self, application):
-        super_process = super().__call__(application)
-
-        def _process_request(request):
-            app_key = application.keys.list()["keys"][0]["key"]["value"]
-            request.prepare_url(request.url, {"app_key": app_key})
-            return super_process(request)
-
-        return _process_request
+    def __call__(self, request):
+        request = super().__call__(request)
+        request.prepare_url(request.url, {"app_key": self.app_key})
+        return request
 
 
 # pylint: disable=too-few-public-methods
@@ -44,8 +39,8 @@ class ServiceMeshRHSSOHook(OIDCClientAuthHook, LifecycleHook):
     def on_application_create(self, application):
         """Register OIDC auth object for api_client"""
 
-        application.register_auth("oidc",
-                                  ServiceMeshOIDCClientAuth(self.rhsso_service_info, self.credentials_location))
+        application.register_auth(
+            "oidc", ServiceMeshOIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
 
 
 @pytest.fixture(scope="module", autouse=True)
