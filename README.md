@@ -6,11 +6,12 @@ This is testsuite by 3scale QE implemented in the Python
 
 ### Software Requirements
 
-[pipenv](https://github.com/pypa/pipenv) is essential tool necessary to run the
-testsuite, make sure you have it installed. Besides that also all the packages
-from [REQUIRES](REQUIRES) must be present. This file references packages as
-they are known in redhat based distributions. For other distros please make
-sure equivalent is present.
+The first thing that should be installed is [pipenv](https://github.com/pypa/pipenv).
+[Pipenv](https://github.com/pypa/pipenv) is essential tool necessary to run the
+testsuite. You will also have to install all the packages from [REQUIRES](REQUIRES).
+Double check that ALL of those packages have been successfully installed!
+This file ([REQUIRES](REQUIRES)) references packages as they are known in redhat 
+based distributions. For other distros please make sure equivalent is present.
 
 ### Openshift Login
 
