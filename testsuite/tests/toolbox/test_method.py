@@ -35,7 +35,7 @@ def my_app_plan(request, service, custom_app_plan):
 
 def disabled_method(app_plan, method):
     """Is method disabled?"""
-    return any([limit['value'] == 0 for limit in app_plan.limits(method).list()])
+    return any(limit['value'] == 0 for limit in app_plan.limits(method).list())
 
 
 def create_cmd(service, cmd, args=None):

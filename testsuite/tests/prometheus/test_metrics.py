@@ -66,4 +66,4 @@ def test_apicast_status_metrics(client, prometheus_client):
                    if int(hit["metric"]["status"]) == status}
 
     assert statuses == sorted(hit_metrics.keys())
-    assert all([count > 0 for count in hit_metrics.values()])
+    assert all(count > 0 for count in hit_metrics.values())
