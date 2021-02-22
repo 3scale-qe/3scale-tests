@@ -57,7 +57,7 @@ def test_rate_limit_connection_no_limit(logger, client, client2):
     assert len(responses) == TOTAL_REQUESTS
 
     # all responses should be ok
-    assert all([i.ok for i in responses])
+    assert all(i.ok for i in responses)
 
 
 def test_rate_limit_connection(logger, client, client2):

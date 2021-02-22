@@ -36,7 +36,7 @@ def my_app_plan(request, service, custom_app_plan):
 
 def disabled_metric(app_plan, metric):
     """Is metric disabled?"""
-    return any([limit['value'] == 0 for limit in app_plan.limits(metric).list()])
+    return any(limit['value'] == 0 for limit in app_plan.limits(metric).list())
 
 
 def create_cmd(metric_obj, cmd, args=None):

@@ -101,7 +101,7 @@ def find_and_cmp(list1, list2, cmp_function, id_attr=None):
     queue = []
     for ent1 in list1:
         for ent2 in list2:
-            if all([ent1.entity[r] == ent2.entity[r] for r in id_attr]):
+            if all(ent1.entity[r] == ent2.entity[r] for r in id_attr):
                 queue.append((ent1, ent2))
                 list2.remove(ent2)
                 break
