@@ -78,9 +78,21 @@ mostlyclean:
 	rm -f .make-*
 	-pipenv --rm
 
+all: ## Run all the tests and submit results to reportportal (may require -k)
+all: test disruptive flaky reportportal
+
 # Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+reportportal: RP_PROJECT ?= 3scale
+reportportal: RP_LAUNCH_NAME ?= ad-hoc with tests $(shell cat VERSION)
+reportportal:
+	$(RUNSCRIPT)junit2reportportal \
+		--reportportal $(REPORTPORTAL) \
+		--project $(RP_PROJECT) --launch-name "$(RP_LAUNCH_NAME)" \
+		--token-variable RP_TOKEN \
+		$(resultsdir)/junit-*.xml
 
 release: ## Create branch of new VERSION (and tag VERSION)
 release: VERSION-required Pipfile.lock
