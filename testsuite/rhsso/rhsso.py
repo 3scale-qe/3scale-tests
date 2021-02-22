@@ -19,9 +19,14 @@ from testsuite.rhsso.realm import RetryKeycloakRealm
 class OIDCClientAuthHook:
     """Configure rhsso auth through app hooks"""
 
-    def __init__(self, rhsso_service_info, credentials_location="authorization"):
+    def __init__(self, rhsso_service_info, credentials_location="authorization", oidc_configuration=None):
         self.rhsso_service_info = rhsso_service_info
         self.credentials_location = credentials_location
+        self.oidc_configuration = oidc_configuration
+        if self.oidc_configuration is None:
+            self.oidc_configuration = {
+                "standard_flow_enabled": False,
+                "direct_access_grants_enabled": True}
 
     # pylint: disable=no-self-use
     def before_service(self, service_params: dict) -> dict:
@@ -42,10 +47,7 @@ class OIDCClientAuthHook:
     def on_service_create(self, service):
         """Update oidc config"""
 
-        service.proxy.oidc.update(params={
-            "oidc_configuration": {
-                "standard_flow_enabled": False,
-                "direct_access_grants_enabled": True}})
+        service.proxy.oidc.update(params={"oidc_configuration": self.oidc_configuration})
 
     def on_application_create(self, application):
         """Register OIDC auth object for api_client"""
