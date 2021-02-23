@@ -3,12 +3,12 @@ Service requires credentials (app_id, app_key) to be passed using the Basic Auth
 
 Rewrite ./spec/functional_specs/auth/basic_auth_app_id_spec.rb
 """
-import base64
-
 import pytest
 
 import threescale_api.auth
 from threescale_api.resources import Service
+
+from testsuite.utils import basic_auth_string
 
 
 @pytest.fixture(scope="module")
@@ -35,13 +35,12 @@ def test_basic_auth_app_id_key(application, api_client):
     Then request made with appropriate Basic auth made has to pass as expected"""
 
     creds = application.authobj.credentials
-    encoded = base64.b64encode(
-        f"{creds['app_id']}:{creds['app_key']}".encode("utf-8")).decode("utf-8")
+    expected_authorization = basic_auth_string(creds['app_id'], creds['app_key'])
 
     response = api_client().get('/get')
 
     assert response.status_code == 200
-    assert response.request.headers["Authorization"] == "Basic %s" % encoded
+    assert response.request.headers["Authorization"] == expected_authorization
 
 
 def test_basic_auth_app_id_403_with_query(application, api_client):

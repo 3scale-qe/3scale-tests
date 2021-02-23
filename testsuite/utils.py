@@ -100,6 +100,18 @@ def random_string(num_bytes):
     return b64encode(random_bytes).decode('utf-8')
 
 
+def _to_bytes(value, encoding='utf-8'):
+    """Encodes string to bytes"""
+    return value.encode(encoding)
+
+
+def basic_auth_string(key, value):
+    """Returns basic auth string from key and value"""
+    key_pass = b":".join((_to_bytes(key), _to_bytes(value)))
+    token = b64encode(key_pass).decode()
+    return f"Basic {token}"
+
+
 def wait_interval(min_sec=15, max_sec=45):
     """
     The requests has to be send between the 15th and 45th second of the minute
