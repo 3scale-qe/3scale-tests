@@ -6,3 +6,4 @@ gcc
 origin-clients/openshift-clients
 openssh-clients
 make
+cfssl
