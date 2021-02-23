@@ -28,14 +28,16 @@ BoxKeyError.__str__ = lambda self: \
     "\nHINT: Don't forget, either login to openshift (and set '3scale' project) or have all required config/ set!"
 
 if settings["ssl_verify"]:
-    if "REQUESTS_CA_BUNDLE" not in os.environ:
-        for ca_bundle in (
-                "/etc/pki/tls/certs/ca-bundle.crt",
-                "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
-                "/etc/ssl/certs/ca-certificates.crt"):
-            if os.path.exists(ca_bundle):
+    for ca_bundle in (
+            "/etc/pki/tls/certs/ca-bundle.crt",
+            "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
+            "/etc/ssl/certs/ca-certificates.crt"):
+        if os.path.exists(ca_bundle):
+            if "REQUESTS_CA_BUNDLE" not in os.environ:
                 os.environ["REQUESTS_CA_BUNDLE"] = ca_bundle
-                break
+            if "SSL_CERT_FILE" not in os.environ:
+                os.environ["SSL_CERT_FILE"] = ca_bundle
+            break
 else:
     os.environ["OPENSHIFT_CLIENT_PYTHON_DEFAULT_SKIP_TLS_VERIFY"] = "true"
 
