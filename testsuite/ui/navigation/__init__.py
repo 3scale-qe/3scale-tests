@@ -121,15 +121,18 @@ class Navigator:
         alternative_steps = []
         for _, method in possible_steps:
             key_word = method._class_name
-            if key_word.startswith('@'):
-                alternative_steps.append(method)
             if key_word == destination.__class__.__name__:
                 signature = inspect.signature(method)
                 filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
                 bound = signature.bind(**filtered_kwargs)
                 bound.apply_defaults()
-                method(*bound.args, **bound.kwargs)
+                try:
+                    method(*bound.args, **bound.kwargs)
+                except Exception as exc:
+                    raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True
+            if key_word.startswith('@'):
+                alternative_steps.append(method)
 
         return self._invoke_alternative_step(alternative_steps, destination)
 
@@ -139,20 +142,23 @@ class Navigator:
         Alternative steps begins with "@".
         See `step(cls, **kwargs)` for alternatives.
 
-        :param possible_steps: list of tuples [(method name, method)]. Describes all View methods
+        :param alternative_steps: list of tuples [(method name, method)]. Describes all View methods
             decorated with @step
         :param destination: View class
         :return: Bool value representing if step was preformed or not
         """
         for method in alternative_steps:
             if method._class_name.startswith('@href'):
-                method(destination.endpoint_path)
+                try:
+                    method(destination.endpoint_path)
+                except Exception as exc:
+                    raise NavigationStepException(method._dict__, destination, method) from exc
                 return True
         return False
 
 
 class NavigationStepNotFound(Exception):
-    """Simple Exception when navigations can't be found"""
+    """Exception when navigations can't be found"""
 
     def __init__(self, current, dest, possibilities):
         super().__init__(self)
@@ -165,6 +171,22 @@ class NavigationStepNotFound(Exception):
             "Couldn't find step to destination View: [{}] from current View: [{}]."
             " Following steps were available: [{}]"
         ).format(self.dest, self.current, ", ".join(list(self.possibilities)))
+
+
+class NavigationStepException(Exception):
+    """Exception when navigation fails on `@step` method"""
+
+    def __init__(self, current, dest, step):
+        super().__init__(self)
+        self.current = current
+        self.dest = dest
+        self.step = step
+
+    def __str__(self):
+        return (
+            "Step from current [{}] View to destination [{}] View failed"
+            " during method invocation: [{}]"
+        ).format(self.dest, self.current, self.step)
 
 
 class Navigable:
