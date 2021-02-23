@@ -20,12 +20,8 @@ import testsuite.tools
 from testsuite import rawobj, CONFIGURATION, ROOT_DIR
 from testsuite.gateways.gateways import Capability
 from testsuite.requestbin import RequestBinClient
-from testsuite.utils import retry_for_session, blame, blame_desc
+from testsuite.utils import blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
-
-# Monkey-patch for HTTP/2, needs to be fixed with  plugable api_client for application
-if settings["http2"]:
-    threescale_api.utils.HttpClient.retry_for_session = staticmethod(retry_for_session)
 
 
 def pytest_addoption(parser):

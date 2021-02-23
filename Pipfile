@@ -21,7 +21,6 @@ dynaconf = "*"
 python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-client.git", editable = true}
 backoff = "*"
 websocket_client = "*"
-hyper = {editable = true, git = "https://github.com/python-hyper/hyper.git", ref = "development"}
 httpx = {version = "*", extras = ["http2"]}
 webdriver-manager = "*"
 widgetastic-core = "*"

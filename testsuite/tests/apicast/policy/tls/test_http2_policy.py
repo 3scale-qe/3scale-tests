@@ -2,12 +2,10 @@
 Default test for HTTP2 policy
 """
 import pytest
-import requests
 
 from testsuite import rawobj, HTTP2 # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
-from testsuite.utils import retry_for_session
 
 
 # CFSSL instance is necessary
@@ -34,12 +32,9 @@ def backends_mapping(custom_backend, private_base_url):
 
 
 @pytest.fixture(scope="module")
-def client(application, api_client):
+def client(api_client):
     """Make sure that api_client is using http2"""
-    session = requests.session()
-    retry_for_session(session)
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client()
 
 
 def test_full_http2(client):
