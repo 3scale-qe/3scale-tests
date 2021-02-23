@@ -1,16 +1,14 @@
 """ 3scale specific widgets"""
 
-from widgetastic.widget import (
-    Text, GenericLocatorWidget)
-from widgetastic_patternfly4 import ContextSelector, Navigation
-
+from widgetastic.widget import Text, GenericLocatorWidget
+from widgetastic_patternfly4 import ContextSelector, Navigation, PatternflyTable
 
 # pylint: disable=arguments-differ
 from widgetastic_patternfly4.navigation import check_nav_loaded
 
 
 class Link(Text):
-    """b
+    """
     Clickable/readable link representation accessible via the standard view functions read/fill.
     """
 
@@ -33,11 +31,14 @@ class RadioGroup(GenericLocatorWidget):
     OPTIONS = './li'
     OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
 
-    def __init__(self, parent, locator, fieldset_id="", logger=None):
+    def __init__(self, parent=None, locator=None, fieldset_id="", logger=None):
         super().__init__(parent, locator, logger)
-        self.options_section = self.browser.element(self.OPTIONS_SECTION.format(fieldset_id))
+        if fieldset_id:
+            self.options_section = self.browser.element(self.OPTIONS_SECTION.format(fieldset_id))
+        else:
+            self.options_section = self.browser.element(locator)
 
-    def select(self, *options):
+    def select(self, options):
         """
         Select radio (check box) element from the list.
         :param options: String id-s of options
@@ -55,8 +56,13 @@ class RadioGroup(GenericLocatorWidget):
 
     @staticmethod
     def _select_option(element):
-        if 'is-unchecked' in element.get_attribute("class").split():
-            element.click()
+        # if 'is-unchecked' in element.get_attribute("class").split():
+        element.click()
+
+
+class CheckBoxGroup(RadioGroup):
+    """CheckBox group of 3scale pages"""
+    OPTIONS_BY_ID = './ol/li/label/input[@id="{}"]'
 
 
 # pylint: disable=too-many-ancestors
@@ -105,3 +111,69 @@ class NavigationMenu(Navigation):
                     self.browser.click(element)
                 self.browser.click(item[0])
                 return
+
+
+class ThreescaleDropdown(GenericLocatorWidget):
+    """Specific dropdown of 3scale pages"""
+
+    def select_by_value(self, value):
+        """Select given value from dropdown"""
+        if value:
+            self.browser.selenium.find_element_by_xpath(f"//select/option[@value='{value}']").click()
+
+
+# pylint: disable=abstract-method
+class AudienceTable(PatternflyTable):
+    """
+    Table defined by 3scale in Accounts view contains two headers: classic table header and header dedicated
+    to search or row manipulation. This widget specifies correct header columns. It may extend already existing
+    search implementation from PF4 in the future.
+    """
+    HEADERS = "./thead/tr[1]/th"
+
+
+class ThreescaleCreateButton(GenericLocatorWidget):
+    """Specific Create button of 3scale pages"""
+
+    def __init__(self, parent=None, locator="//*[contains(@class, 'create')]", logger=None):
+        super().__init__(parent, locator, logger)
+
+
+class ThreescaleDeleteButton(GenericLocatorWidget):
+    """Specific Delete button of 3scale pages"""
+
+    def __init__(self, parent=None, locator="//*[contains(@class, 'delete')]", logger=None):
+        super().__init__(parent, locator, logger)
+
+    def click(self, handle_alert=True):
+        """Perform click action with handling alert"""
+        super().click(handle_alert)
+
+
+class ThreescaleUpdateButton(GenericLocatorWidget):
+    """Specific Update button of 3scale pages"""
+
+    def __init__(self, parent=None, locator="//*[contains(@class, 'update')]", logger=None):
+        super().__init__(parent, locator, logger)
+
+
+class ThreescaleEditButton(GenericLocatorWidget):
+    """Specific Edit button of 3scale pages"""
+
+    def __init__(self, parent=None, locator="//*[contains(@class, 'edit')]", logger=None):
+        super().__init__(parent, locator, logger)
+
+
+class ThreescaleCheckBox(GenericLocatorWidget):
+    """Specific CheckBox button of 3scale pages"""
+
+    def check(self, value=True):
+        """Check or uncheck 3scale checkbox"""
+        if value != self.is_checked():
+            self.__element__().click()
+
+    def is_checked(self):
+        """
+        :return if checkbox is checked
+        """
+        return self.__element__().get_attribute("checked") == "true"
