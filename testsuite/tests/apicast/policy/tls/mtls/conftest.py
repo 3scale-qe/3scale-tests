@@ -3,7 +3,7 @@ import pytest
 
 from testsuite import rawobj
 from testsuite.certificates import Certificate
-from testsuite.utils import blame
+from testsuite.utils import blame, absolute_path
 
 
 @pytest.fixture(scope="module", params=[
@@ -32,6 +32,7 @@ def httpbin_certificate(request, authority_and_code, configuration) -> Certifica
 @pytest.fixture(scope="module")
 def httpbin(staging_gateway, request, httpbin_certificate, authority_and_code):
     """Deploys httpbin with mTLS enabled"""
+    path = absolute_path('testsuite/resources/tls/httpbin_go.yaml')
     authority, _ = authority_and_code
     name = blame(request, "httpbin-mtls")
     parameters = {
@@ -40,7 +41,7 @@ def httpbin(staging_gateway, request, httpbin_certificate, authority_and_code):
         "CERTIFICATE_KEY": httpbin_certificate.key,
         "CA_CERTIFICATE": authority.certificate,
     }
-    staging_gateway.openshift.new_app("testsuite/resources/tls/httpbin_go.yaml", parameters)
+    staging_gateway.openshift.new_app(path, parameters)
     # pylint: disable=protected-access
     staging_gateway.openshift._wait_for_deployment(name)
 

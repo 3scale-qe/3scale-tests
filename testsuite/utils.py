@@ -13,6 +13,8 @@ import requests
 from hyper.contrib import HTTP20Adapter
 from requests.packages.urllib3.util.retry import Retry  # noqa # pylint: disable=import-error
 
+from testsuite import ROOT_DIR
+
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 
@@ -37,6 +39,11 @@ def retry_for_session(session: requests.Session, total: int = 8):
     adapter = HTTP20Adapter(max_retries=retry)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
+
+
+def absolute_path(path: str):
+    """Returns absolute path"""
+    return os.path.join(ROOT_DIR, path)
 
 
 def _whoami():

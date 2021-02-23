@@ -7,7 +7,7 @@ are working as expected.
 import pytest
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
-from testsuite.utils import blame
+from testsuite.utils import blame, absolute_path
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553")]
@@ -18,7 +18,8 @@ def image_template():
     """
     Returns the path of the apicast_example_policy_template
     """
-    return "testsuite/resources/modular_apicast/apicast_example_policy.yml"
+
+    return absolute_path("testsuite/resources/modular_apicast/apicast_example_policy.yml")
 
 
 @pytest.fixture(scope="module")
