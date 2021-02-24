@@ -18,7 +18,7 @@ def policy_settings():
 @pytest.mark.disruptive
 # TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
 @pytest.mark.flaky
-def test_caching_policy_resilient(prod_client, openshift):
+def test_caching_policy_resilient(prod_client, openshift, application):
     """
     Test caching policy with caching mode set to Resilient
 
@@ -32,22 +32,25 @@ def test_caching_policy_resilient(prod_client, openshift):
     """
 
     client = prod_client()
+    client.auth = None
+    auth = application.authobj()
+
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
-    response = client.get("/")
+    response = client.get("/", auth=auth)
     assert response.status_code == 200
     openshift.scale("backend-listener", 0)
 
     try:
         # Test if response will succeed on production calls
         for _ in range(3):
-            response = client.get("/", params=None)
+            response = client.get("/", auth=auth)
             assert response.status_code == 200
 
         # Test if response will succeed on production call after failed one
         response = client.get("/", params={"user_key": ":user_key"})
         assert response.status_code == 403
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
     finally:
         openshift.scale("backend-listener", replicas)

@@ -43,8 +43,10 @@ def test_caching_policy_allow_mod(prod_client, openshift, application):
     replicas = openshift.get_replicas("backend-listener")
     replicas_apicast = openshift.get_replicas("apicast-production")
     client = prod_client(application)
+    client.auth = None
+    auth = application.authobj()
 
-    response = client.get("/", params=None)
+    response = client.get("/", auth=auth)
     assert response.status_code == 200
     response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
@@ -59,7 +61,7 @@ def test_caching_policy_allow_mod(prod_client, openshift, application):
 
     try:
         # Test if response succeed on production calls with valid credentials
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
 
         # Test if response succeed on production calls with known invalid credentials
