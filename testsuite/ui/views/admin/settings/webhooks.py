@@ -29,7 +29,7 @@ class WebhooksView(SettingsNavView):
                       "Keys": ["web_hook_application_key_created_on", "web_hook_application_key_deleted_on",
                                "web_hook_application_key_updated_on"]}
     url = TextInput(id='web_hook_url')
-    update = GenericLocatorWidget(locator="//input[contains(@class, 'update')]")
+    update = GenericLocatorWidget(locator="//input[contains(@type, 'submit')]")
 
     def prerequisite(self):
         return SettingsNavView

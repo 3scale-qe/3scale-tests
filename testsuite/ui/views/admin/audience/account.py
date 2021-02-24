@@ -13,7 +13,7 @@ class AccountsView(AudienceNavView):
     new_account = Link("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
 
-    @step("NewAccountView")
+    @step("AccountNewView")
     def new(self):
         """Create new Account"""
         self.new_account.click()
@@ -40,6 +40,7 @@ class AccountsDetailView(AudienceNavView):
     plan_dropdown = ThreescaleDropdown("//*[@id='account_contract_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
     applications_button = Link("//*[contains(@title,'applications')]")
+    users_button = Link("//*[contains(@title,'users')]")
 
     @step("AccountEditView")
     def edit(self):
@@ -51,13 +52,19 @@ class AccountsDetailView(AudienceNavView):
         """Open account's applications"""
         self.applications_button.click()
 
+    @step("AccountUserView")
+    def users(self):
+        """Open account's users"""
+        self.users_button.click()
+
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return AccountsView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url
+        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url \
+               and self.edit_button.is_displayed and self.plan_dropdown.is_displayed
 
     def change_plan(self, value):
         """Change account plan"""
@@ -65,7 +72,7 @@ class AccountsDetailView(AudienceNavView):
         self.change_plan_button.click(handle_alert=True)
 
 
-class NewAccountView(AudienceNavView):
+class AccountNewView(AudienceNavView):
     """View representation of New Account page"""
     endpoint_path = '/buyers/accounts/new'
     username = TextInput(id='account_user_username')
@@ -105,7 +112,8 @@ class AccountEditView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.org_name.is_displayed
+        return AudienceNavView.is_displayed and self.org_name.is_displayed \
+               and self.org_name.is_displayed and self.update_button.is_displayed
 
     def update(self, org_name: str):
         """Update account"""
@@ -122,7 +130,7 @@ class AccountApplicationsView(AudienceNavView):
     endpoint_path = "/buyers/accounts/{account_id}/applications"
     create_button = Link("//*[contains(@href,'/applications/new')]")
 
-    @step("NewApplicationView")
+    @step("ApplicationNewView")
     def new(self):
         """Crate new application"""
         self.create_button.click()
