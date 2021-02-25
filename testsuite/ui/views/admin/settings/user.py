@@ -21,6 +21,7 @@ class UsersView(SettingsNavView):
     def prerequisite(self):
         return SettingsNavView
 
+    @property
     def is_displayed(self):
         return self.table.is_displayed
 
@@ -64,5 +65,6 @@ class UserDetailView(SettingsNavView):
     def prerequisite(self):
         return UsersView
 
+    @property
     def is_displayed(self):
         return self.username.is_displayed and self.email.is_displayed and self.role.is_displayed

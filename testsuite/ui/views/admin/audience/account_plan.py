@@ -22,6 +22,7 @@ class AccountPlansView(AudienceNavView):
     def prerequisite(self):
         return AudienceNavView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.new_plan.is_displayed and self.table.is_displayed and \
                self.endpoint_path in self.browser.url
@@ -63,6 +64,7 @@ class NewAccountPlanView(AudienceNavView):
     def prerequisite(self):
         return AccountPlansView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.name.is_displayed and self.approval.is_displayed and \
                self.endpoint_path in self.browser.url

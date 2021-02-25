@@ -34,6 +34,7 @@ class WebhooksView(SettingsNavView):
     def prerequisite(self):
         return SettingsNavView
 
+    @property
     def is_displayed(self):
         return self.webhook_active.is_displayed and self.webhook_provider.is_displayed and \
                self.endpoint_path in self.browser.url
