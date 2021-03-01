@@ -75,6 +75,9 @@ def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
     if len(context) > 2:
         context = context[:2] + context[2:-1].translate(str.maketrans("", "", "aiyu")) + context[-1]
 
+    if "." in context:
+        context = context.split(".")[0]
+
     return randomize(f"{name[:8]}-{_whoami()[:8]}-{context[:9]}", tail=tail)
 
 
