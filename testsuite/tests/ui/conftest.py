@@ -34,7 +34,9 @@ def custom_browser(request):
         """
         webdriver = SeleniumDriver(provider=settings["fixtures"]["ui"]["browser"]["provider"],
                                    driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                                   ssl_verify=settings["ssl_verify"])
+                                   ssl_verify=settings["ssl_verify"],
+                                   remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"]
+                                   )
         webdriver.get_driver()
         started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
         started_browser.url = url or settings["threescale"]["admin"]["url"]
