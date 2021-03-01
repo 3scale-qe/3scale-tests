@@ -51,8 +51,8 @@ class SystemApicast(AbstractApicast):
     def reload(self):
         self.openshift.rollout(f"dc/{self.deployment}")
 
-    def get_logs(self):
-        return self.openshift.get_logs(self.deployment)
+    def get_logs(self, since_time=None):
+        return self.openshift.get_logs(self.deployment, since_time=since_time)
 
     def connect_jaeger(self, jaeger, jaeger_randomized_name):
         """

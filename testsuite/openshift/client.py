@@ -7,6 +7,7 @@ import os
 from typing import List, Dict, Union, Any, Optional, Callable
 
 import openshift as oc
+from dateutil.tz import UTC
 
 from testsuite.openshift.apimanager import APIManager
 from testsuite.openshift.env import Environ
@@ -388,17 +389,23 @@ class OpenShiftClient:
                 success_func=lambda deployment: "readyReplicas" in deployment.model.status
             )
 
-    def get_logs(self, deployment_name: str, tail: int = -1) -> str:
+    def get_logs(self, deployment_name: str, since_time=None, tail: int = -1) -> str:
         """
         Get merged logs for the pods of the most recent deployment
 
         Works only for DeploymentConfig, not for Deployment
+        :param since_time starting time from logs
         :param deployment_name name of the pod to get the logs of
         :param tail: how many logs to get, defaults to all
         :return: logs of the pod
         """
+        cmd_args = []
+        if since_time is not None:
+            d_with_timezone = since_time.replace(tzinfo=UTC)
+            time = d_with_timezone.isoformat()
+            cmd_args.append(f"--since-time={time}")
         pod_selector = self.get_pod(deployment_name)
-        logs = pod_selector.logs(tail)
+        logs = pod_selector.logs(tail, cmd_args=cmd_args)
         logs_merged = ""
         for key in logs:
             logs_merged += logs[key]

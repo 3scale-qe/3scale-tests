@@ -1,14 +1,15 @@
 """Module containing all basic gateways"""
 import sys
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING
+from datetime import datetime
+from typing import List, TYPE_CHECKING, Optional
 
 from weakget import weakget
 
 from testsuite.capabilities import Capability
+from testsuite.lifecycle_hook import LifecycleHook
 from testsuite.openshift.env import Environ
 from testsuite.requirements import OpenshiftRequirement
-from testsuite.lifecycle_hook import LifecycleHook
 
 if TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
@@ -26,10 +27,6 @@ class GatewayRequirements(OpenshiftRequirement, ABC):
     @abstractmethod
     def current_openshift(self) -> "OpenShiftClient":
         """Returns currently configured openshift"""
-
-    @property
-    def print_logs(self) -> bool:
-        """True if app logs should be printed"""
 
 
 class AbstractGateway(LifecycleHook, ABC):
@@ -61,8 +58,8 @@ class AbstractApicast(AbstractGateway, ABC):
         """Reloads gateway"""
 
     @abstractmethod
-    def get_logs(self) -> str:
-        """Gets the logs of the active Apicast pod"""
+    def get_logs(self, since_time: Optional[datetime] = None) -> str:
+        """Gets the logs of the active Apicast pod from specific time"""
 
     def create(self):
         pass
