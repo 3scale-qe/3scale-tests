@@ -26,6 +26,8 @@ from testsuite.httpx import HttpxHook
 from testsuite.utils import blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
+pytest_plugins = ("testsuite.gateway_logs",)
+
 
 def pytest_addoption(parser):
     """Add option to include disruptive tests in testrun"""
