@@ -397,7 +397,7 @@ def rhsso_service_info(request, testconfig):
     rhsso = RHSSO(server_url=cnf["url"],
                   username=cnf["username"],
                   password=cnf["password"])
-    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60)
+    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)
 
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
