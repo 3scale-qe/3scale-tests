@@ -8,11 +8,6 @@ import typing
 from base64 import b64encode
 from os import urandom
 
-import requests
-
-from hyper.contrib import HTTP20Adapter
-from requests.packages.urllib3.util.retry import Retry  # noqa # pylint: disable=import-error
-
 from testsuite import ROOT_DIR
 
 if typing.TYPE_CHECKING:
@@ -27,18 +22,6 @@ def generate_tail(tail=5):
 def randomize(name, tail=5):
     "To avoid conflicts returns modified name with random sufffix"
     return "%s-%s" % (name, generate_tail(tail))
-
-
-def retry_for_session(session: requests.Session, total: int = 8):
-    """Adds retry for requests session with HTTP/2 adapter"""
-    retry = Retry(
-        total=total,
-        backoff_factor=1,
-        status_forcelist=(503, 404),
-    )
-    adapter = HTTP20Adapter(max_retries=retry)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
 
 
 def absolute_path(path: str):

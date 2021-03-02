@@ -2,12 +2,12 @@
 Default test for HTTP2 policy
 """
 import pytest
-import requests
 
-from testsuite import rawobj, HTTP2 # noqa # pylint: disable=unused-import
+import testsuite
+from testsuite import rawobj # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
-from testsuite.utils import retry_for_session
+from testsuite.httpx import HttpxClient
 
 
 # CFSSL instance is necessary
@@ -34,43 +34,49 @@ def backends_mapping(custom_backend, private_base_url):
 
 
 @pytest.fixture(scope="module")
-def client(application, api_client):
-    """Make sure that api_client is using http2"""
-    session = requests.session()
-    retry_for_session(session)
-    session.auth = application.authobj
-    return api_client(session=session)
+def http2_client(application):
+    """Use Httpx client with http2"""
+    client = HttpxClient(True, application)
+    client.auth = testsuite.httpx.HttpxUserKeyAuth(application)
+    yield client
+    client.close()
 
 
-def test_full_http2(client):
+@pytest.fixture(scope="module")
+def http1_client(application):
+    """Use Httpx client with http 1.1"""
+    client = HttpxClient(False, application)
+    client.auth = testsuite.httpx.HttpxUserKeyAuth(application)
+    yield client
+    client.close()
+
+
+def test_full_http2(http2_client):
     """
     Test full HTTP2 traffic
     client --> apicast --> backend
     """
-    response = client.get("/http2/info")
+    response = http2_client.get("/http2/info")
     # client --> apicast
     assert response.status_code == 200
-    assert response.raw.version.value == "HTTP/2"
+    assert response.http_version == "HTTP/2"
 
     # apicast --> backend
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.json.get("proto", "") == "HTTP/2.0"
 
 
-# Skip because the test is using default api_client which is overridden by HTTP2 client
-@pytest.mark.skipif("HTTP2")
-def test_http1(api_client):
+def test_http1(http1_client):
     """
     Test successful request
     [http1] client --> apicast
     [http2] apicast --> backend
     """
-    api_client = api_client()
 
     # client --> apicast
-    response = api_client.get("/http2/info")
+    response = http1_client.get("/http2/info")
     assert response.status_code == 200
-    assert response.raw.version == 11, "Expected HTTP1.1 version"
+    assert response.http_version == "HTTP/1.1", "Expected HTTP1.1 version"
 
     # apicast --> backend
     echoed_request = EchoedRequest.create(response)
