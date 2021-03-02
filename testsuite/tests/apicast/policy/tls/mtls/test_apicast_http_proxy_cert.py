@@ -60,7 +60,7 @@ def invalid_authority(request, configuration) -> Certificate:
 
 
 # pylint: disable=unused-argument
-def test_mtls_request(api_client, authority_and_code, setup_gateway):
+def test_mtls_request(api_client, authority_and_code, setup_gateway, staging_gateway):
     """Test that mtls request returns correct status code"""
     _, code = authority_and_code
     assert api_client().get("/get").status_code == code

@@ -39,7 +39,7 @@ def websocket_options(testconfig):
     return options
 
 
-@backoff.on_predicate(backoff.constant, lambda x: not x, 10)
+@backoff.on_predicate(backoff.fibo, lambda x: not x, 7)
 def retry_sucessful(websocket_uri, message, websocket_options):
     """
     Retry for websocket when we expect successful message delivery.
@@ -61,7 +61,7 @@ def retry_sucessful(websocket_uri, message, websocket_options):
             websocket.close()
 
 
-@backoff.on_predicate(backoff.constant, lambda x: not x, 10)
+@backoff.on_predicate(backoff.fibo, lambda x: not x, 7)
 def retry_failing(websocket_uri, expected_message, websocket_options):
     """
     Retry for websockets when we expect specific exception message.
