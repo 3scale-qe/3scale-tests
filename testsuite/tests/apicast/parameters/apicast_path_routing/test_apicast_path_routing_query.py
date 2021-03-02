@@ -53,7 +53,8 @@ def test_args(client2):
     assert echoed_request.params.get('baz') == 'baz'
 
 
-def test_args_another_service(client):
+# pylint: disable=unused-argument
+def test_args_another_service(client, client2):
     """
     Checks that request with matching mapping rule of another service will fail
 
