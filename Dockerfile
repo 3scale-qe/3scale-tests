@@ -1,4 +1,4 @@
-FROM centos/python-38-centos7
+FROM quay.io/centos7/python-38-centos7
 LABEL description="Required env variables: \
 _3SCALE_TESTS_OPENSHIFT__servers__default__server_url={OPENSHIFT_URL}; \
 _3SCALE_TESTS_OPENSHIFT__servers__default__token={OPENSHIFT_TOKEN}; \
