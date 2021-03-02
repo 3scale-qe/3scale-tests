@@ -29,9 +29,7 @@ def application_pass(service_pass, custom_app_plan, custom_application, request,
 @pytest.fixture(scope="module")
 def api_client_pass(application_pass, api_client):
     """Create api_client for 'application_pass'"""
-    session = requests.Session()
-    session.auth = application_pass.authobj
-    return api_client(application_pass, session=session)
+    return api_client(application_pass)
 
 
 @pytest.fixture(scope="module")
