@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+import argparse
+import io
+import itertools
+import os
+import time
+
+from lxml import etree
+import requests
+
+aparser = argparse.ArgumentParser(description="Upload junit to polarion")
+aparser.add_argument("--polarion", required=True, help="URL to polarion")
+aparser.add_argument("--username", required=True, help="polarion username")
+aparser.add_argument("--password-variable", required=True, help="env variable with password")
+aparser.add_argument("--skip-fails", action="store_true", default=False, help="Do not upload failures")
+aparser.add_argument("junitfile", nargs="+", help="junit file to import")
+args = aparser.parse_args()
+
+username = args.username
+password = os.environ[args.password_variable]
+
+session = requests.Session()
+session.auth = requests.auth.HTTPBasicAuth(username, password)
+
+html_parser = etree.HTMLParser()
+
+polarion = args.polarion.rstrip("/")
+
+Requirements = etree.XSLT(etree.parse("./xslt/requirements.xsl"))
+Testcases = etree.XSLT(etree.parse("./xslt/testcases.xsl"))
+polish = etree.XSLT(etree.parse("./xslt/polish-junit.xsl"))
+
+xargs = {}
+if args.skip_fails:
+    xargs = {"rmfails": "'true()'"}
+
+
+def files(xml):
+    return {"file": io.StringIO(etree.tostring(xml).decode("utf-8"))}
+
+
+def searchlist(response):
+    return itertools.chain(*[i["job-ids"] for i in response.json()["files"].values() if "job-ids" in i])
+
+
+def wait(idlist, url):
+    for jobid in idlist:
+        query = f"//table[@id='jobs']//tr/td[2][text() = '{jobid}']"
+        while len(etree.fromstring(session.get(url).text, html_parser).xpath(query)) > 0:
+            time.sleep(4)
+
+
+for xmlfile in args.junitfile:
+    polished = polish(etree.parse(xmlfile), **xargs)
+    testcases = Testcases(polished, approver=f"'{username}'")
+    requirements = Requirements(polished, approver=f"'{username}'")
+
+    response = session.post(f"{polarion}/import/requirement", files=files(requirements))
+    wait(searchlist(response), f"{polarion}/import/requirement-queue")
+
+    response = session.post(f"{polarion}/import/testcase", files=files(testcases))
+    wait(searchlist(response), f"{polarion}/import/testcase-queue")
+
+    response = session.post(f"{polarion}/import/xunit", files=files(polished))
+    wait(searchlist(response), f"{polarion}/import/xunit-queue")

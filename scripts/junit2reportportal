@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import argparse
+import io
+import os
+import zipfile
+
+import requests
+
+aparser = argparse.ArgumentParser(description="Upload junit to reportportal")
+aparser.add_argument("--reportportal", required=True, help="URL of reportportal")
+aparser.add_argument("--project", required=True, help="reportportal project where to import")
+aparser.add_argument("--launch-name", required=True, help="Desired launch name in reportportal")
+aparser.add_argument("--token-variable", required=True, help="env variable with auth token")
+aparser.add_argument("junitfile", nargs="+", help="junit file to import")
+args = aparser.parse_args()
+
+stream = io.BytesIO()
+
+with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip:
+    for junitfile in args.junitfile:
+        azip.write(junitfile, arcname=os.path.basename(junitfile))
+
+token = os.environ[args.token_variable]
+launch = args.launch_name
+project = args.project
+reportportal = args.reportportal.rstrip("/")
+
+auth = {"Authorization": f"Bearer {token}"}
+launch_import = f"{reportportal}/api/v1/{project}/launch/import"
+
+requests.post(launch_import, files={"file": (f"{launch}.zip", stream.getbuffer(), "application/zip")}, headers=auth)
