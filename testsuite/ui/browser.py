@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 from urllib import parse
+from time import sleep
 from widgetastic.browser import Browser, DefaultPlugin
 
 
@@ -50,6 +51,12 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
         # plugin.ensure_page_safe() is invoked from browser click.
         # we should not invoke it a second time, this can conflict with
         # ignore_ajax=True usage from browser click
+        # we need to add sleep in case of using firefox after click action
+        # because gecodriver(firefox driver) execute actions in strange way
+        # TODO: explore possibilities to check JS running or stalness of
+        #  clickable element in click / after_click action
+        if self.browser.browser_type == 'firefox':
+            sleep(1)
         pass
 
 
