@@ -3,10 +3,8 @@
 Test apicast with configuration from config maps.
 """
 import json
-import time
 
 import pytest
-import requests
 
 from testsuite.gateways.gateways import Capability
 from testsuite import rawobj
@@ -93,18 +91,6 @@ def test_threescale_config_file_param(api_client, application2):
     """
     assert api_client().get("/get").status_code == 200
 
-    session = requests.Session()
-    session.auth = application2.authobj
+    client = api_client(application2, disable_retry_status_list={404})
 
-    # pass session for skipping retrying on 404
-    client = api_client(application2, session=session)
-
-    # and we don't have retry anymore...
-    response = None
-    for i in range(8):
-        response = client.get("/get")
-        if response.status_code != 503:
-            break
-        time.sleep(1.3**i)
-
-    assert response.status_code == 404
+    assert client.get("/get").status_code == 404

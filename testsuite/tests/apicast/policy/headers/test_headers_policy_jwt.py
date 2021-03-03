@@ -45,9 +45,8 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
     token = rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
     client = api_client()
 
-    # pylint: disable=protected-access
     # Auth session needs to be None when we are testing access_token
-    client._session.auth = None
+    client.auth = None
     response = client.get("/get", params={'access_token': token})
     assert response.status_code == 200
 

@@ -15,7 +15,7 @@ def staging_client(api_client):
     """
     # pylint: disable=protected-access
     client = api_client()
-    client._session.auth = None
+    client.auth = None
     return client
 
 
@@ -29,7 +29,7 @@ def production_client(prod_client):
     """
     client = prod_client()
     # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     return client
 
 

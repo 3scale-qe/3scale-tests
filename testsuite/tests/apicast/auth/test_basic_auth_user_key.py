@@ -5,7 +5,6 @@ Rewrite ./spec/functional_specs/auth/basic_auth_user_key_spec.rb
 """
 import pytest
 
-import threescale_api.auth
 from threescale_api.resources import Service
 
 from testsuite.utils import basic_auth_string
@@ -30,7 +29,7 @@ def test_should_accept_user_key_passed_by_basic_auth(application, api_client):
     """
     Check credentials passed using the basic auth.
     """
-    key = list(application.authobj.credentials.values())[0]
+    key = list(application.authobj().credentials.values())[0]
 
     response = api_client().get('/get')
 
@@ -42,8 +41,7 @@ def test_basic_auth_app_id_403_with_query(application, api_client):
     "Forbid access if credentials passed wrong way"
     client = api_client()
 
-    # pylint: disable=protected-access
-    client._session.auth = threescale_api.auth.UserKeyAuth(application, "headers")
+    client.auth = application.authobj(location="headers")
 
     response = client.get("/get")
 
@@ -53,8 +51,7 @@ def test_basic_auth_app_id_403_with_query(application, api_client):
 def test_basic_auth_app_id_403_without_auth(api_client):
     "Forbid access if no credentials"
     client = api_client()
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     response = client.get("/get")
 
     assert response.status_code == 403

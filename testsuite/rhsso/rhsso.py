@@ -12,7 +12,9 @@ from keycloak.exceptions import KeycloakClientError
 
 from threescale_api.auth import BaseClientAuth
 from threescale_api.resources import Service
+from threescale_api.utils import HttpClient
 
+from testsuite.httpx import HttpxOidcClientAuth
 from testsuite.rhsso.realm import RetryKeycloakRealm
 
 
@@ -52,8 +54,13 @@ class OIDCClientAuthHook:
     def on_application_create(self, application):
         """Register OIDC auth object for api_client"""
 
-        application.register_auth(
-            "oidc", OIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
+        # pylint: disable=protected-access
+        if application._client_factory is HttpClient:
+            application.register_auth(
+                "oidc", OIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
+        else:
+            application.register_auth(
+                "oidc", HttpxOidcClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
 
 
 class RHSSO:

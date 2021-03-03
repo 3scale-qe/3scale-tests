@@ -31,7 +31,10 @@ def test_batcher_caching_policy(prod_client, application, openshift):
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
     client = prod_client(application)
-    response = client.get("/", params=None)
+    client.auth = None
+    auth = application.authobj()
+
+    response = client.get("/", auth=auth)
     assert response.status_code == 200
     response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
@@ -43,7 +46,7 @@ def test_batcher_caching_policy(prod_client, application, openshift):
     try:
         # Test if response succeed on production calls with valid credentials
         for _ in range(3):
-            response = client.get("/", params=None)
+            response = client.get("/", auth=auth)
             assert response.status_code == 200
 
         # Test if response fail on production calls with known invalid credentials

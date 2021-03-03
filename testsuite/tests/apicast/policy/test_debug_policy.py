@@ -5,48 +5,23 @@ Rewrite: ./spec/functional_specs/policies/debug_policy_spec.rb
 
 from urllib.parse import urlparse
 import pytest
-from threescale_api.resources import Service
+
 from testsuite import rawobj
-from testsuite.rhsso.rhsso import OIDCClientAuth
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 
-@pytest.fixture(scope="module")
-def service_settings(service_settings):
-    """Set auth mode to OIDC"""
-    service_settings.update(backend_version=Service.AUTH_OIDC)
-    return service_settings
+@pytest.fixture(scope="module", autouse=True)
+def rhsso_setup(lifecycle_hooks, rhsso_service_info):
+    """Have application/service with RHSSO auth configured"""
 
-
-@pytest.fixture(scope="module")
-def service_proxy_settings(rhsso_service_info, service_proxy_settings):
-    """Set OIDC issuer and type"""
-    service_proxy_settings.update(
-        {"credentials_location": "query"},
-        oidc_issuer_endpoint=rhsso_service_info.authorization_url(),
-        oidc_issuer_type="keycloak")
-    return service_proxy_settings
+    lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info, "query"))
 
 
 @pytest.fixture(scope="module")
 def service(service):
-    """Update OIDC configuration and prepend liquid_context_debug_policy"""
-    service.proxy.oidc.update(params={
-        "oidc_configuration": {
-            "standard_flow_enabled": False,
-            "direct_access_grants_enabled": True
-        }})
-
-    proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("liquid_context_debug", {}))
-
+    "Service with prepared policy_settings added"
+    service.proxy.list().policies.insert(0, rawobj.PolicyConfig("liquid_context_debug", {}))
     return service
-
-
-@pytest.fixture(scope="module")
-def application(rhsso_service_info, application):
-    """Add OIDC client authentication"""
-    application.register_auth("oidc", OIDCClientAuth.partial(rhsso_service_info))
-    return application
 
 
 @pytest.fixture(scope="module")
@@ -78,9 +53,8 @@ def test_debug_policy(api_client, access_token, service):
         - contains JWT object
     """
     client = api_client()
-    # pylint: disable=protected-access
-    # Auth session needs to be None when we are testing access_token
-    client._session.auth = None
+    client.auth = None
+
     response = client.get('/get', params={'access_token': access_token})
     assert response.status_code == 200
 

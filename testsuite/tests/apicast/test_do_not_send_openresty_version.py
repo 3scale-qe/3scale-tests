@@ -6,7 +6,6 @@ in the response body or in the response header
 """
 import backoff
 import pytest
-import requests
 from testsuite import rawobj
 
 
@@ -17,7 +16,7 @@ def service_proxy_settings():
 
 
 @pytest.fixture(scope="module")
-def client(application, api_client):
+def client(api_client):
     """
     Client configured not to retry requests.
 
@@ -25,9 +24,7 @@ def client(application, api_client):
     As 404 is the desired outcome of one of the tests, the client is
     configured not to retry requests to avoid long time execution.
     """
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={503, 404})
 
 
 @backoff.on_predicate(backoff.fibo, lambda x: x.headers.get("server", "") != "openresty", 7)

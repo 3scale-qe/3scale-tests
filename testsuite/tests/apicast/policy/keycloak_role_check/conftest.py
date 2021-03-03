@@ -32,7 +32,7 @@ def application(rhsso_setup, service, custom_application, custom_app_plan, lifec
     return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-@fixture_plus
+@fixture_plus(scope="module")
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
 
@@ -98,8 +98,7 @@ def prod_client(application, production_gateway):
 
     client = application.api_client(endpoint="endpoint")
 
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     return client
 
 

@@ -4,7 +4,6 @@ Test if APIAP routing only match paths that contain whole routing path
 from urllib.parse import urlparse
 
 import pytest
-import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
@@ -55,7 +54,7 @@ def mapping_rules(service, backend_bin, backend_echo):
 
 
 @pytest.fixture(scope="module")
-def api_client(application, api_client):
+def api_client(api_client):
     """
     Client without retry attempts
 
@@ -65,9 +64,7 @@ def api_client(application, api_client):
     """
     assert api_client().get("/bin/anything/bin").status_code == 200
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 # pylint: disable=unused-argument

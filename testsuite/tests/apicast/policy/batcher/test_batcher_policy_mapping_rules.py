@@ -4,7 +4,6 @@
 
 from time import sleep
 import pytest
-import requests
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
@@ -41,13 +40,11 @@ def service(service):
 
 
 @pytest.fixture(scope='module')
-def client(application, api_client):
+def client(api_client):
     """We are testing path that doesn't match mapping rule so we need to disable retry"""
     assert api_client().get("/get").status_code == 200
 
-    session = requests.Session()
-    session.auth = application.authobj
-    return api_client(session=session)
+    return api_client(disable_retry_status_list={404})
 
 
 def test_batcher_policy_append(client, application):

@@ -42,8 +42,10 @@ def test_caching_batching_resilient_mode(prod_client, openshift, application):
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
     client = prod_client(application)
+    client.auth = None
+    auth = application.authobj()
 
-    response = client.get("/", params=None)
+    response = client.get("/", auth=auth)
     assert response.status_code == 200
 
     openshift.scale("backend-listener", 0)
@@ -53,7 +55,7 @@ def test_caching_batching_resilient_mode(prod_client, openshift, application):
 
     try:
         # Test if response succeed with valid credentials
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
 
         # Test if response fail on production calls with known invalid credentials
@@ -61,7 +63,7 @@ def test_caching_batching_resilient_mode(prod_client, openshift, application):
         assert response.status_code == 403
 
         # Test if response succeed on production calls with valid credentials
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
 
         usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]

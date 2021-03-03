@@ -16,8 +16,7 @@ def test_rhsso_auth(api_client, service):
 def test_rhsso_no_auth(api_client):
     """Check if OIDC connect without auth won't work"""
     client = api_client()
-    # pylint: disable=protected-access
-    client._session.auth = None
+    client.auth = None
     response = client.get("/get")
 
     assert response.status_code == 403

@@ -2,7 +2,6 @@
 Test for env variable APICAST_SERVICES_FILTER_BY_URL
 """
 import pytest
-import requests
 
 from testsuite import rawobj
 from testsuite.gateways.gateways import Capability
@@ -29,7 +28,7 @@ def application_pass(service_pass, custom_app_plan, custom_application, request,
 @pytest.fixture(scope="module")
 def api_client_pass(application_pass, api_client):
     """Create api_client for 'application_pass'"""
-    return api_client(application_pass)
+    return api_client(application_pass, disable_retry_status_list={404})
 
 
 @pytest.fixture(scope="module")
@@ -48,9 +47,7 @@ def application_fail(service_fail, custom_app_plan, custom_application, request,
 @pytest.fixture(scope="module")
 def api_client_fail(application_fail, api_client):
     """Create api_client for 'application_fail'"""
-    session = requests.Session()
-    session.auth = application_fail.authobj
-    return api_client(application_fail, session=session)
+    return api_client(application_fail, disable_retry_status_list={404})
 
 
 def test_filter_by_url(api_client_pass, api_client_fail, staging_gateway, service_pass):

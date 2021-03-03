@@ -17,9 +17,10 @@ from testsuite.config import settings
 import testsuite.gateways as gateways
 import testsuite.tools
 
-from testsuite import rawobj, CONFIGURATION, ROOT_DIR
+from testsuite import rawobj, CONFIGURATION, ROOT_DIR, HTTP2
 from testsuite.gateways.gateways import Capability
 from testsuite.requestbin import RequestBinClient
+from testsuite.httpx import HttpxHook
 from testsuite.utils import blame, blame_desc
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
@@ -210,7 +211,7 @@ def tools(testconfig, configuration):
 
 
 @pytest.fixture(scope="module")
-def prod_client(production_gateway, application):
+def prod_client(production_gateway, application, request):
     """Prepares application and service for production use and creates new production client
 
     Parameters:
@@ -231,7 +232,9 @@ def prod_client(production_gateway, application):
         if redeploy:
             production_gateway.reload()
 
-        return app.api_client(endpoint="endpoint")
+        client = app.api_client(endpoint="endpoint")
+        request.addfinalizer(client.close)
+        return client
 
     return _prod_client
 
@@ -454,6 +457,12 @@ def lifecycle_hooks(request, testconfig):
     return []
 
 
+@pytest.fixture(scope="session")
+def httpx():
+    """Httpx fixture that returns lifecycle hook for httpx"""
+    return HttpxHook(HTTP2)
+
+
 @pytest.fixture(scope="module")
 def service(backends_mapping, custom_service, service_settings, service_proxy_settings, lifecycle_hooks):
     "Preconfigured service with backend defined existing over whole testsing session"
@@ -470,7 +479,7 @@ def application(service, custom_application, custom_app_plan, lifecycle_hooks, r
 
 
 @pytest.fixture(scope="module")
-def api_client(application):
+def api_client(application, request):
     """
     Fixture that returns api_client
     Parameters:
@@ -479,7 +488,9 @@ def api_client(application):
         api_client (HttpClient): Api client for application
     """
     def _api_client(app=application, **kwargs):
-        return app.api_client(**kwargs)
+        client = app.api_client(**kwargs)
+        request.addfinalizer(client.close)
+        return client
 
     return _api_client
 

@@ -2,7 +2,6 @@
 Test apiap routing combined with metrics counting
 """
 import pytest
-import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
@@ -40,23 +39,20 @@ def backend_anything(backends_mapping):
 
 
 @pytest.fixture(scope="module")
-def client(api_client, application, service):
+def client(api_client, service):
     """
     1. Test if request with default session have status code 200
     2. Delete default service mapping rule
     3. Create session without retry for session
     """
 
-    assert application.test_request().ok
+    assert api_client().get('/get').status_code == 200
 
     proxy = service.proxy.list()
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
 
-    session = requests.Session()
-    session.auth = application.authobj
-
-    return api_client(session=session, verify=False)
+    return api_client(disable_retry_status_list={404})
 
 
 @pytest.fixture(scope="module")

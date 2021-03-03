@@ -46,7 +46,7 @@ def a_client(request, api_client):
     client = api_client(app)
 
     # now disable builtin auth credentials
-    client._session.auth = None  # pylint: disable=protected-access
+    client.auth = None
 
     return client
 

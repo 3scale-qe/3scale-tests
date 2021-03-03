@@ -42,7 +42,7 @@ class HttpxClient:
         self._status_forcelist = {503, 404} - set(disable_retry_status_list)
         self._verify = verify
         self._cert = cert
-        self.auth = app.authobj
+        self.auth = app.authobj()
         self.http2 = http2
         self._client = Client(base_url=self._base_url, verify=self._ssl_context(), http2=http2)
 

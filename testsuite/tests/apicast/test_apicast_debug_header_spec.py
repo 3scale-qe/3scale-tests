@@ -15,7 +15,7 @@ def test_make_request(api_client, service, application):
     - 'X-3scale-service-id' - What service id was used
     - 'X-3scale-service-name' - What is the service name
     """
-    user_key = application.authobj.credentials["user_key"]
+    user_key = application.authobj().credentials["user_key"]
     debug_header = service.proxy.list().configs.latest()['content']['backend_authentication_value']
 
     response = api_client().get('/get', headers={'X-3scale-Debug': debug_header})

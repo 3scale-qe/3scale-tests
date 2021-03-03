@@ -8,7 +8,6 @@ from the list of services for which the value of the Host header of the request 
 from urllib.parse import urlparse
 
 import pytest
-import requests
 
 from testsuite.echoed_request import EchoedRequest
 from testsuite.gateways.gateways import Capability
@@ -46,10 +45,6 @@ def test_not_mapped_route_returns_not_found(application2, api_client):
 
     Path-based routing fails and it fallback to the default host-based routing.
     """
-    session = requests.Session()
-    session.auth = application2.authobj
-
-    # skip retrying on 404 by passing Session instance to it
-    client = api_client(application2, session=session)
+    client = api_client(application2, disable_retry_status_list={404})
 
     assert client.get("/anything/blah").status_code == 404

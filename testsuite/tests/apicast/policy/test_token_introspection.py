@@ -34,8 +34,8 @@ def client(api_client):
     Auth session needs to be None when we are testing access_token
     """
     api_client = api_client()
-    # pylint: disable=protected-access
-    api_client._session.auth = None
+
+    api_client.auth = None
     return api_client
 
 

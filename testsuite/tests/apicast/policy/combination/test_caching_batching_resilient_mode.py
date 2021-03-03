@@ -42,8 +42,10 @@ def test_caching_batching_strict_mode(prod_client, openshift, application):
     openshift = openshift()
     replicas = openshift.get_replicas("backend-listener")
     client = prod_client(application)
+    client.auth = None
+    auth = application.authobj()
 
-    response = client.get("/", params=None)
+    response = client.get("/", auth=auth)
     assert response.status_code == 200
 
     openshift.scale("backend-listener", 0)
@@ -53,7 +55,7 @@ def test_caching_batching_strict_mode(prod_client, openshift, application):
 
     try:
         # Test if response succeed on production calls with valid credentials
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
 
         # Test if response fail on production calls with known invalid credentials
@@ -63,14 +65,13 @@ def test_caching_batching_strict_mode(prod_client, openshift, application):
         usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
         assert usage_after == usage_before
 
-        # We need to wait for batcher to try to report to the backend-listener
-        # Then the cache is invalidated with last request with invalid credentials
-        sleep(BATCH_REPORT_SECONDS + 1)
-
-        response = client.get("/", params=None)
+        response = client.get("/", auth=auth)
         assert response.status_code == 200
     finally:
         openshift.scale("backend-listener", replicas)
 
+    # BATCH_REPORT_SECONDS needs to be big enough to execute all the requests to apicast + assert on analytics
+    sleep(BATCH_REPORT_SECONDS + 1)
+
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
-    assert usage_after == usage_before
+    assert usage_after == usage_before + 3
