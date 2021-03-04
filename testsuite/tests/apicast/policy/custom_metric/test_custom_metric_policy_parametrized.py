@@ -1,5 +1,7 @@
 """
 Testing the custom metric policy
+The policy enables to decide whether to increase a
+metric based on the response from the upstream API
 """
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
@@ -13,6 +15,15 @@ from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-imp
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
+
+
+@pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """
+    Change api_backend to httpbin for service, as the test uses utilities provided
+    only by http_bin ("/response_headers" endpoint)"
+    """
+    return rawobj.Proxy(private_base_url("httpbin"))
 
 
 @fixture_plus
@@ -70,8 +81,7 @@ def test_custom_policy(application, threescale, config, client):
     """
 
     analytics = threescale.analytics
-    metrics = config[2]
-    calls = config[1]
+    _, calls, metrics = config
 
     for status_code, increments, endpoint, params in calls:
         hits_before = []
