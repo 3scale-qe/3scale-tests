@@ -9,6 +9,8 @@ from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
 from testsuite.ui.views.admin import BaseAdminView, LoginView, AccountNewView
+from testsuite.ui.views.admin.backends import BackendNewView
+from testsuite.ui.views.admin.product import ProductNewView
 from testsuite.utils import blame
 
 
@@ -101,6 +103,55 @@ def navigator(browser):
     ]
     navigator = Navigator(browser, base_views)
     return navigator
+
+
+# pylint: disable=unused-argument, too-many-arguments
+@pytest.fixture(scope="module")
+def custom_ui_backend(login, navigator, threescale, testconfig, request, private_base_url):
+    """Parametrized custom Backend created via UI"""
+
+    def _custom_ui_backend(name: str, system_name: str, description: str = "", endpoint: str = "", autoclean=True):
+        if not endpoint:
+            endpoint = private_base_url()
+
+        backend = navigator.navigate(BackendNewView)
+        backend.create(name, system_name, description, endpoint)
+        backend = threescale.backends.read_by_name(system_name)
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(backend.delete)
+        return backend
+
+    return _custom_ui_backend
+
+
+@pytest.fixture(scope="module")
+def ui_backend(custom_ui_backend, request):
+    """Preconfigured backend existing over whole testing session"""
+    name = blame(request, "ui_backend")
+    return custom_ui_backend(name, name)
+
+
+# pylint: disable=unused-argument
+@pytest.fixture(scope="module")
+def custom_ui_product(login, navigator, threescale, testconfig, request):
+    """Parametrized custom Product created via UI"""
+
+    def _custom_ui_product(name: str, system_name: str, description: str = "", autoclean=True):
+        product = navigator.navigate(ProductNewView)
+        product.create(name, system_name, description)
+        product = threescale.services.read_by_name(system_name)
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(product.delete)
+        return product
+
+    return _custom_ui_product
+
+
+@pytest.fixture(scope="module")
+def ui_product(custom_ui_product, request):
+    """Preconfigured product existing over whole testing session"""
+    name = blame(request, "ui_product")
+    return custom_ui_product(name, name)
 
 
 # pylint: disable=unused-argument
