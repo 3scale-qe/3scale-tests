@@ -154,8 +154,8 @@ def pytest_report_header(config):
         "",
         f"testsuite: testsuite version = {testsuite_version}",
         f"testsuite: environment = {environment}",
-        #f"testsuite: openshift = {openshift}",
-        #f"testsuite: project = {project}",
+        f"testsuite: openshift = {openshift}",
+        f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
         ""]
@@ -360,34 +360,32 @@ def custom_provider_account(request, testconfig):
 @pytest.fixture(scope="session")
 def staging_gateway(request, testconfig, configuration):
     """Staging gateway"""
-#    options = gateways.configuration.options(staging=True,
-#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-#                                             configuration=configuration)
-#    gateway = gateways.configuration.staging(options)
-#    request.addfinalizer(gateway.destroy)
-#
-#    gateway.create()
-#
-#    return gateway
-    pass
+    options = gateways.configuration.options(staging=True,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateways.configuration.staging(options)
+    request.addfinalizer(gateway.destroy)
+
+    gateway.create()
+
+    return gateway
 
 
 @pytest.fixture(scope="session")
 def production_gateway(request, testconfig, configuration):
     """Production gateway"""
-#    gateway = gateways.configuration.production
-#    if gateway is None:
-#        return None
-#    options = gateways.configuration.options(staging=False,
-#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-#                                             configuration=configuration)
-#    gateway = gateway(options)
-#    request.addfinalizer(gateway.destroy)
-#
-#    gateway.create()
-#
-#    return gateway
-    pass
+    gateway = gateways.configuration.production
+    if gateway is None:
+        return None
+    options = gateways.configuration.options(staging=False,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateway(options)
+    request.addfinalizer(gateway.destroy)
+
+    gateway.create()
+
+    return gateway
 
 
 @pytest.fixture(scope="module")
