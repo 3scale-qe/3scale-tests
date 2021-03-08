@@ -12,6 +12,10 @@ from testsuite.openshift.apimanager import APIManager
 from testsuite.openshift.env import Environ
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 
+# There is indeed cyclic import but it should be negated by TYPE_CHECKING check
+# pylint: disable=cyclic-import
+from testsuite.openshift.scaler import Scaler
+
 
 class SecretKinds(enum.Enum):
     """Secret kinds enum."""
@@ -102,6 +106,12 @@ class OpenShiftClient:
         """Dict-like access to config maps"""
 
         return ConfigMaps(self)
+
+    @property
+    def scaler(self):
+        """Scaling interface for both template and operator deployments"""
+
+        return Scaler(self)
 
     def environ(self, name: str,
                 resource_type: Optional[str] = None,
