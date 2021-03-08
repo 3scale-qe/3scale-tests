@@ -32,7 +32,7 @@ def case_header_increment() -> Tuple[dict, List[tuple], List[str]]:
 
 def case_matches() -> Tuple[dict, List[tuple], List[str]]:
     """
-    Case matching based on the PCRE
+    Case matching based on the regular expressions (PCRE)
     """
     policy = custom_metrics_policy([rule(condition(left="{{status}}", left_type="liquid",
                                                    right="4..", right_type="plain", operation="matches"))])
