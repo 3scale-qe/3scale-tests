@@ -4,7 +4,8 @@ from typing import Dict
 
 from threescale_api.resources import Service
 
-from testsuite.gateways.gateways import AbstractApicast, Capability, GatewayRequirements
+from testsuite.gateways.gateways import AbstractApicast, GatewayRequirements
+from testsuite.capabilities import Capability
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.env import Environ
 

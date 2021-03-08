@@ -5,7 +5,7 @@ Service Mesh by allows both query and headers location to be used
 import pytest
 from threescale_api.resources import Service
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 

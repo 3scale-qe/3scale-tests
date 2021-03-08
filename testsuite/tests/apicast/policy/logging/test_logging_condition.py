@@ -4,7 +4,7 @@ particular status code, only those responses are logged.
 """
 import pytest
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import randomize
 
 pytestmark = pytest.mark.required_capabilities(Capability.LOGS)

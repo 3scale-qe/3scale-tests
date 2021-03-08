@@ -3,7 +3,7 @@ Rewrite spec/functional_specs/policies/caching/caching_allow_policy_spec.rb
 """
 import pytest
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 

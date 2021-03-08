@@ -4,7 +4,7 @@ Test for env variable APICAST_SERVICES_FILTER_BY_URL
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
 pytestmark = [

@@ -10,7 +10,7 @@ It also tests both embedded and path type policies, so in total it runs 4 combin
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.tls import embedded
 from testsuite.utils import blame
 

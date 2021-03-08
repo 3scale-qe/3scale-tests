@@ -5,7 +5,7 @@ Test if apicast is able to serve requests only to listed services.
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)

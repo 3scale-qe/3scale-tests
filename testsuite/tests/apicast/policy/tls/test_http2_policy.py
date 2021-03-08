@@ -6,7 +6,7 @@ import pytest
 import testsuite
 from testsuite import rawobj # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.httpx import HttpxClient
 
 

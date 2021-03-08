@@ -4,8 +4,7 @@ Rewrite: ./spec/functional_specs/api_update_url_spec.rb
 
 import pytest
 from testsuite.utils import blame
-from testsuite.gateways.gateways import Capability
-
+from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2939")
 

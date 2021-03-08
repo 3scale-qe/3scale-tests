@@ -5,20 +5,21 @@ import logging
 import os
 import time
 
-import pytest
-import threescale_api
-import threescale_api.errors
-
 import backoff
+import pytest
+import threescale_api.errors
+from threescale_api import client
 from weakget import weakget
 
-from threescale_api import client
-from testsuite.config import settings
+# to actually initialize all the providers
+# pylint: disable=unused-import
+import testsuite.capabilities.providers
 import testsuite.gateways as gateways
 import testsuite.tools
 
 from testsuite import rawobj, CONFIGURATION, ROOT_DIR, HTTP2
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability, CapabilityRegistry
+from testsuite.config import settings
 from testsuite.requestbin import RequestBinClient
 from testsuite.httpx import HttpxHook
 from testsuite.utils import blame, blame_desc
@@ -55,10 +56,10 @@ def pytest_runtest_setup(item):
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:
             for capability in mark.args:
-                if capability not in gateways.capabilities:
-                    pytest.skip(f"Skipping test because current gateway doesn't have capability {capability}")
+                if capability not in CapabilityRegistry():
+                    pytest.skip(f"Skipping test because current environment doesn't have capability {capability}")
     else:
-        if Capability.APICAST not in gateways.capabilities:
+        if Capability.APICAST not in CapabilityRegistry():
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
 
 

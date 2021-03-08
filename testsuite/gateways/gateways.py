@@ -1,11 +1,11 @@
 """Module containing all basic gateways"""
-import enum
 import sys
 from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING
 
 from weakget import weakget
 
+from testsuite.capabilities import Capability
 from testsuite.openshift.env import Environ
 from testsuite.requirements import OpenshiftRequirement
 from testsuite.lifecycle_hook import LifecycleHook
@@ -30,18 +30,6 @@ class GatewayRequirements(OpenshiftRequirement, ABC):
     @property
     def print_logs(self) -> bool:
         """True if app logs should be printed"""
-
-
-class Capability(enum.Enum):
-    """Enum containing all known gateway capabilities"""
-    PRODUCTION_GATEWAY = "production"           # Allows production gateway with reload() capability
-    APICAST = "apicast"                         # Is Apicast, this is mutually exclusive with Service Mesh
-    CUSTOM_ENVIRONMENT = "env"                  # Allows environment manipulation through environ() method
-    SAME_CLUSTER = "internal-cluster"           # Is always located on the same cluster as 3scale
-    SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
-    STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
-    LOGS = "logs"                               # Allows getting apicast logs through get_logs() method
-    JAEGER = "jaeger"                           # Allows configuring the Apicast to send data to Jaeger
 
 
 class AbstractGateway(LifecycleHook, ABC):

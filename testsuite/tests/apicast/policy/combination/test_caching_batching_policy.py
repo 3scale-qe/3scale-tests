@@ -6,8 +6,7 @@ from time import sleep
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
-
+from testsuite.capabilities import Capability
 
 BATCH_REPORT_SECONDS = 50
 

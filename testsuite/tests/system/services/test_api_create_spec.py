@@ -5,7 +5,7 @@ Rewrite spec/functional_specs/api_create_spec.rb
 import pytest
 from testsuite import rawobj
 from testsuite.utils import blame
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 
 @pytest.fixture(scope="module")

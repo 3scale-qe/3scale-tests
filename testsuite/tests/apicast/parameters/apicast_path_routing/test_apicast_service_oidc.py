@@ -5,7 +5,7 @@ import pytest
 
 from testsuite import rawobj
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 pytestmark = [pytest.mark.required_capabilities(Capability.APICAST, Capability.PRODUCTION_GATEWAY,

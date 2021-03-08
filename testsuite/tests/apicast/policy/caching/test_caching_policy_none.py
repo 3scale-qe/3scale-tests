@@ -4,7 +4,7 @@ Rewrite spec/functional_specs/policies/caching/caching_none_policy_spec.rb
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 

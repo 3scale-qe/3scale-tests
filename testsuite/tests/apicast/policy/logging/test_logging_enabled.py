@@ -3,7 +3,7 @@ When the logging policy is set to enable logging, the logs are outputed as usual
 """
 import pytest
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import randomize
 
 pytestmark = pytest.mark.required_capabilities(Capability.LOGS)

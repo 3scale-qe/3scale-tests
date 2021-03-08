@@ -6,7 +6,7 @@ are working as expected.
 
 import pytest
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import blame, absolute_path
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),

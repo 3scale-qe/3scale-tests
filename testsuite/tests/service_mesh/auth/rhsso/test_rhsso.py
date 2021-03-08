@@ -4,7 +4,7 @@ Testing service authentication using OIDC with RHSSO
 import pytest
 from threescale_api.resources import Service
 
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 

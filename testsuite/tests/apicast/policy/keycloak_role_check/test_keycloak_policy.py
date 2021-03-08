@@ -15,7 +15,7 @@ import pytest
 from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
 
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from .conftest import get_rhsso_client, token
 
 

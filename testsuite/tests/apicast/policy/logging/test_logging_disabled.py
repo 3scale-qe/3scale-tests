@@ -3,7 +3,7 @@ When the logging policy is set to disable logging, than no access logs are creat
 """
 import pytest
 from testsuite import rawobj
-from testsuite.gateways.gateways import Capability
+from testsuite.capabilities import Capability
 from testsuite.utils import randomize
 
 pytestmark = pytest.mark.required_capabilities(Capability.LOGS)
