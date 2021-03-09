@@ -22,6 +22,8 @@ class Capability(enum.Enum):
     STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
     LOGS = "logs"                               # Allows getting apicast logs through get_logs() method
     JAEGER = "jaeger"                           # Allows configuring the Apicast to send data to Jaeger
+    OCP4 = "ocp4"                               # If the current environment is OpenShift 4
+    OCP3 = "ocp3"                               # If the current environment is OpenShift 3
 
 
 class Singleton(type):
