@@ -15,6 +15,16 @@ Design of this navigation is based on: https://github.com/RedHatQE/navmazing
 """
 import inspect
 from collections import deque
+from typing import TypeVar, Callable, TYPE_CHECKING
+
+from testsuite.ui.browser import ThreeScaleBrowser
+
+if TYPE_CHECKING:
+    # pylint: disable=cyclic-import
+    from testsuite.ui.views.admin import BaseAdminView  # noqa
+
+
+ReturnView = TypeVar("ReturnView", bound="BaseAdminView")
 
 
 def step(cls, **kwargs):
@@ -56,7 +66,7 @@ class Navigator:
         self.browser = browser
         self.base_views = base_views
 
-    def navigate(self, cls, **kwargs):
+    def navigate(self, cls: Callable[[ThreeScaleBrowser], ReturnView], **kwargs) -> ReturnView:
         """
         Perform navigation to specific View. If required by particular steps, args and kwargs
         should be specified. They are later passed to avery step method and mapped to
@@ -71,7 +81,7 @@ class Navigator:
 
         return cls(self.browser)
 
-    def open(self, cls, **kwargs):
+    def open(self, cls: Callable[[ThreeScaleBrowser], ReturnView], **kwargs) -> ReturnView:
         """Directly opens desired View, by inserting its `endpoint_path` in to browser"""
         page = cls(self.browser)
         self.browser.set_path(page.endpoint_path.format(**kwargs))
