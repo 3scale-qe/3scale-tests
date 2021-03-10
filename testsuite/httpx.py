@@ -1,9 +1,11 @@
 """Http client with HTTPX library supporting HTTP/1.1 and HTTP/2"""
 import functools
+import logging
 from typing import Iterable, Generator
 
 from httpx import Client, Request, Response, URL, Auth, create_ssl_context
 from threescale_api.resources import Application, Service
+from threescale_api.utils import response2str, request2curl
 import backoff
 
 from testsuite.lifecycle_hook import LifecycleHook
@@ -11,6 +13,19 @@ from testsuite.lifecycle_hook import LifecycleHook
 
 # pylint: disable=too-few-public-methods
 from testsuite.utils import basic_auth_string
+
+
+log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def _log_request(request):
+    """log request details"""
+    log.info("[CLIENT]: %s", request2curl(request))
+
+
+def _log_response(response):
+    """log response details"""
+    log.info("\n".join(["[CLIENT]:", response2str(response)]))
 
 
 class UnexpectedResponse(Exception):
@@ -52,6 +67,8 @@ class HttpxClient:
         self.auth = app.authobj()
         self.http2 = http2
         self._client = Client(base_url=self._base_url, verify=self._ssl_context(), http2=http2)
+        self._client.event_hooks["request"] = [_log_request]
+        self._client.event_hooks["response"] = [_log_response]
 
     def close(self):
         """Close httpx client"""
