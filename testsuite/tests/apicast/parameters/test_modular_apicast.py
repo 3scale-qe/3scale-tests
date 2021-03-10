@@ -91,6 +91,8 @@ def service(service, policy_settings):
     return service
 
 
+# likely requires policy to register first
+@pytest.mark.flaky
 # pylint: disable=unused-argument
 def test_modular_apicast(build_images, api_client):
     """
