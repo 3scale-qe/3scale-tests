@@ -2,13 +2,14 @@
 
 Test metrics provided by apicast to Prometheus.
 """
+import backoff
 import pytest
 
 from testsuite.capabilities import Capability
 
-pytestmark = [pytest.mark.flaky,
-              pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY),
-              pytest.mark.disruptive]
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY),
+    pytest.mark.disruptive]
 
 
 METRICS = [
@@ -18,6 +19,8 @@ METRICS = [
     "total_response_time_seconds", "upstream_response_time_seconds",
     "upstream_status",
 ]
+
+STATUSES = [300, 418, 507]
 
 
 @pytest.fixture(scope="module")
@@ -47,23 +50,30 @@ def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metr
     assert expected_metric in metrics
 
 
+# there is certain delay before all appears in Prometheus
+@backoff.on_predicate(backoff.fibo, lambda x: sorted(x.keys()) == STATUSES, 7)
+def apicast_status_metrics(prometheus):
+    """Reliable gathering of prometheus metrics
+
+    Metrics in prometheus appear with some delay, therefore retry is needed
+    to ensure expected values are available"""
+    hits = prometheus.get_metric("apicast_status")
+
+    return {
+        status: int(hit["value"][1]) for status in STATUSES for hit in hits if int(hit["metric"]["status"]) == status}
+
+
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5417")
 def test_apicast_status_metrics(client, prometheus_client):
     """Test apicast_status metric.
 
     Apicast logs http status codes on prometheus as a counter.
     """
-    statuses = [300, 418, 507]
 
-    for status in statuses:
+    for status in STATUSES:
         assert client.get(f"/status/{status}").status_code == status
 
-    hits = prometheus_client.get_metric("apicast_status")
+    hit_metrics = apicast_status_metrics(prometheus_client)
 
-    hit_metrics = {status: int(hit["value"][1])
-                   for status in statuses
-                   for hit in hits
-                   if int(hit["metric"]["status"]) == status}
-
-    assert statuses == sorted(hit_metrics.keys())
+    assert STATUSES == sorted(hit_metrics.keys())
     assert all(count > 0 for count in hit_metrics.values())
