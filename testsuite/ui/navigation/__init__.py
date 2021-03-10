@@ -85,7 +85,7 @@ class Navigator:
         """
         page = page_cls(self.browser)
         self.page_chain.append(page)
-        if page_cls in self.base_views or page.is_displayed():
+        if page_cls in self.base_views or page.is_displayed:
             return
         self._backtrace(page.prerequisite())
 
@@ -152,7 +152,7 @@ class Navigator:
                 try:
                     method(destination.endpoint_path)
                 except Exception as exc:
-                    raise NavigationStepException(method._dict__, destination, method) from exc
+                    raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True
         return False
 

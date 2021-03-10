@@ -27,6 +27,7 @@ class AccountsView(AudienceNavView):
     def prerequisite(self):
         return AudienceNavView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.new_account.is_displayed and self.table.is_displayed and \
                self.endpoint_path in self.browser.url
@@ -54,6 +55,7 @@ class AccountsDetailView(AudienceNavView):
     def prerequisite(self):
         return AccountsView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url
 
@@ -76,6 +78,7 @@ class NewAccountView(AudienceNavView):
     def prerequisite(self):
         return AccountsView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.username.is_displayed and self.email.is_displayed \
                and self.organization.is_displayed and self.endpoint_path in self.browser.url
@@ -100,6 +103,7 @@ class AccountEditView(AudienceNavView):
     def prerequisite(self):
         return AccountsDetailView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.org_name.is_displayed
 
@@ -127,6 +131,7 @@ class AccountApplicationsView(AudienceNavView):
     def prerequisite(self):
         return AccountsDetailView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.create_button.is_displayed and \
                self.endpoint_path in self.browser.url
@@ -142,6 +147,7 @@ class UsageRulesView(AudienceNavView):
     def prerequisite(self):
         return AudienceNavView
 
+    @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.account_plans_checkbox.is_displayed and \
                self.endpoint_path in self.browser.url

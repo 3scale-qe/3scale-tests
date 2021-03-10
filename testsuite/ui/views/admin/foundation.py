@@ -55,7 +55,7 @@ class BaseAdminView(View, Navigable):
         """Select Dashboard from ContextSelector"""
         self.context_menu.item_select("Dashboard")
 
-    # pylint: disable=invalid-overridden-method
+    @property
     def is_displayed(self):
         return self.threescale_menu_logo.is_displayed \
                and self.support_link.is_displayed \
@@ -72,12 +72,13 @@ class BaseNavView(BaseAdminView):
         """Perform step to specific item in Navigation with use of href locator"""
         self.nav.select_href(href)
 
+    @property
     def is_displayed(self):
         if not self.nav.is_displayed:
             return False
 
         present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
-        return BaseAdminView.is_displayed(self) and len(present_nav_items) > 3
+        return BaseAdminView.is_displayed and len(present_nav_items) > 3
 
     def prerequisite(self):
         return BaseAdminView
@@ -103,13 +104,13 @@ class SettingsNavView(BaseNavView):
     NAV_ITEMS = ['Overview', 'Personal', 'Users', 'Integrate', 'Export']
 
 
-# pylint: disable=invalid-overridden-method
 class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on endpoint_path"""
     endpoint_path = '/p/admin/dashboard'
 
+    @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed(self) and self.endpoint_path in self.browser.url
+        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url
 
     def prerequisite(self):
         return BaseAdminView
@@ -121,6 +122,7 @@ class AccessDeniedView(View):
     title = Text(locator='//*[@id="content"]/h1[2]')
     text_message = Text(locator='//*[@id="content"]/p')
 
+    @property
     def is_displayed(self):
         return self.title.text == "Access Denied" and \
                self.text_message.text == "Sorry, you do not have permission to access this page." and\
@@ -133,6 +135,7 @@ class NotFoundView(View):
     title = Text(locator='//*[@id="content"]/h1[2]')
     text_message = Text(locator='//*[@id="content"]/p')
 
+    @property
     def is_displayed(self):
         return self.title.text == "Not Found" and \
                self.text_message.text == "Sorry. We can't find what you're looking for." and \
