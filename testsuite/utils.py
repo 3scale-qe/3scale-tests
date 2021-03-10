@@ -8,7 +8,6 @@ import typing
 from base64 import b64encode
 from os import urandom
 
-from testsuite import ROOT_DIR
 
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -22,11 +21,6 @@ def generate_tail(tail=5):
 def randomize(name, tail=5):
     "To avoid conflicts returns modified name with random sufffix"
     return "%s-%s" % (name, generate_tail(tail))
-
-
-def absolute_path(path: str):
-    """Returns absolute path"""
-    return os.path.join(ROOT_DIR, path)
 
 
 def _whoami():

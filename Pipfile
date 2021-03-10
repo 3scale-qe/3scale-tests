@@ -11,6 +11,7 @@ web-pdb = "*"
 #pyls-isort = "*"
 
 [packages]
+importlib_resources = "*"
 pytest-xdist = "*"
 pytest = "*"
 pytest-cases = "*"

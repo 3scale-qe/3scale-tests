@@ -4,14 +4,14 @@ import re
 
 import pytest
 import yaml
+import importlib_resources as resources
 from testsuite.config import settings
 
 import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
 
-
-OAS3_FILE = 'testsuite/resources/oas3/petstore-expanded.yaml'
+OAS3_FILE = resources.files('testsuite.resources.oas3').joinpath('petstore-expanded.yaml')
 USER_KEY = '123456'
 
 

@@ -1,9 +1,11 @@
 """Configuration for mTLS tests"""
 import pytest
 
+import importlib_resources as resources
+
 from testsuite import rawobj
 from testsuite.certificates import Certificate
-from testsuite.utils import blame, absolute_path
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module", params=[
@@ -32,7 +34,7 @@ def httpbin_certificate(request, authority_and_code, configuration) -> Certifica
 @pytest.fixture(scope="module")
 def httpbin(staging_gateway, request, httpbin_certificate, authority_and_code):
     """Deploys httpbin with mTLS enabled"""
-    path = absolute_path('testsuite/resources/tls/httpbin_go.yaml')
+    path = resources.files('testsuite.resources.tls').joinpath('httpbin_go.yaml')
     authority, _ = authority_and_code
     name = blame(request, "httpbin-mtls")
     parameters = {
