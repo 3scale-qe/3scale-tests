@@ -26,7 +26,8 @@ def test_cors_headers_for_same_origin(api_client):
     response = api_client().get("/get", headers=dict(origin="localhost"))
     assert response.headers.get("Access-Control-Allow-Origin") == "localhost"
     assert response.headers.get("Access-Control-Allow-Credentials") == 'true'
-    assert response.headers.get("Access-Control-Allow-Methods") == "GET, POST"
+    allow_method = {x.strip() for x in response.headers.get("Access-Control-Allow-Methods").split(",")}
+    assert allow_method == {"GET", "POST"}
 
 
 def test_no_cors_headers_with_none_origin(api_client):
