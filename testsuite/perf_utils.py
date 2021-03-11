@@ -69,6 +69,21 @@ class HyperfoilUtils:
             rows.append([url, auth_user_key, user_key])
         self.factory.csv_data(filename, rows)
 
+    def add_app_id_auth(self, applications, filename):
+        """
+        Adds csv file to the benchmark with following columns of rows
+        [authority url, app id, app key]
+        :param applications: list of 3scale applications
+        :param filename: name of csv file
+        """
+        rows = []
+        for application in applications:
+            url = authority(application.service.proxy.list()['endpoint'])
+            app_id = application["application_id"]
+            app_key = application.keys.list()["keys"][0]["key"]["value"]
+            rows.append([url, app_id, app_key])
+        self.factory.csv_data(filename, rows)
+
     def add_oidc_auth(self, rhsso_service_info, applications, filename):
         """
         Adds csv file to the benchmark with following columns of a row:
