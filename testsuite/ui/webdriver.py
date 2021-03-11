@@ -1,6 +1,8 @@
 """Selenium factory for creating  Threescale browser instances to run UI tests. """
 
 from selenium import webdriver
+from msedge.selenium_tools import EdgeOptions
+from msedge.selenium_tools.remote_connection import EdgeRemoteConnection
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 from testsuite.ui.exception import WebDriverError
@@ -31,16 +33,18 @@ class SeleniumDriver:
         driver.finalize()
     """
 
-    def __init__(self, provider, driver, ssl_verify):
+    def __init__(self, provider, driver, ssl_verify, remote_url=None):
         """
         Initializes factory with either specified or fetched from settings values.
-        :param str optional provider: Browser provider name. One of  ('local', 'remote')
-        :param str optional driver: Browser name. One of ('chrome', 'firefox')
+        :param str provider: Browser provider name. One of  ('local', 'remote')
+        :param str driver: Browser name. One of ('chrome', 'firefox')
+        :param str ssl_verify: option for certificates ignore
+        :param str optional remote_url: URL of remote webdriver
         """
         self.provider = provider
         self.driver = driver
         self.ssl_verify = ssl_verify
-        self._webdriver = None
+        self.remote_url = remote_url or 'http://127.0.0.1:4444'
         self.webdriver = None
 
     # pylint: disable=no-else-return
@@ -70,14 +74,14 @@ class SeleniumDriver:
         """
         # Workaround 'Certificate Error' screen on Microsoft Edge
         if (self.driver == 'edge' and
-                ('Certificate Error' in self._webdriver.title or
-                 'Login' not in self._webdriver.title)):
-            self._webdriver.get(
+                ('Certificate Error' in self.webdriver.title or
+                 'Login' not in self.webdriver.title)):
+            self.webdriver.get(
                 "javascript:document.getElementById('invalidcert_continue')"
                 ".click()"
             )
 
-        self._webdriver.maximize_window()
+        self.webdriver.maximize_window()
 
     def finalize(self):
         """
@@ -85,7 +89,7 @@ class SeleniumDriver:
         :raises: WebDriverError: If problem with browser happens finalization occurs.
         """
         if self.provider == 'local' or self.provider == 'remote':
-            self._webdriver.quit()
+            self.webdriver.quit()
         else:
             raise WebDriverError("Problem with browser finalization")
 
@@ -97,31 +101,53 @@ class SeleniumDriver:
         """
         if self.driver == 'chrome':
             if self.ssl_verify:
-                self._webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+                self.webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
             else:
                 options = webdriver.ChromeOptions()
-                options.add_argument('ignore-certificate-errors')
-                self._webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install(),
-                                                   chrome_options=options)
+                options.set_capability("acceptInsecureCerts", True)
+                self.webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install(),
+                                                  chrome_options=options)
         elif self.driver == 'firefox':
             if self.ssl_verify:
-                self._webdriver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+                self.webdriver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
             else:
                 browser_profile = webdriver.FirefoxProfile()
                 browser_profile.accept_untrusted_certs = True
-                self._webdriver = webdriver.Firefox(firefox_profile=browser_profile,
-                                                    executable_path=GeckoDriverManager().install())
-        if self._webdriver is None:
+                self.webdriver = webdriver.Firefox(firefox_profile=browser_profile,
+                                                   executable_path=GeckoDriverManager().install())
+        else:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'
                 .format(self.driver, ('chrome', 'firefox', 'edge'))
             )
-        self.webdriver = self._webdriver
-        return self._webdriver
+        return self.webdriver
 
     def _get_remote_driver(self):
         """
-        TODO: Add support for remote webdriver
         :return:  Returns remote webdriver instance of selected browser
         :note: Should not be called directly, use :meth:get_browser to choose which browser will be used
         """
+        if self.driver == 'chrome':
+            browser_options = webdriver.ChromeOptions()
+            command_executor = self.remote_url + '/wd/hub'
+        elif self.driver == 'firefox':
+            browser_options = webdriver.FirefoxOptions()
+            command_executor = self.remote_url + '/wd/hub'
+        elif self.driver == 'edge':
+            browser_options = EdgeOptions()
+            browser_options.use_chromium = True
+            command_executor = EdgeRemoteConnection(self.remote_url + '/wd/hub')
+        else:
+            raise ValueError(
+                '"{}" webdriver is not supported. Please use one of {}'
+                .format(self.driver, ('chrome', 'firefox', 'edge'))
+            )
+
+        if not self.ssl_verify and self.driver != 'edge':
+            browser_options.set_capability("acceptInsecureCerts", True)
+
+        self.webdriver = webdriver.Remote(
+            command_executor=command_executor,
+            options=browser_options
+        )
+        return self.webdriver

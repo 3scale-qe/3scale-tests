@@ -11,13 +11,16 @@ First, you need to specify:
 In settings there are two options to run testsuite using option `provider:`:
 * `local` settings  will use webdrivers from library which refers to 
 latest know webdrivers and store those webdrivers in cache/tmp folders
-* [RFE]`remote` settings will use containerized environment of 
-[Selenium images](https://github.com/RedHatQE/selenium-images)
+* `remote` settings will use containerized environment of  
+[Selenium images](https://github.com/SeleniumHQ/docker-selenium)
+* `remote_url` url and port for remote selenium webdriver instance, if not specified
+`http://127.0.0.1:4444` will be used
 
-    To run container use `podman run -it --shm-size=2g -p 4444:4444 
--p 5999:5999 quay.io/redhatqe/selenium-standalone` 
+    To run container use e.g. `podman run -d -p 4444:4444 -p 5900:5900 -v /dev/shm:/dev/shm 
+    selenium/standalone-chrome:4.0.0-beta-1-20210215` 
 
-Currently supported browsers options are `firefox` and `chrome` (and chromium based browser like Edge)
+Currently supported browsers options are `firefox`, `chrome` and `edge`
+(edge only for remote webdriver or using binary path)
 
 There can be also specified 3scale admin url which is used for browser 
 navigation(by default is automatically fetched from dynaconf)
