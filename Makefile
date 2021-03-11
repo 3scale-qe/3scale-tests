@@ -31,7 +31,7 @@ all-is-package:
 
 test: ## Run test
 test pytest tests: pipenv
-	$(PYTEST) -m 'not flaky' $(flags) testsuite
+	$(PYTEST) -n8 -m 'not flaky' $(flags) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
