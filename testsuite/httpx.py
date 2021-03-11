@@ -1,16 +1,38 @@
 """Http client with HTTPX library supporting HTTP/1.1 and HTTP/2"""
 import functools
-import time
+import logging
 from typing import Iterable, Generator
 
 from httpx import Client, Request, Response, URL, Auth, create_ssl_context
 from threescale_api.resources import Application, Service
+from threescale_api.utils import response2str, request2curl
+import backoff
 
 from testsuite.lifecycle_hook import LifecycleHook
 
 
 # pylint: disable=too-few-public-methods
 from testsuite.utils import basic_auth_string
+
+
+log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def _log_request(request):
+    """log request details"""
+    log.info("[CLIENT]: %s", request2curl(request))
+
+
+def _log_response(response):
+    """log response details"""
+    log.info("\n".join(["[CLIENT]:", response2str(response)]))
+
+
+class UnexpectedResponse(Exception):
+    """Slightly different response attributes were expected"""
+    def __init__(self, msg, response):
+        super().__init__(msg)
+        self.response = response
 
 
 class HttpxHook(LifecycleHook):
@@ -45,6 +67,8 @@ class HttpxClient:
         self.auth = app.authobj()
         self.http2 = http2
         self._client = Client(base_url=self._base_url, verify=self._ssl_context(), http2=http2)
+        self._client.event_hooks["request"] = [_log_request]
+        self._client.event_hooks["response"] = [_log_response]
 
     def close(self):
         """Close httpx client"""
@@ -65,6 +89,7 @@ class HttpxClient:
         This method is needed for compatibility with HttpClient
         """
 
+    @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8)
     def request(self, method, path,
                 content=None, data=None, files=None, json=None,
                 params=None, headers=None, cookies=None,
@@ -73,25 +98,21 @@ class HttpxClient:
         auth = auth or self.auth
         self._client.auth = auth
 
-        response = None
-        for _ in range(60):
-            response = self._client.request(
-                method=method,
-                url=path,
-                content=content,
-                data=data,
-                files=files,
-                json=json,
-                params=params,
-                headers=headers,
-                cookies=cookies,
-                allow_redirects=allow_redirects,
-                timeout=timeout)
+        response = self._client.request(
+            method=method,
+            url=path,
+            content=content,
+            data=data,
+            files=files,
+            json=json,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            allow_redirects=allow_redirects,
+            timeout=timeout)
 
-            if response.status_code not in self._status_forcelist:
-                return response
-            # Sleep 1 second before we try to make the request once again
-            time.sleep(1)
+        if response.status_code in self._status_forcelist:
+            raise UnexpectedResponse(f"Didn't expect '{response.status_code}' status code", response)
 
         return response
 
