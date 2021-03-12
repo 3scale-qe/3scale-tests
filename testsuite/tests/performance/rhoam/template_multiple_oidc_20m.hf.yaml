@@ -1,0 +1,156 @@
+name: test_multiple_oidc
+# http endpoints will be added via test
+phases:
+  - rampUp:
+      increasingRate:
+        initialUsersPerSec: 1
+        targetUsersPerSec: 15
+        duration: 1m
+        maxDuration: 2m
+        maxSessions: 150
+        scenario:
+          - login: &login
+            - randomCsvRow:
+                file: 'auth_oidc.csv'
+                skipComments: true
+                removeQuotes: true
+                columns:
+                  0: hostname
+                  1: token
+          - post5KB: &post5KB
+            - randomInt: randomBackend <- 0 .. 9
+            - randomInt: randomPath <- 0 .. 9
+            - template:
+                pattern: Bearer ${token}
+                toVar: authorization
+            - httpRequest:
+                authority:
+                  fromVar: hostname
+                POST: /${randomBackend}/anything/${randomPath}
+                sync: true
+                headers:
+                  authorization:
+                    fromVar: authorization
+                body:
+                  fromFile: payload_5KB.txt
+          - post20KB: &post20KB
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  POST: /${randomBackend}/anything/${randomPath}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
+                  body:
+                    fromFile: payload_20KB.txt
+          - post100KB: &post100KB
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  POST: /${randomBackend}/anything/${randomPath}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
+                  body:
+                    fromFile: payload_100KB.txt
+          - post500KB: &post500KB
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  POST: /${randomBackend}/anything/${randomPath}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
+                  body:
+                    fromFile: payload_500KB.txt
+          - post1MB: &post1MB
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  POST: /${randomBackend}/anything/${randomPath}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
+                  body:
+                    fromFile: payload_1MB.txt
+          - post5MB: &post5MB
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: Bearer ${token}
+                  toVar: authorization
+              - httpRequest:
+                  authority:
+                    fromVar: hostname
+                  POST: /${randomBackend}/anything/${randomPath}
+                  sync: true
+                  headers:
+                    authorization:
+                      fromVar: authorization
+                  body:
+                    fromFile: payload_5MB.txt
+          - getData: &getData
+            - randomInt: randomBackend <- 0 .. 9
+            - randomInt: randomPath <- 0 .. 9
+            - template:
+                pattern: Bearer ${token}
+                toVar: authorization
+            - httpRequest:
+                authority:
+                  fromVar: hostname
+                GET: /${randomBackend}/anything/${randomPath}
+                sync: true
+                headers:
+                  authorization:
+                    fromVar: authorization
+
+  - steadyLoad:
+      constantRate:
+        duration: 180m
+        maxDuration: 183m
+        usersPerSec: 16
+        maxSessions: 500
+        startAfter:
+          phase: rampUp
+        scenario:
+          - login: *login
+          - post5KB0: *post5KB
+          - get0: *getData
+          - post20KB0: *post20KB
+          - get1: *getData
+          - post100KB: *post100KB
+          - get2: *getData
+          - post500KB: *post500KB
+          - get3: *getData
+          - post1MB: *post1MB
+          - get4: *getData
+          - post5MB: *post5MB
+          - get5: *getData
+          - post5KB1: *post5KB
+          - get6: *getData
+          - post20KB1: *post20KB
+          - get7: *getData
