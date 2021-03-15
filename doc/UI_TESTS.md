@@ -8,12 +8,13 @@ First, you need to specify:
  * settings in in `settings.yaml` or local version of settings file
 
 ####Settings
-In settings there are two options to run testsuite using option `provider:`:
+In settings there are three options to run testsuite using option `source:`:
 * `local` settings  will use webdrivers from library which refers to 
 latest know webdrivers and store those webdrivers in cache/tmp folders
+* `binary` settings will use binary files to run tests specified by `binary_path` variable
 * `remote` settings will use containerized environment of  
 [Selenium images](https://github.com/SeleniumHQ/docker-selenium)
-* `remote_url` url and port for remote selenium webdriver instance, if not specified
+    `remote_url` url and port for remote selenium webdriver instance, if not specified
 `http://127.0.0.1:4444` will be used
 
     To run container use e.g. `podman run -d -p 4444:4444 -p 5900:5900 -v /dev/shm:/dev/shm 
