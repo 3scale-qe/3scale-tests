@@ -3,11 +3,10 @@ This file contains methods that are used in performance testing
 """
 import os
 from urllib.parse import urlparse
+import importlib_resources as resources
 
 import yaml
 from hyperfoil.factories import HyperfoilFactory, Benchmark
-
-from testsuite import ROOT_DIR
 
 
 def _load_benchmark(filename):
@@ -28,7 +27,7 @@ class HyperfoilUtils:
         Setup class for hyperfoil test.
         Also wrapper of Hyperfoil-python-client.
     """
-    message_1kb = os.path.join(ROOT_DIR, 'testsuite/resources/performance/files/message_1kb.txt')
+    message_1kb = resources.files('testsuite.resources.performance.files').joinpath('message_1kb.txt')
 
     def __init__(self, hyperfoil_client, template_filename):
         self.hyperfoil_client = hyperfoil_client

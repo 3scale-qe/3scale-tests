@@ -1,5 +1,7 @@
 """Objects for managing Httpbin deployments"""
 
+import importlib_resources as resources
+
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration
 
@@ -12,7 +14,8 @@ class Httpbin:
         self.credentials = credentials
         self.name = f"httpbin-{identifier}"
 
-        self.openshift.new_app("testsuite/resources/service_mesh/httpbin.yaml", {"NAME": self.name})
+        path = resources.files('testsuite.resources.service_mesh').joinpath('httpbin.yaml')
+        self.openshift.new_app(path, {"NAME": self.name})
         self.openshift._wait_for_deployment(self.name)
 
     def destroy(self):
@@ -44,7 +47,8 @@ class Httpbin:
             "ISSUER": info.issuer_url(),
             "JWKS": info.jwks_uri()
         }
-        self.openshift.new_app("testsuite/resources/service_mesh/policy.yaml", params)
+        path = resources.files('testsuite.resources.service_mesh').joinpath('policy.yaml')
+        self.openshift.new_app(path, params)
 
     def remove_policy(self, name: str):
         """Removes existing policy"""

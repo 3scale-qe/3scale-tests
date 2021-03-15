@@ -43,7 +43,7 @@ def _route2url(route):
 def _testsuite_version():
     """Get testsuite version string"""
 
-    path = os.path.join(Path(os.path.abspath(__file__)).parent.parent, "VERSION")
+    path = os.path.join(Path(os.path.abspath(__file__)).parent, "VERSION")
     with open(path) as version:
         return version.read().strip()
 

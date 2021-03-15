@@ -5,6 +5,7 @@ import logging
 import os
 import time
 
+import importlib_resources as resources
 import backoff
 import pytest
 import threescale_api.errors
@@ -17,7 +18,7 @@ import testsuite.capabilities.providers
 import testsuite.gateways as gateways
 import testsuite.tools
 
-from testsuite import rawobj, CONFIGURATION, ROOT_DIR, HTTP2
+from testsuite import rawobj, CONFIGURATION, HTTP2
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.requestbin import RequestBinClient
@@ -123,9 +124,7 @@ def _global_property(config, name, value):
 # pylint: disable=unused-argument
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
-    version_path = os.path.join(ROOT_DIR, 'VERSION')
-
-    testsuite_version = open(version_path).read().strip()
+    testsuite_version = resources.read_text("testsuite", "VERSION").strip()
     environment = settings["env_for_dynaconf"]
     openshift = settings.get("openshift", {}).get("servers", {}).get("default", {}).get("server_url", "UNKNOWN")
     project = _oc_3scale_project()
@@ -520,10 +519,9 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
 
 
 @pytest.fixture(scope="module")
-def oas3_body(fil='testsuite/resources/oas3/petstore-expanded.json'):
+def oas3_body(fil=resources.files('testsuite.resources.oas3').joinpath('petstore-expanded.yaml')):
     """Loads OAS3 yaml file to string"""
-    with open(fil, 'r') as fil_oas:
-        return fil_oas.read()
+    return fil.read_text()
 
 
 @pytest.fixture(scope="module")

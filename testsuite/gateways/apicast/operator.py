@@ -4,6 +4,8 @@ import time
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
+import importlib_resources as resources
+
 from threescale_api.resources import Service
 
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
@@ -89,7 +91,8 @@ class OperatorApicast(SelfManagedApicast):
             params["CACHE_SECONDS"] = 300
             params["ENVIRONMENT"] = "production"
 
-        self.openshift.new_app("testsuite/resources/apicast_operator/apicast.yaml", params)
+        path = resources.files('testsuite.resources.apicast_operator').joinpath('apicast.yaml')
+        self.openshift.new_app(path, params)
 
         # Since apicast operator doesnt have any indication of status of the apicast, we need wait until deployment
         # is created
