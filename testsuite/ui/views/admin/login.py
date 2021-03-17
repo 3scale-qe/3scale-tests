@@ -1,9 +1,7 @@
 """ Representation of Login specific views"""
 from widgetastic.widget import TextInput, View, Text
 from widgetastic_patternfly4 import Button
-from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.admin.wizard import WizardIntroView
-from testsuite.ui.exception import DestinationNotDisplayedError
 from testsuite.ui.widgets import Link
 
 
@@ -23,7 +21,6 @@ class LoginView(View):
     submit = Button(locator=".//button[@type='submit']")
     password_reset_link = Link("//a[@href='/p/password/reset']")
 
-    # pylint: disable=no-else-return
     def do_login(self, name, password):
         """
         Method handle login to 3scale admin portal
@@ -34,14 +31,9 @@ class LoginView(View):
         self.username_field.fill(name)
         self.password_field.fill(password)
         self.submit.click()
-        if '/p/admin/dashboard' in self.browser.url:
-            return DashboardView(self.browser.root_browser)
-        elif '/p/admin/onboarding/wizard/intro' in self.browser.url:
+        if '/p/admin/onboarding/wizard/intro' in self.browser.url:
             wizard = WizardIntroView(self.browser.root_browser)
             wizard.close_wizard()
-            return DashboardView(self.browser.root_browser)
-        else:
-            raise DestinationNotDisplayedError
 
     @property
     def is_displayed(self):
