@@ -53,6 +53,15 @@ class HyperfoilUtils:
         filename = os.path.basename(path)
         self.factory.file(filename, open(path, 'r'))
 
+    def generate_random_file(self, filename: str, size: int):
+        """Generates and adds file with such filename and size to the benchmark"""
+        self.factory.generate_random_file(filename, size)
+
+    def generate_random_files(self, files: dict):
+        """Generates and adds files to the benchmark"""
+        for filename, size in files.items():
+            self.factory.generate_random_file(filename, size)
+
     def add_user_key_auth(self, applications, filename):
         """
         Adds csv file to the benchmark with following columns of rows
