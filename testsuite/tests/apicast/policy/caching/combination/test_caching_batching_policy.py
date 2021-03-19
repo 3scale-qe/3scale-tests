@@ -6,9 +6,8 @@ from time import sleep
 import pytest
 
 from testsuite import rawobj
-from testsuite.capabilities import Capability
 
-BATCH_REPORT_SECONDS = 50
+BATCH_REPORT_SECONDS = 150
 
 
 @pytest.fixture(scope="module")
@@ -21,14 +20,8 @@ def service(service):
 
 
 @pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2705")
-@pytest.mark.disruptive
-# TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
-@pytest.mark.flaky
-@pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
-    openshift = openshift()
-    replicas = openshift.get_replicas("backend-listener")
     client = prod_client(application)
     client.auth = None
     auth = application.authobj()
@@ -37,12 +30,11 @@ def test_batcher_caching_policy(prod_client, application, openshift):
     assert response.status_code == 200
     response = client.get("/", params={"user_key": ":user_key"})
     assert response.status_code == 403
-    openshift.scale("backend-listener", 0)
 
-    analytics = application.threescale_client.analytics
-    usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    with openshift().scaler.scale("backend-listener", 0):
+        analytics = application.threescale_client.analytics
+        usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
 
-    try:
         # Test if response succeed on production calls with valid credentials
         for _ in range(3):
             response = client.get("/", auth=auth)
@@ -55,8 +47,6 @@ def test_batcher_caching_policy(prod_client, application, openshift):
 
         usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
         assert usage_after == usage_before
-    finally:
-        openshift.scale("backend-listener", replicas)
 
     # BATCH_REPORT_SECONDS needs to be big enough to execute all the requests to apicast + assert on analytics
     sleep(BATCH_REPORT_SECONDS + 1)

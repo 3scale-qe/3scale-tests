@@ -35,8 +35,7 @@ def test_caching_policy_allow_mod(openshift, api_client, service):
             -this mode is useful if you want the policy to remain active, but do not want to use caching.
         - if response with valid credentials as before have status_code == 403
     """
-    openshift = openshift()
-    replicas = openshift.get_replicas("backend-listener")
+
     response = api_client().get("/")
     assert response.status_code == 200
 
@@ -47,10 +46,7 @@ def test_caching_policy_allow_mod(openshift, api_client, service):
     # before updating service.proxy.list(), make sure to update caching_type
     service.proxy.list().update(caching_type)
     # promotes the configuration to the staging once again
-    openshift.scale("backend-listener", 0)
 
-    try:
+    with openshift().scaler.scale("backend-listener", 0):
         response = api_client().get("/")
         assert response.status_code == 403
-    finally:
-        openshift.scale("backend-listener", replicas)

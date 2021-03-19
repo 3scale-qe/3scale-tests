@@ -7,9 +7,6 @@ import time
 import pytest
 
 from testsuite import rawobj
-from testsuite.capabilities import Capability
-
-pytestmark = pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 
 
 @pytest.fixture(scope="module")
@@ -18,9 +15,6 @@ def policy_settings():
     return rawobj.PolicyConfig("caching", {"caching_type": "strict"})
 
 
-@pytest.mark.disruptive
-# TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
-@pytest.mark.flaky
 def test_caching_policy_strict(prod_client, openshift):
     """
     Test caching policy with caching mode set to Strict
@@ -35,14 +29,11 @@ def test_caching_policy_strict(prod_client, openshift):
     """
 
     client = prod_client()
-    openshift = openshift()
-    replicas = openshift.get_replicas("backend-listener")
     response = client.get("/")
     assert response.status_code == 200
-    openshift.scale("backend-listener", 0)
 
     # Test if requests start failing on production calls after first successful request
-    try:
+    with openshift().scaler.scale("backend-listener", 0):
         response = client.get("/")
         assert response.status_code == 200
         status_code1 = 0
@@ -56,8 +47,6 @@ def test_caching_policy_strict(prod_client, openshift):
             if status_code1 == 403 and status_code2 == 403:
                 break
             time.sleep(5)
-    finally:
-        openshift.scale("backend-listener", replicas)
 
     assert status_code1 == 403
     assert status_code2 == 403
