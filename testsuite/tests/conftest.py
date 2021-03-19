@@ -498,7 +498,7 @@ def api_client(application, request):
 
 
 @pytest.fixture(scope="module")
-def custom_app_plan(custom_service, service_proxy_settings, request, testconfig):
+def custom_app_plan(custom_service, service_proxy_settings, request, testconfig, logger):
     """Parametrized custom Application Plan
 
     Args:
@@ -515,7 +515,13 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
         return plan
 
     if not testconfig["skip_cleanup"]:
-        request.addfinalizer(lambda: [item.delete() for item in plans])
+        def finalizer():
+            for item in plans:
+                try:
+                    item.delete()
+                except threescale_api.errors.ApiClientError as error:
+                    logger.debug('Acceptable object not found: ' + str(error))
+        request.addfinalizer(finalizer)
 
     return _custom_app_plan
 
