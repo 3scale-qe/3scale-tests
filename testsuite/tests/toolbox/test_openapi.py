@@ -15,7 +15,6 @@ from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
-from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 # authentization in 3scale and mapping to OAS(http://spec.openapis.org/oas/v3.0.3#security-scheme-object):
 #
