@@ -79,7 +79,7 @@ mostlyclean:
 	-pipenv --rm
 
 all: ## Run all the tests and submit results to reportportal (may require -k)
-all: test disruptive flaky reportportal
+all: .ensure-smoke ensure-smoke test disruptive flaky reportportal
 
 # Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## Print this help
@@ -116,6 +116,13 @@ VERSION-required:
 ifndef VERSION
 	$(error You must define VERSION=x.y.z)
 endif
+
+.ensure-smoke: smoke
+	@touch $@
+
+ensure-smoke:
+	$(if $(wildcard .$@),,$(error smoke failed))
+	@rm -f .$@
 
 # this ensures dependent target is run everytime
 FORCE:
