@@ -12,11 +12,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-<<<<<<< HEAD
   - url: http://petstore.swagger.io/api
-=======
-  - url: https://httpbin-tools.apps.ocp.api-qe.eng.rdu2.redhat.com/anything
->>>>>>> replace import of openapi3 with one test file including oas2; add rhsso auth for oas3
 security:
   - myOauth:
       - read
