@@ -11,13 +11,11 @@ import pytest
 import yaml
 from dynaconf import settings
 
-from testsuite import rawobj
 import testsuite.toolbox.constants as constants
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
-from testsuite.rhsso.rhsso import OIDCClientAuth
 
 # authentization in 3scale and mapping to OAS(http://spec.openapis.org/oas/v3.0.3#security-scheme-object):
 #
@@ -84,8 +82,8 @@ def oas(request):
 @pytest.fixture(scope="module")
 def import_oas(dest_client, request, oas):
     """Import OAS by Toolbox"""
-    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} {settings['toolbox']['podman_cert_dir']}/"
-    import_cmd += OAS_FILES[oas['type']].split('/')[-1]
+    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} "
+    import_cmd += oas['file_name']
     import_cmd += f" --default-credentials-userkey={USER_KEY} "
     import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"
     ret = toolbox.run_cmd(import_cmd)
