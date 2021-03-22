@@ -1,12 +1,15 @@
 "UI conftest"
 
 import pytest
+from threescale_api.resources import Account
 
 from testsuite.config import settings
+from testsuite.ui.views.admin.audience.application import ApplicationNewView
 from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
-from testsuite.ui.views.admin import BaseAdminView, LoginView
+from testsuite.ui.views.admin import BaseAdminView, LoginView, AccountNewView
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
@@ -27,6 +30,7 @@ def custom_browser(request):
         Args:
             :param request: finalizer for browser teardown
     """
+
     def _custom_browser(url=None):
         """
         :param url: url which should be used for browser navigation and usage
@@ -54,6 +58,7 @@ def custom_login(browser, request):
        :param request: finalizer for session cleanup
        :return: Function with logged browser
     """
+
     def _login(name=None, password=None, finalizer_request=None):
         finalizer_request = finalizer_request or request
 
@@ -96,3 +101,54 @@ def navigator(browser):
     ]
     navigator = Navigator(browser, base_views)
     return navigator
+
+
+# pylint: disable=unused-argument
+@pytest.fixture(scope="module")
+def custom_ui_account(login, navigator, threescale, request, testconfig):
+    """
+    Create a custom account
+    """
+
+    def _custom_account(name: str, email: str, password: str, org_name: str, autoclean=True):
+        account = navigator.navigate(AccountNewView)
+        account.create(name, email, password, org_name)
+        account = threescale.accounts.read_by_name(name)
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(account.delete)
+        return account
+
+    return _custom_account
+
+
+@pytest.fixture(scope="module")
+def ui_account(custom_ui_account, request):
+    """Create an account through UI"""
+    name = blame(request, "ui_account")
+    return custom_ui_account(name, f"{name}@anything.invalid", name, name)
+
+
+# pylint: disable=unused-argument
+@pytest.fixture(scope="module")
+def custom_ui_application(login, navigator, threescale, request, testconfig):
+    """
+    :return: params for custom application
+    """
+
+    def _custom_ui_appliaction(name: str, email: str, account: Account, autoclean=True):
+        app = navigator.navigate(ApplicationNewView, account_id=account.entity_id)
+        app.create(name, email)
+        application = account.applications.read_by_name(name)
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(application.delete)
+        return application
+
+    return _custom_ui_appliaction
+
+
+@pytest.fixture(scope="module")
+def ui_application(custom_ui_application, account, request):
+    """Create an application through UI"""
+    name = blame(request, "ui_account")
+    return custom_ui_application(name, f"{name}@anything.invalid", account)

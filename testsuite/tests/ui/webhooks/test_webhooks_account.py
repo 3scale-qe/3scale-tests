@@ -5,6 +5,7 @@ import xml.etree.ElementTree as Et
 
 import pytest
 
+from testsuite import rawobj
 from testsuite.ui.views.admin import AccountsDetailView, AccountEditView, UsageRulesView, \
     AccountPlansView, NewAccountPlanView, WebhooksView
 from testsuite.utils import blame
@@ -32,7 +33,7 @@ def account_plans(navigator, login):
 
 
 # pylint: disable=unused-argument
-def test_account_created(params, requestbin, login, create_account):
+def test_account_created(requestbin, login, ui_account):
     """
     Test:
         - Create account
@@ -40,18 +41,16 @@ def test_account_created(params, requestbin, login, create_account):
         - Assert that webhook response is not None
         - Assert that response xml body contains right account name
     """
-    account = create_account(params)
-
-    webhook = requestbin.get_webhook("created", str(account.entity_id))
+    webhook = requestbin.get_webhook("created", str(ui_account.entity_id))
     assert webhook is not None
 
     xml = Et.fromstring(webhook)
     name = xml.find(".//org_name").text
-    assert name == account.entity_name
+    assert name == ui_account.entity_name
 
 
 # pylint: disable=too-many-arguments, unused-argument
-def test_account_updated(custom_account, params, login, navigator, request, requestbin, threescale):
+def test_account_updated(ui_account, login, navigator, request, requestbin, threescale):
     """
     Test:
         - Update account
@@ -59,25 +58,20 @@ def test_account_updated(custom_account, params, login, navigator, request, requ
         - Assert that webhook response is not None
         - Assert that response xml body contains right account name
     """
-    name, email, _, _ = params
-    params = dict(name=name, username=name, org_name=name, email=email)
-    account = custom_account(params=params)
-
-    account_view = navigator.navigate(AccountEditView, account_id=account.entity_id)
+    account_view = navigator.navigate(AccountEditView, account_id=ui_account.entity_id)
     account_view.update(blame(request, "test_name"))
-    account = threescale.accounts.read(account.entity_id)
+    ui_account = threescale.accounts.read(ui_account.entity_id)
 
-    webhook = requestbin.get_webhook("updated", str(account.entity_id))
+    webhook = requestbin.get_webhook("updated", str(ui_account.entity_id))
     assert webhook is not None
 
     xml = Et.fromstring(webhook)
     name = xml.find(".//org_name").text
-    assert name == account.entity_name
+    assert name == ui_account.entity_name
 
 
 # pylint: disable=too-many-arguments, too-many-locals, unused-argument
-def test_account_plan_changed(custom_account, params, threescale, login, navigator, requestbin, request,
-                              account_plans):
+def test_account_plan_changed(account, threescale, login, navigator, requestbin, request, account_plans):
     """
     Test:
         - Allow account plans
@@ -86,10 +80,6 @@ def test_account_plan_changed(custom_account, params, threescale, login, navigat
         - Assert that webhook response is not None
         - Assert that response xml body contains right account name
     """
-    name, email, _, _ = params
-    params = dict(name=name, username=name, org_name=name, email=email)
-    account = custom_account(params=params)
-
     name = blame(request, "app_plan")
     plan_view = navigator.navigate(NewAccountPlanView)
     plan_view.create(name, name)
@@ -108,15 +98,16 @@ def test_account_plan_changed(custom_account, params, threescale, login, navigat
 
 
 # pylint: disable=unused-argument
-def test_account_deleted(custom_account, params, requestbin, login, navigator):
+def test_account_deleted(custom_account, requestbin, login, navigator, request):
     """
     Test:
         - Delete account
         - Get webhook response for deleted
         - Assert that webhook response is not None
     """
-    name, email, _, _ = params
-    params = dict(name=name, username=name, org_name=name, email=email)
+    name = blame(request, "ui_account")
+    params = rawobj.Account(name, None, None)
+    params.update(dict(name=name, username=name, email=f"{name}@anything.invalid"))
     account = custom_account(params=params, autoclean=False)
 
     account_view = navigator.navigate(AccountEditView, account_id=account.entity_id)
