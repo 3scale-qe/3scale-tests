@@ -97,7 +97,7 @@ reportportal:
 release: ## Create branch of new VERSION (and tag VERSION)
 release: VERSION-required Pipfile.lock
 	$(RUNSCRIPT)make-next-release $(VERSION)
-	git add VERSION
+	git add testsuite/VERSION
 	git add -f Pipfile.lock
 	git commit -m"`git rev-parse --abbrev-ref HEAD`"
 	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c2-`" -m"`git rev-parse --abbrev-ref HEAD`"
