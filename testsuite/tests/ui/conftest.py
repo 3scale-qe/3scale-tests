@@ -38,10 +38,11 @@ def custom_browser(request):
         :param url: url which should be used for browser navigation and usage
         :return: browser instance
         """
-        webdriver = SeleniumDriver(provider=settings["fixtures"]["ui"]["browser"]["provider"],
+        webdriver = SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
                                    driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
                                    ssl_verify=settings["ssl_verify"],
-                                   remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"]
+                                   remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                                   binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"]
                                    )
         webdriver.get_driver()
         started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)

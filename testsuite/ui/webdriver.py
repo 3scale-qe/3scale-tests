@@ -33,36 +33,38 @@ class SeleniumDriver:
         driver.finalize()
     """
 
-    def __init__(self, provider, driver, ssl_verify, remote_url=None):
+    # pylint: disable=too-many-arguments
+    def __init__(self, source, driver, ssl_verify, remote_url=None, binary_path=None):
         """
         Initializes factory with either specified or fetched from settings values.
-        :param str provider: Browser provider name. One of  ('local', 'remote')
+        :param str source: Browser source name. One of  ('local', 'binary', 'remote')
         :param str driver: Browser name. One of ('chrome', 'firefox')
         :param str ssl_verify: option for certificates ignore
         :param str optional remote_url: URL of remote webdriver
         """
-        self.provider = provider
+        self.source = source
         self.driver = driver
         self.ssl_verify = ssl_verify
         self.remote_url = remote_url or 'http://127.0.0.1:4444'
+        self.binary_path = binary_path
         self.webdriver = None
 
     # pylint: disable=no-else-return
     def get_driver(self):
         """
-        Returns selenium webdriver instance of selected provider and browser.
+        Returns selenium webdriver instance of selected source and browser.
 
         :return: selenium webdriver instance
         :raises: ValueError: If wrong provider or browser specified.
         """
-        if self.provider == 'local':
+        if self.source in ('local', 'binary'):
             return self._get_selenium_driver()
-        elif self.provider == 'remote':
+        elif self.source == 'remote':
             return self._get_remote_driver()
         else:
             raise ValueError(
                 '"{}" browser is not supported. Please use one of {}'
-                .format(self.provider, ('local', 'remote'))
+                .format(self.source, ('local', 'remote', 'binary'))
             )
 
     def post_init(self):
@@ -88,10 +90,10 @@ class SeleniumDriver:
         Finalize handling of webdriver.
         :raises: WebDriverError: If problem with browser happens finalization occurs.
         """
-        if self.provider == 'local' or self.provider == 'remote':
+        try:
             self.webdriver.quit()
-        else:
-            raise WebDriverError("Problem with browser finalization")
+        except Exception as exception:
+            raise WebDriverError("Problem with browser finalization") from exception
 
     def _get_selenium_driver(self):
         """
@@ -100,21 +102,39 @@ class SeleniumDriver:
         :raises: ValueError: If wrong browser is specified.
         """
         if self.driver == 'chrome':
-            if self.ssl_verify:
-                self.webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
-            else:
-                options = webdriver.ChromeOptions()
+            options = webdriver.ChromeOptions()
+            if not self.ssl_verify:
                 options.set_capability("acceptInsecureCerts", True)
-                self.webdriver = webdriver.Chrome(executable_path=ChromeDriverManager().install(),
-                                                  chrome_options=options)
-        elif self.driver == 'firefox':
-            if self.ssl_verify:
-                self.webdriver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+            if self.source == 'binary':
+                executor = self.binary_path
+            elif self.source == 'local':
+                executor = ChromeDriverManager().install()
             else:
-                browser_profile = webdriver.FirefoxProfile()
+                raise ValueError(
+                    '"{}" source is not supported. Please use one of {}'
+                    .format(self.source, ('local', 'binary', 'remote'))
+                )
+
+            self.webdriver = webdriver.Chrome(executable_path=executor,
+                                              chrome_options=options)
+        elif self.driver == 'firefox':
+            browser_profile = webdriver.FirefoxProfile()
+            if not self.ssl_verify:
                 browser_profile.accept_untrusted_certs = True
-                self.webdriver = webdriver.Firefox(firefox_profile=browser_profile,
-                                                   executable_path=GeckoDriverManager().install())
+
+            if self.source == 'binary':
+                executor = self.binary_path
+            elif self.source == 'local':
+                executor = GeckoDriverManager().install()
+            else:
+                raise ValueError(
+                    '"{}" source is not supported. Please use one of {}'
+                    .format(self.source, ('local', 'binary', 'remote'))
+                )
+
+            self.webdriver = webdriver.Firefox(firefox_profile=browser_profile,
+                                               executable_path=executor)
         else:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'

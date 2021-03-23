@@ -46,7 +46,7 @@ ${ENVIRONMENT}:
             hostPort: "" # route to the jaeger-query (may be internal)
     ui:
       browser:
-        provider: "" #local or remote
+        source: "" #local ,remote or binary
         webdriver: "" #chrome , firefox or edge(edge with remote drivers)
         remote_url: "" #URL and port to remote selenium instance e.g. http://127.0.0.1:4444
   hyperfoil:
