@@ -103,4 +103,4 @@ parameters:
 - name: IMG_HTTPBIN_GOHTTPBIN
   description: Go httpbin image to use
   required: true
-  value: quay.io/jsmadis/go-httpbin@sha256:28aa3eeeccefe1d608756cd1d46ce2d6fa2aa2faa6b3e4b33228f0a477d2e53b
+  value: quay.io/jsmadis/go-httpbin:latest
