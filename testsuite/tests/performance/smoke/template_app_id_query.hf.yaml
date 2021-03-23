@@ -1,0 +1,74 @@
+name: test_smoke_app_id_query
+# http endpoints will be added via test
+phases:
+  - rampUp:
+      increasingRate:
+        initialUsersPerSec: 2
+        targetUsersPerSec: 20
+        duration: 60s
+        maxSessions: 400
+        scenario: &postLargeData
+          - get:
+            - randomCsvRow:
+                file: 'auth_app_id.csv'
+                skipComments: true
+                removeQuotes: true
+                columns:
+                  0: 0 # hostname
+                  1: 1 # app_id
+                  2: 2 # app_key
+            - randomInt: randomBackend <- 0 .. 9
+            - randomInt: randomPath <- 0 .. 9
+            - template:
+                pattern: app_id=${1}&app_key=${2}
+                toVar: param
+            - template:
+                pattern: /${randomBackend}/anything/${randomPath}?${param}
+                toVar: path
+            - httpRequest:
+                authority:
+                  fromVar: 0
+                POST:
+                  fromVar: path
+                sync: true
+                body:
+                  fromFile: message_1kb.txt
+  - steadyLoad  :
+      constantRate:
+        duration: 2m
+        usersPerSec: 20
+        maxSessions: 400
+        startAfter:
+          phase: rampUp
+        scenario: *postLargeData
+  - steadyLoadGet:
+      constantRate:
+        duration: 2m
+        usersPerSec: 5
+        maxSessions: 400
+        startAfter:
+          phase: rampUp
+        scenario:
+          - getData:
+              - randomCsvRow:
+                  file: 'auth_app_id.csv'
+                  skipComments: true
+                  removeQuotes: true
+                  columns:
+                    0: 0 # hostname
+                    1: 1 # app_id
+                    2: 2 # app_key
+              - randomInt: randomBackend <- 0 .. 9
+              - randomInt: randomPath <- 0 .. 9
+              - template:
+                  pattern: app_id=${1}&app_key=${2}
+                  toVar: param
+              - template:
+                  pattern: /${randomBackend}/anything/${randomPath}?${param}
+                  toVar: path
+              - httpRequest:
+                  authority:
+                    fromVar: 0
+                  GET:
+                    fromVar: path
+                  sync: true
