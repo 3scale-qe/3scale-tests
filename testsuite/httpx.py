@@ -20,12 +20,31 @@ log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 def _log_request(request):
     """log request details"""
-    log.info("[CLIENT]: %s", request2curl(request))
+    class Request:
+        """attribute body/url is needed"""
+        def __init__(self, request):
+            self.__request = request
+            self.body = "".join([i.decode("utf-8") for i in request.stream])
+            self.url = str(request.url)
+
+        def __getattr__(self, name):
+            return getattr(self.__request, name)
+
+    log.info("[CLIENT]: %s", request2curl(Request(request)))
 
 
 def _log_response(response):
     """log response details"""
-    log.info("\n".join(["[CLIENT]:", response2str(response)]))
+    class Response:
+        """attr reason is needed"""
+        def __init__(self, response):
+            self.__response = response
+            self.reason = response.reason_phrase
+
+        def __getattr__(self, name):
+            return getattr(self.__response, name)
+
+    log.info("\n".join(["[CLIENT]:", response2str(Response(response))]))
 
 
 class UnexpectedResponse(Exception):
