@@ -35,12 +35,12 @@ class BaseAdminView(View, Navigable):
         """Selects Audience item from ContextSelector"""
         self.context_menu.item_select("Audience")
 
-    @step("ProductNavView")
+    @step("ProductView")
     def products(self):
         """Selects Products item from ContextSelector"""
         self.context_menu.item_select("Products")
 
-    @step("BackendNavView")
+    @step("BackendsView")
     def backends(self):
         """Selects Backends item from ContextSelector"""
         self.context_menu.item_select("Backends")
