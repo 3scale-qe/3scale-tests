@@ -1,10 +1,11 @@
 """Custom KeyCloak resources for test suite"""
 import requests
-from dynaconf import settings
 from keycloak.client import KeycloakClient
 from keycloak.realm import KeycloakRealm
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+
+from testsuite.config import settings
 
 
 class RetryKeycloakRealm(KeycloakRealm):
