@@ -139,11 +139,10 @@ class TemplateApicastOptions(SelfDeployedApicastOptions, TemplateApicastRequirem
     @property
     def configuration_url(self):
         try:
-            url = self.setting_block["apicast-configuration-url"]
+            return self.setting_block["apicast-configuration-url"]
         except KeyError:
             admin_url = urlparse(self.url)
-            url = f"https://{self.token}@{admin_url.hostname}"
-        return url.encode("utf-8")
+            return f"https://{self.token}@{admin_url.hostname}"
 
     @property
     def token(self) -> str:

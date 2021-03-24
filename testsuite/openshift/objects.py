@@ -7,10 +7,25 @@ from io import StringIO
 from typing import List, Union
 import yaml
 
-
 if typing.TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
+
+
+class SecretKinds(enum.Enum):
+    """Secret kinds enum."""
+
+    TLS = "tls"
+    GENERIC = "generic"
+    DOCKER_REGISTRY = "docker-registry"
+
+
+class SecretTypes(enum.Enum):
+    """Secret types enum."""
+
+    OPAQUE = "opaque"
+    BASIC_AUTH = "kubernetes.io/basic-auth"
+    TLS = "kubernetes.io/ssl"
 
 
 class RemoteMapping:
@@ -62,7 +77,7 @@ class Routes(RemoteMapping):
         PASSTHROUGH = "passthrough"
         REENCRYPT = "reencrypt"
 
-    def __init__(self, client,) -> None:
+    def __init__(self, client, ) -> None:
         super().__init__(client, "route")
 
     def expose(self, name, service, hostname):
@@ -112,6 +127,42 @@ class Secrets(RemoteMapping):
                 return base64.b64decode(self._data[name])
 
         return _DecodedSecrets(super().__getitem__(name)["data"])
+
+    # pylint: disable=too-many-arguments
+    def create(self, name: str, kind: SecretKinds = SecretKinds.GENERIC, secret_type: SecretTypes = None,
+               string_data: typing.Dict[str, str] = None, files: typing.Dict[str, str] = None,
+               cert_path: str = None, cert_key_path: str = None):
+        """Create a new secret.
+
+        Args:
+            :param name: Secret name
+            :param kind: The kind of the secret, given by SecretKinds
+            :param secret_type: The type of the secret, given by SecretTypes
+            :param string_data: Specify a key and literal value to insert in secret
+            :param files: Key files key be specified using their file path,  in which case a default
+                          name will be given to them, or optionally with a name and file path,
+                          in which case the given name will be used.  Specifying a directory will
+                          iterate each named file in the directory that is a valid secret key.
+            :param cert_path: The path to the certificate
+            :param cert_key_path: The path to the certificate key
+        """
+        opt_args = []
+
+        if secret_type:
+            opt_args.extend(["--type", secret_type.value])
+
+        if string_data:
+            opt_args.extend([f"--from-literal={n}={v}" for n, v in string_data.items()])
+
+        if files:
+            opt_args.extend([f"--from-file={n}={v}" for n, v in files.items()])
+
+        if kind == SecretKinds.TLS:
+            if cert_path is None or cert_key_path is None:
+                raise ValueError("cert_path and cert_key_path required.")
+            opt_args.extend(["--cert", cert_path, "--key", cert_key_path])
+
+        self.do_action("create", ["secret", kind.value, name, opt_args])
 
 
 class ConfigMaps(RemoteMapping):

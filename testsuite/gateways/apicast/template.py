@@ -1,5 +1,4 @@
 """Self managed apicast deployed from apicast template"""
-import base64
 import logging
 from abc import ABC, abstractmethod
 from typing import Optional, List
@@ -7,7 +6,7 @@ from urllib.parse import urlparse
 
 from threescale_api.resources import Service
 
-from testsuite.openshift.objects import Routes
+from testsuite.openshift.objects import Routes, SecretTypes
 from testsuite.requirements import ThreeScaleAuthDetails
 from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
 from ...openshift.env import Environ
@@ -79,25 +78,14 @@ class TemplateApicast(SelfManagedApicast):
 
         return params
 
-    def _get_configuration_url_secret_resource(self):
-        config_url = base64.b64encode(self.requirements.configuration_url).decode("utf-8")
-        return {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": self.configuration_url_secret_name,
-            },
-            "data": {
-                "password": config_url,
-            },
-            "type": "kubernetes.io/basic-auth"
-        }
-
     def _create_configuration_url_secret(self):
-        if self.configuration_url_secret_name not in self.openshift.secrets:
-            LOGGER.debug('Secret "%s" does not exist. Creating...', self.configuration_url_secret_name)
-
-            self.openshift.apply(self._get_configuration_url_secret_resource())
+        self.openshift.secrets.create(
+            name=self.configuration_url_secret_name,
+            string_data={
+                "password": self.requirements.configuration_url
+            },
+            secret_type=SecretTypes.BASIC_AUTH
+        )
 
     def _route_name(self, entity_id):
         if self.staging:

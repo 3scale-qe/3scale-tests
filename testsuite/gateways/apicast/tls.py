@@ -90,22 +90,13 @@ class TLSApicast(TemplateApicast):
 
         cert = self.server_certificate
 
-        pem = cert.certificate
-        key = cert.key
-
-        resource = {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": self.secret_name,
+        self.openshift.secrets.create(
+            name=self.secret_name,
+            string_data={
+                "tls.crt": cert.certificate,
+                "tls.key": cert.key
             },
-            "stringData": {
-                "tls.crt": pem,
-                "tls.key": key,
-            }
-        }
-
-        self.openshift.apply(resource)
+        )
 
     def create(self):
         """Deploy TLS Apicast."""

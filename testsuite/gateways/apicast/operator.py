@@ -1,5 +1,4 @@
 """Apicast deployed with ApicastOperator"""
-import base64
 import time
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
@@ -8,8 +7,8 @@ import importlib_resources as resources
 
 from threescale_api.resources import Service
 
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
 from testsuite.openshift.env import Environ
 from testsuite.requirements import ThreeScaleAuthDetails
 from testsuite.utils import randomize
@@ -66,18 +65,13 @@ class OperatorApicast(SelfManagedApicast):
 
     def _create_credentials(self):
         url = self.auth.url.replace('https://', f'https://{self.auth.token}@')
-        resource = {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": self._credentials_name,
-            },
-            "data": {
-                "AdminPortalURL": base64.b64encode(url.encode("ascii")).decode("ascii"),
-            }
-        }
 
-        self.openshift.apply(resource)
+        self.openshift.secrets.create(
+            name=self._credentials_name,
+            string_data={
+                "AdminPortalURL": url
+            }
+        )
 
     def create(self):
         self._create_credentials()
@@ -101,7 +95,7 @@ class OperatorApicast(SelfManagedApicast):
         self.openshift.wait_for_ready(self.name)
 
     def destroy(self):
-        self.openshift.delete("secret", self._credentials_name)
+        self.openshift.delete("Secret", self._credentials_name)
         self.openshift.delete("APIcast", self.deployment)
 
     def get_logs(self, since_time=None):
