@@ -93,6 +93,7 @@ def import_oas(dest_client, request, oas):
     yield (ret, service_id, service_name, service)
     if not settings["skip_cleanup"]:
         service.delete()
+        toolbox.run_cmd('rm -f ' + oas['file_name'], False)
 
 
 @pytest.fixture(scope="module")

@@ -44,9 +44,9 @@ def ssh_client():
     return client
 
 
-def run_cmd(cmd_input):
+def run_cmd(cmd_input, scale_cmd=True):
     """
-    Execute Toolbox command on remote machine
+    Execute command on remote machine
 
     @param [String] Command to execute
     @return Returns hash with STDOUT and STDERR
@@ -60,7 +60,8 @@ def run_cmd(cmd_input):
     ret_value = []
     for command in cmd_in:
         logging.debug("Run Toolbox command: '%s'", command)
-        command = get_toolbox_cmd(command)
+        if scale_cmd:
+            command = get_toolbox_cmd(command)
 
         _, stdout, stderr = client.exec_command(command)
 
