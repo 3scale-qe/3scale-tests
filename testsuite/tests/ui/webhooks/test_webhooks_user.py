@@ -58,7 +58,7 @@ def test_user_update(login, navigator, requestbin, threescale, account):
         - Assert that response xml body contains right email
     """
     user = account.users.list()[0]
-    user_edit = navigator.navigate(AccountUserEditView, account_id=account.entity_id, user_id=user.entity_id)
+    user_edit = navigator.navigate(AccountUserEditView, account=account, user=user)
     user_edit.update("updated_username", "updated@anything.invalid")
     user = account.users.list()[0]
     webhook = requestbin.get_webhook("updated", str(user.entity_id))
@@ -86,7 +86,7 @@ def test_user_delete(login, navigator, requestbin, threescale, custom_account, r
 
     user = account.users.list()[0]
 
-    account_view = navigator.navigate(AccountEditView, account_id=account.entity_id)
+    account_view = navigator.navigate(AccountEditView, account=account)
     account_view.delete()
     webhook = requestbin.get_webhook("deleted", str(user.entity_id))
     assert webhook is not None

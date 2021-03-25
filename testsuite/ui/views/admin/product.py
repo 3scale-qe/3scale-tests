@@ -1,35 +1,9 @@
 """View representations of Product pages"""
 from widgetastic.widget import TextInput
-from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin import BaseAdminView
-from testsuite.ui.views.admin.foundation import ProductNavView
+from testsuite.ui.views.admin.foundation import ProductNavView, ProductsView, BaseAdminView
 from testsuite.ui.widgets import Link, ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton
-
-
-class ProductView(BaseAdminView):
-    """View representation of Product Listing page"""
-    endpoint_path = "/apiconfig/services"
-    create_product_button = Link("//a[@href='/apiconfig/services/new']")
-    table = PatternflyTable("//*[@id='products']/section/table")
-
-    def prerequisite(self):
-        return BaseAdminView
-
-    @property
-    def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url and self.table.is_displayed
-
-    @step("ProductDetailView")
-    def detail(self, product_name):
-        """Detail of Product"""
-        self.table.row(system_name__contains=product_name).name.click()
-
-    @step("ProductNewView")
-    def create_product(self):
-        """Create new Product"""
-        self.create_product_button.click()
 
 
 class ProductDetailView(ProductNavView):
@@ -38,7 +12,7 @@ class ProductDetailView(ProductNavView):
     edit_button = Link(locator="//*[@id='content']/section/div/a")
 
     def prerequisite(self):
-        return ProductView
+        return ProductsView
 
     @property
     def is_displayed(self):
@@ -50,7 +24,7 @@ class ProductDetailView(ProductNavView):
         self.edit_button.click()
 
 
-class ProductNewView(ProductNavView):
+class ProductNewView(BaseAdminView):
     """View representation of New Product page"""
     endpoint_path = "/apiconfig/services/new"
     name = TextInput(id="service_name")
@@ -59,7 +33,7 @@ class ProductNewView(ProductNavView):
     create_button = ThreescaleCreateButton()
 
     def prerequisite(self):
-        return ProductView
+        return ProductsView
 
     @property
     def is_displayed(self):

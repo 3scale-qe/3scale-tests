@@ -37,11 +37,10 @@ def test_edit_product(login, navigator, service, threescale):
         - Assert that name is correct
         - Assert that description is correct
     """
-    name = service.entity_name
-    edit = navigator.navigate(ProductEditView, product_name=name)
+    edit = navigator.navigate(ProductEditView, product=service)
 
     edit.update("updated_name", "updated_description")
-    product = threescale.services.read_by_name(name)
+    product = threescale.services.read_by_name(service.entity_name)
 
     assert product["name"] == "updated_name"
     assert product["description"] == "updated_description"
@@ -55,9 +54,8 @@ def test_delete_product(login, navigator, threescale, product):
         - Delete product via UI
         - Assert that deleted product no longer exists
     """
-    name = product.entity_name
-    edit = navigator.navigate(ProductEditView, product_name=name)
+    edit = navigator.navigate(ProductEditView, product=product)
     edit.delete()
-    product = threescale.services.read_by_name(name)
+    product = threescale.services.read_by_name(product.entity_name)
 
     assert product is None

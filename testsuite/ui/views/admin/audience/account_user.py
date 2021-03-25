@@ -15,9 +15,9 @@ class AccountUserView(AudienceNavView):
     table = PatternflyTable("//*[@id='buyer_users']")
 
     @step("AccountUserEditView")
-    def user(self, user_id):
+    def user(self, user):
         """Open account's applications"""
-        self.table.row(_row__attr=('id', f'user_{user_id}'))[5].click()
+        self.table.row(_row__attr=('id', f'user_{user.entity_id}'))[5].click()
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):

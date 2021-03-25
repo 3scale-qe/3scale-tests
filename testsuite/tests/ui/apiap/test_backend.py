@@ -32,11 +32,10 @@ def test_edit_backend(login, navigator, custom_backend, threescale):
         - Assert that endpoint is correct
     """
     backend = custom_backend()
-    name = backend.entity_name
-    edit = navigator.navigate(BackendEditView, backend_name=name)
+    edit = navigator.navigate(BackendEditView, backend=backend)
 
     edit.update("updated_name", "updated_description", "https://updated_endpoint")
-    backend = threescale.backends.read_by_name(name)
+    backend = threescale.backends.read_by_name(backend.entity_name)
 
     assert backend["name"] == "updated_name"
     assert backend["description"] == "updated_description"
@@ -52,9 +51,8 @@ def test_delete_backend(login, navigator, threescale, custom_backend):
         - Assert that deleted backend no longer exists
     """
     backend = custom_backend(autoclean=False)
-    name = backend.entity_name
-    edit = navigator.navigate(BackendEditView, backend_name=name)
+    edit = navigator.navigate(BackendEditView, backend=backend)
     edit.delete()
-    backend = threescale.backends.read_by_name(name)
+    backend = threescale.backends.read_by_name(backend.entity_name)
 
     assert backend is None

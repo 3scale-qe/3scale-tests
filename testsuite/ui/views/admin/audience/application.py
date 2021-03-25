@@ -16,9 +16,9 @@ class ApplicationsView(AudienceNavView):
     table = AudienceTable("//*[@class='data']")
 
     @step("ApplicationDetailView")
-    def detail(self, application_id):
+    def detail(self, application):
         """Opens detail app by ID"""
-        self.table.row(_row__attr=('id', f'contract_{application_id}')).name.click()
+        self.table.row(_row__attr=('id', f'contract_{application.entity_id}')).name.click()
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):

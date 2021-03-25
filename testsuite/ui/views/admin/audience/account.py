@@ -19,9 +19,9 @@ class AccountsView(AudienceNavView):
         self.new_account.click()
 
     @step("AccountsDetailView")
-    def detail(self, account_id):
+    def detail(self, account):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=('id', 'account_' + str(account_id))).grouporg.click()
+        self.table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.click()
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
