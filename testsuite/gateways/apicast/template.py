@@ -64,7 +64,7 @@ class TemplateApicast(SelfManagedApicast):
             "DEPLOYMENT_ENVIRONMENT": "production",
             "CONFIGURATION_LOADER": "boot",
             "CONFIGURATION_CACHE": 300,
-            "LOG_LEVEL": "debug",
+            "LOG_LEVEL": "info",
             "CONFIGURATION_URL_SECRET": self.configuration_url_secret_name,
         }
 

@@ -1,6 +1,11 @@
 """
 Rewrite spec/functional_specs/proxy_endpoints_set_spec.rb
 """
+import pytest
+
+from testsuite.capabilities import Capability
+
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 def test_proxy_endpoints_set(service, configuration):
