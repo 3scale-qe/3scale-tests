@@ -225,6 +225,12 @@ def matching_rule(request):
     return request.param
 
 
+@pytest.fixture(scope="module")
+def service_proxy_settings(private_base_url):
+    """httpbin is needed as this tool implements delayed request"""
+    return rawobj.Proxy(private_base_url("httpbin"))
+
+
 @pytest.fixture
 def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, request):
     """In case of 'global' key_scope two application are needed to ensure
