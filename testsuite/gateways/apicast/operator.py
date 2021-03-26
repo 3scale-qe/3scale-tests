@@ -104,5 +104,5 @@ class OperatorApicast(SelfManagedApicast):
         self.openshift.delete("secret", self._credentials_name)
         self.openshift.delete("APIcast", self.deployment)
 
-    def get_logs(self):
+    def get_logs(self, since_time=None):
         raise NotImplementedError()
