@@ -5,6 +5,7 @@ import io
 import os
 import zipfile
 
+from lxml import etree
 import requests
 
 aparser = argparse.ArgumentParser(description="Upload junit to reportportal")
@@ -15,11 +16,14 @@ aparser.add_argument("--token-variable", required=True, help="env variable with 
 aparser.add_argument("junitfile", nargs="+", help="junit file to import")
 args = aparser.parse_args()
 
+polish = etree.XSLT(etree.parse("./xslt/polish-junit.xsl"))
+
 stream = io.BytesIO()
 
 with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip:
     for junitfile in args.junitfile:
-        azip.write(junitfile, arcname=os.path.basename(junitfile))
+        content = etree.tostring(polish(etree.parse(junitfile)))
+        azip.writestr(os.path.basename(junitfile), content)
 
 token = os.environ[args.token_variable]
 launch = args.launch_name
