@@ -1,4 +1,6 @@
 """HttpClient for Service mesh"""
+from typing import Iterable
+
 import requests
 from threescale_api.utils import HttpClient
 
@@ -7,11 +9,12 @@ class ServiceMeshHttpClient(HttpClient):
     """HttpClient for Service mesh"""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, app, session, verify, root_path, openshift, root_url):
+    def __init__(self,  openshift, root_url, root_path, app,
+                 verify: bool = None, cert=None, disable_retry_status_list: Iterable = ()):
         self.openshift = openshift
         self.root_url = root_url
         self.root_path = root_path
-        super().__init__(app, "endpoint", session, verify)
+        super().__init__(app, "endpoint", verify, cert, disable_retry_status_list)
 
     # pylint: disable=too-many-locals
     def request(self, method, path, params=None, data=None, headers=None, cookies=None, files=None, auth=None,

@@ -73,10 +73,11 @@ class ServiceMeshGateway(AbstractGateway):
         """Returns environ for Service Mesh Gateway"""
         return self.mesh.environ
 
-    # pylint: disable=unused-argument
-    def _create_api_client(self, application, endpoint, session, verify):
+    # pylint: disable=unused-argument, too-many-arguments
+    def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         return ServiceMeshHttpClient(app=application,
-                                     session=session,
+                                     cert=cert,
+                                     disable_retry_status_list=disable_retry_status_list,
                                      verify=verify,
                                      openshift=self.mesh.openshift,
                                      root_path=self.httpbin.name,
