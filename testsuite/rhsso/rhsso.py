@@ -180,15 +180,16 @@ class RHSSOServiceConfiguration:
         """
         return self.oidc_client.get_url("token_endpoint")
 
-    def body_for_token_creation(self, app) -> str:
+    def body_for_token_creation(self, app, use_service_accounts=False) -> str:
         """
         Returns body for creation of token
         :return: body
         """
         app_key = app.keys.list()["keys"][0]["key"]["value"]
         app_id = app["client_id"]
-        return f"grant_type=password&client_id={app_id}&client_secret={app_key}" \
-               f"&username={self.username}&password={self.password}"
+        grant_type = "client_credentials" if use_service_accounts else "password"
+        user_credentials = "" if use_service_accounts else f"&username={self.username}&password={self.password}"
+        return f"grant_type={grant_type}&client_id={app_id}&client_secret={app_key}{user_credentials}"
 
     def access_token(self, app) -> str:
         """

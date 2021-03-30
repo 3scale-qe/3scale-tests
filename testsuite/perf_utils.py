@@ -107,7 +107,7 @@ class HyperfoilUtils:
             rows.append([url, token])
         self.factory.csv_data(filename, rows)
 
-    def add_token_creation_data(self, rhsso_service_info, applications, filename):
+    def add_token_creation_data(self, rhsso_service_info, applications, filename, use_service_accounts=False):
         """
         Adds csv file with data for access token creation. Each row consits of following columns:
         [authority url, rhsso url, rhsso path, body for token creation]
@@ -121,8 +121,8 @@ class HyperfoilUtils:
         token_port = 80 if token_url.scheme == 'http' else 443
         for application in applications:
             url = authority(application.service.proxy.list()['endpoint'])
-            rows.append([url, f"{token_url.hostname}:{token_port}",
-                         token_url.path, rhsso_service_info.body_for_token_creation(application)])
+            rows.append([url, f"{token_url.hostname}:{token_port}", token_url.path,
+                         rhsso_service_info.body_for_token_creation(application, use_service_accounts)])
         self.factory.csv_data(filename, rows)
 
     def update_benchmark(self, benchmark):
