@@ -6,5 +6,4 @@ from .audience.account_plan import AccountPlansView, NewAccountPlanView
 from .settings.webhooks import WebhooksView
 from .foundation import DashboardView, BaseAdminView, AccessDeniedView, NotFoundView
 from .login import LoginView
-from .wizard import WizardIntroView, WizardExplainView
 from .settings.user import UsersView, UserDetailView

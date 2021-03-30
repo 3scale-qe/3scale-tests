@@ -1,8 +1,9 @@
 """ Representation of Login specific views"""
 from widgetastic.widget import TextInput, View, Text
-from widgetastic_patternfly4 import Button
+
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.widgets import Link
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class LoginView(View):
@@ -18,7 +19,7 @@ class LoginView(View):
     username_label = Text('//input[@id="session_username"]/preceding-sibling::label')
     password_field = TextInput(id='session_password')
     password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
-    submit = Button(locator=".//button[@type='submit']")
+    submit = ThreescaleSubmitButton()
     password_reset_link = Link("//a[@href='/p/password/reset']")
 
     def do_login(self, name, password):

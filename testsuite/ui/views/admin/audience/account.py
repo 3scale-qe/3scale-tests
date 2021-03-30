@@ -3,8 +3,9 @@ from widgetastic.widget import TextInput, GenericLocatorWidget
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import AudienceNavView
-from testsuite.ui.widgets import Link, ThreescaleDropdown, AudienceTable, ThreescaleCreateButton, \
-    ThreescaleUpdateButton, ThreescaleDeleteButton, ThreescaleEditButton, ThreescaleCheckBox
+from testsuite.ui.widgets import Link, ThreescaleDropdown, AudienceTable, ThreescaleCheckBox
+from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton, \
+    ThreescaleEditButton
 
 
 class AccountsView(AudienceNavView):
