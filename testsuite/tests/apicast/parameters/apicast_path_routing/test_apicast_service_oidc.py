@@ -8,7 +8,7 @@ from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.capabilities import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
-pytestmark = [pytest.mark.required_capabilities(Capability.APICAST, Capability.PRODUCTION_GATEWAY,
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY,
                                                 Capability.CUSTOM_ENVIRONMENT)]
 
 
