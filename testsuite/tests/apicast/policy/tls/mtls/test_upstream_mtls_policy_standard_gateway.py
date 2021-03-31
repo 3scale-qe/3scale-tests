@@ -11,8 +11,13 @@ import pytest
 
 import testsuite.gateways as gateways
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 from testsuite.certificates import Certificate
 from testsuite.tests.apicast.policy.tls import embedded
+
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
+]
 
 
 @pytest.fixture(scope="session")
