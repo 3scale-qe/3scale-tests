@@ -1,6 +1,7 @@
 """Pytest plugin for collecting gateway logs"""
 from datetime import datetime
 
+import pytest
 from weakget import weakget
 
 from testsuite.config import settings
@@ -9,6 +10,7 @@ from testsuite.gateways.gateways import Capability
 PRINT_LOGS = weakget(settings)["reporting"]["print_app_logs"] % True
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_runtest_setup(item):
     """Figures out what gateways are in use and when did he test setup started"""
     if not PRINT_LOGS:
@@ -17,6 +19,7 @@ def pytest_runtest_setup(item):
     _gather_data(item)
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_runtest_call(item):
     """Prints setup logs and figures out what gateways are in use and when did the test execution started"""
     # pylint: disable=protected-access
@@ -29,12 +32,14 @@ def pytest_runtest_call(item):
     _gather_data(item)
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_runtest_teardown(item):
     """Collect logs and add them to the output"""
     if not PRINT_LOGS:
         return
 
-    _print_logs(item, item.gateways, item.start_time, "teardown", "test-run")
+    if hasattr(item, "gateways") and hasattr(item, "start_time"):
+        _print_logs(item, item.gateways, item.start_time, "teardown", "test-run")
 
 
 def _gather_data(item):
@@ -54,7 +59,9 @@ def _gather_data(item):
 
 def _print_logs(item, gateways, start_time, phase, suffix):
     """Appends logs to the stdout"""
-    if hasattr(item, "gateways") and hasattr(item, "start_time"):
+    # This cannot ever fail or it will cause chain reaction
+    # https://github.com/pytest-dev/pytest/issues/7724
+    try:
         for gateway_name, gateway in gateways.items():
             name = f"{gateway_name} - {suffix}"
             if Capability.LOGS in gateway.CAPABILITIES:
@@ -65,6 +72,9 @@ def _print_logs(item, gateways, start_time, phase, suffix):
                 item.add_report_section(phase,
                                         "stdout",
                                         _generate_log_section(name, "Gateway doesn't have LOGS capability"))
+    # pylint: disable=broad-except
+    except Exception:
+        pass
 
 
 def _generate_log_section(name, content):
