@@ -85,13 +85,13 @@ def applications(services, custom_application, lifecycle_hooks, number_of_apps):
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope='module')
 def services(request, custom_backend, custom_service, custom_app_plan, number_of_products,
-             number_of_backends, service_proxy_settings, service_settings, lifecycle_hooks):
+             number_of_backends, service_proxy_settings, service_settings, private_base_url, lifecycle_hooks):
     """Create multiple services with multiple backends"""
 
     def _create_services():
         backends_mapping = {}
         for j in range(number_of_backends):
-            backends_mapping[f"/{j}"] = custom_backend()
+            backends_mapping[f"/{j}"] = custom_backend(endpoint=private_base_url("httpbin"))
         service_settings.update({"name": blame(request, randomize("perf"))})
         svc = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
         custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), svc)
