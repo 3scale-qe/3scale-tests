@@ -94,11 +94,16 @@ reportportal:
 		--token-variable RP_TOKEN \
 		$(resultsdir)/junit-*.xml
 
+testsuite/resources/apicast.yml: FORCE VERSION-required
+	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/$(VERSION).GA/apicast-gateway/apicast.yml > $@ || \
+	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/apicast-gateway/apicast.yml > $@
+
 release: ## Create branch of new VERSION (and tag VERSION)
-release: VERSION-required Pipfile.lock
+release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
 	$(RUNSCRIPT)make-next-release $(VERSION)
 	git add testsuite/VERSION
 	git add -f Pipfile.lock
+	git add testsuite/resources/apicast.yml
 	git commit -m"`git rev-parse --abbrev-ref HEAD`"
 	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c2-`" -m"`git rev-parse --abbrev-ref HEAD`"
 	git rm --cached Pipfile.lock
