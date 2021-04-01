@@ -2,15 +2,28 @@
 
 import logging
 import os
+import sys
+import time
 
 if "_3SCALE_TESTS_DEBUG" in os.environ:
-    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    # pylint: disable=invalid-name
+    fmt = '%(asctime)s %(levelname)s:%(name)s:%(message)s'
+    datefmt = '%H:%M:%S'
+    formatter = logging.Formatter(fmt, datefmt)
+    # time in UTC
+    formatter.converter = time.gmtime  # type: ignore
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
-from pathlib import Path
-from packaging.version import Version
+from pathlib import Path  # noqa
+from packaging.version import Version  # noqa
 
-from testsuite.config import settings
-from testsuite.configuration import CommonConfiguration
+from testsuite.config import settings  # noqa
+from testsuite.configuration import CommonConfiguration  # noqa
 
 
 # Monkey patching! Yes! True power of dynamic language
