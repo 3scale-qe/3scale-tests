@@ -527,8 +527,8 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig,
 
 
 @pytest.fixture(scope="module")
-def oas3_body(fil=resources.files('testsuite.resources.oas3').joinpath('petstore-expanded.yaml')):
-    """Loads OAS3 yaml file to string"""
+def oas3_body(fil=resources.files('testsuite.resources.oas3').joinpath('petstore-expanded.json')):
+    """Loads OAS3 file to string"""
     return fil.read_text()
 
 
