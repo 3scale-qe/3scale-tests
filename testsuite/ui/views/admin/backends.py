@@ -12,7 +12,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 
 class BackendsView(BaseAdminView):
     """View representation of Backend Listing page"""
-    endpoint_path = "p/admin/backend_apis"
+    path_pattern = "p/admin/backend_apis"
     create_backend_button = Link("//a[@href='/p/admin/backend_apis/new']")
     table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={
         "Name": Link("./a")
@@ -41,7 +41,7 @@ class BackendsView(BaseAdminView):
 
 class BackendNewView(BaseAdminView):
     """View representation of New Backend page"""
-    endpoint_path = "p/admin/backend_apis/new"
+    path_pattern = "p/admin/backend_apis/new"
     name = TextInput(id="backend_api_name")
     system_name = TextInput(id="backend_api_system_name")
     description = TextInput(id="backend_api_description")
@@ -69,8 +69,11 @@ class BackendNewView(BaseAdminView):
 
 class BackendDetailView(BackendNavView):
     """View representation of Backend detail page"""
-    endpoint_path = "p/admin/backend_apis/{backend_id}"
+    path_pattern = "p/admin/backend_apis/{backend_id}"
     edit_button = Link("//*[contains(@href,'edit')]")
+
+    def __init__(self, parent, backend):
+        super().__init__(parent, backend_id=backend.entity_id)
 
     def prerequisite(self):
         return BackendsView
@@ -87,13 +90,16 @@ class BackendDetailView(BackendNavView):
 
 class BackendEditView(BackendNavView):
     """View representation of Edit Backend page"""
-    endpoint_path = "p/admin/backend_apis/{backend_id}/edit"
+    path_pattern = "p/admin/backend_apis/{backend_id}/edit"
     name = TextInput(id="backend_api_name")
     system_name = TextInput(id="backend_api_system_name")
     description = TextInput(id="backend_api_description")
     endpoint = TextInput(id="backend_api_private_endpoint")
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, backend):
+        super().__init__(parent, backend_id=backend.entity_id)
 
     def prerequisite(self):
         return BackendDetailView

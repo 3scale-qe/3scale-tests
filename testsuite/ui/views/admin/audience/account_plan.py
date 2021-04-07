@@ -9,7 +9,7 @@ from testsuite.ui.widgets import Link
 
 class AccountPlansView(AudienceNavView):
     """View representation of Account Plans Listing page"""
-    endpoint_path = '/buyers/account_plans'
+    path_pattern = '/buyers/account_plans'
     new_plan = Link("//a[@href='/admin/buyers/account_plans/new']")
     table = PatternflyTable("//*[@id='plans']")
 
@@ -34,7 +34,7 @@ class AccountPlansView(AudienceNavView):
 
 class NewAccountPlanView(AudienceNavView):
     """View representation of New Account page"""
-    endpoint_path = "/buyers/account_plans/new"
+    path_pattern = "/buyers/account_plans/new"
     name = TextInput(id='account_plan_name')
     system_name = TextInput(id='account_plan_system_name')
     approval = GenericLocatorWidget('//*[@id="account_plan_approval_required"]')

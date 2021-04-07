@@ -13,7 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 
 class ApplicationsView(AudienceNavView):
     """View representation of Accounts Listing page"""
-    endpoint_path = '/buyers/applications'
+    path_pattern = '/buyers/applications'
     table = AudienceTable("//*[@class='data']")
 
     @step("ApplicationDetailView")
@@ -32,7 +32,7 @@ class ApplicationsView(AudienceNavView):
 
 class ApplicationDetailView(AudienceNavView):
     """View representation of Account detail page"""
-    endpoint_path = '/apiconfig/services/{service_id}/applications/{application_id}'
+    path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}'
     edit_button = ThreescaleEditButton()
     suspend_button = Link("//*[contains(@class, 'suspend')]")
     regenerate_button = Link("//*[contains(@class, 'refresh')]")
@@ -42,6 +42,9 @@ class ApplicationDetailView(AudienceNavView):
     })
     plan_dropdown = ThreescaleDropdown("//*[@id='cinstance_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change Plan']")
+
+    def __init__(self, parent, product, application):
+        super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
@@ -81,11 +84,14 @@ class ApplicationDetailView(AudienceNavView):
 
 class ApplicationNewView(AudienceNavView):
     """View representation of New Application page"""
-    endpoint_path = 'buyers/accounts/{account_id}/applications/new'
+    path_pattern = 'buyers/accounts/{account_id}/applications/new'
     username = TextInput(id='cinstance_name')
     description = TextInput(id='cinstance_description')
     app_plan = Text("//*[@id='select2-cinstance_plan_id-container']")
     create_button = ThreescaleCreateButton()
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
 
     def prerequisite(self):
         return AccountApplicationsView
@@ -111,11 +117,14 @@ class ApplicationNewView(AudienceNavView):
 
 class ApplicationEditView(AudienceNavView):
     """View representation of Edit Application page"""
-    endpoint_path = '/apiconfig/services/{service_id}/applications/{application_id}/edit'
+    path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}/edit'
     username = TextInput(id='cinstance_name')
     description = TextInput(id='cinstance_description')
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, product, application):
+        super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
 
     def prerequisite(self):
         return ApplicationDetailView

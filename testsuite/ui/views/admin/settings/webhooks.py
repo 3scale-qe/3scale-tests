@@ -12,7 +12,7 @@ class WebhooksView(SettingsNavView):
     """
     View representation of Webhook page
     """
-    endpoint_path = '/p/admin/webhooks/edit'
+    path_pattern = '/p/admin/webhooks/edit'
 
     webhook_active = GenericLocatorWidget('//*[@id="web_hook_active"]')
     webhook_provider = GenericLocatorWidget('//*[@id="web_hook_provider_actions"]')

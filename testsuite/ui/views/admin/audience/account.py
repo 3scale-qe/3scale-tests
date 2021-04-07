@@ -10,7 +10,7 @@ from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdat
 
 class AccountsView(AudienceNavView):
     """View representation of Accounts Listing page"""
-    endpoint_path = '/buyers/accounts'
+    path_pattern = '/buyers/accounts'
     new_account = Link("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
 
@@ -36,12 +36,15 @@ class AccountsView(AudienceNavView):
 
 class AccountsDetailView(AudienceNavView):
     """View representation of Account detail page"""
-    endpoint_path = '/buyers/accounts/{account_id}'
+    path_pattern = '/buyers/accounts/{account_id}'
     edit_button = ThreescaleEditButton()
     plan_dropdown = ThreescaleDropdown("//*[@id='account_contract_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
     applications_button = Link("//*[contains(@title,'applications')]")
     users_button = Link("//*[contains(@title,'users')]")
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
 
     @step("AccountEditView")
     def edit(self):
@@ -65,7 +68,7 @@ class AccountsDetailView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.edit_button.is_displayed and self.plan_dropdown.is_displayed
+               and self.edit_button.is_displayed and self.applications_button.is_displayed
 
     def change_plan(self, value):
         """Change account plan"""
@@ -75,7 +78,7 @@ class AccountsDetailView(AudienceNavView):
 
 class AccountNewView(AudienceNavView):
     """View representation of New Account page"""
-    endpoint_path = '/buyers/accounts/new'
+    path_pattern = '/buyers/accounts/new'
     username = TextInput(id='account_user_username')
     email = TextInput(id='account_user_email')
     password = TextInput(id='account_user_password')
@@ -102,10 +105,13 @@ class AccountNewView(AudienceNavView):
 
 class AccountEditView(AudienceNavView):
     """View representation of Edit Account page"""
-    endpoint_path = "/buyers/accounts/{account_id}/edit"
+    path_pattern = "/buyers/accounts/{account_id}/edit"
     org_name = TextInput(id="account_org_name")
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
@@ -128,8 +134,11 @@ class AccountEditView(AudienceNavView):
 
 class AccountApplicationsView(AudienceNavView):
     """View representation of Account's Applications page"""
-    endpoint_path = "/buyers/accounts/{account_id}/applications"
+    path_pattern = "/buyers/accounts/{account_id}/applications"
     create_button = Link("//*[contains(@href,'/applications/new')]")
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
 
     @step("ApplicationNewView")
     def new(self):
@@ -148,7 +157,7 @@ class AccountApplicationsView(AudienceNavView):
 
 class UsageRulesView(AudienceNavView):
     """View representation of Account's Usage Rules page"""
-    endpoint_path = "/site/usage_rules/edit"
+    path_pattern = "/site/usage_rules/edit"
     account_plans_checkbox = ThreescaleCheckBox(locator="//input[@id='settings_account_plans_ui_visible']")
     update_button = ThreescaleUpdateButton()
 

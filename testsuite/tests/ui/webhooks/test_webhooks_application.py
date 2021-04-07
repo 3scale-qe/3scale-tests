@@ -57,7 +57,7 @@ def test_application_created(login, navigator, requestbin, ui_application):
 
 
 # pylint: disable=unused-argument
-def test_application_updated(custom_app, navigator, login, requestbin):
+def test_application_updated(custom_app, navigator, login, requestbin, service):
     """
     Test:
         - Update application
@@ -66,7 +66,7 @@ def test_application_updated(custom_app, navigator, login, requestbin):
         - Assert that response xml body contains right application name and description
       """
     application = custom_app()
-    app = navigator.navigate(ApplicationEditView, application=application)
+    app = navigator.navigate(ApplicationEditView, application=application, product=service)
     app.update("updated_name", "updated_description")
     webhook = requestbin.get_webhook("updated", str(application.entity_id))
     assert webhook is not None
@@ -79,7 +79,7 @@ def test_application_updated(custom_app, navigator, login, requestbin):
 
 
 # pylint: disable=unused-argument
-def test_application_suspended(custom_app, navigator, login, requestbin):
+def test_application_suspended(custom_app, navigator, login, requestbin, service):
     """
     Test:
         - Suspend application
@@ -89,7 +89,7 @@ def test_application_suspended(custom_app, navigator, login, requestbin):
     """
 
     application = custom_app()
-    app = navigator.navigate(ApplicationDetailView, application=application)
+    app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.suspend()
     webhook = requestbin.get_webhook("suspended", str(application.entity_id))
     assert webhook is not None
@@ -111,7 +111,7 @@ def test_application_plan_changed(custom_app_plan, request, login, navigator, se
     """
     application = custom_app()
     app_plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app_plan")), service)
-    app = navigator.navigate(ApplicationDetailView, application=application)
+    app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.change_plan(app_plan.entity_id)
 
     webhook = requestbin.get_webhook("plan_changed", str(application.entity_id))
@@ -127,7 +127,7 @@ def test_application_plan_changed(custom_app_plan, request, login, navigator, se
 
 
 # pylint: disable=unused-argument
-def test_user_key_updated(custom_app, navigator, login, requestbin, account):
+def test_user_key_updated(custom_app, navigator, login, requestbin, account, service):
     """
     Test:
         - Create custom application
@@ -137,7 +137,7 @@ def test_user_key_updated(custom_app, navigator, login, requestbin, account):
         - Assert that response xml body contains right application name and user_key
     """
     application = custom_app()
-    app = navigator.navigate(ApplicationDetailView, application=application)
+    app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.regenerate_user_key()
     application = account.applications.read_by_name(application.entity_name)
 
@@ -152,7 +152,7 @@ def test_user_key_updated(custom_app, navigator, login, requestbin, account):
 
 
 # pylint: disable=unused-argument
-def test_application_deleted(custom_app, navigator, login, requestbin):
+def test_application_deleted(custom_app, navigator, login, requestbin, service):
     """
     Test:
         - Create application
@@ -161,7 +161,7 @@ def test_application_deleted(custom_app, navigator, login, requestbin):
         - Assert that response xml body contains right account id
     """
     application = custom_app(autoclean=False)
-    app = navigator.navigate(ApplicationEditView, application=application)
+    app = navigator.navigate(ApplicationEditView, application=application, product=service)
     app.delete()
     webhook = requestbin.get_webhook("deleted", str(application.entity_id))
     assert webhook is not None

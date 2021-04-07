@@ -38,7 +38,7 @@ def test_user_key_create_delete(login, service, application, requestbin, navigat
     """
     service.update({"backend_version": Service.AUTH_APP_ID_KEY})
     service.proxy.list().update()
-    app = navigator.navigate(ApplicationDetailView, application=application)
+    app = navigator.navigate(ApplicationDetailView, application=application, product=service)
 
     # Create user key
     app.add_random_app_key()
@@ -66,7 +66,7 @@ def test_user_key_regenerate(login, service, application, account, requestbin, n
     service.update({"backend_version": Service.AUTH_USER_KEY})
     service.proxy.list().update()
 
-    app = navigator.navigate(ApplicationDetailView, application=application)
+    app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.regenerate_user_key()
     application = account.applications.read_by_name(application.entity_name)
 

@@ -11,8 +11,11 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 class AccountUserView(AudienceNavView):
     """View representation of Accounts User page"""
-    endpoint_path = 'buyers/accounts/{account_id}/users'
+    path_pattern = 'buyers/accounts/{account_id}/users'
     table = PatternflyTable("//*[@id='buyer_users']")
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
 
     @step("AccountUserEditView")
     def user(self, user):
@@ -30,10 +33,13 @@ class AccountUserView(AudienceNavView):
 
 class AccountUserEditView(AudienceNavView):
     """View representation of Accounts User Edit page"""
-    endpoint_path = 'buyers/accounts/{account_id}/users/{user_id}'
+    path_pattern = 'buyers/accounts/{account_id}/users/{user_id}'
     username = TextInput(id="user_username")
     email = TextInput(id="user_email")
     update_button = ThreescaleUpdateButton()
+
+    def __init__(self, parent, account, user):
+        super().__init__(parent, account_id=account.entity_id, user_id=user.entity_id)
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
