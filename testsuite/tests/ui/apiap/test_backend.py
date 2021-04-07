@@ -1,4 +1,6 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
+import pytest
+
 from testsuite.ui.views.admin.backends import BackendEditView
 from testsuite.utils import blame
 
@@ -56,3 +58,16 @@ def test_delete_backend(login, navigator, threescale, custom_backend):
     backend = threescale.backends.read_by_name(backend.entity_name)
 
     assert backend is None
+
+
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3571")
+def test_delete_used_backend(service, login, navigator, threescale):
+    """
+    Test:
+        - Create service with backend via API
+        - Assert that used backend cannot be deleted
+    """
+    backend_id = service.backend_usages.list()[0]["backend_id"]
+    backend = threescale.backends.read(backend_id)
+    edit = navigator.navigate(BackendEditView, backend=backend)
+    assert not edit.delete_button.is_displayed
