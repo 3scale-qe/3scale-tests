@@ -189,7 +189,7 @@ def custom_ui_application(login, navigator, threescale, request, testconfig):
     """
 
     def _custom_ui_appliaction(name: str, email: str, account: Account, autoclean=True):
-        app = navigator.navigate(ApplicationNewView, account_id=account.entity_id)
+        app = navigator.navigate(ApplicationNewView, account=account)
         app.create(name, email)
         application = account.applications.read_by_name(name)
         if autoclean and not testconfig["skip_cleanup"]:

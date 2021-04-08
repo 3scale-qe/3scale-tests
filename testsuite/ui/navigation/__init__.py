@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from testsuite.ui.views.admin import BaseAdminView  # noqa
 
-
 ReturnView = TypeVar("ReturnView", bound="BaseAdminView")
 
 
@@ -77,9 +76,7 @@ class Navigator:
         """
         self.page_chain.clear()
         self._backtrace(cls)
-        self._perform_steps(**kwargs)
-
-        return cls(self.browser)
+        return self._perform_steps(**kwargs)
 
     def open(self, cls: Callable[[ThreeScaleBrowser], ReturnView], **kwargs) -> ReturnView:
         """Directly opens desired View, by inserting its `endpoint_path` in to browser"""
@@ -107,15 +104,14 @@ class Navigator:
         Each iteration represent one step - one UI action that changes one View to another.
         """
         if len(self.page_chain) == 1:
-            return
+            return self.page_chain[0]
         page = self.page_chain.pop()
         dest = self.page_chain[-1]
 
         possible_steps = inspect.getmembers(page, lambda o: hasattr(o, '_class_name'))
         if self._invoke_step(possible_steps, dest, **kwargs):
-            self._perform_steps(**kwargs)
-        else:
-            raise NavigationStepNotFound(page, dest, possible_steps)
+            return self._perform_steps(**kwargs)
+        raise NavigationStepNotFound(page, dest, possible_steps)
 
     def _invoke_step(self, possible_steps, destination, **kwargs):
         """
@@ -144,10 +140,10 @@ class Navigator:
             if key_word.startswith('@'):
                 alternative_steps.append(method)
 
-        return self._invoke_alternative_step(alternative_steps, destination)
+        return self._invoke_alternative_step(alternative_steps, destination, **kwargs)
 
     @staticmethod
-    def _invoke_alternative_step(alternative_steps, destination):
+    def _invoke_alternative_step(alternative_steps, destination, **kwargs):
         """
         Alternative steps begins with "@".
         See `step(cls, **kwargs)` for alternatives.
@@ -160,7 +156,7 @@ class Navigator:
         for method in alternative_steps:
             if method._class_name.startswith('@href'):
                 try:
-                    method(destination.endpoint_path)
+                    method(destination.endpoint_path, **kwargs)
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True

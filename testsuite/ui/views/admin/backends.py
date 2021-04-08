@@ -12,7 +12,9 @@ class BackendsView(BaseAdminView):
     """View representation of Backend Listing page"""
     endpoint_path = "p/admin/backend_apis"
     create_backend_button = Link("//a[@href='/p/admin/backend_apis/new']")
-    table = PatternflyTable("//*[@id='backend-apis']/section/table")
+    table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={
+        "Name": Link("./a")
+    })
 
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
@@ -25,9 +27,9 @@ class BackendsView(BaseAdminView):
                and self.create_backend_button.is_displayed and self.table.is_displayed
 
     @step("BackendDetailView")
-    def detail(self, backend_name):
+    def detail(self, backend):
         """Detail of Backend"""
-        self.table.row(system_name__contains=backend_name).name.click()
+        self.table.row(system_name__contains=backend.entity_name).name.widget.click()
 
     @step("BackendNewView")
     def create_backend(self):

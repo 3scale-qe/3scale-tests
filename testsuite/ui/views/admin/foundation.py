@@ -5,7 +5,9 @@ Admin portal pages.
 :TODO Add locators/menus for basic pages
 """
 from typing import List
+
 from widgetastic.widget import GenericLocatorWidget, View, Text
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step, Navigable
 from testsuite.ui.widgets import Link, ContextMenu, NavigationMenu
@@ -35,7 +37,7 @@ class BaseAdminView(View, Navigable):
         """Selects Audience item from ContextSelector"""
         self.context_menu.item_select("Audience")
 
-    @step("ProductView")
+    @step("ProductsView")
     def products(self):
         """Selects Products item from ContextSelector"""
         self.context_menu.item_select("Products")
@@ -68,9 +70,9 @@ class BaseNavView(BaseAdminView):
     nav = NavigationMenu(id='mainmenu')
 
     @step("@href")
-    def step(self, href):
+    def step(self, href, **kwargs):
         """Perform step to specific item in Navigation with use of href locator"""
-        self.nav.select_href(href)
+        self.nav.select_href(href, **kwargs)
 
     @property
     def is_displayed(self):
@@ -92,6 +94,9 @@ class AudienceNavView(BaseNavView):
 class ProductNavView(BaseNavView):
     """Base View for all Product pages. Features product vertical navigation menu"""
     NAV_ITEMS = ['Overview', 'Analytics', 'Applications', 'ActiveDocs', 'Integration']
+
+    def prerequisite(self):
+        return ProductsView
 
 
 class BackendNavView(BaseNavView):
@@ -140,3 +145,29 @@ class NotFoundView(View):
         return self.title.text == "Not Found" and \
                self.text_message.text == "Sorry. We can't find what you're looking for." and \
                self.logo.is_displayed
+
+
+class ProductsView(BaseAdminView):
+    """View representation of Product Listing page"""
+    endpoint_path = "/apiconfig/services"
+    create_product_button = Link("//a[@href='/apiconfig/services/new']")
+    table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
+        "Name": Link("./a")
+    })
+
+    def prerequisite(self):
+        return BaseAdminView
+
+    @property
+    def is_displayed(self):
+        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url and self.table.is_displayed
+
+    @step("ProductDetailView")
+    def detail(self, product):
+        """Detail of Product"""
+        self.table.row(system_name__contains=product.entity_name).name.widget.click()
+
+    @step("ProductNewView")
+    def create_product(self):
+        """Create new Product"""
+        self.create_product_button.click()

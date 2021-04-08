@@ -58,7 +58,7 @@ def test_account_updated(ui_account, login, navigator, request, requestbin, thre
         - Assert that webhook response is not None
         - Assert that response xml body contains right account name
     """
-    account_view = navigator.navigate(AccountEditView, account_id=ui_account.entity_id)
+    account_view = navigator.navigate(AccountEditView, account=ui_account)
     account_view.update(blame(request, "test_name"))
     ui_account = threescale.accounts.read(ui_account.entity_id)
 
@@ -86,7 +86,7 @@ def test_account_plan_changed(account, threescale, login, navigator, requestbin,
     plan = threescale.account_plans.read_by_name(name)
     plan_view = navigator.navigate(AccountPlansView)
     plan_view.publish(plan.entity_id)
-    account_view = navigator.navigate(AccountsDetailView, account_id=account.entity_id)
+    account_view = navigator.navigate(AccountsDetailView, account=account)
     account_view.change_plan(plan.entity_id)
 
     webhook = requestbin.get_webhook("plan_changed", str(account.entity_id))
@@ -110,7 +110,7 @@ def test_account_deleted(custom_account, requestbin, login, navigator, request):
     params.update(dict(name=name, username=name, email=f"{name}@anything.invalid"))
     account = custom_account(params=params, autoclean=False)
 
-    account_view = navigator.navigate(AccountEditView, account_id=account.entity_id)
+    account_view = navigator.navigate(AccountEditView, account=account)
     account_view.delete()
 
     webhook = requestbin.get_webhook("deleted", str(account.entity_id))
