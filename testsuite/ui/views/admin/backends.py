@@ -5,7 +5,9 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin import BaseAdminView
 from testsuite.ui.views.admin.foundation import BackendNavView
-from testsuite.ui.widgets import Link, ThreescaleUpdateButton, ThreescaleDeleteButton, ThreescaleCreateButton
+from testsuite.ui.widgets import Link
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
+    ThreescaleCreateButton
 
 
 class BackendsView(BaseAdminView):

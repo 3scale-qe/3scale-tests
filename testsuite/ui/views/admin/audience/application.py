@@ -6,8 +6,9 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin import AccountApplicationsView
 from testsuite.ui.views.admin.foundation import AudienceNavView
-from testsuite.ui.widgets import AudienceTable, Link, ThreescaleDropdown, ThreescaleUpdateButton, \
-    ThreescaleDeleteButton, ThreescaleCreateButton, ThreescaleEditButton
+from testsuite.ui.widgets import AudienceTable, Link, ThreescaleDropdown
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
+    ThreescaleCreateButton, ThreescaleEditButton
 
 
 class ApplicationsView(AudienceNavView):

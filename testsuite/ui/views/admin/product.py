@@ -3,7 +3,9 @@ from widgetastic.widget import TextInput
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import ProductNavView, ProductsView, BaseAdminView
-from testsuite.ui.widgets import Link, ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton
+from testsuite.ui.widgets import Link
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
+    ThreescaleCreateButton
 
 
 class ProductDetailView(ProductNavView):
