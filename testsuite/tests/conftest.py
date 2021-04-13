@@ -584,7 +584,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
 
-    def _custom_application(params, autoclean=True, hooks=None, annotate=True):
+    def _custom_application(params, autoclean=True, hooks=None, annotate=True, acc=None):
         params = params.copy()
         for hook in _select_hooks("before_application", hooks):
             params = hook(params)
@@ -592,7 +592,10 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         if annotate:
             params["description"] = blame_desc(request, params.get("description"))
 
-        app = account.applications.create(params=params)
+        if not acc:
+            acc = account
+
+        app = acc.applications.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
             def finalizer():
