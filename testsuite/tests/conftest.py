@@ -285,7 +285,7 @@ def account(custom_account, request, testconfig):
 
 
 @pytest.fixture(scope="session")
-def custom_account(request, testconfig, threescale):
+def custom_account(threescale, request, testconfig):
     """Parametrized custom Account
 
     Args:
@@ -534,7 +534,7 @@ def active_doc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def custom_active_doc(testconfig, request, threescale):
+def custom_active_doc(threescale, testconfig, request):
     """Parametrized custom Active document
 
     Args:
@@ -701,7 +701,7 @@ def _backend_delete(backend):
 
 
 @pytest.fixture(scope="module")
-def custom_backend(request, testconfig, private_base_url, threescale):
+def custom_backend(threescale, request, testconfig, private_base_url):
     """
     Parametrized custom Backend
     Args:

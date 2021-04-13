@@ -134,7 +134,6 @@ def test_import(import_oas, oas):
             path_url = {'oas2': lambda: f"{oas['file']['basePath']}",
                         'oas3': lambda: f"{urlparse(oas['file']['servers'][0]['url']).path}"}[oas['type']]
             path_url = f"{path_url()}{path}"
-
             assert re.findall(
                 rf"^Created {method.upper()} {path_url}\$ endpoint$",
                 ret['stdout'],
@@ -148,6 +147,7 @@ def test_service(import_oas, oas):
     service = import_oas[3]
     assert service['description'] == oas['file']['info']['description']
     assert service['name'] == oas['file']['info']['title']
+
 
 def test_metrics_mappings_oas2(import_oas, oas):
     """Checks imported metrics - oas2"""
