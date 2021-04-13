@@ -156,8 +156,8 @@ def pytest_report_header(config):
         "",
         f"testsuite: testsuite version = {testsuite_version}",
         f"testsuite: environment = {environment}",
-        #f"testsuite: openshift = {openshift}",
-        #f"testsuite: project = {project}",
+        f"testsuite: openshift = {openshift}",
+        f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
         f"testsuite: catalogsource = {catalogsource}",
@@ -268,12 +268,17 @@ def threescale(testconfig):
 
 @pytest.fixture(scope="session")
 def master_threescale(testconfig):
-    """Threescale client using master url and token"""
+    """
+    Threescale client using master url and token
+    It returns functions which creates client on demand.
+    """
 
-    return client.ThreeScaleClient(
-        testconfig["threescale"]["master"]["url"],
-        testconfig["threescale"]["master"]["token"],
-        ssl_verify=testconfig["ssl_verify"])
+    def _master_threescale():
+        return client.ThreeScaleClient(
+            testconfig["threescale"]["master"]["url"],
+            testconfig["threescale"]["master"]["token"],
+            ssl_verify=testconfig["ssl_verify"])
+    return _master_threescale
 
 
 @pytest.fixture(scope="session")
@@ -297,7 +302,7 @@ def account(custom_account, request, testconfig, account_password):
 
 
 @pytest.fixture(scope="session")
-def custom_account(request, testconfig, threescale):
+def custom_account(threescale, request, testconfig):
     """Parametrized custom Account
 
     Args:
@@ -378,34 +383,32 @@ def custom_provider_account_user(request, threescale, testconfig):
 @pytest.fixture(scope="session")
 def staging_gateway(request, testconfig, configuration):
     """Staging gateway"""
-#    options = gateways.configuration.options(staging=True,
-#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-#                                             configuration=configuration)
-#    gateway = gateways.configuration.staging(options)
-#    request.addfinalizer(gateway.destroy)
-#
-#    gateway.create()
-#
-#    return gateway
-    pass
+    options = gateways.configuration.options(staging=True,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateways.configuration.staging(options)
+    request.addfinalizer(gateway.destroy)
+
+    gateway.create()
+
+    return gateway
 
 
 @pytest.fixture(scope="session")
 def production_gateway(request, testconfig, configuration):
     """Production gateway"""
-#    gateway = gateways.configuration.production
-#    if gateway is None:
-#        return None
-#    options = gateways.configuration.options(staging=False,
-#                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-#                                             configuration=configuration)
-#    gateway = gateway(options)
-#    request.addfinalizer(gateway.destroy)
-#
-#    gateway.create()
-#
-#    return gateway
-    pass
+    gateway = gateways.configuration.production
+    if gateway is None:
+        return None
+    options = gateways.configuration.options(staging=False,
+                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
+                                             configuration=configuration)
+    gateway = gateway(options)
+    request.addfinalizer(gateway.destroy)
+
+    gateway.create()
+
+    return gateway
 
 
 @pytest.fixture(scope="module")
@@ -554,7 +557,7 @@ def active_doc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def custom_active_doc(testconfig, request, threescale):
+def custom_active_doc(threescale, testconfig, request):
     """Parametrized custom Active document
 
     Args:
@@ -721,7 +724,7 @@ def _backend_delete(backend):
 
 
 @pytest.fixture(scope="module")
-def custom_backend(request, testconfig, private_base_url, threescale):
+def custom_backend(threescale, request, testconfig, private_base_url):
     """
     Parametrized custom Backend
     Args:
@@ -772,13 +775,14 @@ def custom_tenant(testconfig, master_threescale, request):
     Custom Tenant
     """
     def _custom_tenant(name="t", autoclean=True, wait=True):
+        master_client = master_threescale()
         user_name = blame(request, name)
-        tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
+        tenant = master_client.tenants.create(rawobj.CustomTennant(user_name))
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
 
-        master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
+        master_client.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
 
         if wait:
             admin_base_url = tenant.entity["signup"]["account"]["admin_base_url"]
