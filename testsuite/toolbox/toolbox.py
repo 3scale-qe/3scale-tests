@@ -177,7 +177,7 @@ def cmp_app_plans(svc1, svc2, cmp_length=True):
         cmp_pricing_rules(ap1, ap2)
         cmp_limits(ap1, ap2)
 
-    find_and_cmp(app_plan1, app_plan2, _cmp_func, cmp_length)
+    find_and_cmp(app_plan1, app_plan2, _cmp_func, cmp_length=cmp_length)
 
 
 def cmp_limits(ap1, ap2, cmp_length=True):

@@ -285,7 +285,7 @@ def account(custom_account, request, testconfig):
 
 
 @pytest.fixture(scope="session")
-def custom_account(request, testconfig, threescale):
+def custom_account(threescale, request, testconfig):
     """Parametrized custom Account
 
     Args:
@@ -498,7 +498,7 @@ def api_client(application, request):
 
 
 @pytest.fixture(scope="module")
-def custom_app_plan(custom_service, service_proxy_settings, request, testconfig, logger):
+def custom_app_plan(custom_service, service_proxy_settings, request, testconfig):
     """Parametrized custom Application Plan
 
     Args:
@@ -515,13 +515,7 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig,
         return plan
 
     if not testconfig["skip_cleanup"]:
-        def finalizer():
-            for item in plans:
-                try:
-                    item.delete()
-                except threescale_api.errors.ApiClientError as error:
-                    logger.debug('Acceptable object not found: ' + str(error))
-        request.addfinalizer(finalizer)
+        request.addfinalizer(lambda: [item.delete() for item in plans])
 
     return _custom_app_plan
 
@@ -540,7 +534,7 @@ def active_doc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def custom_active_doc(testconfig, request, threescale):
+def custom_active_doc(threescale, testconfig, request):
     """Parametrized custom Active document
 
     Args:
@@ -584,7 +578,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
 
-    def _custom_application(params, autoclean=True, hooks=None, annotate=True, acc=None):
+    def _custom_application(params, autoclean=True, hooks=None, annotate=True):
         params = params.copy()
         for hook in _select_hooks("before_application", hooks):
             params = hook(params)
@@ -592,10 +586,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         if annotate:
             params["description"] = blame_desc(request, params.get("description"))
 
-        if not acc:
-            acc = account
-
-        app = acc.applications.create(params=params)
+        app = account.applications.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
             def finalizer():
@@ -710,7 +701,7 @@ def _backend_delete(backend):
 
 
 @pytest.fixture(scope="module")
-def custom_backend(request, testconfig, private_base_url, threescale):
+def custom_backend(threescale, request, testconfig, private_base_url):
     """
     Parametrized custom Backend
     Args:

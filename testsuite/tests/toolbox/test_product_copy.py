@@ -83,7 +83,7 @@ def my_policy_configs():
         ]
 
 
-@pytest.fixture(scope="module", params=['service', 'product'])
+@pytest.fixture(scope="module", params=['copy_service', 'product_copy', 'service_copy'])
 def product_service(request):
     """Test copying of service or product"""
     return request.param
@@ -94,7 +94,7 @@ def my_backends_mapping(custom_backend, product_service):
     """
     :return: dict in format {path: backend}
     """
-    if product_service == 'product':
+    if product_service == 'product_copy':
         return {'/test1': custom_backend('backend1'), '/test2': custom_backend('backend2')}
     return {'/test1': custom_backend('backend1')}
 
@@ -108,13 +108,11 @@ def service_settings(request, product_service):
 
 
 @pytest.fixture(scope="module")
-def service(custom_service, my_backends_mapping, service_settings, my_policy_configs):
+def service(my_backends_mapping, custom_service, service_settings, my_policy_configs):
     """Service fixture"""
     service = custom_service(service_settings, backends=my_backends_mapping)
     service.proxy.list().policies.append(*my_policy_configs)
-    yield service
-    for back_usage in service.backend_usages.list():
-        back_usage.delete()
+    return service
 
 
 @pytest.fixture(scope="module")
@@ -195,11 +193,13 @@ def toolbox_copy(service, my_applications, my_activedoc, product_service):
     """Toolbox copies product from one 3scale instance to another one"""
     # pylint: disable=unused-argument
     copy_cmd = ''
-    if product_service == 'product':
-        copy_cmd = 'product '
+    if product_service == 'product_copy':
+        copy_cmd = 'product copy '
+    elif product_service == 'service_copy':
+        copy_cmd = 'service copy '
     else:
-        copy_cmd = 'service '
-    copy_cmd += f"copy -s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} {service['id']}"
+        copy_cmd = 'copy service '
+    copy_cmd += f"-s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} {service['id']}"
     ret = toolbox.run_cmd(copy_cmd)
     return (ret['stdout'], ret['stderr'])
 
@@ -224,7 +224,10 @@ def test_copy(toolbox_copy, service, my_applications, my_activedoc, dest_client,
     assert re.findall(r'copy proxy policies', stdout)
     assert re.findall(r'copying all service ActiveDocs', stdout)
 
-    toolbox.cmp_services(service, dst_product, product_service)
+    if product_service in ['copy_service', 'service_copy']:
+        toolbox.cmp_services(service, dst_product, 'service')
+    else:
+        toolbox.cmp_services(service, dst_product, 'product')
 
 
 def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_client,
@@ -232,7 +235,7 @@ def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_cli
     """Test backends of the product."""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
-    if product_service == 'service':
+    if product_service in ['service_copy', 'copy_service']:
         pytest.skip("If copying 'service' one backend is copied in background.")
 
     stdout = toolbox_copy[0]
