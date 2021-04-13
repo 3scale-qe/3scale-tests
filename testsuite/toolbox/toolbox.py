@@ -118,7 +118,7 @@ def cmp_ents(ent1, ent2, attrlist):
             raise error
 
 
-def find_and_cmp(list1, list2, cmp_function, id_attr=None):
+def find_and_cmp(list1, list2, cmp_function, id_attr=None, cmp_length=True):
     """
     Compare objects in two lists.
 
@@ -128,7 +128,8 @@ def find_and_cmp(list1, list2, cmp_function, id_attr=None):
     @param [String] Entity ID
     """
     id_attr = id_attr or ['system_name']
-    assert len(list1) == len(list2)
+    if cmp_length:
+        assert len(list1) == len(list2)
     queue = []
     for ent1 in list1:
         for ent2 in list2:
@@ -141,7 +142,7 @@ def find_and_cmp(list1, list2, cmp_function, id_attr=None):
         cmp_function(ent1, ent2)
 
 
-def cmp_services(svc1, svc2, product_service):
+def cmp_services(svc1, svc2, product_service, cmp_length=True):
     """
     Compare two services/products.
 
@@ -153,19 +154,20 @@ def cmp_services(svc1, svc2, product_service):
     cmp_ents(svc1.entity, svc2.entity, set(svc1.entity.keys()) - constants.SERVICE_CMP_ATTRS)
 
     cmp_proxies(svc1.proxy.list(), svc2.proxy.list(), product_service)
-    cmp_metrics(svc1, svc2)
-    cmp_mappings(svc1, svc2)
-    cmp_app_plans(svc1, svc2)
-    cmp_active_docs(svc1, svc2)
-    cmp_backend_usages(svc1, svc2)
+    cmp_metrics(svc1, svc2, cmp_length)
+    cmp_mappings(svc1, svc2, cmp_length)
+    cmp_app_plans(svc1, svc2, cmp_length)
+    cmp_active_docs(svc1, svc2, cmp_length)
+    cmp_backend_usages(svc1, svc2, cmp_length)
 
 
-def cmp_app_plans(svc1, svc2):
+def cmp_app_plans(svc1, svc2, cmp_length=True):
     """
     Compare application plans of two services/products.
 
     @param [Object] First service
     @param [Object] Second service
+    @param [Bool] Should we compare lists' length
     """
     app_plan1 = svc1.app_plans.list()
     app_plan2 = svc2.app_plans.list()
@@ -175,15 +177,16 @@ def cmp_app_plans(svc1, svc2):
         cmp_pricing_rules(ap1, ap2)
         cmp_limits(ap1, ap2)
 
-    find_and_cmp(app_plan1, app_plan2, _cmp_func)
+    find_and_cmp(app_plan1, app_plan2, _cmp_func, cmp_length)
 
 
-def cmp_limits(ap1, ap2):
+def cmp_limits(ap1, ap2, cmp_length=True):
     """
     Compare limits of two application plans.
 
     @param [Object] First list of app. plan
     @param [Object] Second list of app. plan
+    @param [Bool] Should we compare lists' length
     """
     def _cmp_func(metr1, metr2):
         find_and_cmp(ap1.limits(metr1).list(),
@@ -196,15 +199,17 @@ def cmp_limits(ap1, ap2):
         ap1.service.metrics.list(),
         ap2.service.metrics.list(),
         _cmp_func,
-        ['friendly_name'])
+        ['friendly_name'],
+        cmp_length)
 
 
-def cmp_pricing_rules(ap1, ap2):
+def cmp_pricing_rules(ap1, ap2, cmp_length=True):
     """
     Compare pricing rules of two application plans.
 
     @param [Object] First list of app. plan
     @param [Object] Second list of app. plan
+    @param [Bool] Should we compare lists' length
     """
     def _cmp_func(metr1, metr2):
         find_and_cmp(ap1.pricing_rules(metr1).list(),
@@ -219,7 +224,8 @@ def cmp_pricing_rules(ap1, ap2):
         ap1.service.metrics.list(),
         ap2.service.metrics.list(),
         _cmp_func,
-        ['friendly_name'])
+        ['friendly_name'],
+        cmp_length)
 
 
 def cmp_proxies(proxy1, proxy2, product_service):
@@ -258,87 +264,93 @@ def cmp_proxies(proxy1, proxy2, product_service):
             cmp_ents(rule1, rule2, set(rule1.keys()) - constants.PROXY_RULES_CMP_ATTRS)
 
 
-def cmp_backends(back1, back2):
+def cmp_backends(back1, back2, cmp_length=True):
     """
     Compare two backends.
 
     @param [Object] First backend
     @param [Object] Second backend
+    @param [Bool] Should we compare lists' length
     """
     assert len(back1.entity.keys()) == len(back2.entity.keys())
     cmp_ents(back1.entity, back2.entity, set(back1.entity.keys()) - constants.BACKEND_CMP_ATTRS)
-    cmp_metrics(back1, back2)
-    cmp_mappings(back1, back2)
+    cmp_metrics(back1, back2, cmp_length)
+    cmp_mappings(back1, back2, cmp_length)
 
 
-def cmp_metrics(ent1, ent2):
+def cmp_metrics(ent1, ent2, cmp_length=True):
     """
     Compare metrics of two entities.
 
     @param [Object] First entity
     @param [Object] Second entity
+    @param [Bool] Should we compare lists' length
     """
     metrs1 = ent1.metrics.list()
     metrs2 = ent2.metrics.list()
 
     def _cmp_func(metr1, metr2):
         cmp_ents(metr1.entity, metr2.entity, set(metr1.keys()) - constants.METRIC_CMP_ATTRS)
-        cmp_methods(metr1, metr2)
+        cmp_methods(metr1, metr2, cmp_length)
 
-    find_and_cmp(metrs1, metrs2, _cmp_func, ['friendly_name'])
+    find_and_cmp(metrs1, metrs2, _cmp_func, ['friendly_name'], cmp_length)
 
 
-def cmp_methods(metr1, metr2):
+def cmp_methods(metr1, metr2, cmp_length=True):
     """
     Compare methods of two metrics.
 
     @param [Object] First metric
     @param [Object] Second metric
+    @param [Bool] Should we compare lists' length
     """
     methods1 = metr1.methods.list()
     methods2 = metr2.methods.list()
 
     def _cmp_func(meth1, meth2):
         cmp_ents(meth1.entity, meth2.entity, set(meth1.keys()) - constants.METRIC_METHOD_CMP_ATTRS)
-    find_and_cmp(methods1, methods2, _cmp_func)
+    find_and_cmp(methods1, methods2, _cmp_func, cmp_length=cmp_length)
 
 
-def cmp_mappings(ent1, ent2):
+def cmp_mappings(ent1, ent2, cmp_length=True):
     """
     Compare mappings of two entities.
 
     @param [Object] First entity
     @param [Object] Second entity
+    @param [Bool] Should we compare lists' length
     """
     maps1 = ent1.mapping_rules.list()
     maps2 = ent2.mapping_rules.list()
 
     def _cmp_func(map1, map2):
         cmp_ents(map1.entity, map2.entity, set(map1.keys()) - constants.MAPPING_CMP_ATTRS)
-    find_and_cmp(maps1, maps2, _cmp_func, ['pattern'])
+    find_and_cmp(maps1, maps2, _cmp_func, ['pattern'], cmp_length)
 
 
-def cmp_active_docs(svc1, svc2):
+def cmp_active_docs(svc1, svc2, cmp_length=True):
     """
     Compare active docs of two services.
 
     @param [Object] First service
     @param [Object] Second service
+    @param [Bool] Should we compare lists' length
     """
     acs1 = svc1.active_docs.list()
     acs2 = svc2.active_docs.list()
 
     def _cmp_func(adc1, adc2):
         cmp_ents(adc1.entity, adc2.entity, set(adc1.keys()) - constants.ACTIVEDOCS_CMP_ATTRS)
-    find_and_cmp(acs1, acs2, _cmp_func)
+    find_and_cmp(acs1, acs2, _cmp_func, cmp_length=cmp_length)
 
 
-def cmp_backend_usages(svc1, svc2):
+def cmp_backend_usages(svc1, svc2, cmp_length=True):
     """
     Compare backend usages and their subobjects of two services.
 
     @param [Object] First service
     @param [Object] Second service
+    @param [Bool] Should we compare lists' length
     """
     buses1 = svc1.backend_usages.list()
     buses2 = svc2.backend_usages.list()
@@ -349,7 +361,7 @@ def cmp_backend_usages(svc1, svc2):
         assert bus2['service_id'] == svc2['id']
         back1 = svc1.threescale_client.backends.read(bus1['backend_id'])
         back2 = svc2.threescale_client.backends.read(bus2['backend_id'])
-        cmp_backends(back1, back2)
+        cmp_backends(back1, back2, cmp_length)
     find_and_cmp(buses1, buses2, _cmp_func, ['path'])
 
 
