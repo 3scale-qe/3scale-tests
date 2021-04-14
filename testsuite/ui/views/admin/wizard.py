@@ -3,12 +3,12 @@ from widgetastic.widget import View, GenericLocatorWidget, TextInput
 from widgetastic_patternfly import Text
 from widgetastic_patternfly4 import Button
 
-from testsuite.ui.navigation import step
+from testsuite.ui.navigation import step, Navigable
 from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
-class WizardCommonView(View):
+class WizardCommonView(View, Navigable):
     """
     All wizard pages common objects
     """
@@ -27,7 +27,7 @@ class WizardCommonView(View):
         return self.close_wizard_link.is_displayed and self.logo.is_displayed
 
 
-class WizardIntroView(WizardCommonView):
+class WizardIntroView(WizardCommonView, Navigable):
     """
     Representation of Wizard introduction view page object.
     """
@@ -47,7 +47,7 @@ class WizardIntroView(WizardCommonView):
                and WizardCommonView.is_displayed
 
 
-class WizardExplainView(WizardCommonView):
+class WizardExplainView(WizardCommonView, Navigable):
     """
     Representation of Wizard explain view page object.
     """
@@ -71,7 +71,7 @@ class WizardExplainView(WizardCommonView):
         return self.endpoint_path in self.browser.url and WizardCommonView.is_displayed
 
 
-class WizardBackendApiView(WizardCommonView):
+class WizardBackendApiView(WizardCommonView, Navigable):
     """
     Representation of Wizard Add Backend API view page object.
     """
@@ -103,7 +103,7 @@ class WizardBackendApiView(WizardCommonView):
                self.endpoint_path in self.browser.url and self.base_url_field.is_displayed
 
 
-class WizardEditApiView(WizardCommonView):
+class WizardEditApiView(WizardCommonView, Navigable):
     """
     Representation of Wizard Edit Backend API view page object.
     """
@@ -119,7 +119,7 @@ class WizardEditApiView(WizardCommonView):
                self.product_name_field.is_displayed and self.base_url_field.is_displayed
 
 
-class WizardProductView(WizardCommonView):
+class WizardProductView(WizardCommonView, Navigable):
     """
     Representation of Wizard New Product view page object.
     """
@@ -144,7 +144,7 @@ class WizardProductView(WizardCommonView):
                self.endpoint_path in self.browser.url and self.add_product_btn.is_displayed
 
 
-class WizardConnectView(WizardCommonView):
+class WizardConnectView(WizardCommonView, Navigable):
     """
     Representation of Wizard Connect view page object.
     """
@@ -169,7 +169,7 @@ class WizardConnectView(WizardCommonView):
                self.endpoint_path in self.browser.url and self.connect_btn.is_displayed
 
 
-class WizardRequestView(WizardCommonView):
+class WizardRequestView(WizardCommonView, Navigable):
     """
     Representation of Wizard Request view page object.
     """
@@ -197,7 +197,7 @@ class WizardRequestView(WizardCommonView):
                self.endpoint_path in self.browser.url and self.edit_api_btn.is_displayed
 
 
-class WizardResponseView(WizardCommonView):
+class WizardResponseView(WizardCommonView, Navigable):
     """
     Representation of Wizard Request view page object.
     """
@@ -228,7 +228,7 @@ class WizardResponseView(WizardCommonView):
                and WizardCommonView.is_displayed
 
 
-class WizardOutroView(WizardCommonView):
+class WizardOutroView(WizardCommonView, Navigable):
     """
     Representation of Wizard outro view page object.
     """

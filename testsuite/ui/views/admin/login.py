@@ -1,12 +1,13 @@
 """ Representation of Login specific views"""
 from widgetastic.widget import TextInput, View, Text
 
+from testsuite.ui.navigation import Navigable
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
-class LoginView(View):
+class LoginView(View, Navigable):
     """
     Basic login view page object that can be found on endpoint_path
     """
