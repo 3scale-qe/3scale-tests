@@ -1,4 +1,5 @@
 """Module for setting up test that require TLS gateway and/or certificates"""
+
 import pytest
 
 from testsuite.certificates import Certificate
@@ -25,6 +26,35 @@ def staging_gateway(request, configuration):
 
 
 @pytest.fixture(scope="session")
+def create_cert(request, configuration):
+    """Creates certificate that is valid for entire 3scale subdomain"""
+    host = "*." + configuration.superdomain
+
+    def _create(name: str, certificate_authority: Certificate) -> Certificate:
+        cert = configuration.manager.get_or_create(name,
+                                                   common_name=host,
+                                                   hosts=[host],
+                                                   certificate_authority=certificate_authority)
+
+        request.addfinalizer(cert.delete_files)
+        return cert
+    return _create
+
+
+@pytest.fixture(scope="session")
+def chainify(request):
+    """Creates chain from certificate and his certificate authorities"""
+    def _chain(certificate: Certificate, *authorities: Certificate) -> Certificate:
+        entire_chain = [certificate]
+        entire_chain.extend(authorities)
+        chain = Certificate(certificate="".join(cert.certificate for cert in entire_chain),
+                            key=certificate.key)
+        request.addfinalizer(chain.delete_files)
+        return chain
+    return _chain
+
+
+@pytest.fixture(scope="session")
 def valid_authority(request, configuration) -> Certificate:
     """To be used in tests validating server certificates"""
     certificate_authority = configuration.manager.get_or_create_ca("valid_ca", hosts=["*.com"])
@@ -33,16 +63,9 @@ def valid_authority(request, configuration) -> Certificate:
 
 
 @pytest.fixture(scope="session")
-def certificate(request, valid_authority, configuration) -> Certificate:
+def certificate(valid_authority, create_cert) -> Certificate:
     """Valid certificate for entire 3scale superdomain"""
-    host = "*." + configuration.superdomain
-    cert = configuration.manager.get_or_create("valid",
-                                               common_name=host,
-                                               hosts=[host],
-                                               certificate_authority=valid_authority)
-
-    request.addfinalizer(cert.delete_files)
-    return cert
+    return create_cert("valid", valid_authority)
 
 
 @pytest.fixture(scope="module")
@@ -52,16 +75,9 @@ def invalid_authority(staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def invalid_certificate(request, invalid_authority, configuration) -> Certificate:
+def invalid_certificate(invalid_authority, create_cert) -> Certificate:
     """Valid certificate for entire 3scale superdomain"""
-    host = "*." + configuration.superdomain
-    cert = configuration.manager.get_or_create("invalid",
-                                               common_name=host,
-                                               hosts=[host],
-                                               certificate_authority=invalid_authority)
-
-    request.addfinalizer(cert.delete_files)
-    return cert
+    return create_cert("invalid", invalid_authority)
 
 
 @pytest.fixture(scope="module")
