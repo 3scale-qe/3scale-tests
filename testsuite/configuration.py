@@ -1,6 +1,8 @@
 """Module responsible for processing configuration"""
+import os.path
 
 from weakget import weakget
+import importlib_resources as resources
 
 from testsuite.certificates.cfssl.cli import CFSSLProviderCLI
 from testsuite.certificates.stores import InMemoryCertificateStore
@@ -29,7 +31,10 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, Certifica
     @property
     def gateway_template(self) -> str:
         """Template for Gateway"""
-        return settings["threescale"]["gateway"]["template"]
+        template = settings["threescale"]["gateway"]["template"]
+        if template.endswith(".yml") and template == os.path.basename(template):
+            return resources.files("testsuite.resources").joinpath(template)
+        return template
 
     @property
     def gateway_image(self) -> str:
