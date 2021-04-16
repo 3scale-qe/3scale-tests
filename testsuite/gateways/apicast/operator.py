@@ -3,15 +3,13 @@ import time
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
-import importlib_resources as resources
-
 from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
+from testsuite.openshift.crd.apicast import APIcast
 from testsuite.openshift.env import Environ
 from testsuite.requirements import ThreeScaleAuthDetails
-from testsuite.utils import randomize
 
 
 class OperatorApicastRequirements(SelfManagedApicastRequirements, ABC):
@@ -29,17 +27,13 @@ class OperatorApicast(SelfManagedApicast):
     def __init__(self, requirements: OperatorApicastRequirements) -> None:
         super().__init__(requirements)
         self.auth = requirements.auth_details
-        self.deployment = randomize(self.deployment)
         self.name = f"apicast-{self.deployment}"
+        self.apicast = None
 
     def _route_name(self, entity_id):
         if self.staging:
             return f"{entity_id}-staging"
         return f"{entity_id}-production"
-
-    @property
-    def _credentials_name(self):
-        return f"{self.name}-credentials-secret"
 
     @property
     def environ(self) -> Environ:
@@ -63,31 +57,24 @@ class OperatorApicast(SelfManagedApicast):
         # pylint: disable=protected-access
         self.openshift.wait_for_ready(self.name)
 
-    def _create_credentials(self):
-        url = self.auth.url.replace('https://', f'https://{self.auth.token}@')
-
-        self.openshift.secrets.create(
-            name=self._credentials_name,
-            string_data={
-                "AdminPortalURL": url
-            }
-        )
-
     def create(self):
-        self._create_credentials()
+        provider_url = self.auth.url.replace('https://', f'https://{self.auth.token}@')
 
-        params = {
-            "NAME": self.deployment,
-            "CREDENTIALS": self._credentials_name,
-        }
+        apicast = APIcast.create_instance(
+            openshift=self.openshift,
+            name=self.deployment,
+            provider_url=provider_url
+        )
+        apicast["logLevel"] = "info"
+        apicast["openSSLPeerVerificationEnabled"] = False
+        if self.staging:
+            apicast["deploymentEnvironment"] = "staging"
+            apicast["cacheConfigurationSeconds"] = 0
+        else:
+            apicast["deploymentEnvironment"] = "production"
+            apicast["cacheConfigurationSeconds"] = 300
 
-        if not self.staging:
-            params["CACHE_SECONDS"] = 300
-            params["ENVIRONMENT"] = "production"
-
-        path = resources.files('testsuite.resources.apicast_operator').joinpath('apicast.yaml')
-        self.openshift.new_app(path, params)
-
+        self.apicast = apicast.commit()
         # Since apicast operator doesnt have any indication of status of the apicast, we need wait until deployment
         # is created
         time.sleep(2)
@@ -95,8 +82,8 @@ class OperatorApicast(SelfManagedApicast):
         self.openshift.wait_for_ready(self.name)
 
     def destroy(self):
-        self.openshift.delete("Secret", self._credentials_name)
-        self.openshift.delete("APIcast", self.deployment)
+        if self.apicast:
+            self.apicast.delete(ignore_not_found=True)
 
     def get_logs(self, since_time=None):
         raise NotImplementedError()
