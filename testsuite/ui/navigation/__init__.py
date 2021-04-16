@@ -15,7 +15,7 @@ Design of this navigation is based on: https://github.com/RedHatQE/navmazing
 """
 import inspect
 from collections import deque
-from typing import TypeVar, Callable, TYPE_CHECKING
+from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
 from testsuite.ui.browser import ThreeScaleBrowser
 
@@ -52,7 +52,6 @@ def step(cls, **kwargs):
     return decorator
 
 
-# pylint: disable=too-few-public-methods
 class Navigator:
     """Responsible for Views navigation"""
 
@@ -60,6 +59,9 @@ class Navigator:
         """
         Initializes Navigator with Browser instance and list of base Views.
         Base Views are specifically chosen to represent root elements in navigation tree (without any prerequisites)
+        Args:
+            :param browser: instance of browser
+            :param base_views: Views that are roots in prerequisite hierarchy (does not have any prerequisite)
         """
         self.page_chain = deque()
         self.browser = browser
@@ -78,9 +80,14 @@ class Navigator:
         self._backtrace(cls)
         return self._perform_steps(**kwargs)
 
-    def open(self, cls: Callable[[ThreeScaleBrowser], ReturnView], **kwargs) -> ReturnView:
-        """Directly opens desired View, by inserting its `endpoint_path` in to browser"""
-        page = cls(self.browser)
+    def open(self, cls: Callable[[ThreeScaleBrowser, Any], ReturnView], **kwargs) -> ReturnView:
+        """
+        Directly opens desired View, by inserting its `endpoint_path` in to browser
+        Args:
+            :param cls: Class of desired View
+            :return: Instance of the opened View
+        """
+        page = cls(self.browser, **kwargs)  # type: ignore
         self.browser.set_path(page.endpoint_path.format(**kwargs))
         return page
 
@@ -110,6 +117,7 @@ class Navigator:
 
         possible_steps = inspect.getmembers(page, lambda o: hasattr(o, '_class_name'))
         if self._invoke_step(possible_steps, dest, **kwargs):
+            dest.post_navigate(**kwargs)
             return self._perform_steps(**kwargs)
         raise NavigationStepNotFound(page, dest, possible_steps)
 
@@ -212,8 +220,14 @@ class Navigable:
         This is a default and is generally overridden.
         """
 
-    def alternative_views(self, *args, **kwargs):
+    def alternative_views(self):
         """
         Specify alternative Views that can be returned after navigation e.g. "Not Found 404"
         This is a default and is generally overridden.
+        """
+
+    def post_navigate(self, **kwargs):
+        """
+        Method is invoked when page is opened or navigated to. This method is called even when
+        page is not destination page and is in the middle of page_chain.
         """
