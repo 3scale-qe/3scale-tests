@@ -7,7 +7,7 @@ Admin portal pages.
 from typing import List
 
 from widgetastic.widget import GenericLocatorWidget, View, Text
-from widgetastic_patternfly4 import PatternflyTable
+from widgetastic_patternfly4 import PatternflyTable, Button
 
 from testsuite.ui.navigation import step, Navigable
 from testsuite.ui.widgets import Link, ContextMenu, NavigationMenu
@@ -112,10 +112,25 @@ class SettingsNavView(BaseNavView):
 class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on endpoint_path"""
     endpoint_path = '/p/admin/dashboard'
+    products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
+    create_product_button_link = Button(locator="//a[@href='/apiconfig/services/new']")
+    backend_title = Text(locator='//*[@id="backends-widget"]/article/div[1]/div[1]/h1')
+    create_backend_button_link = Button(locator='//a[@href="/p/admin/backend_apis/new"]')
+    account_link = Link('//a[@href="/buyers/accounts"]')
+    application_link = Link('//a[@href="/buyers/applications"]')
+    billing_link = Link('//a[@href="/finance"]')
+    develop_portal_link = Link('//a[@href="/p/admin/cms"]')
+    message_link = Link('//a[@href="/p/admin/messages"]')
+    explore_all_products = Link('//a[@href="/apiconfig/services"]')
+    explore_all_backends = Link('//a[@href="/p/admin/backend_apis"]')
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url
+        return self.endpoint_path in self.browser.url and self.message_link.is_displayed \
+               and self.products_title.is_displayed and self.create_product_button_link.is_displayed \
+               and self.backend_title.is_displayed and self.create_backend_button_link.is_displayed \
+               and self.account_link.is_displayed and self.application_link.is_displayed \
+               and self.billing_link.is_displayed and self.develop_portal_link.is_displayed
 
     def prerequisite(self):
         return BaseAdminView
@@ -130,7 +145,7 @@ class AccessDeniedView(View):
     @property
     def is_displayed(self):
         return self.title.text == "Access Denied" and \
-               self.text_message.text == "Sorry, you do not have permission to access this page." and\
+               self.text_message.text == "Sorry, you do not have permission to access this page." and \
                self.logo.is_displayed
 
 
