@@ -10,6 +10,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicastRequirement
 from testsuite.gateways.gateways import GatewayRequirements
 from testsuite.gateways.service_mesh import ServiceMeshRequirements, HttpbinFactory, ServiceMeshFactory
 from testsuite.requirements import ThreeScaleAuthDetails
+from testsuite.utils import randomize, _whoami
 
 if TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
@@ -77,8 +78,42 @@ class SelfManagedApicastOptions(GatewayOptions, SelfManagedApicastRequirements):
         return self._deployments["production"]
 
 
+class SelfDeployedApicastOptions(SelfManagedApicastOptions):
+    """
+    Class that is common ancestor to TemplateApicastOptions and OperatorApicastOptions
+    and add optional randomization of names and endpoints to enable parallel running
+    """
+
+    def __init__(self, staging: bool, settings_block, configuration: CommonConfiguration) -> None:
+        super().__init__(staging, settings_block, configuration)
+        random = self.setting_block.get("randomize", False)
+        self._tail = f"-{randomize(_whoami()[:8])}" if random else ""
+
+    @property
+    def staging_endpoint(self) -> str:
+        try:
+            return super().staging_endpoint
+        except KeyError:
+            return f"https://%s-staging{self._tail}.{self.configuration.superdomain}"
+
+    @property
+    def production_endpoint(self) -> str:
+        try:
+            return super().production_endpoint
+        except KeyError:
+            return f"https://%s-production{self._tail}.{self.configuration.superdomain}"
+
+    @property
+    def staging_deployment(self) -> str:
+        return f"{super().staging_deployment}{self._tail}"
+
+    @property
+    def production_deployment(self) -> str:
+        return f"{super().production_deployment}{self._tail}"
+
+
 # pylint: disable=too-many-ancestors
-class OperatorApicastOptions(SelfManagedApicastOptions, OperatorApicastRequirements):
+class OperatorApicastOptions(SelfDeployedApicastOptions, OperatorApicastRequirements):
     """Implementation of OperatorApicastRequirements with current testsuite"""
 
     @property
@@ -86,26 +121,12 @@ class OperatorApicastOptions(SelfManagedApicastOptions, OperatorApicastRequireme
         return self.configuration
 
 
-class TemplateApicastOptions(SelfManagedApicastOptions, TemplateApicastRequirements):
+class TemplateApicastOptions(SelfDeployedApicastOptions, TemplateApicastRequirements):
     """Implementation of TemplateApicastRequirements"""
 
     @property
     def service_routes(self) -> bool:
         return self.setting_block.get("service_routes", True)
-
-    @property
-    def staging_endpoint(self) -> str:
-        try:
-            return super().staging_endpoint
-        except KeyError:
-            return f"https://%s-staging.{self.configuration.superdomain}"
-
-    @property
-    def production_endpoint(self) -> str:
-        try:
-            return super().production_endpoint
-        except KeyError:
-            return f"https://%s-production.{self.configuration.superdomain}"
 
     @property
     def template(self):
