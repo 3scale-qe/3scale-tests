@@ -68,6 +68,14 @@ class SigningProvider(ABC):
             :param certificate_authority:  Optional argument to specify which ca to use for signing
         """
 
+    @abstractmethod
+    def sign_intermediate_ca(self, key: UnsignedKey, certificate_authority: Certificate) -> Certificate:
+        """Signs generate key with root certificate authority in order to create intermediate authority.
+        Args:
+            :param key: Key to be signed
+            :param certificate_authority: Ca to be used for signing
+        """
+
 
 class KeyProvider(ABC):
     """Class that can generate keys to be used in certificates"""
@@ -86,12 +94,14 @@ class KeyProvider(ABC):
 
     @abstractmethod
     def generate_ca(self,
+                    common_name: str,
                     names: List[Dict[str, str]],
                     hosts: List[str],
                     ) -> Tuple[Certificate, UnsignedKey]:
         """Creates new CA key, returns both self signed certificate and Unsigned key with CSR
          if we want to make it a intermediate CA
         Args:
+            :param common_name: Name of the Certificate authority
             :param names: Subject Information to be added to the request.
             :param hosts: Hosts to be added to the request.
         """
@@ -165,9 +175,9 @@ class CertificateManager:
             :param label: a identifier to the certificate and key.
         """
         names = names or self.DEFAULT_NAMES
-        certificate, key = self.key_provider.generate_ca(names, hosts)
+        certificate, key = self.key_provider.generate_ca(label, names, hosts)
         if certificate_authority:
-            certificate = self.sign_provider.sign(key, certificate_authority)
+            certificate = self.sign_provider.sign_intermediate_ca(key, certificate_authority)
         self.store[label] = certificate
         return certificate, key
 
