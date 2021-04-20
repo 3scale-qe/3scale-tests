@@ -15,13 +15,13 @@ __all__ = ["CapabilityRegistry", "Capability"]
 class Capability(enum.Enum):
     """Enum containing all known environment capabilities"""
     PRODUCTION_GATEWAY = "production"           # Allows production gateway with reload() capability
-    APICAST = "apicast"                         # Is Apicast, this is mutually exclusive with Service Mesh
+    APICAST = "apicast"                         # Is APIcast, this is mutually exclusive with Service Mesh
     CUSTOM_ENVIRONMENT = "env"                  # Allows environment manipulation through environ() method
     SAME_CLUSTER = "internal-cluster"           # Is always located on the same cluster as 3scale
     SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
     STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
-    LOGS = "logs"                               # Allows getting apicast logs through get_logs() method
-    JAEGER = "jaeger"                           # Allows configuring the Apicast to send data to Jaeger
+    LOGS = "logs"                               # Allows getting APIcast logs through get_logs() method
+    JAEGER = "jaeger"                           # Allows configuring the APIcast to send data to Jaeger
     OCP4 = "ocp4"                               # If the current environment is OpenShift 4
     OCP3 = "ocp3"                               # If the current environment is OpenShift 3
 
