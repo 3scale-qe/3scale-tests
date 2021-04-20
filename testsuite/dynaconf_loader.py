@@ -145,7 +145,13 @@ def load(obj, env=None, silent=None, key=None):
                     "password": ocp.secrets["system-seed"]["MASTER_PASSWORD"].decode("utf-8"),
                     "token": master_token},
                 "gateway": {
-                    "image": _apicast_image(ocp)}}}
+                    "image": _apicast_image(ocp)},
+                "backend_internal_api": {
+                    "route": ocp.routes.for_service("backend-listener")[0],
+                    "username": ocp.secrets["backend-internal-api"]["username"],
+                    "password": ocp.secrets["backend-internal-api"]["password"]
+                }
+            }}
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated
         project_data = {

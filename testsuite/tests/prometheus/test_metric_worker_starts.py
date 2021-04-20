@@ -10,7 +10,8 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
-              pytest.mark.disruptive]
+              pytest.mark.disruptive,
+              ]
 
 
 def test_metric_worker(prometheus_client, production_gateway):
