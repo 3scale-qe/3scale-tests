@@ -18,22 +18,6 @@ from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 from testsuite.openshift.scaler import Scaler
 
 
-class SecretKinds(enum.Enum):
-    """Secret kinds enum."""
-
-    TLS = "tls"
-    GENERIC = "generic"
-    DOCKER_REGISTRY = "docker-registry"
-
-
-class SecretTypes(enum.Enum):
-    """Secret types enum."""
-
-    OPAQUE = "opaque"
-    BASIC_AUTH = "kubernetes.io/basic-auth"
-    TLS = "kubernetes.io/ssl"
-
-
 class ServiceTypes(enum.Enum):
     """Service types enum."""
 
@@ -245,42 +229,6 @@ class OpenShiftClient:
         self.do_action("rollout", ["latest", deployment_name])
         self.do_action("rollout", ["status", deployment_name])
 
-    # pylint: disable=too-many-arguments
-    def create_secret(self, name: str, kind: "SecretKinds", secret_type: "SecretTypes" = None,
-                      literals: Dict[str, str] = None, files: Dict[str, str] = None,
-                      cert_path: str = None, cert_key_path: str = None):
-        """Create a new secret.
-
-        Args:
-            :param name: Secret name
-            :param kind: The kind of the secret, given by SecretKinds
-            :param secret_type: The type of the secret, given by SecretTypes
-            :param literals: Speficy a key and literal value to insert in secret
-            :param files: Key files key be specified using their file path,  in which case a default
-                          name will be given to them, or optionally with a name and file path,
-                          in which case the given name will be used.  Specifying a directory will
-                          iterate each named file in the directory that is a valid secret key.
-            :param cert_path: The path to the certificate
-            :param cert_key_path: The path to the certificate key
-        """
-        opt_args = []
-
-        if secret_type:
-            opt_args.extend(["--type", secret_type.value])
-
-        if literals:
-            opt_args.extend([f"--from-literal={n}={v}" for n, v in literals.items()])
-
-        if files:
-            opt_args.extend([f"--from-file={n}={v}" for n, v in files.items()])
-
-        if kind == SecretKinds.TLS:
-            if cert_path is None or cert_key_path is None:
-                raise ValueError("cert_path and cert_key_path required.")
-            opt_args.extend(["--cert", cert_path, "--key", cert_key_path])
-
-        self.do_action("create", ["secret", f"{kind.value}", f"{name}", opt_args])
-
     def new_app(self, source: str, params: Dict[str, str] = None):
         """Create application based on source code.
 
@@ -297,6 +245,7 @@ class OpenShiftClient:
 
         self.do_action("new-app", [source, opt_args])
 
+    # pylint: disable=too-many-arguments
     def add_volume(self, deployment_name: str, volume_name: str, mount_path: str,
                    secret_name: str = None, configmap_name: str = None):
         """Add volume to a given deployment.
@@ -448,7 +397,7 @@ class OpenShiftClient:
                 selector = selector.narrow(narrow_function)
             return selector
 
-    def create(self, definition: str, cmd_args: Optional[List[str]] = None):
+    def create(self, definition, cmd_args: Optional[List[str]] = None):
         """
         Creates objects from yaml/json representations
 
