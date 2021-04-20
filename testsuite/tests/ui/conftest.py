@@ -188,9 +188,9 @@ def custom_ui_application(login, navigator, threescale, request, testconfig):
     :return: params for custom application
     """
 
-    def _custom_ui_appliaction(name: str, email: str, account: Account, autoclean=True):
+    def _custom_ui_appliaction(name: str, description: str, account: Account, autoclean=True):
         app = navigator.navigate(ApplicationNewView, account=account)
-        app.create(name, email)
+        app.create(name, description)
         application = account.applications.read_by_name(name)
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(application.delete)
