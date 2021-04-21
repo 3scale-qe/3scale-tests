@@ -25,7 +25,7 @@ def setup(browser, navigator, login, requestbin, request, threescale):
 
 
 @pytest.fixture(scope="module")
-def custom_app(custom_application, custom_app_plan, service, lifecycle_hooks, request):
+def custom_app(service, custom_app_plan, custom_application, lifecycle_hooks, request):
     """
     Create an application
     """

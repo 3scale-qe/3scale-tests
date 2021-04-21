@@ -1,8 +1,9 @@
 "UI conftest"
 
 import pytest
-from threescale_api.resources import Account
+from threescale_api.resources import Account, ApplicationPlan
 
+from testsuite import rawobj
 from testsuite.config import settings
 from testsuite.ui.views.admin.audience.application import ApplicationNewView
 from testsuite.ui.webdriver import SeleniumDriver
@@ -182,25 +183,31 @@ def ui_account(custom_ui_account, request):
 
 
 # pylint: disable=unused-argument
+# custom_app_plan dependency is needed to ensure cleanup in correct order
 @pytest.fixture(scope="module")
-def custom_ui_application(login, navigator, threescale, request, testconfig):
+def custom_ui_application(custom_app_plan, request, login, navigator, threescale, testconfig):
     """
     :return: params for custom application
     """
 
-    def _custom_ui_appliaction(name: str, description: str, account: Account, autoclean=True):
+    def _custom_ui_application(name: str, description: str, plan: ApplicationPlan, account: Account, autoclean=True):
         app = navigator.navigate(ApplicationNewView, account=account)
-        app.create(name, description)
+        app.create(name, description, plan)
         application = account.applications.read_by_name(name)
+
         if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(application.delete)
+            def delete():
+                application.delete()
+
+            request.addfinalizer(delete)
         return application
 
-    return _custom_ui_appliaction
+    return _custom_ui_application
 
 
 @pytest.fixture(scope="module")
-def ui_application(custom_ui_application, account, request):
+def ui_application(service, custom_app_plan, custom_ui_application, account, request):
     """Create an application through UI"""
     name = blame(request, "ui_account")
-    return custom_ui_application(name, f"{name}@anything.invalid", account)
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    return custom_ui_application(name, "description", plan, account)
