@@ -14,12 +14,12 @@ def check_availability(prometheus_client):
     """
     try:
         if prometheus_client.get_metric("apicast_status") == []:
-            warn_and_skip()
+            warn_and_skip_apicast()
     except requests.exceptions.HTTPError:
-        warn_and_skip()
+        warn_and_skip_apicast()
 
 
-def warn_and_skip():
+def warn_and_skip_apicast():
     """
     Prints warning and skips the tests
     """
@@ -30,6 +30,27 @@ def warn_and_skip():
 
 
 @pytest.fixture(scope="session")
-def prometheus_client(testconfig):
+def prometheus_client(prometheus_url):
     """Returns an instance of Prometheus client."""
-    return prometheus.PrometheusClient(testconfig["prometheus"]["url"])
+    return prometheus.PrometheusClient(prometheus_url)
+
+
+@pytest.fixture(scope="session")
+def prometheus_url(testconfig, openshift):
+    """
+    Returns an url of the Prometheus instance.
+    Uses a route for the
+    """
+    if "prometheus" in testconfig:
+        return testconfig["prometheus"]["url"]
+
+    routes = openshift().routes.for_service('prometheus-operated')
+    if len(routes) == 0:
+        routes = openshift().routes.for_service('prometheus')
+
+    if len(routes) == 0:
+        warnings.warn("Prometheus is not present in this project. Prometheus tests have been skipped.")
+        pytest.skip("Prometheus is not present in this project.")
+
+    protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
+    return protocol + routes[0]['spec']['host']
