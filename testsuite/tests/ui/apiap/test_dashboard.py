@@ -1,17 +1,20 @@
 """Rewrite of spec/ui_specs/dashboard_spec.rb"""
 import pytest
 
-from testsuite.ui.views.admin import AccountsView
+
+# pylint: disable=unused-argument
+from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.audience.billing import BillingView
 from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalView
 from testsuite.ui.views.admin.audience.messages import MessagesView
-from testsuite.ui.views.admin.backends import BackendNewView, BackendsView
-from testsuite.ui.views.admin.foundation import DashboardView, ProductsView
-from testsuite.ui.views.admin.product import ProductNewView
+from testsuite.ui.views.admin.backend import BackendsView
+from testsuite.ui.views.admin.backend.backend import BackendNewView
+from testsuite.ui.views.admin.foundation import DashboardView
+from testsuite.ui.views.admin.product import ProductsView
+from testsuite.ui.views.admin.product.product import ProductNewView
 
 
-# pylint: disable=unused-argument
 def test_dashboard_is_loaded_correctly(login, navigator):
     """
     Test:

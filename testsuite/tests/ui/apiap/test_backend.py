@@ -1,8 +1,8 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
 import pytest
 
-from testsuite.ui.views.admin.backends import BackendEditView
 from testsuite.utils import blame
+from testsuite.ui.views.admin.backend.backend import BackendEditView
 
 
 def test_create_backend(custom_ui_backend, request):

@@ -8,10 +8,12 @@ from testsuite.config import settings
 from testsuite.tests.ui import Sessions
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
-from testsuite.ui.views.admin import BaseAdminView, LoginView, AccountNewView
+from testsuite.ui.views.admin.audience.account import AccountNewView
 from testsuite.ui.views.admin.audience.application import ApplicationNewView
-from testsuite.ui.views.admin.backends import BackendNewView
-from testsuite.ui.views.admin.product import ProductNewView
+from testsuite.ui.views.admin.backend.backend import BackendNewView
+from testsuite.ui.views.admin.foundation import BaseAdminView
+from testsuite.ui.views.admin.login import LoginView
+from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.utils import blame
 

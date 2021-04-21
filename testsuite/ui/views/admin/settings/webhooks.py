@@ -3,12 +3,11 @@ View representations of Webhook pages
 """
 from widgetastic.widget import TextInput, GenericLocatorWidget
 
-from testsuite.ui.views.admin.foundation import SettingsNavView
+from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import CheckBoxGroup
 
 
-# pylint: disable=invalid-overridden-method
-class WebhooksView(SettingsNavView):
+class WebhooksView(BaseSettingsView):
     """
     View representation of Webhook page
     """
@@ -51,9 +50,9 @@ class WebhooksView(SettingsNavView):
         self.update.click()
 
     def prerequisite(self):
-        return SettingsNavView
+        return BaseSettingsView
 
     @property
     def is_displayed(self):
-        return self.webhook_active.is_displayed and self.webhook_provider.is_displayed and \
-               self.path in self.browser.url
+        return BaseSettingsView.is_displayed and self.webhook_active.is_displayed \
+               and self.webhook_provider.is_displayed and self.path in self.browser.url

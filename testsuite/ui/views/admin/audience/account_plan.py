@@ -3,11 +3,11 @@ from widgetastic.widget import TextInput, GenericLocatorWidget
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin.foundation import AudienceNavView
+from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import Link
 
 
-class AccountPlansView(AudienceNavView):
+class AccountPlansView(BaseAudienceView):
     """View representation of Account Plans Listing page"""
     path_pattern = '/buyers/account_plans'
     new_plan = Link("//a[@href='/admin/buyers/account_plans/new']")
@@ -22,17 +22,16 @@ class AccountPlansView(AudienceNavView):
         """Create new account plan"""
         self.new_plan.click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
-        return AudienceNavView
+        return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.new_plan.is_displayed and self.table.is_displayed and \
+        return BaseAudienceView.is_displayed and self.new_plan.is_displayed and self.table.is_displayed and \
                self.path in self.browser.url
 
 
-class NewAccountPlanView(AudienceNavView):
+class NewAccountPlanView(BaseAudienceView):
     """View representation of New Account page"""
     path_pattern = "/buyers/account_plans/new"
     name = TextInput(id='account_plan_name')
@@ -60,11 +59,10 @@ class NewAccountPlanView(AudienceNavView):
             self.cost.fill(cost)
         self.create_button.click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return AccountPlansView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.name.is_displayed and self.approval.is_displayed and \
+        return BaseAudienceView.is_displayed and self.name.is_displayed and self.approval.is_displayed and \
                self.path in self.browser.url

@@ -93,6 +93,7 @@ class NavigationMenu(Navigation):
     argument (this argument is usually taken from destination View in a form of `path` variable),
     it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
     """
+    RELATED_RESOURCE = './/h2[@class="pf-c-nav__section-title"]'
     LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'
     # Product and backend navigation menu differs from others,
     # hence we need different ITEMS parameter than default one is.
@@ -117,6 +118,14 @@ class NavigationMenu(Navigation):
                     self.browser.click(element)
                 self.browser.click(item[0])
                 return
+
+    def nav_resource(self):
+        """
+        Returns navigation title. This text is shown only in Product and Backend Views and it is used
+        in `is_display` method to verify, if currently visible navigation menu (or whole View)
+        is correctly loaded for particular Product or Backend.
+        """
+        return self.browser.element(self.RELATED_RESOURCE).text
 
 
 class ThreescaleDropdown(GenericLocatorWidget):

@@ -3,12 +3,12 @@ from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin.foundation import SettingsNavView
+from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import RadioGroup
 
 
 # pylint: disable=invalid-overridden-method
-class UsersView(SettingsNavView):
+class UsersView(BaseSettingsView):
     """View representation of Users Listing page"""
     path_pattern = '/p/admin/account/users'
     table = PatternflyTable('//*[@id="users"]')
@@ -19,14 +19,14 @@ class UsersView(SettingsNavView):
         self.table.row(_row__attr=('id', 'user_' + str(user_id))).name.click()
 
     def prerequisite(self):
-        return SettingsNavView
+        return BaseSettingsView
 
     @property
     def is_displayed(self):
         return self.table.is_displayed and self.path in self.browser.url
 
 
-class UserDetailView(SettingsNavView):
+class UserDetailView(BaseSettingsView):
     """View representation of User Detail page"""
     path_pattern = '/p/admin/account/users/{user_id}/edit'
     username = TextInput(id='#user_username')

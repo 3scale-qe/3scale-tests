@@ -1,8 +1,9 @@
 """UI Login smoketests"""
 
 import pytest
-from testsuite.ui.views.admin import LoginView
+
 from testsuite.config import settings
+from testsuite.ui.views.admin.login import LoginView
 
 
 @pytest.fixture(scope="module")

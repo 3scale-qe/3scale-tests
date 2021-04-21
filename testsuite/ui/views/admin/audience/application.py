@@ -4,14 +4,15 @@ from widgetastic.widget import TextInput, GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin import AccountApplicationsView
-from testsuite.ui.views.admin.foundation import AudienceNavView
+from testsuite.ui.views.admin.audience import BaseAudienceView
+from testsuite.ui.views.admin.audience.account import AccountApplicationsView
+from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import AudienceTable, Link, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleCreateButton, ThreescaleEditButton
 
 
-class ApplicationsView(AudienceNavView):
+class ApplicationsView(BaseAudienceView):
     """View representation of Accounts Listing page"""
     path_pattern = '/buyers/applications'
     table = AudienceTable("//*[@class='data']")
@@ -21,16 +22,15 @@ class ApplicationsView(AudienceNavView):
         """Opens detail app by ID"""
         self.table.row(_row__attr=('id', f'contract_{application.entity_id}')).name.click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
-        return AudienceNavView
+        return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.table.is_displayed and self.path in self.browser.url
+        return BaseAudienceView.is_displayed and self.table.is_displayed and self.path in self.browser.url
 
 
-class ApplicationDetailView(AudienceNavView):
+class ApplicationDetailView(BaseProductView):
     """View representation of Account detail page"""
     path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}'
     edit_button = ThreescaleEditButton()
@@ -44,7 +44,7 @@ class ApplicationDetailView(AudienceNavView):
     change_plan_button = GenericLocatorWidget("//*[@value='Change Plan']")
 
     def __init__(self, parent, product, application):
-        super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
+        super().__init__(parent, product, application_id=application.entity_id)
 
     def suspend(self):
         """Suspend application plan"""
@@ -72,17 +72,16 @@ class ApplicationDetailView(AudienceNavView):
         """Edit application plan"""
         self.edit_button.click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return ApplicationsView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.path in self.browser.url \
+        return BaseAudienceView.is_displayed and self.path in self.browser.url \
                and self.edit_button.is_displayed and self.suspend_button.is_displayed
 
 
-class ApplicationNewView(AudienceNavView):
+class ApplicationNewView(BaseAudienceView):
     """View representation of New Application page"""
     path_pattern = 'buyers/accounts/{account_id}/applications/new'
     username = TextInput(id='cinstance_name')
@@ -111,11 +110,11 @@ class ApplicationNewView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
+        return BaseAudienceView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.path in self.browser.url
 
 
-class ApplicationEditView(AudienceNavView):
+class ApplicationEditView(BaseProductView):
     """View representation of Edit Application page"""
     path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}/edit'
     username = TextInput(id='cinstance_name')
@@ -124,7 +123,7 @@ class ApplicationEditView(AudienceNavView):
     delete_button = ThreescaleDeleteButton()
 
     def __init__(self, parent, product, application):
-        super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
+        super().__init__(parent, product, application_id=application.entity_id)
 
     def update(self, username: str = "", description: str = ""):
         """Update Application"""
@@ -143,5 +142,5 @@ class ApplicationEditView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
+        return BaseAudienceView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.path in self.browser.url
