@@ -47,6 +47,9 @@ def metrics(request, warmup_prod_gateway, prometheus_client):
     return [m["metric"] for m in metrics["data"]]
 
 
+# flaky as the testsuite does not trigger the metrics that are expected, their presence
+# depends on prior usage of the gateway
+@pytest.mark.flaky
 @pytest.mark.parametrize("expected_metric", METRICS)
 def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metrics):
     """Metrics must contains expected apicast metrics defined in METRICS."""
