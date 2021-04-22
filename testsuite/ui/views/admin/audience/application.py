@@ -83,7 +83,7 @@ class ApplicationNewView(AudienceNavView):
     """View representation of New Application page"""
     endpoint_path = 'buyers/accounts/{account_id}/applications/new'
     username = TextInput(id='cinstance_name')
-    email = TextInput(id='cinstance_description')
+    description = TextInput(id='cinstance_description')
     create_button = ThreescaleCreateButton()
 
     def prerequisite(self):
@@ -91,13 +91,13 @@ class ApplicationNewView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.email.is_displayed \
+        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.endpoint_path in self.browser.url
 
     def create(self, username: str, email: str):
         """Create Application"""
         self.username.fill(username)
-        self.email.fill(email)
+        self.description.fill(email)
         self.create_button.click()
 
 
@@ -105,7 +105,7 @@ class ApplicationEditView(AudienceNavView):
     """View representation of Edit Application page"""
     endpoint_path = '/apiconfig/services/{service_id}/applications/{application_id}/edit'
     username = TextInput(id='cinstance_name')
-    email = TextInput(id='cinstance_description')
+    description = TextInput(id='cinstance_description')
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
 
@@ -114,7 +114,7 @@ class ApplicationEditView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.email.is_displayed \
+        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.endpoint_path in self.browser.url
 
     def update(self, username: str = "", email: str = ""):
@@ -122,7 +122,7 @@ class ApplicationEditView(AudienceNavView):
         if username:
             self.username.fill(username)
         if email:
-            self.email.fill(email)
+            self.description.fill(email)
         self.update_button.click()
 
     def delete(self):
