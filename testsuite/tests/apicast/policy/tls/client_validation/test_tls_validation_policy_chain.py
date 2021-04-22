@@ -11,9 +11,9 @@ import pytest
     pytest.param(("some_valid2", 200), id="some_certs_valid2"),
     pytest.param(("empty", 400), id="empty_chain"),
 ])
-def certificates_and_code(request):
+def certificates_and_code(request, certificate):
     """List of certificates and their respective expected return codes"""
-    return request.getfixturevalue(request.param[0]), request.param[1]
+    return request.getfixturevalue(request.param[0]), certificate, request.param[1]
 
 
 @pytest.fixture(scope="module")
@@ -46,9 +46,9 @@ def some_valid2(invalid_certificate, valid_authority):
     return [invalid_certificate, valid_authority]
 
 
-def test_tls_validation(certificate, api_client, certificates_and_code):
+def test_tls_validation(api_client, certificates_and_code):
     """Test that TLS validation returns expected result when using client certificate"""
-    _, code = certificates_and_code
+    _, certificate, code = certificates_and_code
 
     client = api_client(cert=(certificate.files["certificate"], certificate.files["key"]))
     response = client.get("/get")
