@@ -112,7 +112,9 @@ def service(custom_service, my_backends_mapping, service_settings, my_policy_con
     """Service fixture"""
     service = custom_service(service_settings, backends=my_backends_mapping)
     service.proxy.list().policies.append(*my_policy_configs)
-    return service
+    yield service
+    for back_usage in service.backend_usages.list():
+        back_usage.delete()
 
 
 @pytest.fixture(scope="module")

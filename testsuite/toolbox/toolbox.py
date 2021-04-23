@@ -2,12 +2,12 @@
 
 import logging
 import os
+from io import BytesIO
+
 import jsondiff
-
 import paramiko
-from testsuite.config import settings
-
 import testsuite.toolbox.constants as constants
+from testsuite.config import settings
 
 
 def get_toolbox_cmd(cmd_in):
@@ -22,9 +22,26 @@ def get_toolbox_cmd(cmd_in):
         ret += f"target={settings['toolbox']['podman_cert_dir']} "
         ret += f"-e SSL_CERT_FILE={settings['toolbox']['podman_cert_dir']}/"
         ret += f"{settings['toolbox']['podman_cert_name']} "
-        ret += f"{settings['toolbox']['podman_image']} 3scale {cmd_in}"
+        ret += f"{settings['toolbox']['podman_image']} 3scale "
+        if not bool(settings['ssl_verify']):
+            ret += '-k '
+        ret += f" {cmd_in}"
         return ret
     raise ValueError(f"Unsupported toolbox command: {settings['toolbox']['cmd']}")
+
+
+def ssh_client():
+    """
+    Function returns ssh client. Client should be closed!
+
+    @return ssh client
+    """
+    client = paramiko.client.SSHClient()
+    client.load_system_host_keys()
+    client.connect(settings['toolbox']['machine_ip'],
+                   username=settings['toolbox']['ssh_user'],
+                   password=settings['toolbox']['ssh_passwd'])
+    return client
 
 
 def run_cmd(cmd_input):
@@ -34,11 +51,7 @@ def run_cmd(cmd_input):
     @param [String] Command to execute
     @return Returns hash with STDOUT and STDERR
     """
-    client = paramiko.client.SSHClient()
-    client.load_system_host_keys()
-    client.connect(settings['toolbox']['machine_ip'],
-                   username=settings['toolbox']['ssh_user'],
-                   password=settings['toolbox']['ssh_passwd'])
+    client = ssh_client()
     if isinstance(cmd_input, str):
         cmd_in = [cmd_input]
     else:
@@ -63,11 +76,28 @@ def run_cmd(cmd_input):
 
         ret_value.append({'stdout': stdoutstr, 'stderr': stderrstr})
 
-        logging.debug("Output of Toolbox command: stdout: %s; stderr: %s", stdout, stderr)
+        logging.debug("Output of Toolbox command: stdout: %s; stderr: %s", stdoutstr, stderrstr)
+    client.close()
 
     if isinstance(cmd_input, str):
         return ret_value[0]
     return ret_value
+
+
+def copy_string_to_remote_file(input_string, remote_file):
+    """
+    Function copies string into remote file.
+
+    @param [String] Input string
+    @param [String] Name of remote file
+    """
+    client = ssh_client()
+
+    sftp = client.open_sftp()
+    sftp.putfo(BytesIO(input_string.encode()), remote_file)
+
+    sftp.close()
+    client.close()
 
 
 def cmp_ents(ent1, ent2, attrlist):

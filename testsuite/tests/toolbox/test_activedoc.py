@@ -93,7 +93,8 @@ def test_list2(empty_list, service, my_activedoc):
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('list'))
     assert not ret['stderr']
-    assert empty_list in ret['stdout']
+    for line in empty_list.splitlines():
+        assert line in ret['stdout']
 
     to_cmp = fr"{out_variables['ac1_entity']['id']}\t{out_variables['ac1_entity']['name']}\t"
     to_cmp += fr"{out_variables['ac1_entity']['system_name']}\t\(empty\)\tfalse\tfalse"
