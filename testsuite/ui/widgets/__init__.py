@@ -149,3 +149,11 @@ class ThreescaleCheckBox(GenericLocatorWidget):
         :return if checkbox is checked
         """
         return self.__element__().get_attribute("checked") == "true"
+
+
+class DeploymentRadio(RadioGroup):
+    """Variation of 3scale radio group"""
+    OPTIONS_SECTION = './/li[@id="{}"]/fieldset/ol'
+
+    OPTIONS = './/li'
+    OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
