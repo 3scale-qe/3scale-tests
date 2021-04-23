@@ -13,6 +13,10 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: http://petstore.swagger.io/api
+security:
+  - myOauth:
+      - read
+      - write
 paths:
   /pets:
     get:
@@ -54,6 +58,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+        - myOauth:
+            - read
+            - write
     post:
       description: Creates a new pet in the store. Duplicates are allowed
       operationId: addPet
@@ -77,6 +85,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+        - myOauth:
+            - read
+            - write
   /pets/{id}:
     get:
       description: Returns a user based on a single ID, if the user does not have access to the pet
@@ -102,6 +114,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+        - myOauth:
+            - read
+            - write
     delete:
       description: deletes a single pet based on the ID supplied
       operationId: deletePet
@@ -122,6 +138,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      security:
+        - myOauth:
+            - read
+            - write
 components:
   schemas:
     Pet:
@@ -156,3 +176,15 @@ components:
           format: int32
         message:
           type: string
+
+  securitySchemes:
+    myOauth:
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        password:
+          tokenUrl: https://api.example.com/oauth2/token
+          scopes:
+            read_pets: read your pets
+            write_pets: modify pets in your account
+

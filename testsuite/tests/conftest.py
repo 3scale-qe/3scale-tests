@@ -292,8 +292,8 @@ def custom_account(threescale, request, testconfig):
         :param params: dict for remote call, rawobj.Account should be used
     """
 
-    def _custom_account(params, autoclean=True):
-        acc = threescale.accounts.create(params=params)
+    def _custom_account(params, autoclean=True, threescale_client=threescale):
+        acc = threescale_client.accounts.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(acc.delete)
         return acc
@@ -544,8 +544,8 @@ def custom_active_doc(threescale, testconfig, request):
 
     ads = []
 
-    def _custom_active_doc(params, autoclean=True):
-        acd = threescale.active_docs.create(params=params)
+    def _custom_active_doc(params, autoclean=True, threescale_client=threescale):
+        acd = threescale_client.active_docs.create(params=params)
         if autoclean:
             ads.append(acd)
         return acd
@@ -627,7 +627,8 @@ def custom_service(threescale, request, testconfig, logger):
         :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook"""
 
     # pylint: disable=too-many-arguments
-    def _custom_service(params, proxy_params=None, backends=None, autoclean=True, hooks=None, annotate=True):
+    def _custom_service(params, proxy_params=None, backends=None, autoclean=True,
+                        hooks=None, annotate=True, threescale_client=threescale):
         params = params.copy()
         for hook in _select_hooks("before_service", hooks):
             params = hook(params)
@@ -635,7 +636,7 @@ def custom_service(threescale, request, testconfig, logger):
         if annotate:
             params["description"] = blame_desc(request, params.get("description"))
 
-        svc = threescale.services.create(params=params)
+        svc = threescale_client.services.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
             def finalizer():
@@ -708,7 +709,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         :param endpoint: endpoint of backend
     """
 
-    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None):
+    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None, threescale_client=threescale):
         if endpoint is None:
             endpoint = private_base_url()
 
@@ -717,7 +718,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         for hook in _select_hooks("before_backend", hooks):
             hook(params)
 
-        backend = threescale.backends.create(params=params)
+        backend = threescale_client.backends.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
             def finalizer():

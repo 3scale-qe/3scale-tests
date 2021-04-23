@@ -65,7 +65,8 @@ def test_promote1(service):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
     assert not ret['stderr']
-    assert re.findall("Proxy Configuration version 1 promoted to 'production'", ret['stdout'])
+    # this is "version 2" because there is autopromotion in testsuite
+    assert re.findall("Proxy Configuration version 2 promoted to 'production'", ret['stdout'])
 
 
 def test_show_production1(service):
@@ -112,7 +113,8 @@ def test_update_staging_and_list1(service, hits, empty_list_staging):
 
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'staging'))
     assert not ret['stderr']
-    assert empty_list_staging in ret['stdout']
+    for line in empty_list_staging.splitlines():
+        assert line in ret['stdout']
     assert re.findall(r'\d+\t2\tsandbox', ret['stdout'])
 
 
@@ -127,7 +129,7 @@ def test_promote2(service):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
     assert not ret['stderr']
-    assert re.findall("Proxy Configuration version 3 promoted to 'production'", ret['stdout'])
+    assert re.findall("Proxy Configuration version 5 promoted to 'production'", ret['stdout'])
 
 
 def test_list_production2(service, empty_list_production):
@@ -136,7 +138,7 @@ def test_list_production2(service, empty_list_production):
     assert not ret['stderr']
     assert empty_list_production in ret['stdout']
     assert re.findall(r'ID\tVERSION\tENVIRONMENT', ret['stdout'])
-    assert re.findall(r'\d+\t3\tproduction', ret['stdout'])
+    assert re.findall(r'\d+\t2\tproduction', ret['stdout'])
 
 
 def test_show_production2(service):
