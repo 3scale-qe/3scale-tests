@@ -4,6 +4,7 @@ import pytest
 
 from testsuite.certificates import Certificate
 from testsuite.gateways import TLSApicastOptions, TLSApicast
+from testsuite.openshift.objects import SecretKinds
 from testsuite.utils import blame
 
 
@@ -21,7 +22,6 @@ def staging_gateway(request, configuration):
 
     request.addfinalizer(gateway.destroy)
     gateway.create()
-
     return gateway
 
 
@@ -85,25 +85,14 @@ def mount_certificate_secret(request, staging_gateway):
     """Mount volume from TLS secret on staging gateway."""
 
     def _mount(mount_path, certificate):
-        secret_name = blame(request, "tls-term")
-        resource = {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": secret_name,
-            },
-            "stringData": {
-                "tls.crt": certificate.certificate,
-                "tls.key": certificate.key,
-            }
-        }
+        secret_name = blame(request, "tls")
 
         def turn_down():
             staging_gateway.openshift.delete("secret", secret_name)
 
         request.addfinalizer(turn_down)
 
-        staging_gateway.openshift.apply(resource)
+        staging_gateway.openshift.secrets.create(secret_name, SecretKinds.TLS, certificate=certificate)
         staging_gateway.openshift.add_volume(staging_gateway.deployment, secret_name,
                                              mount_path, secret_name)
     return _mount

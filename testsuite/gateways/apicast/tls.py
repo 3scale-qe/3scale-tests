@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 from threescale_api.resources import Application
 
-from testsuite.openshift.objects import Routes
+from testsuite.openshift.objects import Routes, SecretKinds
 from .template import TemplateApicastRequirements, TemplateApicast
 from ...certificates import Certificate
 from ...requirements import CertificateManagerRequirement
@@ -90,13 +90,7 @@ class TLSApicast(TemplateApicast):
 
         cert = self.server_certificate
 
-        self.openshift.secrets.create(
-            name=self.secret_name,
-            string_data={
-                "tls.crt": cert.certificate,
-                "tls.key": cert.key
-            },
-        )
+        self.openshift.secrets.create(name=self.secret_name, kind=SecretKinds.TLS, certificate=cert)
 
     def create(self):
         """Deploy TLS Apicast."""

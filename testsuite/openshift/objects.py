@@ -7,6 +7,8 @@ from io import StringIO
 from typing import List, Union
 import yaml
 
+from testsuite.certificates import Certificate
+
 if typing.TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
@@ -131,7 +133,7 @@ class Secrets(RemoteMapping):
     # pylint: disable=too-many-arguments
     def create(self, name: str, kind: SecretKinds = SecretKinds.GENERIC, secret_type: SecretTypes = None,
                string_data: typing.Dict[str, str] = None, files: typing.Dict[str, str] = None,
-               cert_path: str = None, cert_key_path: str = None):
+               certificate: Certificate = None):
         """Create a new secret.
 
         Args:
@@ -143,8 +145,7 @@ class Secrets(RemoteMapping):
                           name will be given to them, or optionally with a name and file path,
                           in which case the given name will be used.  Specifying a directory will
                           iterate each named file in the directory that is a valid secret key.
-            :param cert_path: The path to the certificate
-            :param cert_key_path: The path to the certificate key
+            :param certificate: The Certificate
         """
         opt_args = []
 
@@ -158,9 +159,9 @@ class Secrets(RemoteMapping):
             opt_args.extend([f"--from-file={n}={v}" for n, v in files.items()])
 
         if kind == SecretKinds.TLS:
-            if cert_path is None or cert_key_path is None:
-                raise ValueError("cert_path and cert_key_path required.")
-            opt_args.extend(["--cert", cert_path, "--key", cert_key_path])
+            if certificate is None:
+                raise ValueError("Certificate is required for TLS secret.")
+            opt_args.extend(["--cert", certificate.files["certificate"], "--key", certificate.files["key"]])
 
         self.do_action("create", ["secret", kind.value, name, opt_args])
 
