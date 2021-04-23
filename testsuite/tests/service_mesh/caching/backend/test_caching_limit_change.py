@@ -6,7 +6,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
+pytestmark = [pytest.mark.required_capabilities(Capability.SERVICE_MESH), pytest.mark.disruptive]
 
 
 @pytest.fixture(scope="module")
@@ -39,7 +39,7 @@ def test_limit_change(limit, api_client):
     """
     client = api_client()
     assert client.get("/anything/exceeded").status_code == 200
-    # Apicast allows more request to pass than is the actual limit, other gateway do not
+    # APIcast allows more request to pass than is the actual limit, other gateways do not
     client.get("/anything/exceeded")
     assert client.get("/anything/exceeded").status_code == 429
 
