@@ -175,7 +175,7 @@ class HttpxBaseClientAuth(Auth):
         elif self.location == 'headers':
             self._prepare_headers(request)
         elif self.location == 'query':
-            request.url = URL(request.url, self.credentials)
+            request.url = URL(request.url, params=self.credentials)
         else:
             raise ValueError("Unknown credentials location '%s'" % self.location)
 
@@ -238,7 +238,7 @@ class HttpxOidcClientAuth(HttpxBaseClientAuth):
         elif self.location == 'headers':
             request.headers['access_token'] = self.token
         elif self.location == 'query':
-            request.url = URL(request.url, {'access_token': self.token})
+            request.url = URL(request.url, params={'access_token': self.token})
         else:
             raise ValueError("Unknown credentials location '%s'" % self.location)
 
