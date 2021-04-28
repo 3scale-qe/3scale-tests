@@ -2,6 +2,7 @@
 This policy instructs APIcast to use specific certificate for communicating with client.
 Tests both embedded and path type"""
 import pytest
+import requests
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
@@ -46,7 +47,10 @@ def policy_settings(request):
 @pytest.fixture(scope="function")
 def client(api_client):
     """Returns HttpClient instance with retrying feature skipped."""
-    return api_client(disable_retry_status_list={503, 404})
+    api_client = api_client(disable_retry_status_list={503, 404})
+    # This won't work with Httpx but will save us about 10 mins for this test alone
+    api_client.session = requests.Session()
+    return api_client
 
 
 def test_get_should_return_ok(api_client, valid_authority):
