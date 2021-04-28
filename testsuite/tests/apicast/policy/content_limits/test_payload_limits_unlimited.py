@@ -6,7 +6,9 @@ import pytest
 from testsuite import rawobj
 from testsuite.utils import random_string
 
-pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
 
 
 @pytest.fixture(scope="module")

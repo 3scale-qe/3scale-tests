@@ -3,9 +3,14 @@ Testing that the request/response content limit policy limits the content-length
 response body
 """
 import pytest
-from testsuite import rawobj
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
+from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+
+
+pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
+              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6736")]
 
 
 @pytest.fixture(scope="module")
@@ -28,7 +33,8 @@ def service_proxy_settings(private_base_url):
 def test_payload_limits_response(api_client, num_bytes, status_code):
     """
     Tests that the backend response with a content_length greater than the limit
-     will produce 413 status code
+     will produce 413 status code.
+    Also asserts that the 'Content-Length' header corresponds to the actual content length.
     - send a request to the httpbin "/bytes/{num_bytes}" endpoint, that will produce a response
       containing a body of length num_bytes
     - if num_bytes < RESPONSE_LIMIT assert 200
@@ -36,3 +42,4 @@ def test_payload_limits_response(api_client, num_bytes, status_code):
     """
     response = api_client().get(f"/bytes/{num_bytes}")
     assert response.status_code == status_code
+    assert response.headers['Content-Length'] == str(len(response.content))
