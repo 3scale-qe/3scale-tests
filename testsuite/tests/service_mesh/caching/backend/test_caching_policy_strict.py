@@ -1,15 +1,20 @@
 """
-Rewrite spec/functional_specs/policies/caching/caching_allow_policy_spec.rb
+Tests strict backend caching (unknown credentials are forbidden) in the adapter
 """
 import pytest
 
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
+
+@pytest.fixture(scope="module")
+def gateway_environment(gateway_environment):
+    """Ensure that the strict caching is enabled even if it is not the default in the future"""
+    gateway_environment["BACKEND_CACHE_POLICY_FAIL_CLOSED"] = "True"
+    return gateway_environment
 
 
-# TODO: flaky because ocp4 won't scale the pod to 0, we need to use apimanager object to change replicas
-@pytest.mark.flaky
+@pytest.mark.required_capabilities(Capability.SERVICE_MESH)
+@pytest.mark.disruptive
 def test_caching_policy_strict(api_client, openshift):
     """
     Test caching policy with caching mode set to Strict
