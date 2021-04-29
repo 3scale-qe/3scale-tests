@@ -13,10 +13,11 @@ from testsuite.utils import blame
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module", autouse=True)
-def setup(navigator, login, requestbin, request, threescale):
+def setup(navigator, custom_admin_login, requestbin, request, threescale):
     """
     Configure webhooks and create requestbin.
     """
+    custom_admin_login()
     webhooks = navigator.navigate(WebhooksView)
     webhooks.webhook_check("Accounts", requestbin.url)
     request.addfinalizer(threescale.webhooks.clear)
@@ -24,10 +25,11 @@ def setup(navigator, login, requestbin, request, threescale):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def account_plans(navigator, login):
+def account_plans(navigator, custom_admin_login):
     """
     Allow account plans
     """
+    custom_admin_login()
     usage = navigator.navigate(UsageRulesView)
     usage.account_plans()
 
