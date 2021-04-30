@@ -1,5 +1,6 @@
 "UI conftest"
 
+import os
 import pytest
 from threescale_api.resources import Account, ApplicationPlan
 
@@ -240,3 +241,53 @@ def ui_application(service, custom_app_plan, custom_ui_application, account, req
     name = blame(request, "ui_account")
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
     return custom_ui_application(name, "description", plan, account)
+
+
+def pytest_exception_interact(node, call, report):
+    """
+        Method that is being invoked, when a test fails (hook)
+
+        From py-test documentation:
+            "Called when an exception was raised which can potentially be interactively handled."
+
+        For more information about this method, please see:
+            https://docs.pytest.org/en/stable/_modules/_pytest/hookspec.html#pytest_exception_interact
+
+       :param node: info about the called test. What test was called, when it was called, which session etc.
+       :param call: in depth summary of what exception was thrown
+       :param report: generated summary of the test output
+    """
+    if report.failed:
+        browser = node.funcargs.get("browser")
+        screenshot = os.path.join(get_resultsdir_path(node), "failed-test-screenshot.png")
+        browser.selenium.save_screenshot(screenshot)
+
+
+def get_resultsdir_path(node):
+    """
+        Method that gives you the path where you should store screenshots. It also creates the dirs on the road.
+    """
+
+    xml = node.config.getoption('--junitxml')
+    # path to "3scape-py-testsuite" folder
+    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../..')
+    resultsdir = os.environ.get("resultsdir", no_argument_dir)
+    failed_test_name = node.nodeid.replace('/', '.').replace('.py::', '.')
+
+    if not xml:
+        path = f"{resultsdir}/attachments/ui/{failed_test_name}/"
+
+    else:
+        directory = os.path.dirname(xml)
+
+        if directory == "":
+            directory = "."
+
+        # gets the file with extension and then it splits on the "." and returns only the name
+        name = os.path.splitext(os.path.basename(xml))[0]
+        path = f"{directory}/attachments/{name}/{failed_test_name}/"
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    return path

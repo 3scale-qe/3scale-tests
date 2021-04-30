@@ -137,6 +137,40 @@ web_pdb.set_trace()
 
 After that you need to visit `localhost:5555` where is interactive console and other related information from debugger.
 
+###Reporting
+
+If a UI test fails, it will generate a screenshot from a moment, when the test was marked as failed. 
+This is being handled by `pytest_exception_interact`. You can specify the output location by
+setting `resultsdir` environmental variable or by passing an `--junitxml` argument (with path).
+The name of a screenshot is fixed to `failed-test-screenshot.png`, the only thing that changes
+is a directory, where we will save the screenshot in.
+
+####Cases of reporting:
+
+* if no option is selected, the `resultsdir` will be considered to be `.`. In this case, failing test `test1` 
+  will put the screenshot into the `./attachments/ui/test1/` directory.
+
+
+* `resultsdir=/home/tmp/` with failing test `test1` will put the screenshot into the 
+  `/home/tmp/attachments/ui/test1/` directory.
+
+
+* `--junitxml=/home/tmp/junit-ui-tests.xml` with failing test `test1` will put the screenshot in 
+  `/home/tmp/attachments/junit-ui-tests/test1/` directory.
+  
+
+* `--junitxml=junit-ui-tests.xml` with failing test `test1` will put the screenshot in 
+  `./attachments/junit-ui-tests/test1/` directory. The `.` in the path means that it will be saved in a starting location
+  of a test (for example, if we run only a single test, this directory will be created in a same directory
+  as a test is and if we for example start a test suite from `/home/tmp/`, the `.` will be replaced by `/home/tmp/`)
+
+
+* if `--junitxml` and `resultsdir` is provided, the xml path will be used.
+
+Note: If a test is parametrized, the output will be the same, except the test name will be set to its
+failing variables (for example: `test1` with `param1` and `param2` will have the directory `test1[param1-param2]`) 
+and not the `test1`.
+
 ###Example test 
 
 ```python
