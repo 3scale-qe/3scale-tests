@@ -2,18 +2,34 @@
 
 import re
 
+import pytest
+
 from testsuite.config import settings
 
 import testsuite
-import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 
 
 EMPTY_LIST = 'Empty remote list.\n'
 
-SRC1_STR = f"^source {testsuite.CONFIGURATION.url} {testsuite.CONFIGURATION.token}$"
-REGEXP_SRC1 = re.compile(SRC1_STR)
-REGEXP_DST1 = re.compile(f"^destination {settings['toolbox']['destination_endpoint']} {settings['toolbox']['destination_provider_key']}$")  # noqa: E501 # pylint: disable=line-too-long
+
+@pytest.fixture(scope="module")
+def src1_str():
+    """ Expected source remote config """
+    return f"^source {testsuite.CONFIGURATION.url} {testsuite.CONFIGURATION.token}$"
+
+
+@pytest.fixture(scope="module")
+def regexp_src1(src1_str):
+    """ Compiled expected source remote config """
+    return re.compile(src1_str)
+
+
+@pytest.fixture(scope="module")
+def regexp_dst1(dest_client):
+    """ Compiled expected destination remote config """
+    dst1_str = f"^destination {dest_client.url} {dest_client.token}$"
+    return re.compile(dst1_str)
 
 
 def create_cmd(cmd):
@@ -28,27 +44,27 @@ def test_list1():
     assert ret['stdout'] == EMPTY_LIST
 
 
-def test_add_src():
+def test_add_src(threescale_src1):
     """Run command 'add source'"""
-    ret = toolbox.run_cmd(create_cmd(f"add source {constants.THREESCALE_SRC1}"))
+    ret = toolbox.run_cmd(create_cmd(f"add source {threescale_src1}"))
     assert not ret['stderr']
     assert not ret['stdout']
 
 
-def test_add_dst():
+def test_add_dst(threescale_dst1):
     """Run command 'add destination'"""
-    ret = toolbox.run_cmd(create_cmd(f"add destination {constants.THREESCALE_DST1}"))
+    ret = toolbox.run_cmd(create_cmd(f"add destination {threescale_dst1}"))
     assert not ret['stderr']
     assert not ret['stdout']
 
 
-def test_list2():
+def test_list2(regexp_src1, regexp_dst1):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))
     assert not ret['stderr']
     lines = ret['stdout'].splitlines()
-    assert REGEXP_SRC1.match(lines[0]) is not None
-    assert REGEXP_DST1.match(lines[2]) is not None
+    assert regexp_src1.match(lines[0]) is not None
+    assert regexp_dst1.match(lines[2]) is not None
 
 
 def test_rename():
@@ -58,13 +74,13 @@ def test_rename():
     assert not ret['stdout']
 
 
-def test_list3():
+def test_list3(src1_str, regexp_dst1):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list'))
     assert not ret['stderr']
     lines = ret['stdout'].splitlines()
-    assert re.compile(SRC1_STR.replace('source', 'source_renamed')).match(lines[2]) is not None
-    assert REGEXP_DST1.match(lines[0]) is not None
+    assert re.compile(src1_str.replace('source', 'source_renamed')).match(lines[2]) is not None
+    assert regexp_dst1.match(lines[0]) is not None
 
 
 def test_remove1():

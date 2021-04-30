@@ -1,15 +1,5 @@
 "These are constants used for Toolbox testing."
 
-from testsuite.config import settings
-
-import testsuite
-
-THREESCALE_SRC1 = testsuite.CONFIGURATION.url.\
-        replace('//', f"//{testsuite.CONFIGURATION.token}@")
-
-THREESCALE_DST1 = settings['toolbox']['destination_endpoint'].\
-    replace('//', f"//{settings['toolbox']['destination_provider_key']}@")
-
 # 'name', 'state', 'end_user_registration_required', 'backend_version',
 # 'deployment_option', 'support_email', 'buyer_can_select_plan',
 # 'buyer_key_regenerate_enabled', 'buyer_plan_change_permission',

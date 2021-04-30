@@ -11,7 +11,6 @@ import pytest
 import yaml
 from testsuite.config import settings
 
-import testsuite.toolbox.constants as constants
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
@@ -80,9 +79,9 @@ def oas(request):
 
 
 @pytest.fixture(scope="module")
-def import_oas(dest_client, request, oas):
+def import_oas(threescale_dst1, dest_client, request, oas):
     """Import OAS by Toolbox"""
-    import_cmd = f"import openapi -d {constants.THREESCALE_DST1} "
+    import_cmd = f"import openapi -d {threescale_dst1} "
     import_cmd += oas['file_name']
     import_cmd += f" --default-credentials-userkey={USER_KEY} "
     import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"

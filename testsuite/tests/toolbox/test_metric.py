@@ -39,10 +39,15 @@ def disabled_metric(app_plan, metric):
     return any(limit['value'] == 0 for limit in app_plan.limits(metric).list())
 
 
-def create_cmd(metric_obj, cmd, args=None):
-    """Creates command for metric."""
-    args = args or ''
-    return f"metric {cmd} {constants.THREESCALE_SRC1} {metric_obj['id']} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of metrics command creation """
+
+    def _create_cmd(metric_obj, cmd, args=None):
+        args = args or ''
+        return f"metric {cmd} {threescale_src1} {metric_obj['id']} {args}"
+
+    return _create_cmd
 
 
 def parse_create_command_out(out):
@@ -51,7 +56,7 @@ def parse_create_command_out(out):
 
 
 @pytest.fixture(scope="module")
-def empty_list(metric_obj):
+def empty_list(metric_obj, create_cmd):
     """Fixture for empty list constant"""
     return toolbox.run_cmd(create_cmd(metric_obj, 'list'))['stdout']
 
@@ -60,7 +65,7 @@ def empty_list(metric_obj):
 out_variables = {}
 
 
-def test_list1(empty_list, metric_obj):
+def test_list1(empty_list, metric_obj, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
     assert not ret['stderr']
@@ -70,7 +75,7 @@ def test_list1(empty_list, metric_obj):
     assert re.findall(r'\d+\s+metric[^\s]*\s+metric[^\s]*\s+Hit\s+\(empty\)', ret['stdout'])
 
 
-def test_create_metric1(metric_obj, my_app_plan):
+def test_create_metric1(metric_obj, my_app_plan, create_cmd):
     """Create metric1"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'create', 'metric1 --description="metric1 desc"'))
     assert not ret['stderr']
@@ -81,7 +86,7 @@ def test_create_metric1(metric_obj, my_app_plan):
     assert not disabled_metric(my_app_plan, met)
 
 
-def test_create_metric2(metric_obj, my_app_plan):
+def test_create_metric2(metric_obj, my_app_plan, create_cmd):
     """Create metric2"""
     cmd = 'metric2 --disabled --description="metric2 desc" '
     cmd += '--system-name="metric_system" --unit="apple"'
@@ -95,7 +100,7 @@ def test_create_metric2(metric_obj, my_app_plan):
     assert disabled_metric(my_app_plan, met)
 
 
-def test_list2(empty_list, metric_obj):
+def test_list2(empty_list, metric_obj, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
     assert not ret['stderr']
@@ -104,7 +109,7 @@ def test_list2(empty_list, metric_obj):
     assert re.findall(r'\d+\s+metric2\s+metric_system\s+apple\s+metric2 desc', ret['stdout'])
 
 
-def test_update_metric2(metric_obj):
+def test_update_metric2(metric_obj, create_cmd):
     """Update metric2"""
     cmd = 'metric_system --enabled --description="metric3 desc changed" '
     cmd += '--unit="hit" --name="metric3"'
@@ -116,7 +121,7 @@ def test_update_metric2(metric_obj):
     assert int(m_id) == int(out_variables['metric_system']['id'])
 
 
-def test_delete_metrics(metric_obj):
+def test_delete_metrics(metric_obj, create_cmd):
     """Delete metrics"""
     for met in ['metric1', 'metric_system']:
         ret = toolbox.run_cmd(create_cmd(metric_obj, 'delete', met))
@@ -125,7 +130,7 @@ def test_delete_metrics(metric_obj):
         assert int(m_id) == int(out_variables[met]['id'])
 
 
-def test_list3(empty_list, metric_obj):
+def test_list3(empty_list, metric_obj, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(metric_obj, 'list'))
     assert not ret['stderr']

@@ -55,17 +55,22 @@ def promote(request, my_services, my_accounts, my_app_plans, my_applications):
 
 
 @pytest.fixture(scope="module")
-def empty_list(my_services, my_applications):
+def empty_list(my_services, my_applications, create_cmd):
     """Fixture for empty list constant"""
     # these fixtures should be created for being able to list empty list
     # pylint: disable=unused-argument
     return toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))['stdout']
 
 
-def create_cmd(cmd, args=None):
-    """Creates command for metric."""
-    args = args or ''
-    return f"application {cmd} {constants.THREESCALE_SRC1} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of application command creation """
+
+    def _create_cmd(cmd, args=None):
+        args = args or ''
+        return f"application {cmd} {threescale_src1} {args}"
+
+    return _create_cmd
 
 
 def parse_create_command_out(output):
@@ -77,7 +82,7 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-def test_list1(empty_list, my_services, my_applications):
+def test_list1(empty_list, my_services, my_applications, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))
     assert not ret['stderr']
@@ -91,7 +96,7 @@ def test_list1(empty_list, my_services, my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_create_app1(my_services, my_accounts, my_app_plans):
+def test_create_app1(my_services, my_accounts, my_app_plans, create_cmd):
     """Run command 'create' to create first application"""
     cmd = f"{my_accounts[0]['id']} {my_services[0]['id']} {my_app_plans[0]['id']} app1 --user-key=\"123456\""
     ret = toolbox.run_cmd(create_cmd('create', cmd))
@@ -100,7 +105,7 @@ def test_create_app1(my_services, my_accounts, my_app_plans):
     out_variables['app1'] = my_accounts[0].applications[int(parse_create_command_out(ret['stdout']))].entity
 
 
-def test_create_app2(my_services, my_accounts, my_app_plans):
+def test_create_app2(my_services, my_accounts, my_app_plans, create_cmd):
     # these fixtures should be created for creating
     # pylint: disable=unused-argument
     """Run command 'create' to create second application"""
@@ -113,7 +118,7 @@ def test_create_app2(my_services, my_accounts, my_app_plans):
     out_variables['app2'] = my_accounts[1].applications[int(parse_create_command_out(ret['stdout']))].entity
 
 
-def test_list2(empty_list, my_services, my_applications):
+def test_list2(empty_list, my_services, my_applications, create_cmd):
     """Run command 'create' to create second application"""
     # these fixtures should be created for listing
     # pylint: disable=unused-argument
@@ -127,7 +132,7 @@ def test_list2(empty_list, my_services, my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_show_app2(my_services, my_accounts, my_app_plans):
+def test_show_app2(my_services, my_accounts, my_app_plans, create_cmd):
     """Run command 'show' to show second application"""
     # these fixtures should be created for showing
     # pylint: disable=unused-argument
@@ -143,7 +148,7 @@ def test_show_app2(my_services, my_accounts, my_app_plans):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_update_app1_1(my_services, my_accounts, my_app_plans):
+def test_update_app1_1(my_services, my_accounts, my_app_plans, create_cmd):
     """Run command 'update' to update first application"""
     # these fixtures should be created for updating
     # pylint: disable=unused-argument
@@ -158,7 +163,7 @@ def test_update_app1_1(my_services, my_accounts, my_app_plans):
     out_variables['app3'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
 
 
-def test_update_app1_2(my_services, my_accounts):
+def test_update_app1_2(my_services, my_accounts, create_cmd):
     """Run command 'update' to update first application again"""
     # these fixtures should be created for update
     # pylint: disable=unused-argument
@@ -170,7 +175,8 @@ def test_update_app1_2(my_services, my_accounts):
     out_variables['app4'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
 
 
-def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applications):
+# pylint: disable=too-many-arguments
+def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applications, create_cmd):
     """Run command 'list' applications"""
     # these fixtures should be created for listing
     # pylint: disable=unused-argument
@@ -189,7 +195,7 @@ def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applicatio
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_show_app1(my_applications):
+def test_show_app1(my_applications, create_cmd):
     """Run command 'show' to show first application"""
     # my_applications and all related fixtures should be created for showing
     # pylint: disable=unused-argument
@@ -206,7 +212,7 @@ def test_show_app1(my_applications):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_delete_app2(my_applications):
+def test_delete_app2(my_applications, create_cmd):
     """Run command 'delete' to delete second application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument
@@ -215,7 +221,7 @@ def test_delete_app2(my_applications):
     assert f"Application id: {out_variables['app2']['id']} deleted" in ret['stdout']
 
 
-def test_delete_app1(my_applications):
+def test_delete_app1(my_applications, create_cmd):
     """Run command 'delete' to delete first application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument
@@ -224,7 +230,7 @@ def test_delete_app1(my_applications):
     assert f"Application id: {out_variables['app1']['id']} deleted" in ret['stdout']
 
 
-def test_list4(empty_list, my_services):
+def test_list4(empty_list, my_services, create_cmd):
     """Run command 'list' applications"""
     ret = toolbox.run_cmd(create_cmd('list', f" --service={my_services[0]['id']}"))
     assert not ret['stderr']

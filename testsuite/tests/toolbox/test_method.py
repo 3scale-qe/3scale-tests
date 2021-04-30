@@ -38,10 +38,15 @@ def disabled_method(app_plan, method):
     return any(limit['value'] == 0 for limit in app_plan.limits(method).list())
 
 
-def create_cmd(service, cmd, args=None):
-    """Creates command for method."""
-    args = args or ''
-    return f"method {cmd} {constants.THREESCALE_SRC1} {service['id']} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of method command creation """
+
+    def _create_cmd(service, cmd, args=None):
+        args = args or ''
+        return f"method {cmd} {threescale_src1} {service['id']} {args}"
+
+    return _create_cmd
 
 
 def parse_create_command_out(out):
@@ -50,7 +55,7 @@ def parse_create_command_out(out):
 
 
 @pytest.fixture(scope="module")
-def empty_list(service, hits):
+def empty_list(service, hits, create_cmd):
     # pylint: disable=unused-argument
     # hits should be created for this fixture
     """Fixture for empty list constant"""
@@ -61,7 +66,7 @@ def empty_list(service, hits):
 out_variables = {}
 
 
-def test_list1(empty_list, service):
+def test_list1(empty_list, service, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
     assert not ret['stderr']
@@ -69,7 +74,7 @@ def test_list1(empty_list, service):
     assert re.findall(r'ID\tFRIENDLY_NAME\tSYSTEM_NAME\tDESCRIPTION', ret['stdout'])
 
 
-def test_create_method1(service, my_app_plan, hits):
+def test_create_method1(service, my_app_plan, hits, create_cmd):
     """Create method1"""
     ret = toolbox.run_cmd(create_cmd(service, 'create', 'method1 --description="method1 desc"'))
     assert not ret['stderr']
@@ -80,7 +85,7 @@ def test_create_method1(service, my_app_plan, hits):
     assert not disabled_method(my_app_plan, met)
 
 
-def test_create_method2(service, my_app_plan, hits):
+def test_create_method2(service, my_app_plan, hits, create_cmd):
     """Create method2"""
     cmd = 'method2 --disabled --description="method2 desc" '
     cmd += '--system-name="method_system"'
@@ -94,7 +99,7 @@ def test_create_method2(service, my_app_plan, hits):
     assert disabled_method(my_app_plan, met)
 
 
-def test_list2(empty_list, service):
+def test_list2(empty_list, service, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
     assert not ret['stderr']
@@ -103,7 +108,7 @@ def test_list2(empty_list, service):
     assert re.findall(r'\d+\s+method2\s+method_system\s+method2 desc', ret['stdout'])
 
 
-def test_update_method2(service, hits):
+def test_update_method2(service, hits, create_cmd):
     """Update method2"""
     cmd = 'method_system --enabled --description="method3 desc changed" '
     cmd += '--name="method3"'
@@ -115,7 +120,7 @@ def test_update_method2(service, hits):
     assert int(m_id) == int(out_variables['method_system']['id'])
 
 
-def test_delete_methods(service):
+def test_delete_methods(service, create_cmd):
     """Delete method"""
     for met in ['method1', 'method_system']:
         ret = toolbox.run_cmd(create_cmd(service, 'delete', met))
@@ -124,7 +129,7 @@ def test_delete_methods(service):
         assert int(m_id) == int(out_variables[met]['id'])
 
 
-def test_list3(empty_list, service):
+def test_list3(empty_list, service, create_cmd):
     """Run command 'list'"""
     ret = toolbox.run_cmd(create_cmd(service, 'list'))
     assert not ret['stderr']

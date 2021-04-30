@@ -12,6 +12,9 @@ from testsuite.config import settings
 
 def get_toolbox_cmd(cmd_in):
     """Creates template for Toolbox command according configuration options"""
+    if not bool(settings['ssl_verify']):
+        cmd_in = f"-k {cmd_in}"
+
     if settings['toolbox']['cmd'] == 'rpm':
         return f"3scale {cmd_in}"
     if settings['toolbox']['cmd'] == 'gem':
@@ -21,11 +24,8 @@ def get_toolbox_cmd(cmd_in):
         ret += f"--mount type=bind,src={settings['toolbox']['podman_cert_dir']},"
         ret += f"target={settings['toolbox']['podman_cert_dir']} "
         ret += f"-e SSL_CERT_FILE={settings['toolbox']['podman_cert_dir']}/"
-        ret += f"{settings['toolbox']['podman_cert_name']} "
-        ret += f"{settings['toolbox']['podman_image']} 3scale "
-        if not bool(settings['ssl_verify']):
-            ret += '-k '
-        ret += f" {cmd_in}"
+        ret += f"{settings['toolbox']['podman_cert_name']} {settings['toolbox']['podman_image']} "
+        ret += f"3scale {cmd_in}"
         return ret
     raise ValueError(f"Unsupported toolbox command: {settings['toolbox']['cmd']}")
 
