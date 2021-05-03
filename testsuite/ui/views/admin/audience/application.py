@@ -1,6 +1,6 @@
 """View representations of Applications pages"""
 
-from widgetastic.widget import TextInput, GenericLocatorWidget
+from widgetastic.widget import TextInput, GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
@@ -84,6 +84,7 @@ class ApplicationNewView(AudienceNavView):
     endpoint_path = 'buyers/accounts/{account_id}/applications/new'
     username = TextInput(id='cinstance_name')
     description = TextInput(id='cinstance_description')
+    app_plan = Text("//*[@id='select2-cinstance_plan_id-container']")
     create_button = ThreescaleCreateButton()
 
     def prerequisite(self):
@@ -94,10 +95,17 @@ class ApplicationNewView(AudienceNavView):
         return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.endpoint_path in self.browser.url
 
-    def create(self, username: str, email: str):
+    def create(self, username: str, description: str, plan):
         """Create Application"""
+        plan_name = plan["name"]
+        if self.app_plan.text is not plan_name:
+            self.app_plan.click()
+            self.browser.element(f".//*[contains(text(),'{plan['name']}')]").click()
+            # Since this element is totally different from patternfly 4 and
+            # select options and root element are in different html trees, we need to do this 'hack' to make it work.
+            self.app_plan.click()
         self.username.fill(username)
-        self.description.fill(email)
+        self.description.fill(description)
         self.create_button.click()
 
 
@@ -117,12 +125,12 @@ class ApplicationEditView(AudienceNavView):
         return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
                and self.endpoint_path in self.browser.url
 
-    def update(self, username: str = "", email: str = ""):
+    def update(self, username: str = "", description: str = ""):
         """Update Application"""
         if username:
             self.username.fill(username)
-        if email:
-            self.description.fill(email)
+        if description:
+            self.description.fill(description)
         self.update_button.click()
 
     def delete(self):
