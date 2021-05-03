@@ -744,3 +744,22 @@ def requestbin(testconfig, tools):
     Returns an instance of RequestBin.
     """
     return RequestBinClient(weakget(testconfig)["requestbin"]["url"] % tools["request-bin"])
+
+
+@pytest.fixture(scope="session")
+def custom_tenant(testconfig, master_threescale, request):
+    """
+    Custom Tenant
+    """
+    def _custom_tenant(name="t"):
+        user_name = blame(request, name)
+        tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
+
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(tenant.delete)
+
+        master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
+
+        return tenant
+
+    return _custom_tenant
