@@ -5,24 +5,18 @@ Creates a new tenant and tests if the tenant works
 import backoff
 import pytest
 from threescale_api import client
-from testsuite import rawobj
-from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
-def threescale(testconfig, master_threescale, request):
+def threescale(custom_tenant, testconfig):
     """
     Creates a new tenant and returns a threescale client configured to use
     the new tenant
     """
-    tenant = master_threescale.tenants.create(rawobj.CustomTennant(
-        username=blame(request, "t")))
+    tenant = custom_tenant()
 
     url = "https://" + tenant.entity["signup"]["account"]["admin_domain"]
     access_token = tenant.entity["signup"]["access_token"]["value"]
-
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(tenant.delete)
 
     verify = testconfig["ssl_verify"]
     return get_custom_client(url, access_token, verify)
