@@ -2,6 +2,14 @@
 
 import pytest
 from testsuite.ui.views.admin import LoginView
+from testsuite.config import settings
+
+
+@pytest.fixture(scope="module")
+def browser(browser):
+    """Displays Admin pages when browser is created"""
+    browser.url = settings["threescale"]["admin"]["url"]
+    return browser
 
 
 @pytest.fixture(scope="function")

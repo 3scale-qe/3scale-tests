@@ -13,11 +13,12 @@ from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 
 # pylint: disable=too-many-arguments, disable=unused-argument
 @pytest.fixture(scope="module", autouse=True)
-def setup(browser, navigator, login, requestbin, request, threescale):
+def setup(browser, navigator, custom_admin_login, requestbin, request, threescale):
     """
     Configure webhooks and create requestbin.
     :return: name of specific requestbin
     """
+    custom_admin_login()
     webhooks = navigator.navigate(WebhooksView)
     webhooks.webhook_check("Keys", requestbin.url)
     request.addfinalizer(threescale.webhooks.clear)

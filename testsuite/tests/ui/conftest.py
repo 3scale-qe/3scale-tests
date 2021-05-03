@@ -5,92 +5,75 @@ from threescale_api.resources import Account, ApplicationPlan
 
 from testsuite import rawobj
 from testsuite.config import settings
-from testsuite.ui.views.admin.audience.application import ApplicationNewView
-from testsuite.ui.webdriver import SeleniumDriver
+from testsuite.tests.ui import Sessions
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
 from testsuite.ui.views.admin import BaseAdminView, LoginView, AccountNewView
+from testsuite.ui.views.admin.audience.application import ApplicationNewView
 from testsuite.ui.views.admin.backends import BackendNewView
 from testsuite.ui.views.admin.product import ProductNewView
+from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
-def browser(custom_browser):
+def browser(request):
     """
-       Browser representation based on UI settings
-       Args:
-           :param custom_browser: custom browser function
-           :return browser instance
+    Browser representation based on UI settings
+    Args:
+        :param request: Finalizer for session cleanup
+        :return browser: Browser instance
     """
-    return custom_browser()
+    webdriver = SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
+                               driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+                               ssl_verify=settings["ssl_verify"],
+                               remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                               binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
+    webdriver.get_driver()
+    started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
+    request.addfinalizer(webdriver.finalize)
+    return started_browser
 
 
 @pytest.fixture(scope="session")
-def custom_browser(request):
-    """
-        Browser representation based on UI settings
-        Args:
-            :param request: finalizer for browser teardown
-    """
-
-    def _custom_browser(url=None):
-        """
-        :param url: url which should be used for browser navigation and usage
-        :return: browser instance
-        """
-        webdriver = SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                                   driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                                   ssl_verify=settings["ssl_verify"],
-                                   remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                                   binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"]
-                                   )
-        webdriver.get_driver()
-        started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
-        started_browser.url = url or settings["threescale"]["admin"]["url"]
-        request.addfinalizer(webdriver.finalize)
-        return started_browser
-
-    return _custom_browser
+def sessions(browser):
+    """Sessions that were stored during test run"""
+    return Sessions(browser)
 
 
 @pytest.fixture(scope="module")
-def custom_login(browser, request):
+def custom_admin_login(browser, sessions, navigator):
     """
-       Method for basic login to 3scale tenant, fixture finalizer scope can be overridden by finalizer_request
-       :param browser: browser based on UI settings
-       :param request: finalizer for session cleanup
-       :return: Function with logged browser
+    Login fixture for admin portal.
+    :param browser: Browser instance
+    :param sessions: Dict-like instance that contains all available browserSessions that were used within scope=session
+    :param navigator: Navigator Instance
+    :return: Login to Admin portal with custom credentials
     """
 
-    def _login(name=None, password=None, finalizer_request=None):
-        finalizer_request = finalizer_request or request
+    def _login(name=None, password=None):
+        url = settings["threescale"]["admin"]["url"]
+        name = name or settings["ui"]["username"]
+        password = password or settings["ui"]["password"]
+        browser.url = url
 
-        def _clear_session():
-            browser.selenium.delete_all_cookies()
-            if old_session:
-                browser.selenium.add_cookie(old_session)
-                browser.refresh()
-
-        old_session = browser.selenium.get_cookie('user_session')
-        browser.selenium.delete_all_cookies()
-        browser.url = settings["threescale"]["admin"]["url"]
-        login = LoginView(browser)
-        login.do_login(name or settings["ui"]["username"], password or settings["ui"]["password"])
-        finalizer_request.addfinalizer(_clear_session)
-        return browser
+        if not sessions.restore(name, password, url):
+            page = navigator.open(LoginView)
+            page.do_login(name, password)
+            cookies = [browser.selenium.get_cookie('user_session')]
+            sessions.save(name, password, url, values=cookies)
 
     return _login
 
 
-@pytest.fixture(scope="module")
-def login(custom_login):
+@pytest.fixture
+def login(custom_admin_login):
     """
-    Default login method called with test on start
-    :param custom_login: Parametrized login method
+    Login to the Admin portal with default admin credentials
+    :param custom_admin_login: Parametrized login method
     :return: Login with default credentials
     """
-    return custom_login()
+    return custom_admin_login()
 
 
 @pytest.fixture(scope="module")
@@ -109,10 +92,11 @@ def navigator(browser):
 
 # pylint: disable=unused-argument, too-many-arguments
 @pytest.fixture(scope="module")
-def custom_ui_backend(login, navigator, threescale, testconfig, request, private_base_url):
+def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, request, private_base_url):
     """Parametrized custom Backend created via UI"""
 
     def _custom_ui_backend(name: str, system_name: str, description: str = "", endpoint: str = "", autoclean=True):
+        custom_admin_login()
         if not endpoint:
             endpoint = private_base_url()
 
@@ -135,10 +119,10 @@ def ui_backend(custom_ui_backend, request):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def custom_ui_product(login, navigator, threescale, testconfig, request):
+def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, request):
     """Parametrized custom Product created via UI"""
-
     def _custom_ui_product(name: str, system_name: str, description: str = "", autoclean=True):
+        custom_admin_login()
         product = navigator.navigate(ProductNewView)
         product.create(name, system_name, description)
         product = threescale.services.read_by_name(system_name)
@@ -158,12 +142,12 @@ def ui_product(custom_ui_product, request):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def custom_ui_account(login, navigator, threescale, request, testconfig):
+def custom_ui_account(custom_admin_login, navigator, threescale, request, testconfig):
     """
     Create a custom account
     """
-
     def _custom_account(name: str, email: str, password: str, org_name: str, autoclean=True):
+        custom_admin_login()
         account = navigator.navigate(AccountNewView)
         account.create(name, email, password, org_name)
         account = threescale.accounts.read_by_name(name)
@@ -182,15 +166,14 @@ def ui_account(custom_ui_account, request):
     return custom_ui_account(name, f"{name}@anything.invalid", name, name)
 
 
-# pylint: disable=unused-argument
 # custom_app_plan dependency is needed to ensure cleanup in correct order
 @pytest.fixture(scope="module")
-def custom_ui_application(custom_app_plan, request, login, navigator, threescale, testconfig):
+def custom_ui_application(custom_app_plan, custom_admin_login, navigator, request, testconfig):
     """
     :return: params for custom application
     """
-
     def _custom_ui_application(name: str, description: str, plan: ApplicationPlan, account: Account, autoclean=True):
+        custom_admin_login()
         app = navigator.navigate(ApplicationNewView, account=account)
         app.create(name, description, plan)
         application = account.applications.read_by_name(name)
