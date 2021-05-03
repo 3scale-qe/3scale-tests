@@ -9,7 +9,7 @@ from typing import List, Dict, Union, Any, Optional, Callable
 import openshift as oc
 from dateutil.tz import UTC
 
-from testsuite.openshift.apimanager import APIManager
+from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.env import Environ
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 
