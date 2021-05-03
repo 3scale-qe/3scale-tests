@@ -166,10 +166,9 @@ def ui_account(custom_ui_account, request):
     return custom_ui_account(name, f"{name}@anything.invalid", name, name)
 
 
-# pylint: disable=unused-argument
 # custom_app_plan dependency is needed to ensure cleanup in correct order
 @pytest.fixture(scope="module")
-def custom_ui_application(custom_app_plan, request, login, navigator, threescale, testconfig):
+def custom_ui_application(custom_app_plan, custom_admin_login, navigator, request, testconfig):
     """
     :return: params for custom application
     """
