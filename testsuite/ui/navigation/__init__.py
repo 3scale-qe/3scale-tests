@@ -77,8 +77,14 @@ class Navigator:
             :return: Instance of the current View
         """
         self.page_chain.clear()
-        self._backtrace(cls)
+        self._backtrace(cls, **kwargs)
         return self._perform_steps(**kwargs)
+
+    def new_page(self, cls, **kwargs):
+        """Creates a new instance of class with necessary arguments."""
+        signature = inspect.signature(cls.__init__)
+        filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
+        return cls(self.browser, **filtered_kwargs)
 
     def open(self, cls: Callable[[ThreeScaleBrowser, Any], ReturnView], **kwargs) -> ReturnView:
         """
@@ -87,21 +93,21 @@ class Navigator:
             :param cls: Class of desired View
             :return: Instance of the opened View
         """
-        page = cls(self.browser, **kwargs)  # type: ignore
-        self.browser.set_path(page.endpoint_path.format(**kwargs))
+        page = self.new_page(cls, **kwargs)
+        self.browser.set_path(page.endpoint_path)
         return page
 
-    def _backtrace(self, page_cls):
+    def _backtrace(self, cls, **kwargs):
         """
         Recursively constructs logical path from root to navigated element. This path is saved in queue `page_chain`
         Args:
             :param page_cls: currently processed View class
         """
-        page = page_cls(self.browser)
+        page = self.new_page(cls, **kwargs)
         self.page_chain.append(page)
-        if page_cls in self.base_views or page.is_displayed:
+        if cls in self.base_views or page.is_displayed:
             return
-        self._backtrace(page.prerequisite())
+        self._backtrace(page.prerequisite(), **kwargs)
 
     # pylint: disable=protected-access
     def _perform_steps(self, **kwargs):
@@ -148,10 +154,10 @@ class Navigator:
             if key_word.startswith('@'):
                 alternative_steps.append(method)
 
-        return self._invoke_alternative_step(alternative_steps, destination, **kwargs)
+        return self._invoke_alternative_step(alternative_steps, destination)
 
     @staticmethod
-    def _invoke_alternative_step(alternative_steps, destination, **kwargs):
+    def _invoke_alternative_step(alternative_steps, destination):
         """
         Alternative steps begins with "@".
         See `step(cls, **kwargs)` for alternatives.
@@ -164,7 +170,7 @@ class Navigator:
         for method in alternative_steps:
             if method._class_name.startswith('@href'):
                 try:
-                    method(destination.endpoint_path, **kwargs)
+                    method(destination.endpoint_path)
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True

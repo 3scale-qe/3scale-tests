@@ -18,7 +18,7 @@ class BaseAdminView(View, Navigable):
     Basic representation of logged in admin portal page.
     All admin portal page should inherits from this class.
     """
-    endpoint_path = ''
+    path_pattern = ''
     explorer_menu = Link("//div[@id='api_selector']//a[@title='Context Selector']/span")
     threescale_menu_logo = GenericLocatorWidget('//*[@id="user_widget"]/a/div')
     support_link = Link("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
@@ -26,6 +26,10 @@ class BaseAdminView(View, Navigable):
     user_logout_link = Link("//a[@href='/p/logout']")
 
     context_menu = ContextMenu()
+
+    def __init__(self, parent, logger=None, **kwargs):
+        super().__init__(parent, logger=logger, **kwargs)
+        self.endpoint_path = self.path_pattern.format_map(kwargs)
 
     def logout(self):
         """Method which logouts current user from admin portal"""
@@ -111,7 +115,7 @@ class SettingsNavView(BaseNavView):
 
 class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on endpoint_path"""
-    endpoint_path = '/p/admin/dashboard'
+    path_pattern = '/p/admin/dashboard'
     products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
     create_product_button_link = Button(locator="//a[@href='/apiconfig/services/new']")
     backend_title = Text(locator='//*[@id="backends-widget"]/article/div[1]/div[1]/h1')
@@ -164,7 +168,7 @@ class NotFoundView(View):
 
 class ProductsView(BaseAdminView):
     """View representation of Product Listing page"""
-    endpoint_path = "/apiconfig/services"
+    path_pattern = "/apiconfig/services"
     create_product_button = Link("//a[@href='/apiconfig/services/new']")
     table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
         "Name": Link("./a")

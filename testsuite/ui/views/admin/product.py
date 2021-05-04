@@ -10,9 +10,11 @@ from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdat
 
 class ProductDetailView(ProductNavView):
     """View representation of Product detail page"""
-    endpoint_path = "/apiconfig/services/{product_id}"
+    path_pattern = "/apiconfig/services/{product_id}"
     edit_button = Link(locator="//*[@id='content']/section/div/a")
-    configuration_outdated = GenericLocatorWidget("//*[contains(@href, '/integration')]")
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductsView
@@ -29,7 +31,7 @@ class ProductDetailView(ProductNavView):
 
 class ProductNewView(BaseAdminView):
     """View representation of New Product page"""
-    endpoint_path = "/apiconfig/services/new"
+    path_pattern = "/apiconfig/services/new"
     name = TextInput(id="service_name")
     system_name = TextInput(id="service_system_name")
     description = TextInput(id="service_description")
@@ -53,11 +55,14 @@ class ProductNewView(BaseAdminView):
 
 class ProductEditView(ProductNavView):
     """View representation of Edit Product page"""
-    endpoint_path = "/apiconfig/services/{product_id}/edit"
+    path_pattern = "/apiconfig/services/{product_id}/edit"
     name = TextInput(id="service_name")
     description = TextInput(id="service_description")
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductDetailView
@@ -83,11 +88,14 @@ class ProductEditView(ProductNavView):
 
 class ProductSettingsView(ProductNavView):
     """View representation of Product's Settings page"""
-    endpoint_path = "/apiconfig/services/{product_id}/settings"
+    path_pattern = "/apiconfig/services/{product_id}/settings"
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
     deployment = DeploymentRadio('//*[@id="service_deployment_option_input"]')
     update_button = ThreescaleUpdateButton()
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductDetailView
@@ -113,11 +121,14 @@ class ProductSettingsView(ProductNavView):
 
 class ProductBackendsView(ProductNavView):
     """View representation of Product's Backends page"""
-    endpoint_path = "/apiconfig/services/{product_id}/backend_usages"
+    path_pattern = "/apiconfig/services/{product_id}/backend_usages"
     add_backend_button = Link("//*[contains(@href,'/backend_usages/new')]")
     backend_table = PatternflyTable("//*[@id='backend_api_configs']", column_widgets={
         "Add Backend": GenericLocatorWidget("./a[contains(@class, 'delete')]")
     })
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductDetailView
@@ -139,10 +150,13 @@ class ProductBackendsView(ProductNavView):
 
 class ProductAddBackendView(ProductNavView):
     """View representation of Product's Backends add page"""
-    endpoint_path = "/apiconfig/services/{product_id}/backend_usages/new"
+    path_pattern = "/apiconfig/services/{product_id}/backend_usages/new"
     backend = ThreescaleDropdown("//*[id='backend_api_config_backend_api_id']")
     path = TextInput(id="backend_api_config_path")
     add_button = ThreescaleCreateButton()
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductBackendsView
@@ -161,7 +175,10 @@ class ProductAddBackendView(ProductNavView):
 
 class ProductConfigurationView(ProductNavView):
     """View representation of Product configuration page"""
-    endpoint_path = "/apiconfig/services/{product_id}/integration"
+    path_pattern = "/apiconfig/services/{product_id}/integration"
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductDetailView
@@ -173,8 +190,11 @@ class ProductConfigurationView(ProductNavView):
 
 class ApplicationPlansView(ProductNavView):
     """View representation of Application plans page"""
-    endpoint_path = "/apiconfig/services/{product_id}/application_plans"
+    path_pattern = "/apiconfig/services/{product_id}/application_plans"
     table = PatternflyTable(".//*[@id='plans']")
+
+    def __init__(self, parent, product):
+        super().__init__(parent, product_id=product.entity_id)
 
     def prerequisite(self):
         return ProductDetailView
@@ -192,8 +212,11 @@ class ApplicationPlansView(ProductNavView):
 
 class ApplicationPlanDetailView(ProductNavView):
     """View representation of Application plan detail page"""
-    endpoint_path = "/apiconfig/application_plans/{application_plan_id}/edit"
+    path_pattern = "/apiconfig/application_plans/{application_plan_id}/edit"
     product_level = PatternflyTable(".//*[@id='metrics']")
+
+    def __init__(self, parent, application_plan):
+        super().__init__(parent, application_plan_id=application_plan.entity_id)
 
     def prerequisite(self):
         return ApplicationPlansView

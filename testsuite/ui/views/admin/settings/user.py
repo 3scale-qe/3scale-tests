@@ -10,7 +10,7 @@ from testsuite.ui.widgets import RadioGroup
 # pylint: disable=invalid-overridden-method
 class UsersView(SettingsNavView):
     """View representation of Users Listing page"""
-    endpoint_path = '/p/admin/account/users'
+    path_pattern = '/p/admin/account/users'
     table = PatternflyTable('//*[@id="users"]')
 
     @step("UserDetailView")
@@ -28,7 +28,10 @@ class UsersView(SettingsNavView):
 
 class UserDetailView(SettingsNavView):
     """View representation of User Detail page"""
-    endpoint_path = '/p/admin/account/users/{user_id}/edit'
+    path_pattern = '/p/admin/account/users/{user_id}/edit'
+
+    def __init__(self, parent, user):
+        super().__init__(parent, user_id=user.entity_id)
 
     username = TextInput(id='#user_username')
     email = TextInput(id='#user_email')
