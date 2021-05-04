@@ -11,6 +11,9 @@ from testsuite.ui.views.admin import WebhooksView, AccountEditView
 from testsuite.ui.views.admin.audience.account_user import AccountUserEditView
 from testsuite.utils import blame
 
+# webhook tests seem disruptive to requestbin as they reset it with no mercy
+pytestmark = [pytest.mark.disruptive]
+
 
 # pylint: disable=too-many-arguments, disable=unused-argument
 @pytest.fixture(scope="module", autouse=True)
