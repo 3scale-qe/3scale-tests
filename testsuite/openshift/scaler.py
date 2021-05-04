@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 if typing.TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
-    from testsuite.openshift.apimanager import APIManager
+    from testsuite.openshift.crd.apimanager import APIManager
 
 
 # pylint: disable=too-few-public-methods
