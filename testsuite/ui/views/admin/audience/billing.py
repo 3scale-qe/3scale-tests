@@ -6,7 +6,7 @@ from testsuite.ui.widgets import AudienceTable
 
 class BillingView(AudienceNavView):
     """View representation of Accounts Listing page"""
-    endpoint_path = '/finance'
+    path_pattern = '/finance'
     table = AudienceTable("//*[@class='data']")
 
     # pylint: disable=invalid-overridden-method
@@ -16,4 +16,4 @@ class BillingView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.table.is_displayed \
-               and self.endpoint_path in self.browser.url
+               and self.path in self.browser.url

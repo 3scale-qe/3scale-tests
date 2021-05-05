@@ -88,13 +88,13 @@ class Navigator:
 
     def open(self, cls: Callable[[ThreeScaleBrowser, Any], ReturnView], **kwargs) -> ReturnView:
         """
-        Directly opens desired View, by inserting its `endpoint_path` in to browser
+        Directly opens desired View, by inserting its `path` in to browser
         Args:
             :param cls: Class of desired View
             :return: Instance of the opened View
         """
         page = self.new_page(cls, **kwargs)
-        self.browser.set_path(page.endpoint_path)
+        self.browser.set_path(page.path)
         return page
 
     def _backtrace(self, cls, **kwargs):
@@ -170,7 +170,7 @@ class Navigator:
         for method in alternative_steps:
             if method._class_name.startswith('@href'):
                 try:
-                    method(destination.endpoint_path)
+                    method(destination.path)
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True

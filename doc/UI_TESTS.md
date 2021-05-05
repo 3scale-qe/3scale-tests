@@ -70,16 +70,16 @@ ROOT = ".//div[contains(@class, ExampleRootElement)]"
 Represents Root element for faster element search
 
 ```python
-endpoint_path = "/example/something"
+path_pattern = "/example/something"
 ```
-Represents endpoint path of View
+Represents path pattern of View which will be converted to path using ids in parameterized paths
 
 ```python
 def is_displayed(self):
         return self.first_example_element and self.seccond_example_element 
-                and self.endpoint_path in self.browser.url
+                and self.path in self.browser.url
 ```
-Method check if elements are present on page and endpoint_path is in current url.
+Method check if elements are present on page and path is in current url.
 
 
 ####Widgets

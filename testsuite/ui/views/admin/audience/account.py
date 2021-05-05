@@ -31,7 +31,7 @@ class AccountsView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.new_account.is_displayed and self.table.is_displayed and \
-               self.endpoint_path in self.browser.url
+               self.path in self.browser.url
 
 
 class AccountsDetailView(AudienceNavView):
@@ -45,6 +45,11 @@ class AccountsDetailView(AudienceNavView):
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
+
+    def change_plan(self, value):
+        """Change account plan"""
+        self.plan_dropdown.select_by_value(value)
+        self.change_plan_button.click(handle_alert=True)
 
     @step("AccountEditView")
     def edit(self):
@@ -67,13 +72,8 @@ class AccountsDetailView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.edit_button.is_displayed and self.applications_button.is_displayed
-
-    def change_plan(self, value):
-        """Change account plan"""
-        self.plan_dropdown.select_by_value(value)
-        self.change_plan_button.click(handle_alert=True)
+        return AudienceNavView.is_displayed and self.path in self.browser.url and \
+               self.edit_button.is_displayed and self.applications_button.is_displayed
 
 
 class AccountNewView(AudienceNavView):
@@ -85,15 +85,6 @@ class AccountNewView(AudienceNavView):
     organization = TextInput(id='account_org_name')
     create_button = ThreescaleCreateButton()
 
-    # pylint: disable=invalid-overridden-method
-    def prerequisite(self):
-        return AccountsView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.email.is_displayed \
-               and self.organization.is_displayed and self.endpoint_path in self.browser.url
-
     def create(self, username: str, email: str, password: str, organization: str):
         """Crate new account"""
         self.username.fill(username)
@@ -101,6 +92,15 @@ class AccountNewView(AudienceNavView):
         self.password.fill(password)
         self.organization.fill(organization)
         self.create_button.click()
+
+    # pylint: disable=invalid-overridden-method
+    def prerequisite(self):
+        return AccountsView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.username.is_displayed and self.email.is_displayed \
+               and self.organization.is_displayed and self.path in self.browser.url
 
 
 class AccountEditView(AudienceNavView):
@@ -113,15 +113,6 @@ class AccountEditView(AudienceNavView):
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
 
-    # pylint: disable=invalid-overridden-method
-    def prerequisite(self):
-        return AccountsDetailView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.org_name.is_displayed \
-               and self.org_name.is_displayed and self.update_button.is_displayed
-
     def update(self, org_name: str):
         """Update account"""
         self.org_name.fill(org_name)
@@ -130,6 +121,15 @@ class AccountEditView(AudienceNavView):
     def delete(self):
         """Delete account"""
         self.delete_button.click()
+
+    # pylint: disable=invalid-overridden-method
+    def prerequisite(self):
+        return AccountsDetailView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.org_name.is_displayed and \
+               self.org_name.is_displayed and self.update_button.is_displayed
 
 
 class AccountApplicationsView(AudienceNavView):
@@ -152,7 +152,7 @@ class AccountApplicationsView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.create_button.is_displayed and \
-               self.endpoint_path in self.browser.url
+               self.path in self.browser.url
 
 
 class UsageRulesView(AudienceNavView):
@@ -161,6 +161,11 @@ class UsageRulesView(AudienceNavView):
     account_plans_checkbox = ThreescaleCheckBox(locator="//input[@id='settings_account_plans_ui_visible']")
     update_button = ThreescaleUpdateButton()
 
+    def account_plans(self):
+        """Allow account plans"""
+        self.account_plans_checkbox.check()
+        self.update_button.click()
+
     # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return AudienceNavView
@@ -168,9 +173,4 @@ class UsageRulesView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.account_plans_checkbox.is_displayed and \
-               self.endpoint_path in self.browser.url
-
-    def account_plans(self):
-        """Allow account plans"""
-        self.account_plans_checkbox.check()
-        self.update_button.click()
+               self.path in self.browser.url

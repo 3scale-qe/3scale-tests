@@ -28,7 +28,7 @@ class AccountUserView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url and self.table.is_displayed
+        return AudienceNavView.is_displayed and self.path in self.browser.url and self.table.is_displayed
 
 
 class AccountUserEditView(AudienceNavView):
@@ -41,15 +41,6 @@ class AccountUserEditView(AudienceNavView):
     def __init__(self, parent, account, user):
         super().__init__(parent, account_id=account.entity_id, user_id=user.entity_id)
 
-    # pylint: disable=invalid-overridden-method
-    def prerequisite(self):
-        return AccountUserView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.username.is_displayed and self.email.is_displayed
-
     def update(self, username: str = "", email: str = ""):
         """Update account user"""
         if username:
@@ -57,3 +48,12 @@ class AccountUserEditView(AudienceNavView):
         if email:
             self.email.fill(email)
         self.update_button.click()
+
+    # pylint: disable=invalid-overridden-method
+    def prerequisite(self):
+        return AccountUserView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.path in self.browser.url \
+               and self.username.is_displayed and self.email.is_displayed

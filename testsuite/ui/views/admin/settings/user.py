@@ -23,16 +23,12 @@ class UsersView(SettingsNavView):
 
     @property
     def is_displayed(self):
-        return self.table.is_displayed
+        return self.table.is_displayed and self.path in self.browser.url
 
 
 class UserDetailView(SettingsNavView):
     """View representation of User Detail page"""
     path_pattern = '/p/admin/account/users/{user_id}/edit'
-
-    def __init__(self, parent, user):
-        super().__init__(parent, user_id=user.entity_id)
-
     username = TextInput(id='#user_username')
     email = TextInput(id='#user_email')
     password = TextInput(id='#user_password')
@@ -42,6 +38,9 @@ class UserDetailView(SettingsNavView):
                              fieldset_id='FeatureAccessList')
     access_list = RadioGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
                              fieldset_id='ServiceAccessList')
+
+    def __init__(self, parent, user):
+        super().__init__(parent, user_id=user.entity_id)
 
     def role_admin(self):
         """Set admin role for the User"""
@@ -58,11 +57,12 @@ class UserDetailView(SettingsNavView):
         """
         self.permissions.select(permissions)
 
-    # pylint: disable=missing-function-docstring
     def clear_permissions(self):
+        """Remove all permissions for user"""
         self.permissions.clear_all()
 
-    def cleat_access_list(self):
+    def clear_access_list(self):
+        """Clear permissions for all services"""
         self.access_list.clear_all()
 
     def prerequisite(self):
@@ -70,4 +70,5 @@ class UserDetailView(SettingsNavView):
 
     @property
     def is_displayed(self):
-        return self.username.is_displayed and self.email.is_displayed and self.role.is_displayed
+        return self.username.is_displayed and self.email.is_displayed and self.role.is_displayed \
+               and self.path in self.browser.url

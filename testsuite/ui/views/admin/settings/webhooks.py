@@ -13,7 +13,6 @@ class WebhooksView(SettingsNavView):
     View representation of Webhook page
     """
     path_pattern = '/p/admin/webhooks/edit'
-
     webhook_active = GenericLocatorWidget('//*[@id="web_hook_active"]')
     webhook_provider = GenericLocatorWidget('//*[@id="web_hook_provider_actions"]')
     accounts = CheckBoxGroup('//*[@name="Accounts"]')
@@ -30,14 +29,6 @@ class WebhooksView(SettingsNavView):
                                "web_hook_application_key_updated_on"]}
     url = TextInput(id='web_hook_url')
     update = GenericLocatorWidget(locator="//input[contains(@type, 'submit')]")
-
-    def prerequisite(self):
-        return SettingsNavView
-
-    @property
-    def is_displayed(self):
-        return self.webhook_active.is_displayed and self.webhook_provider.is_displayed and \
-               self.endpoint_path in self.browser.url
 
     def webhook_check(self, webhook_type: str, requestbin: str):
         """Configure given webhooks"""
@@ -58,3 +49,11 @@ class WebhooksView(SettingsNavView):
             self.keys.select(self.checkbox_names[webhook_type])
 
         self.update.click()
+
+    def prerequisite(self):
+        return SettingsNavView
+
+    @property
+    def is_displayed(self):
+        return self.webhook_active.is_displayed and self.webhook_provider.is_displayed and \
+               self.path in self.browser.url

@@ -90,7 +90,7 @@ class NavigationMenu(Navigation):
     which brought great code simplification for this component.
 
     As part of NavViews it handles steps to particular views. When `select_href` method is called with `href`
-    argument (this argument is usually taken from destination View in a form of `endpoint_path` variable),
+    argument (this argument is usually taken from destination View in a form of `path` variable),
     it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
     """
     LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'

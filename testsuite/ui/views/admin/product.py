@@ -21,7 +21,7 @@ class ProductDetailView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url and self.edit_button.is_displayed
+        return ProductNavView.is_displayed and self.path in self.browser.url and self.edit_button.is_displayed
 
     @step("ProductEditView")
     def edit(self):
@@ -42,7 +42,7 @@ class ProductNewView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.name.is_displayed and self.system_name.is_displayed
 
     def create(self, name: str, system: str, desc: str):
@@ -69,7 +69,7 @@ class ProductEditView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.name.is_displayed and self.description.is_displayed
 
     def update(self, name: str = "", desc: str = ""):
@@ -102,7 +102,7 @@ class ProductSettingsView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.deployment.is_displayed
 
     def update_gateway(self, staging="", production=""):
@@ -135,7 +135,7 @@ class ProductBackendsView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.backend_table.is_displayed
 
     @step("ProductAddBackendView")
@@ -152,7 +152,7 @@ class ProductAddBackendView(ProductNavView):
     """View representation of Product's Backends add page"""
     path_pattern = "/apiconfig/services/{product_id}/backend_usages/new"
     backend = ThreescaleDropdown("//*[id='backend_api_config_backend_api_id']")
-    path = TextInput(id="backend_api_config_path")
+    backend_path = TextInput(id="backend_api_config_path")
     add_button = ThreescaleCreateButton()
 
     def __init__(self, parent, product):
@@ -163,13 +163,13 @@ class ProductAddBackendView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.backend.is_displayed and self.path.is_displayed
 
-    def add_backend(self, backend, path):
+    def add_backend(self, backend, backend_path):
         """Add backend"""
         self.backend.select_by_value(backend.entity_id)
-        self.path.fill(path)
+        self.backend_path.fill(backend_path)
         self.add_button.click()
 
 
@@ -185,7 +185,7 @@ class ProductConfigurationView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url
+        return ProductNavView.is_displayed and self.path in self.browser.url
 
 
 class ApplicationPlansView(ProductNavView):
@@ -196,18 +196,18 @@ class ApplicationPlansView(ProductNavView):
     def __init__(self, parent, product):
         super().__init__(parent, product_id=product.entity_id)
 
+    @step("ApplicationPlanDetailView")
+    def detail(self, application_plan):
+        """Detail of Application plan"""
+        next(row for row in self.table.rows() if row[0].text == application_plan["name"]).name.click()
+
     def prerequisite(self):
         return ProductDetailView
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url \
+        return ProductNavView.is_displayed and self.path in self.browser.url \
                and self.table.is_displayed
-
-    @step("ApplicationPlanDetailView")
-    def detail(self, application_plan):
-        """Detail of Application plan"""
-        next(row for row in self.table.rows() if row[0].text == application_plan["name"]).name.click()
 
 
 class ApplicationPlanDetailView(ProductNavView):
@@ -223,4 +223,4 @@ class ApplicationPlanDetailView(ProductNavView):
 
     @property
     def is_displayed(self):
-        return ProductNavView.is_displayed and self.endpoint_path in self.browser.url
+        return ProductNavView.is_displayed and self.path in self.browser.url

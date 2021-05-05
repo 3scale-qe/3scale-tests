@@ -31,7 +31,7 @@ class WizardIntroView(WizardCommonView, Navigable):
     """
     Representation of Wizard introduction view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/intro'
+    path = '/p/admin/onboarding/wizard/intro'
 
     next_button = Button(locator="//a[@href='/p/admin/onboarding/wizard/explain']")
     page_title = Text("//main/h1")
@@ -43,7 +43,7 @@ class WizardIntroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and self.next_button.is_displayed \
+        return self.path in self.browser.url and self.next_button.is_displayed \
                and WizardCommonView.is_displayed
 
 
@@ -51,7 +51,7 @@ class WizardExplainView(WizardCommonView, Navigable):
     """
     Representation of Wizard explain view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/explain'
+    path = '/p/admin/onboarding/wizard/explain'
 
     tenant_url = Text('.code-example__base')
     next_button = Button(locator="//a[@href='/p/admin/onboarding/wizard/backend_api/new']")
@@ -68,18 +68,22 @@ class WizardExplainView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and WizardCommonView.is_displayed
+        return self.path in self.browser.url and WizardCommonView.is_displayed
 
 
 class WizardBackendApiView(WizardCommonView, Navigable):
     """
     Representation of Wizard Add Backend API view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/backend_api/new'
+    path = '/p/admin/onboarding/wizard/backend_api/new'
     backend_name_field = TextInput(id='backend_api_name')
     base_url_field = TextInput(id='backend_api_private_endpoint')
     add_backend_btn = ThreescaleSubmitButton()
     use_echo_api_link = Link("//a[@href='#']")
+
+    def set_echo_api(self):
+        """Set base_url to predefined value"""
+        self.use_echo_api_link.click()
 
     @step('WizardProductView')
     def add_backend(self, backend_name: str, base_url: str):
@@ -87,10 +91,6 @@ class WizardBackendApiView(WizardCommonView, Navigable):
         self.backend_name_field.fill(backend_name)
         self.base_url_field.fill(base_url)
         self.add_backend_btn.click()
-
-    def set_echo_api(self):
-        """Set base_url to predefined value"""
-        self.use_echo_api_link.click()
 
     # pylint: disable=no-self-use
     def prerequisite(self):
@@ -100,14 +100,14 @@ class WizardBackendApiView(WizardCommonView, Navigable):
     @property
     def is_displayed(self):
         return self.backend_name_field.is_displayed and WizardCommonView.is_displayed and \
-               self.endpoint_path in self.browser.url and self.base_url_field.is_displayed
+               self.path in self.browser.url and self.base_url_field.is_displayed
 
 
 class WizardEditApiView(WizardCommonView, Navigable):
     """
     Representation of Wizard Edit Backend API view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/api/edit'
+    path = '/p/admin/onboarding/wizard/api/edit'
     base_url_field = TextInput(id='api_backend')
     product_name_field = TextInput(id='api_name')
     page_title = Text("//main/h1")
@@ -115,7 +115,7 @@ class WizardEditApiView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and WizardCommonView.is_displayed and\
+        return self.path in self.browser.url and WizardCommonView.is_displayed and\
                self.product_name_field.is_displayed and self.base_url_field.is_displayed
 
 
@@ -123,7 +123,7 @@ class WizardProductView(WizardCommonView, Navigable):
     """
     Representation of Wizard New Product view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/product/new'
+    path = '/p/admin/onboarding/wizard/product/new'
     product_name_field = TextInput(id='service_name')
     add_product_btn = ThreescaleSubmitButton()
 
@@ -141,14 +141,14 @@ class WizardProductView(WizardCommonView, Navigable):
     @property
     def is_displayed(self):
         return self.product_name_field.is_displayed and WizardCommonView.is_displayed and \
-               self.endpoint_path in self.browser.url and self.add_product_btn.is_displayed
+               self.path in self.browser.url and self.add_product_btn.is_displayed
 
 
 class WizardConnectView(WizardCommonView, Navigable):
     """
     Representation of Wizard Connect view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/connect/new'
+    path = '/p/admin/onboarding/wizard/connect/new'
     path_field = TextInput(id='backend_api_config_path')
     connect_btn = ThreescaleSubmitButton()
 
@@ -166,14 +166,14 @@ class WizardConnectView(WizardCommonView, Navigable):
     @property
     def is_displayed(self):
         return self.path_field.is_displayed and WizardCommonView.is_displayed and \
-               self.endpoint_path in self.browser.url and self.connect_btn.is_displayed
+               self.path in self.browser.url and self.connect_btn.is_displayed
 
 
 class WizardRequestView(WizardCommonView, Navigable):
     """
     Representation of Wizard Request view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/request/new'
+    path = '/p/admin/onboarding/wizard/request/new'
     method_field = TextInput(id='request_path')
     send_request_btn = ThreescaleSubmitButton()
     request_example_path = Text(locator='//*[@id="edit_request_2"]/ol/li[1]/code/span[2]')
@@ -194,23 +194,18 @@ class WizardRequestView(WizardCommonView, Navigable):
     @property
     def is_displayed(self):
         return self.method_field.is_displayed and WizardCommonView.is_displayed and \
-               self.endpoint_path in self.browser.url and self.edit_api_btn.is_displayed
+               self.path in self.browser.url and self.edit_api_btn.is_displayed
 
 
 class WizardResponseView(WizardCommonView, Navigable):
     """
     Representation of Wizard Request view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/request'
+    path = '/p/admin/onboarding/wizard/request'
     page_title = Text("//main/h1")
     what_next_btn = Button(locator="//a[@href='/p/admin/onboarding/wizard/outro']")
     base_url = TextInput(id='request_api_base_url')
     try_again_btn = Link('//*[@id="edit_request_2"]/fieldset/ol/input')
-
-    # pylint: disable=no-self-use
-    def prerequisite(self):
-        """Page prerequisite used by navigator"""
-        return WizardRequestView
 
     def try_again(self, url):
         """Fill backend api url with 'url' and click to navigate to next page"""
@@ -222,9 +217,14 @@ class WizardResponseView(WizardCommonView, Navigable):
         """Proceed to next page"""
         self.what_next_btn.click()
 
+    # pylint: disable=no-self-use
+    def prerequisite(self):
+        """Page prerequisite used by navigator"""
+        return WizardRequestView
+
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and self.what_next_btn.is_displayed \
+        return self.path in self.browser.url and self.what_next_btn.is_displayed \
                and WizardCommonView.is_displayed
 
 
@@ -232,7 +232,7 @@ class WizardOutroView(WizardCommonView, Navigable):
     """
     Representation of Wizard outro view page object.
     """
-    endpoint_path = '/p/admin/onboarding/wizard/outro'
+    path = '/p/admin/onboarding/wizard/outro'
 
     continue_button = Link("/html/body/main/a")
     page_title = Text("//main/h1")
@@ -248,5 +248,5 @@ class WizardOutroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and self.continue_button.is_displayed \
+        return self.path in self.browser.url and self.continue_button.is_displayed \
                and WizardCommonView.is_displayed

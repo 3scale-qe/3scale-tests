@@ -29,7 +29,7 @@ class BaseAdminView(View, Navigable):
 
     def __init__(self, parent, logger=None, **kwargs):
         super().__init__(parent, logger=logger, **kwargs)
-        self.endpoint_path = self.path_pattern.format_map(kwargs)
+        self.path = self.path_pattern.format_map(kwargs)
 
     def logout(self):
         """Method which logouts current user from admin portal"""
@@ -78,6 +78,9 @@ class BaseNavView(BaseAdminView):
         """Perform step to specific item in Navigation with use of href locator"""
         self.nav.select_href(href, **kwargs)
 
+    def prerequisite(self):
+        return BaseAdminView
+
     @property
     def is_displayed(self):
         if not self.nav.is_displayed:
@@ -85,9 +88,6 @@ class BaseNavView(BaseAdminView):
 
         present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
         return BaseAdminView.is_displayed and len(present_nav_items) > 3
-
-    def prerequisite(self):
-        return BaseAdminView
 
 
 class AudienceNavView(BaseNavView):
@@ -114,7 +114,7 @@ class SettingsNavView(BaseNavView):
 
 
 class DashboardView(BaseAdminView):
-    """Dashboard view page object that can be found on endpoint_path"""
+    """Dashboard view page object that can be found on path"""
     path_pattern = '/p/admin/dashboard'
     products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
     create_product_button_link = Button(locator="//a[@href='/apiconfig/services/new']")
@@ -128,16 +128,16 @@ class DashboardView(BaseAdminView):
     explore_all_products = Link('//a[@href="/apiconfig/services"]')
     explore_all_backends = Link('//a[@href="/p/admin/backend_apis"]')
 
+    def prerequisite(self):
+        return BaseAdminView
+
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and self.message_link.is_displayed \
-               and self.products_title.is_displayed and self.create_product_button_link.is_displayed \
+        return self.path in self.browser.url and self.message_link.is_displayed and \
+               self.products_title.is_displayed and self.create_product_button_link.is_displayed \
                and self.backend_title.is_displayed and self.create_backend_button_link.is_displayed \
                and self.account_link.is_displayed and self.application_link.is_displayed \
                and self.billing_link.is_displayed and self.develop_portal_link.is_displayed
-
-    def prerequisite(self):
-        return BaseAdminView
 
 
 class AccessDeniedView(View):
@@ -174,13 +174,6 @@ class ProductsView(BaseAdminView):
         "Name": Link("./a")
     })
 
-    def prerequisite(self):
-        return BaseAdminView
-
-    @property
-    def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url and self.table.is_displayed
-
     @step("ProductDetailView")
     def detail(self, product):
         """Detail of Product"""
@@ -190,3 +183,10 @@ class ProductsView(BaseAdminView):
     def create_product(self):
         """Create new Product"""
         self.create_product_button.click()
+
+    def prerequisite(self):
+        return BaseAdminView
+
+    @property
+    def is_displayed(self):
+        return BaseAdminView.is_displayed and self.path in self.browser.url and self.table.is_displayed
