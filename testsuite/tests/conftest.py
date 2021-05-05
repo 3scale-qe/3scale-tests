@@ -343,7 +343,7 @@ def provider_account(custom_provider_account, request, testconfig):
 
 
 @pytest.fixture(scope="module")
-def custom_provider_account(request, testconfig):
+def custom_provider_account(request, testconfig, threescale):
     """Parametrized custom Provider account user
     Args:
         :param params: dict for remote call, rawobj.AccountUser should be used
