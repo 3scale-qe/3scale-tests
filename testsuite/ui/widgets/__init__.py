@@ -94,21 +94,23 @@ class NavigationMenu(Navigation):
     it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
     """
     LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'
-    ITEMS = ".//ul/li[.//*[self::a or self::button]]"
+    # Product and backend navigation menu differs from others,
+    # hence we need different ITEMS parameter than default one is.
+    ITEMS = "./ul/li|./section/ul/li"
     SUB_ITEMS = './section/ul/li[contains(@class, "pf-c-nav__item")]'
     HREF_LOCATOR = SUB_ITEMS + '/a[contains(@href, "{}")]'
 
     @check_nav_loaded
-    def select_href(self, href, **kwargs):
+    def select_href(self, href):
         """
         Selects item from Navigation with specific href locator
         TODO: Add an exception like in Navigation select method
         """
         for element in self.browser.elements(self.ITEMS):
-            updated_kwargs = {}
-            for key, value in kwargs.items():
-                updated_kwargs.update({f"{key}_id": str(value.entity_id)})
-            href = href.format_map(updated_kwargs)
+            element_href = element.find_element_by_tag_name("a").get_attribute("href")
+            if element_href.endswith(href):
+                self.browser.click(element)
+                return
             item = self.browser.elements(self.HREF_LOCATOR.format(href), parent=element)
             if item:
                 if "pf-m-expanded" not in element.get_attribute("class").split():
