@@ -6,7 +6,6 @@ import pytest
 
 from testsuite.ui.navigation import Navigator
 from testsuite.utils import blame
-from testsuite.config import settings
 from testsuite.ui.views.admin.wizard import WizardIntroView, \
     WizardBackendApiView, WizardRequestView, WizardEditApiView, \
     WizardResponseView, WizardOutroView
@@ -27,7 +26,8 @@ def navigator(browser):
 
 
 # pylint:disable=unused-argument
-def test_wizard_correct_request(navigator, login, request):
+@pytest.mark.disruptive
+def test_wizard_correct_request(navigator, login, request, private_base_url):
     """
         Test:
         - Fill wizard with correct data
@@ -36,7 +36,7 @@ def test_wizard_correct_request(navigator, login, request):
         - Assert that response page is displayed with successful request
         - Assert that wizard outer page is displayed
     """
-    backend_url = settings["threescale"]["service"]["backends"]["echo_api"]
+    backend_url = private_base_url("echo-api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"
@@ -59,7 +59,8 @@ def test_wizard_correct_request(navigator, login, request):
 
 
 # pylint:disable=unused-argument
-def test_wizard_bad_request(navigator, login, request):
+@pytest.mark.disruptive
+def test_wizard_bad_request(navigator, login, request, private_base_url):
     """
         Test:
         - Fill wizard with wrong data
@@ -69,7 +70,7 @@ def test_wizard_bad_request(navigator, login, request):
         - Assert that response page is displayed with successful request
     """
     wrong_backend_url = "https://wrong_url.api"
-    correct_backend_url = settings["threescale"]["service"]["backends"]["echo_api"]
+    correct_backend_url = private_base_url("echo-api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"
@@ -99,7 +100,8 @@ def test_wizard_set_default_backend_url(navigator, login, browser):
 
 
 # pylint:disable=unused-argument
-def test_wizard_link_to_product(navigator, login, request, browser):
+@pytest.mark.disruptive
+def test_wizard_link_to_product(navigator, login, request, browser, private_base_url):
     """
         Test:
         - Fill wizard with correct data
@@ -108,7 +110,7 @@ def test_wizard_link_to_product(navigator, login, request, browser):
         - Navigate to next page
         - Assert that request page is displayed
     """
-    backend_url = settings["threescale"]["service"]["backends"]["echo_api"]
+    backend_url = private_base_url("echo-api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"

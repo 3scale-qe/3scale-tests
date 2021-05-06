@@ -43,8 +43,7 @@ class WizardIntroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.next_button.is_displayed \
-               and WizardCommonView.is_displayed
+        return self.logo.is_displayed and self.path in self.browser.url and self.next_button.is_displayed
 
 
 class WizardExplainView(WizardCommonView, Navigable):
@@ -68,7 +67,8 @@ class WizardExplainView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and WizardCommonView.is_displayed
+        return self.path in self.browser.url and self.logo.is_displayed and \
+               self.next_button.is_displayed and self.tenant_url.is_displayed
 
 
 class WizardBackendApiView(WizardCommonView, Navigable):
@@ -99,7 +99,7 @@ class WizardBackendApiView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.backend_name_field.is_displayed and WizardCommonView.is_displayed and \
+        return self.logo.is_displayed and self.backend_name_field.is_displayed and \
                self.path in self.browser.url and self.base_url_field.is_displayed
 
 
@@ -115,8 +115,8 @@ class WizardEditApiView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and WizardCommonView.is_displayed and\
-               self.product_name_field.is_displayed and self.base_url_field.is_displayed
+        return self.logo.is_displayed and self.path in self.browser.url \
+               and self.product_name_field.is_displayed and self.base_url_field.is_displayed
 
 
 class WizardProductView(WizardCommonView, Navigable):
@@ -140,7 +140,7 @@ class WizardProductView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.product_name_field.is_displayed and WizardCommonView.is_displayed and \
+        return self.logo.is_displayed and self.product_name_field.is_displayed and \
                self.path in self.browser.url and self.add_product_btn.is_displayed
 
 
@@ -165,7 +165,7 @@ class WizardConnectView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path_field.is_displayed and WizardCommonView.is_displayed and \
+        return self.close_wizard_link.is_displayed and self.path_field.is_displayed and \
                self.path in self.browser.url and self.connect_btn.is_displayed
 
 
@@ -176,9 +176,12 @@ class WizardRequestView(WizardCommonView, Navigable):
     path = '/p/admin/onboarding/wizard/request/new'
     method_field = TextInput(id='request_path')
     send_request_btn = ThreescaleSubmitButton()
-    request_example_path = Text(locator='//*[@id="edit_request_2"]/ol/li[1]/code/span[2]')
-    backend_url_example = Text(locator='//*[@id="edit_request_2"]/ol/li[2]/code/span[1]')
-    feedback_example_path = Text(locator='//*[@id="edit_request_2"]/ol/li[2]/code/span[2]')
+    request_example_path = \
+        Text(locator='//*[contains(@class,"request")]/ol/li[1]/code/span[contains(@class, "code-example__path")]')
+    backend_url_example = \
+        Text(locator='//*[contains(@class,"request")]/ol/li[2]/code/span[contains(@class, "code-example__base")]')
+    feedback_example_path = \
+        Text(locator='//*[contains(@class,"request")]/ol/li[2]/code/span[contains(@class, "code-example__path")]')
     edit_api_btn = Button(locator="//a[@href='/p/admin/onboarding/wizard/api/edit']")
 
     @step('WizardResponseView')
@@ -193,7 +196,7 @@ class WizardRequestView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.method_field.is_displayed and WizardCommonView.is_displayed and \
+        return self.logo.is_displayed and self.method_field.is_displayed and \
                self.path in self.browser.url and self.edit_api_btn.is_displayed
 
 
@@ -205,7 +208,7 @@ class WizardResponseView(WizardCommonView, Navigable):
     page_title = Text("//main/h1")
     what_next_btn = Button(locator="//a[@href='/p/admin/onboarding/wizard/outro']")
     base_url = TextInput(id='request_api_base_url')
-    try_again_btn = Link('//*[@id="edit_request_2"]/fieldset/ol/input')
+    try_again_btn = Link('//*[contains(@class,"request")]/fieldset/ol/input')
 
     def try_again(self, url):
         """Fill backend api url with 'url' and click to navigate to next page"""
@@ -224,8 +227,7 @@ class WizardResponseView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.what_next_btn.is_displayed \
-               and WizardCommonView.is_displayed
+        return self.logo.is_displayed and self.path in self.browser.url and self.what_next_btn.is_displayed
 
 
 class WizardOutroView(WizardCommonView, Navigable):
@@ -248,5 +250,4 @@ class WizardOutroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.continue_button.is_displayed \
-               and WizardCommonView.is_displayed
+        return self.logo.is_displayed and self.path in self.browser.url and self.continue_button.is_displayed
