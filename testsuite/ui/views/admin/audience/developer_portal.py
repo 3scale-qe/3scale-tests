@@ -6,7 +6,7 @@ from testsuite.ui.widgets import Link
 
 class DeveloperPortalView(AudienceNavView):
     """View representation of Accounts Listing page"""
-    endpoint_path = '/p/admin/cms'
+    path_pattern = '/p/admin/cms'
     root_in_table = Link(locator='//*[@id="cms-sidebar-content"]/ul/li[1]/a')  # TODO
 
     # pylint: disable=invalid-overridden-method
@@ -16,4 +16,4 @@ class DeveloperPortalView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.root_in_table.is_displayed \
-               and self.endpoint_path in self.browser.url
+               and self.path in self.browser.url

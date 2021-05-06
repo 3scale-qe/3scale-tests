@@ -27,7 +27,7 @@ class ApplicationsView(AudienceNavView):
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.table.is_displayed and self.endpoint_path in self.browser.url
+        return AudienceNavView.is_displayed and self.table.is_displayed and self.path in self.browser.url
 
 
 class ApplicationDetailView(AudienceNavView):
@@ -45,20 +45,6 @@ class ApplicationDetailView(AudienceNavView):
 
     def __init__(self, parent, product, application):
         super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
-
-    # pylint: disable=invalid-overridden-method
-    def prerequisite(self):
-        return ApplicationsView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.edit_button.is_displayed and self.suspend_button.is_displayed
-
-    @step("ApplicationEditView")
-    def edit(self):
-        """Edit application plan"""
-        self.edit_button.click()
 
     def suspend(self):
         """Suspend application plan"""
@@ -81,6 +67,20 @@ class ApplicationDetailView(AudienceNavView):
         self.plan_dropdown.select_by_value(value)
         self.change_plan_button.click(handle_alert=True)
 
+    @step("ApplicationEditView")
+    def edit(self):
+        """Edit application plan"""
+        self.edit_button.click()
+
+    # pylint: disable=invalid-overridden-method
+    def prerequisite(self):
+        return ApplicationsView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.path in self.browser.url \
+               and self.edit_button.is_displayed and self.suspend_button.is_displayed
+
 
 class ApplicationNewView(AudienceNavView):
     """View representation of New Application page"""
@@ -92,14 +92,6 @@ class ApplicationNewView(AudienceNavView):
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
-
-    def prerequisite(self):
-        return AccountApplicationsView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
-               and self.endpoint_path in self.browser.url
 
     def create(self, username: str, description: str, plan):
         """Create Application"""
@@ -114,6 +106,14 @@ class ApplicationNewView(AudienceNavView):
         self.description.fill(description)
         self.create_button.click()
 
+    def prerequisite(self):
+        return AccountApplicationsView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
+               and self.path in self.browser.url
+
 
 class ApplicationEditView(AudienceNavView):
     """View representation of Edit Application page"""
@@ -126,14 +126,6 @@ class ApplicationEditView(AudienceNavView):
     def __init__(self, parent, product, application):
         super().__init__(parent, product_id=product.entity_id, application_id=application.entity_id)
 
-    def prerequisite(self):
-        return ApplicationDetailView
-
-    @property
-    def is_displayed(self):
-        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
-               and self.endpoint_path in self.browser.url
-
     def update(self, username: str = "", description: str = ""):
         """Update Application"""
         if username:
@@ -145,3 +137,11 @@ class ApplicationEditView(AudienceNavView):
     def delete(self):
         """Delete Application"""
         self.delete_button.click()
+
+    def prerequisite(self):
+        return ApplicationDetailView
+
+    @property
+    def is_displayed(self):
+        return AudienceNavView.is_displayed and self.username.is_displayed and self.description.is_displayed \
+               and self.path in self.browser.url

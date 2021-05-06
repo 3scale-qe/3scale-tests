@@ -13,6 +13,10 @@ class AccountPlansView(AudienceNavView):
     new_plan = Link("//a[@href='/admin/buyers/account_plans/new']")
     table = PatternflyTable("//*[@id='plans']")
 
+    def publish(self, plan_id):
+        """Publish account plan"""
+        self.table.row(_row__attr=('id', f'account_plan_{plan_id}'))[3].click()
+
     @step("NewAccountPlanView")
     def new(self):
         """Create new account plan"""
@@ -25,11 +29,7 @@ class AccountPlansView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.new_plan.is_displayed and self.table.is_displayed and \
-               self.endpoint_path in self.browser.url
-
-    def publish(self, plan_id):
-        """Publish account plan"""
-        self.table.row(_row__attr=('id', f'account_plan_{plan_id}'))[3].click()
+               self.path in self.browser.url
 
 
 class NewAccountPlanView(AudienceNavView):
@@ -67,4 +67,4 @@ class NewAccountPlanView(AudienceNavView):
     @property
     def is_displayed(self):
         return AudienceNavView.is_displayed and self.name.is_displayed and self.approval.is_displayed and \
-               self.endpoint_path in self.browser.url
+               self.path in self.browser.url

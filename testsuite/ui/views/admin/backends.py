@@ -22,12 +22,6 @@ class BackendsView(BaseAdminView):
     def prerequisite(self):
         return BaseAdminView
 
-    # pylint: disable=invalid-overridden-method
-    @property
-    def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.create_backend_button.is_displayed and self.table.is_displayed
-
     @step("BackendDetailView")
     def detail(self, backend):
         """Detail of Backend"""
@@ -37,6 +31,11 @@ class BackendsView(BaseAdminView):
     def create_backend(self):
         """Create new Backend"""
         self.create_backend_button.click()
+
+    @property
+    def is_displayed(self):
+        return BaseAdminView.is_displayed and self.path in self.browser.url and \
+               self.create_backend_button.is_displayed and self.table.is_displayed
 
 
 class BackendNewView(BaseAdminView):
@@ -52,12 +51,6 @@ class BackendNewView(BaseAdminView):
     def prerequisite(self):
         return BackendsView
 
-    # pylint: disable=invalid-overridden-method
-    @property
-    def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.name.is_displayed and self.system_name.is_displayed
-
     def create(self, name: str, system_name: str, desc: str, endpoint: str):
         """Create new  Backend"""
         self.name.fill(name)
@@ -65,6 +58,11 @@ class BackendNewView(BaseAdminView):
         self.description.fill(desc)
         self.endpoint.fill(endpoint)
         self.create_button.click()
+
+    @property
+    def is_displayed(self):
+        return BaseAdminView.is_displayed and self.path in self.browser.url and self.name.is_displayed \
+               and self.system_name.is_displayed
 
 
 class BackendDetailView(BackendNavView):
@@ -78,14 +76,14 @@ class BackendDetailView(BackendNavView):
     def prerequisite(self):
         return BackendsView
 
-    @property
-    def is_displayed(self):
-        return BackendNavView.is_displayed and self.endpoint_path in self.browser.url and self.edit_button.is_displayed
-
     @step("BackendEditView")
     def edit(self):
         """Edit Backend"""
         self.edit_button.click()
+
+    @property
+    def is_displayed(self):
+        return BackendNavView.is_displayed and self.path in self.browser.url and self.edit_button.is_displayed
 
 
 class BackendEditView(BackendNavView):
@@ -101,14 +99,6 @@ class BackendEditView(BackendNavView):
     def __init__(self, parent, backend):
         super().__init__(parent, backend_id=backend.entity_id)
 
-    def prerequisite(self):
-        return BackendDetailView
-
-    @property
-    def is_displayed(self):
-        return BackendNavView.is_displayed and self.endpoint_path in self.browser.url \
-               and self.name and self.system_name.is_displayed
-
     def update(self, name: str = "", desc: str = "", endpoint: str = ""):
         """Update Backend"""
         if name:
@@ -123,3 +113,11 @@ class BackendEditView(BackendNavView):
     def delete(self):
         """Delete Backend"""
         self.delete_button.click()
+
+    def prerequisite(self):
+        return BackendDetailView
+
+    @property
+    def is_displayed(self):
+        return BackendNavView.is_displayed and self.path in self.browser.url and \
+               self.name.is_displayed and self.system_name.is_displayed
