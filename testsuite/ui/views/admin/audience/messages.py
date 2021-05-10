@@ -13,4 +13,4 @@ class MessagesView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return self.table.is_displayed and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url

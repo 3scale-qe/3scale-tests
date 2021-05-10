@@ -55,7 +55,6 @@ def test_edit_product(login, navigator, service, threescale):
         - Assert that description is correct
     """
     edit = navigator.navigate(ProductEditView, product=service)
-
     edit.update("updated_name", "updated_description")
     product = threescale.services.read_by_name(service.entity_name)
 

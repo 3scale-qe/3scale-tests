@@ -43,7 +43,8 @@ class WizardIntroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.path in self.browser.url and self.next_button.is_displayed
+        return WizardCommonView.is_displayed.fget(self) and self.path in self.browser.url \
+               and self.next_button.is_displayed
 
 
 class WizardExplainView(WizardCommonView, Navigable):
@@ -67,7 +68,7 @@ class WizardExplainView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.logo.is_displayed and \
+        return WizardCommonView.is_displayed.fget(self) and self.path in self.browser.url and \
                self.next_button.is_displayed and self.tenant_url.is_displayed
 
 
@@ -99,7 +100,7 @@ class WizardBackendApiView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.backend_name_field.is_displayed and \
+        return WizardCommonView.is_displayed.fget(self) and self.backend_name_field.is_displayed and \
                self.path in self.browser.url and self.base_url_field.is_displayed
 
 
@@ -115,7 +116,7 @@ class WizardEditApiView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.path in self.browser.url \
+        return WizardCommonView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.product_name_field.is_displayed and self.base_url_field.is_displayed
 
 
@@ -140,7 +141,7 @@ class WizardProductView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.product_name_field.is_displayed and \
+        return WizardCommonView.is_displayed.fget(self) and self.product_name_field.is_displayed and \
                self.path in self.browser.url and self.add_product_btn.is_displayed
 
 
@@ -165,7 +166,7 @@ class WizardConnectView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.close_wizard_link.is_displayed and self.path_field.is_displayed and \
+        return WizardCommonView.is_displayed.fget(self) and self.path_field.is_displayed and \
                self.path in self.browser.url and self.connect_btn.is_displayed
 
 
@@ -196,7 +197,7 @@ class WizardRequestView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.method_field.is_displayed and \
+        return WizardCommonView.is_displayed.fget(self) and self.method_field.is_displayed and \
                self.path in self.browser.url and self.edit_api_btn.is_displayed
 
 
@@ -227,7 +228,8 @@ class WizardResponseView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.path in self.browser.url and self.what_next_btn.is_displayed
+        return WizardCommonView.is_displayed.fget(self) and self.path in self.browser.url and \
+               self.what_next_btn.is_displayed
 
 
 class WizardOutroView(WizardCommonView, Navigable):
@@ -250,4 +252,5 @@ class WizardOutroView(WizardCommonView, Navigable):
 
     @property
     def is_displayed(self):
-        return self.logo.is_displayed and self.path in self.browser.url and self.continue_button.is_displayed
+        return WizardCommonView.is_displayed.fget(self) and self.path in self.browser.url and \
+               self.continue_button.is_displayed

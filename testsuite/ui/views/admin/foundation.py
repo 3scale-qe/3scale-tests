@@ -62,8 +62,7 @@ class BaseAdminView(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.threescale_menu_logo.is_displayed \
-               and self.support_link.is_displayed \
+        return self.threescale_menu_logo.is_displayed and self.support_link.is_displayed \
                and self.explorer_menu.is_displayed
 
 

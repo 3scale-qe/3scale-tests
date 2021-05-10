@@ -23,7 +23,7 @@ class UsersView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return self.table.is_displayed and self.path in self.browser.url
+        return BaseSettingsView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url
 
 
 class UserDetailView(BaseSettingsView):
@@ -70,5 +70,5 @@ class UserDetailView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return self.username.is_displayed and self.email.is_displayed and self.role.is_displayed \
-               and self.path in self.browser.url
+        return BaseSettingsView.is_displayed.fget(self) and self.username.is_displayed and\
+               self.email.is_displayed and self.role.is_displayed and self.path in self.browser.url

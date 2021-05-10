@@ -29,8 +29,8 @@ class AccountsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.new_account.is_displayed and self.table.is_displayed and \
-               self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.new_account.is_displayed and \
+               self.table.is_displayed and self.path in self.browser.url
 
 
 class AccountsDetailView(BaseAudienceView):
@@ -70,7 +70,7 @@ class AccountsDetailView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.path in self.browser.url and \
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
                self.edit_button.is_displayed and self.applications_button.is_displayed
 
 
@@ -96,7 +96,7 @@ class AccountNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.username.is_displayed and self.email.is_displayed \
+        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and self.email.is_displayed \
                and self.organization.is_displayed and self.path in self.browser.url
 
 
@@ -124,7 +124,7 @@ class AccountEditView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.org_name.is_displayed \
+        return BaseAudienceView.is_displayed.fget(self) and self.org_name.is_displayed \
                and self.org_name.is_displayed and self.update_button.is_displayed
 
 
@@ -146,7 +146,7 @@ class AccountApplicationsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.create_button.is_displayed and \
+        return BaseAudienceView.is_displayed.fget(self) and self.create_button.is_displayed and \
                self.path in self.browser.url
 
 
@@ -166,5 +166,5 @@ class UsageRulesView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.account_plans_checkbox.is_displayed and \
+        return BaseAudienceView.is_displayed.fget(self) and self.account_plans_checkbox.is_displayed and \
                self.path in self.browser.url

@@ -31,7 +31,7 @@ class BackendNewView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed and self.path in self.browser.url \
+        return BaseAdminView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.name.is_displayed and self.system_name.is_displayed
 
 
@@ -50,7 +50,7 @@ class BackendDetailView(BaseBackendView):
 
     @property
     def is_displayed(self):
-        return BaseBackendView.is_displayed and self.path in self.browser.url \
+        return BaseBackendView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.edit_button.is_displayed
 
 
@@ -84,5 +84,5 @@ class BackendEditView(BaseBackendView):
 
     @property
     def is_displayed(self):
-        return BaseBackendView.is_displayed and self.path in self.browser.url \
+        return BaseBackendView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.name and self.system_name.is_displayed

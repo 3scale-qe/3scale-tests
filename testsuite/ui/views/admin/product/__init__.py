@@ -8,7 +8,7 @@ from testsuite.ui.widgets import Link, NavigationMenu
 
 class ProductsView(BaseAdminView):
     """View representation of Product Listing page"""
-    endpoint_path = "/apiconfig/services"
+    path_pattern = "/apiconfig/services"
     create_product_button = Link("//a[@href='/apiconfig/services/new']")
     table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
         "Name": Link("./a")
@@ -29,7 +29,7 @@ class ProductsView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return self.endpoint_path in self.browser.url and self.table.is_displayed
+        return self.path in self.browser.url and self.table.is_displayed and BaseAdminView.is_displayed.fget(self)
 
 
 class BaseProductView(BaseAdminView):
@@ -50,7 +50,7 @@ class BaseProductView(BaseAdminView):
         """
         Perform step to specific item in Navigation with use of href locator.
         This step function is used by Navigator. Every item in Navigation Menu contains link to the specific View.
-        Navigator calls this function with href parameter (Views endpoint_path), Step then locates correct
+        Navigator calls this function with href parameter (Views path), Step then locates correct
         item from Navigation Menu and clicks on it.
         """
         self.nav.select_href(href, **kwargs)
@@ -60,9 +60,5 @@ class BaseProductView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        if not self.nav.is_displayed:
-            return False
-
-        present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
-        return BaseAdminView.is_displayed and len(present_nav_items) > 3 \
-            and self.nav.nav_resource() == self.product['system_name']
+        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS \
+               and self.nav.nav_resource() == self.product['name']

@@ -14,7 +14,7 @@ class BaseSettingsView(BaseAdminView):
         """
         Perform step to specific item in Navigation with use of href locator.
         This step function is used by Navigator. Every item in Navigation Menu contains link to the specific View.
-        Navigator calls this function with href parameter (Views endpoint_path), Step then locates correct
+        Navigator calls this function with href parameter (Views path), Step then locates correct
         item from Navigation Menu and clicks on it.
         """
         self.nav.select_href(href, **kwargs)
@@ -24,8 +24,4 @@ class BaseSettingsView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        if not self.nav.is_displayed:
-            return False
-
-        present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
-        return BaseAdminView.is_displayed and len(present_nav_items) > 3
+        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS

@@ -54,5 +54,5 @@ class WebhooksView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed and self.webhook_active.is_displayed \
+        return BaseSettingsView.is_displayed.fget(self) and self.webhook_active.is_displayed \
                and self.webhook_provider.is_displayed and self.path in self.browser.url

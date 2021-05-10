@@ -8,7 +8,7 @@ from testsuite.ui.widgets import NavigationMenu, Link
 
 class BackendsView(BaseAdminView):
     """View representation of Backend Listing page"""
-    endpoint_path = "p/admin/backend_apis"
+    path_pattern = "p/admin/backend_apis"
     create_backend_button = Link("//a[@href='/p/admin/backend_apis/new']")
     table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={
         "Name": Link("./a")
@@ -29,7 +29,7 @@ class BackendsView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed and self.endpoint_path in self.browser.url \
+        return BaseAdminView.is_displayed and self.path in self.browser.url \
                and self.create_backend_button.is_displayed and self.table.is_displayed
 
 
@@ -51,7 +51,7 @@ class BaseBackendView(BaseAdminView):
         """
         Perform step to specific item in Navigation with use of href locator.
         This step function is used by Navigator. Every item in Navigation Menu contains link to the specific View.
-        Navigator calls this function with href parameter (Views endpoint_path), Step then locates correct
+        Navigator calls this function with href parameter (Views path), Step then locates correct
         item from Navigation Menu and clicks on it.
         """
         self.nav.select_href(href, **kwargs)
@@ -61,8 +61,5 @@ class BaseBackendView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        if not self.nav.is_displayed:
-            return False
-
-        present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
-        return len(present_nav_items) > 3 and self.nav.nav_resource() == self.backend['system_name']
+        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS \
+               and self.nav.nav_resource() == self.backend['name']

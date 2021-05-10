@@ -27,8 +27,8 @@ class AccountPlansView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.new_plan.is_displayed and self.table.is_displayed and \
-               self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.new_plan.is_displayed and self.table.is_displayed \
+               and self.path in self.browser.url
 
 
 class NewAccountPlanView(BaseAudienceView):
@@ -64,5 +64,5 @@ class NewAccountPlanView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.name.is_displayed and self.approval.is_displayed and \
+        return BaseAudienceView.is_displayed.fget(self) and self.name.is_displayed and self.approval.is_displayed and \
                self.path in self.browser.url

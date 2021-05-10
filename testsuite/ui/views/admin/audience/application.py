@@ -27,7 +27,7 @@ class ApplicationsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.table.is_displayed and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url
 
 
 class ApplicationDetailView(BaseProductView):
@@ -77,7 +77,7 @@ class ApplicationDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.path in self.browser.url \
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.edit_button.is_displayed and self.suspend_button.is_displayed
 
 
@@ -110,8 +110,8 @@ class ApplicationNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.username.is_displayed and self.description.is_displayed \
-               and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and \
+               self.description.is_displayed and self.path in self.browser.url
 
 
 class ApplicationEditView(BaseProductView):
@@ -142,5 +142,5 @@ class ApplicationEditView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.username.is_displayed and self.description.is_displayed \
-               and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and \
+               self.description.is_displayed and self.path in self.browser.url

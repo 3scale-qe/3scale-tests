@@ -29,7 +29,7 @@ class ProductNewView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed and self.path in self.browser.url \
+        return BaseAdminView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.name.is_displayed and self.system_name.is_displayed
 
 
@@ -48,7 +48,7 @@ class ProductDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.edit_button.is_displayed
 
 
@@ -78,7 +78,7 @@ class ProductEditView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.name.is_displayed and self.description.is_displayed
 
 
@@ -108,7 +108,7 @@ class ProductSettingsView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.deployment.is_displayed
 
 
@@ -134,7 +134,7 @@ class ProductBackendsView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.backend_table.is_displayed
 
 
@@ -156,8 +156,8 @@ class ProductAddBackendView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
-               and self.backend.is_displayed and self.path.is_displayed
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
+               and self.backend.is_displayed and self.backend_path.is_displayed
 
 
 class ProductConfigurationView(BaseProductView):
@@ -169,7 +169,7 @@ class ProductConfigurationView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url
 
 
 class ApplicationPlansView(BaseProductView):
@@ -187,7 +187,7 @@ class ApplicationPlansView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url \
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.table.is_displayed
 
 
@@ -204,4 +204,5 @@ class ApplicationPlanDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed and self.path in self.browser.url
+        return BaseProductView.is_displayed.fget(self) and self.product_level.is_displayed \
+               and self.path in self.browser.url

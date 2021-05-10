@@ -13,4 +13,5 @@ class DeveloperPortalView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return self.root_in_table.is_displayed and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.root_in_table.is_displayed and \
+               self.path in self.browser.url

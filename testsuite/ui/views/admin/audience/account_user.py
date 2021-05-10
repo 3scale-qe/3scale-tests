@@ -27,7 +27,7 @@ class AccountUserView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.path in self.browser.url and self.table.is_displayed
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and self.table.is_displayed
 
 
 class AccountUserEditView(BaseAudienceView):
@@ -53,5 +53,5 @@ class AccountUserEditView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed and self.path in self.browser.url \
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.username.is_displayed and self.email.is_displayed
