@@ -6,6 +6,7 @@ from time import sleep
 import pytest
 
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 
 BATCH_REPORT_SECONDS = 150
 
@@ -20,6 +21,7 @@ def service(service):
 
 
 @pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2705")
+@pytest.mark.required_capabilities(Capability.SCALING)
 def test_batcher_caching_policy(prod_client, application, openshift):
     """Test if return correct number of usages of a service in batch after backend was unavailable"""
     client = prod_client(application)

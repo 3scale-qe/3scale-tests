@@ -5,6 +5,7 @@ https://issues.redhat.com/browse/THREESCALE-4464
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite.capabilities import Capability
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
               pytest.mark.disruptive,
@@ -23,6 +24,7 @@ def service(service):
     return service
 
 
+@pytest.mark.required_capabilities(Capability.SCALING)
 def test_caching_policy_allow_mod(openshift, api_client, service):
     """
     Tests:
