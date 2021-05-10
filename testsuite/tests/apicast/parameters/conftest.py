@@ -2,7 +2,7 @@
 from weakget import weakget
 import pytest
 
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import gateway, TemplateApicastOptions, TemplateApicast
 from testsuite.utils import blame, warn_and_skip
 
 
@@ -14,7 +14,7 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, settings_block, gateway_environment):
+def staging_gateway0(request, configuration, settings_block, gateway_environment):
     """Deploy template apicast gateway."""
 
     options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
@@ -28,6 +28,26 @@ def staging_gateway(request, configuration, settings_block, gateway_environment)
         gateway.environ.set_many(gateway_environment)
 
     return gateway
+
+
+@pytest.fixture(scope="module")
+def staging_gateway(request, testconfig, openshift, gateway_environment):
+    """Deploy self-managed template based apicast gateway."""
+    kwargs = dict(
+        **testconfig["threescale"]["gateway"],
+        name=blame(request, "gw"),
+        openshift=openshift(),
+        kind="TemplateApicast2")
+    gw = gateway(**kwargs)
+
+    request.addfinalizer(gw.destroy)
+
+    gw.create()
+
+    if len(gateway_environment) > 0:
+        gw.environ.set_many(gateway_environment)
+
+    return gw
 
 
 @pytest.fixture(scope="module")

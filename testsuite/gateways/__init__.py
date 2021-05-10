@@ -2,6 +2,9 @@
 Sets up gateway defined in testsuite settings
 """
 from typing import Tuple, Optional, Dict, Type, NamedTuple
+import importlib
+import inspect
+import pkgutil
 
 from testsuite.config import settings
 from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
@@ -10,6 +13,26 @@ from testsuite.gateways.gateways import AbstractGateway
 from testsuite.gateways.options import GatewayOptions, SystemApicastOptions, SelfManagedApicastOptions, \
     OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions, ServiceMeshGatewayOptions
 from testsuite.gateways.service_mesh import ServiceMeshGateway
+
+# walk through all sub-packages and import all gateway classes
+__all__ = ["gateway", "Gateway", "Options", "GATEWAYS", "GatewayConfiguration", "load_gateway", "configuration"]
+for _, module, _ in pkgutil.walk_packages(__path__, "testsuite.gateways."):  # type: ignore
+    imported = importlib.import_module(module)
+    for item in dir(imported):
+        if item not in __all__:
+            obj = getattr(imported, item)
+            if inspect.isclass(obj) and issubclass(obj, AbstractGateway):
+                globals()[item] = obj
+                __all__.append(item)
+
+
+def gateway(kind, **kwargs):
+    """Return instance of given kind"""
+    cls = globals()[kind]
+    expected = inspect.signature(cls.__init__).parameters.keys()
+    gwargs = {k: v for k, v in kwargs.items() if k in expected}
+    return cls(**gwargs)
+
 
 Gateway = Type[AbstractGateway]
 Options = Type[GatewayOptions]

@@ -1,14 +1,16 @@
 """Self managed apicast deployed from apicast template"""
 import logging
+import os
 from abc import ABC, abstractmethod
 from typing import Optional, List
 from urllib.parse import urlparse
 
 from threescale_api.resources import Service
+import importlib_resources as resources
 
 from testsuite.openshift.objects import Routes, SecretTypes
 from testsuite.requirements import ThreeScaleAuthDetails
-from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
+from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements, SelfManagedApicast2
 from ...openshift.env import Environ
 
 LOGGER = logging.getLogger(__name__)
@@ -37,6 +39,70 @@ class TemplateApicastRequirements(SelfManagedApicastRequirements,
     @abstractmethod
     def service_routes(self) -> bool:
         """True, if apicast should creates route for every service"""
+
+
+class TemplateApicast2(SelfManagedApicast2):
+    """Template-based Apicast Gateway."""
+    # pylint: disable=too-many-arguments
+    def __init__(self, openshift, template, name, image, portal_endpoint):
+        super().__init__(openshift, name)
+        self._image = image
+        self._portal_endpoint = portal_endpoint
+
+        if template.endswith(".yml") and template == os.path.basename(template):
+            template = resources.files("testsuite.resources").joinpath(template)
+
+        self._template = template
+
+    @property
+    def _params(self):
+        params = {
+            "APICAST_NAME": self.name,
+            "AMP_APICAST_IMAGE": self._image,
+            "CONFIGURATION_URL_SECRET": f"{self.name}-secret"}
+        if self.staging:
+            params.update({
+                "CONFIGURATION_LOADER": "lazy",
+                "DEPLOYMENT_ENVIRONMENT": "staging",
+                "CONFIGURATION_CACHE": 0})
+        return params
+
+    def _create_connection_secret(self):
+        self._oc.secrets.create(
+            name=self._params["CONFIGURATION_URL_SECRET"],
+            string_data={
+                "password": self._portal_endpoint
+            },
+            secret_type=SecretTypes.BASIC_AUTH
+        )
+
+    def create(self):
+        LOGGER.debug('Deploying new template-based apicast "%s". Template params: "%s"',
+                     self.name, self._params)
+
+        self._create_connection_secret()
+
+        self._oc.new_app(self._template, self._params)
+
+        # pylint: disable=protected-access
+        self._oc._wait_for_deployment(self.name)
+
+    def destroy(self):
+        LOGGER.debug('Destroying template-based apicast "%s"...', self.name)
+
+        for route in self._routes:
+            if route in self._oc.routes:
+                LOGGER.debug('Removing route "%s"...', route)
+                del self._oc.routes[route]
+
+        LOGGER.debug('Deleting service "%s"', self.name)
+        self._oc.delete("service", self.name)
+
+        LOGGER.debug('Deleting deploymentconfig "%s"', self.name)
+        self._oc.delete("deploymentconfig", self.name)
+
+        LOGGER.debug('Deleting secret "%s"', self._params["CONFIGURATION_URL_SECRET"])
+        self._oc.delete("secret", self._params["CONFIGURATION_URL_SECRET"])
 
 
 # pylint: disable=too-many-instance-attributes
