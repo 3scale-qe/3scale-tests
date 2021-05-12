@@ -104,7 +104,7 @@ class ProductSettingsView(BaseProductView):
         self.update_button.click()
 
     def prerequisite(self):
-        return ProductDetailView
+        return BaseProductView
 
     @property
     def is_displayed(self):
@@ -130,7 +130,7 @@ class ProductBackendsView(BaseProductView):
         next(row for row in self.backend_table.rows() if row[0].text == backend["name"])[3].widget.click(True)
 
     def prerequisite(self):
-        return ProductDetailView
+        return BaseProductView
 
     @property
     def is_displayed(self):
@@ -165,7 +165,7 @@ class ProductConfigurationView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/integration"
 
     def prerequisite(self):
-        return ProductDetailView
+        return BaseProductView
 
     @property
     def is_displayed(self):
@@ -183,7 +183,7 @@ class ApplicationPlansView(BaseProductView):
         next(row for row in self.table.rows() if row[0].text == application_plan["name"]).name.click()
 
     def prerequisite(self):
-        return ProductDetailView
+        return BaseProductView
 
     @property
     def is_displayed(self):
