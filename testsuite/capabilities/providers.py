@@ -4,6 +4,17 @@ from testsuite.capabilities import CapabilityRegistry, Capability
 from testsuite.gateways import configuration
 
 
+def _rhoam():
+    """Returns True, if the current instance is RHOAM. Detects RHOAM by annotations on APIManager object"""
+    client = CONFIGURATION.openshift()
+    if client.is_operator_deployment:
+        manager = client.api_manager
+        if manager.get_annotation("integreatly-name") or manager.get_annotation("integreatly-namespace"):
+            return True
+
+    return False
+
+
 def gateway_capabilities():
     """Adds capabilities provided by gateways"""
     staging = configuration.staging.CAPABILITIES
@@ -26,3 +37,13 @@ def ocp_version():
 
 
 CapabilityRegistry().register_provider(ocp_version)
+
+
+def scaling():
+    """
+    Scaling is allowed on all known configurations (so far) except for RHOAM
+    """
+    return {Capability.SCALING} if not _rhoam() else {}
+
+
+CapabilityRegistry().register_provider(scaling)

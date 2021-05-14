@@ -4,6 +4,7 @@ Rewrite spec/functional_specs/policies/caching/caching_allow_policy_spec.rb
 import pytest
 
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 
 
 @pytest.fixture(scope="module")
@@ -12,6 +13,7 @@ def policy_settings():
     return rawobj.PolicyConfig("caching", {"caching_type": "allow"})
 
 
+@pytest.mark.required_capabilities(Capability.SCALING)
 def test_caching_policy_allow(prod_client, openshift, application):
     """
     Test caching policy with caching mode set to Allow
