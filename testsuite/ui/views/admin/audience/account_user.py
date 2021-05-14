@@ -4,12 +4,12 @@ from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin import AccountsDetailView
-from testsuite.ui.views.admin.foundation import AudienceNavView
+from testsuite.ui.views.admin.audience import BaseAudienceView
+from testsuite.ui.views.admin.audience.account import AccountsDetailView
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
-class AccountUserView(AudienceNavView):
+class AccountUserView(BaseAudienceView):
     """View representation of Accounts User page"""
     path_pattern = 'buyers/accounts/{account_id}/users'
     table = PatternflyTable("//*[@id='buyer_users']")
@@ -22,16 +22,15 @@ class AccountUserView(AudienceNavView):
         """Open account's applications"""
         self.table.row(_row__attr=('id', f'user_{user.entity_id}'))[5].click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return AccountsDetailView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.path in self.browser.url and self.table.is_displayed
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and self.table.is_displayed
 
 
-class AccountUserEditView(AudienceNavView):
+class AccountUserEditView(BaseAudienceView):
     """View representation of Accounts User Edit page"""
     path_pattern = 'buyers/accounts/{account_id}/users/{user_id}'
     username = TextInput(id="user_username")
@@ -49,11 +48,10 @@ class AccountUserEditView(AudienceNavView):
             self.email.fill(email)
         self.update_button.click()
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
         return AccountUserView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.path in self.browser.url \
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.username.is_displayed and self.email.is_displayed

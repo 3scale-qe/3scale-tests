@@ -1,19 +1,17 @@
 """View representations of Developer Portal pages"""
-
-from testsuite.ui.views.admin.foundation import AudienceNavView
+from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import Link
 
 
-class DeveloperPortalView(AudienceNavView):
+class DeveloperPortalView(BaseAudienceView):
     """View representation of Accounts Listing page"""
     path_pattern = '/p/admin/cms'
     root_in_table = Link(locator='//*[@id="cms-sidebar-content"]/ul/li[1]/a')  # TODO
 
-    # pylint: disable=invalid-overridden-method
     def prerequisite(self):
-        return AudienceNavView
+        return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return AudienceNavView.is_displayed and self.root_in_table.is_displayed \
-               and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.root_in_table.is_displayed and \
+               self.path in self.browser.url

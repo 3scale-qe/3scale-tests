@@ -93,12 +93,25 @@ class NavigationMenu(Navigation):
     argument (this argument is usually taken from destination View in a form of `path` variable),
     it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
     """
+    RELATED_RESOURCE = './/h2[@class="pf-c-nav__section-title"]'
     LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'
     # Product and backend navigation menu differs from others,
     # hence we need different ITEMS parameter than default one is.
-    ITEMS = "./ul/li|./section/ul/li"
+    ITEMS = './section/ul/li/a| ./ul/li/a'
+    # We need NAVIGATION_ITEMS due to navigation in subitems which cannot be done From ITEMS locator
+    NAVIGATION_ITEMS = "./ul/li|./section/ul/li"
     SUB_ITEMS = './section/ul/li[contains(@class, "pf-c-nav__item")]'
     HREF_LOCATOR = SUB_ITEMS + '/a[contains(@href, "{}")]'
+
+    @check_nav_loaded
+    def currently_selected_item(self):
+        """Returns the current navigation item."""
+        return self.currently_selected[0]
+
+    @check_nav_loaded
+    def currently_selected_sub_item(self):
+        """Returns the current navigation item."""
+        return self.currently_selected[1]
 
     @check_nav_loaded
     def select_href(self, href):
@@ -106,7 +119,7 @@ class NavigationMenu(Navigation):
         Selects item from Navigation with specific href locator
         TODO: Add an exception like in Navigation select method
         """
-        for element in self.browser.elements(self.ITEMS):
+        for element in self.browser.elements(self.NAVIGATION_ITEMS):
             element_href = element.find_element_by_tag_name("a").get_attribute("href")
             if element_href.endswith(href):
                 self.browser.click(element)
@@ -117,6 +130,14 @@ class NavigationMenu(Navigation):
                     self.browser.click(element)
                 self.browser.click(item[0])
                 return
+
+    def nav_resource(self):
+        """
+        Returns navigation title. This text is shown only in Product and Backend Views and it is used
+        in `is_display` method to verify, if currently visible navigation menu (or whole View)
+        is correctly loaded for particular Product or Backend.
+        """
+        return self.browser.element(self.RELATED_RESOURCE).text
 
 
 class ThreescaleDropdown(GenericLocatorWidget):

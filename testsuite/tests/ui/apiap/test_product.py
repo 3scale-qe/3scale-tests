@@ -1,9 +1,9 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_service_spec.rb"""
 import pytest
 
-from testsuite import rawobj
-from testsuite.ui.views.admin.product import ProductEditView, ProductSettingsView, ProductAddBackendView, \
+from testsuite.ui.views.admin.product.product import ProductEditView, ProductSettingsView, ProductAddBackendView, \
     ProductBackendsView, ProductConfigurationView, ApplicationPlanDetailView
+from testsuite import rawobj
 from testsuite.utils import blame
 
 
@@ -55,7 +55,6 @@ def test_edit_product(login, navigator, service, threescale):
         - Assert that description is correct
     """
     edit = navigator.navigate(ProductEditView, product=service)
-
     edit.update("updated_name", "updated_description")
     product = threescale.services.read_by_name(service.entity_name)
 

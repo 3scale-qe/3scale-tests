@@ -7,8 +7,9 @@ import xml.etree.ElementTree as Et
 import pytest
 
 from testsuite import rawobj
-from testsuite.ui.views.admin import WebhooksView, AccountEditView
+from testsuite.ui.views.admin.audience.account import AccountEditView
 from testsuite.ui.views.admin.audience.account_user import AccountUserEditView
+from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 
 # webhook tests seem disruptive to requestbin as they reset it with no mercy

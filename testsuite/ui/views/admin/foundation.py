@@ -4,13 +4,12 @@ Product, Backend, and AccountSettings Views. All of them creates basic page stru
 Admin portal pages.
 :TODO Add locators/menus for basic pages
 """
-from typing import List
 
 from widgetastic.widget import GenericLocatorWidget, View, Text
-from widgetastic_patternfly4 import PatternflyTable, Button
+from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step, Navigable
-from testsuite.ui.widgets import Link, ContextMenu, NavigationMenu
+from testsuite.ui.widgets import Link, ContextMenu
 
 
 class BaseAdminView(View, Navigable):
@@ -36,7 +35,7 @@ class BaseAdminView(View, Navigable):
         self.user_session.click()
         self.user_logout_link.click()
 
-    @step("AudienceNavView")
+    @step("BaseAudienceView")
     def audience(self):
         """Selects Audience item from ContextSelector"""
         self.context_menu.item_select("Audience")
@@ -51,7 +50,7 @@ class BaseAdminView(View, Navigable):
         """Selects Backends item from ContextSelector"""
         self.context_menu.item_select("Backends")
 
-    @step("SettingsNavView")
+    @step("BaseSettingsView")
     def settings(self):
         """Select Account Settings from ContextSelector"""
         self.context_menu.item_select("Account Settings")
@@ -63,54 +62,8 @@ class BaseAdminView(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.threescale_menu_logo.is_displayed \
-               and self.support_link.is_displayed \
+        return self.threescale_menu_logo.is_displayed and self.support_link.is_displayed \
                and self.explorer_menu.is_displayed
-
-
-class BaseNavView(BaseAdminView):
-    """Class adding Navigation menu. Used by Audience, Product, Backend and Settings NavViews """
-    NAV_ITEMS: List[str]
-    nav = NavigationMenu(id='mainmenu')
-
-    @step("@href")
-    def step(self, href, **kwargs):
-        """Perform step to specific item in Navigation with use of href locator"""
-        self.nav.select_href(href, **kwargs)
-
-    def prerequisite(self):
-        return BaseAdminView
-
-    @property
-    def is_displayed(self):
-        if not self.nav.is_displayed:
-            return False
-
-        present_nav_items = set(self.nav.nav_links()) & set(self.NAV_ITEMS)
-        return BaseAdminView.is_displayed and len(present_nav_items) > 3
-
-
-class AudienceNavView(BaseNavView):
-    """Base View for all Audience/Account pages. Features audience vertical navigation menu"""
-    NAV_ITEMS = ['Accounts', 'Applications', 'Billing', 'Developer Portal', 'Messages']
-
-
-class ProductNavView(BaseNavView):
-    """Base View for all Product pages. Features product vertical navigation menu"""
-    NAV_ITEMS = ['Overview', 'Analytics', 'Applications', 'ActiveDocs', 'Integration']
-
-    def prerequisite(self):
-        return ProductsView
-
-
-class BackendNavView(BaseNavView):
-    """Base View for all Backends pages. Features backend vertical navigation menu"""
-    NAV_ITEMS = ['Overview', 'Analytics', 'Methods & Metrics', 'Mapping Rules']
-
-
-class SettingsNavView(BaseNavView):
-    """Base View for all Account Settings pages. Features settings vertical navigation menu"""
-    NAV_ITEMS = ['Overview', 'Personal', 'Users', 'Integrate', 'Export']
 
 
 class DashboardView(BaseAdminView):
@@ -164,29 +117,3 @@ class NotFoundView(View):
         return self.title.text == "Not Found" and \
                self.text_message.text == "Sorry. We can't find what you're looking for." and \
                self.logo.is_displayed
-
-
-class ProductsView(BaseAdminView):
-    """View representation of Product Listing page"""
-    path_pattern = "/apiconfig/services"
-    create_product_button = Link("//a[@href='/apiconfig/services/new']")
-    table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
-        "Name": Link("./a")
-    })
-
-    @step("ProductDetailView")
-    def detail(self, product):
-        """Detail of Product"""
-        self.table.row(system_name__contains=product.entity_name).name.widget.click()
-
-    @step("ProductNewView")
-    def create_product(self):
-        """Create new Product"""
-        self.create_product_button.click()
-
-    def prerequisite(self):
-        return BaseAdminView
-
-    @property
-    def is_displayed(self):
-        return BaseAdminView.is_displayed and self.path in self.browser.url and self.table.is_displayed
