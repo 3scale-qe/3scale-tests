@@ -1,5 +1,6 @@
 """Provide a small client for interacting with Prometheus REST API."""
-from typing import Optional
+import time
+from typing import Optional, Callable
 
 import requests
 
@@ -48,3 +49,28 @@ class PrometheusClient:
         response = requests.get(f"{self.endpoint}/api/v1/query", params=params)
         response.raise_for_status()
         return response.json()["data"]["result"]
+
+    def has_metric(self, metric: str, trigger_request: Optional[Callable] = None) -> bool:
+        """
+        Returns true if the given metric is collected by the current settings
+        of prometheus.
+        Args:
+            :param metric: the name of the metric to test
+            :param trigger_request: a function triggering the metric,
+            as it does not have to be always present in Prometheus.
+            (e. g. fresh install)
+            When empty, the trigger call is not invoked.
+        """
+        try:
+            _has_metric = self.get_metric(metric) != []
+            if not _has_metric and trigger_request is not None:
+                # when testing on a new install, the metric does not have to be present
+                trigger_request()
+                # waits to refresh the prometheus metrics
+                time.sleep(PROMETHEUS_REFRESH)
+                _has_metric = self.get_metric(metric) != []
+
+        except requests.exceptions.HTTPError:
+            _has_metric = False
+
+        return _has_metric

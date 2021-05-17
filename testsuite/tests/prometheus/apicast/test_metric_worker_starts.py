@@ -14,11 +14,11 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
               ]
 
 
-def test_metric_worker(prometheus_client, production_gateway):
+def test_metric_worker(prometheus, production_gateway):
     """
     Test if metric worker counter will be increased when apicast worker is killed
     """
-    metrics = prometheus_client.get_metric("worker_process")
+    metrics = prometheus.get_metric("worker_process")
     count_before = [m for m in metrics if m['metric']['job'] == '3scale Apicast Production'][0]['value'][1]
 
     # There is no ps/top/htop in container, we need to search all processes and find out nginx: worker and kill him
@@ -33,7 +33,7 @@ def test_metric_worker(prometheus_client, production_gateway):
     # prometheus is downloading metrics each 5 seconds, we need to wait
     sleep(10)
 
-    metrics = prometheus_client.get_metric("worker_process")
+    metrics = prometheus.get_metric("worker_process")
     count_after = [m for m in metrics if m['metric']['job'] == '3scale Apicast Production'][0]['value'][1]
 
     assert int(count_after) == int(count_before) + 1

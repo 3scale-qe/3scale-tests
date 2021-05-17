@@ -41,9 +41,9 @@ def warmup_prod_gateway(client):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module", params=["3scale Apicast Staging", "3scale Apicast Production"])
-def metrics(request, warmup_prod_gateway, prometheus_client):
+def metrics(request, warmup_prod_gateway, prometheus):
     """Return all metrics from target defined of staging and also production apicast."""
-    metrics = prometheus_client.get_metrics(request.param)
+    metrics = prometheus.get_metrics(request.param)
     return [m["metric"] for m in metrics["data"]]
 
 
@@ -70,7 +70,7 @@ def apicast_status_metrics(prometheus):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5417")
-def test_apicast_status_metrics(client, prometheus_client):
+def test_apicast_status_metrics(client, prometheus):
     """Test apicast_status metric.
 
     Apicast logs http status codes on prometheus as a counter.
@@ -79,7 +79,7 @@ def test_apicast_status_metrics(client, prometheus_client):
     for status in STATUSES:
         assert client.get(f"/status/{status}").status_code == status
 
-    hit_metrics = apicast_status_metrics(prometheus_client)
+    hit_metrics = apicast_status_metrics(prometheus)
 
     assert STATUSES == sorted(hit_metrics.keys())
     assert all(count > 0 for count in hit_metrics.values())

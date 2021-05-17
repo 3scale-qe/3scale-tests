@@ -5,9 +5,11 @@ import datetime
 import secrets
 import time
 import typing
+import warnings
 from base64 import b64encode
 from os import urandom
 
+import pytest
 
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -123,3 +125,11 @@ def wait_interval_hour(max_min, min_min=0):
     if minutes < min_min or minutes > max_min:
         sleep_time = ((60 - minutes + min_min) % 60) * 60 + 10
         time.sleep(sleep_time)
+
+
+def warn_and_skip(message):
+    """
+    Prints warning and skips the test
+    """
+    warnings.warn(message)
+    pytest.skip(message)
