@@ -375,6 +375,17 @@ class OpenShiftClient:
 
         return self.select_resource("pods", narrow_function=select_pod)
 
+    def get_operator(self):
+        """
+        Gets the selector for the 3scale operator
+
+        :return: the operator pod
+        """
+        def select_operator(apiobject):
+            return apiobject.get_label("com.redhat.component-name") == "3scale-operator"
+
+        return self.select_resource("pods", narrow_function=select_operator)
+
     def select_resource(self,
                         resource: str,
                         labels: Optional[Dict[str, str]] = None,
