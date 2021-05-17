@@ -152,7 +152,7 @@ def custom_ui_account(custom_admin_login, navigator, threescale, request, testco
         custom_admin_login()
         account = navigator.navigate(AccountNewView)
         account.create(name, email, password, org_name)
-        account = threescale.accounts.read_by_name(name)
+        account = threescale.accounts.read_by_name(org_name)
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(account.delete)

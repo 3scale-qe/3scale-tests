@@ -13,6 +13,13 @@ class AccountsView(BaseAudienceView):
     path_pattern = '/buyers/accounts'
     new_account = Link("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
+    search_button = GenericLocatorWidget("//*[@value='Search']")
+    search_bar = TextInput(id="search_query")
+
+    def search(self, value: str):
+        """Search in account table by given value"""
+        self.search_bar.fill(value)
+        self.search_button.click()
 
     @step("AccountNewView")
     def new(self):
