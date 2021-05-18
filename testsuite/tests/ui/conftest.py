@@ -180,6 +180,8 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
         app.create(name, description, plan)
         application = account.applications.read_by_name(name)
 
+        application.api_client_verify = testconfig["ssl_verify"]
+
         if autoclean and not testconfig["skip_cleanup"]:
             def delete():
                 application.delete()
