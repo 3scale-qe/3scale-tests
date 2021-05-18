@@ -14,6 +14,7 @@ from testsuite.ui.views.admin.backend.backend import BackendNewView
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.product import ProductNewView
+from testsuite.ui.views.devel.login import LoginDevelView
 from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.utils import blame
 
@@ -77,6 +78,46 @@ def login(custom_admin_login):
     :return: Login with default credentials
     """
     return custom_admin_login()
+
+
+@pytest.fixture(scope="module")
+def custom_devel_login(browser, sessions, navigator, provider_account, account_password):
+    """
+    Login to Developer portal with specific account or credentials
+    :param browser: Browser instance
+    :param sessions: Dict-like instance that contains all available browserSessions that were used within scope=session
+    :param navigator: Navigator Instance
+    :param provider_account: Currently used provider account (tenant)
+    :param account_password: fixture that returns default account password
+    :return: Login to Developer portal with custom credentials (account or name-password pair)
+    """
+    def _login(account=None, name=None, password=None):
+        url = settings["threescale"]["devel"]["url"]
+        name = name or account['org_name']
+        password = password or account_password
+        browser.url = url
+
+        if not sessions.restore(name, password, url):
+            page = navigator.open(LoginDevelView,
+                                  access_code=provider_account['site_access_code'])
+            page.do_login(name, password)
+            cookies = [browser.selenium.get_cookie('access_code'),
+                       browser.selenium.get_cookie('user_session')]
+            sessions.save(name, password, url, values=cookies)
+
+    return _login
+
+
+@pytest.fixture
+def devel_login(account, custom_devel_login):
+    """
+    return custom_admin_login()
+    Login to the Developer portal with new account
+    :param account: Source of login credentials
+    :param custom_devel_login: Parametrized developer portal login method
+    :return: Login to Developer portal with account created by session scoped fixture
+    """
+    return custom_devel_login(account=account)
 
 
 @pytest.fixture(scope="module")

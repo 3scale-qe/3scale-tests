@@ -112,6 +112,7 @@ def load(obj, env=None, silent=None, key=None):
         admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
         master_url = _route2url(ocp.routes.for_service("system-master")[0])
         master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
+        devel_url = _route2url(ocp.routes.for_service("system-developer")[0])
         try:
             backend_route = ocp.routes.for_service("backend-listener")[0]
         except IndexError:
@@ -119,7 +120,7 @@ def load(obj, env=None, silent=None, key=None):
             backend_route = ocp.routes.for_service("backend-listener-proxy")[0]
 
         # all this or nothing
-        if None in (project, admin_url, admin_token, master_url, master_token):
+        if None in (project, admin_url, admin_token, master_url, master_token, devel_url):
             return
 
         # Values gathered in this loader are just fallback defaults, current
@@ -149,6 +150,8 @@ def load(obj, env=None, silent=None, key=None):
                     "username": ocp.secrets["system-seed"]["MASTER_USER"].decode("utf-8"),
                     "password": ocp.secrets["system-seed"]["MASTER_PASSWORD"].decode("utf-8"),
                     "token": master_token},
+                "devel": {
+                    "url": devel_url},
                 "gateway": {
                     "image": _apicast_image(ocp)},
                 "backend_internal_api": {

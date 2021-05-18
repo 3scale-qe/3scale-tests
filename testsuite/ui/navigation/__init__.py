@@ -92,6 +92,7 @@ class Navigator:
         """
         page = self.new_page(cls, **kwargs)
         self.browser.set_path(page.path)
+        page.post_navigate(**kwargs)
         return page
 
     def _backtrace(self, cls, **kwargs):
