@@ -1,5 +1,6 @@
 """Module containing classes that manipulate deployment configs environment"""
 import re
+import logging
 from typing import TYPE_CHECKING, Callable, Match, Dict
 
 if TYPE_CHECKING:
@@ -75,6 +76,9 @@ class ConfigMapEnvironmentVariable(EnvironmentVariable):
         raise NotImplementedError()
 
 
+logger = logging.getLogger(__name__)
+
+
 class Environ:
     """Contains all env variables for a specific deployment config"""
     types = [EnvironmentVariable, SecretEnvironmentVariable, ConfigMapEnvironmentVariable]
@@ -115,6 +119,7 @@ class Environ:
         env_args = []
         for name, value in envs.items():
             env_args.append(f"{name}={value}")
+            logger.info("Setting env %s=%s in %s", name, value, self.deployment_name)
 
         self.openshift.do_action("set", ["env", self.resource_type, self.deployment_name, env_args])
         self.wait_for_resource(self.deployment_name)
@@ -133,6 +138,8 @@ class Environ:
         else:
             self.openshift.do_action("set", ["env", self.resource_type, self.deployment_name, f"{name}={value}"])
             self.wait_for_resource(self.deployment_name)
+
+        logger.info("Setting env %s=%s in %s", name, value, self.deployment_name)
 
         self.__envs = None
 
