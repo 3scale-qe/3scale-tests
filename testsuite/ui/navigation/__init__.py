@@ -17,6 +17,7 @@ import inspect
 from collections import deque
 from typing import TypeVar, Type
 
+import backoff
 from widgetastic.widget import View
 
 CustomView = TypeVar("CustomView", bound=View)
@@ -143,7 +144,7 @@ class Navigator:
                 bound = signature.bind(**filtered_kwargs)
                 bound.apply_defaults()
                 try:
-                    method(*bound.args, **bound.kwargs)
+                    self.invoke_method(method, *bound.args, **bound.kwargs)
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True
@@ -152,8 +153,7 @@ class Navigator:
 
         return self._invoke_alternative_step(alternative_steps, destination)
 
-    @staticmethod
-    def _invoke_alternative_step(alternative_steps, destination):
+    def _invoke_alternative_step(self, alternative_steps, destination):
         """
         Alternative steps begins with "@".
         See `step(cls, **kwargs)` for alternatives.
@@ -166,11 +166,17 @@ class Navigator:
         for method in alternative_steps:
             if method._class_name.startswith('@href'):
                 try:
-                    method(destination.path)
+                    self.invoke_method(method, destination.path)
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True
         return False
+
+    @staticmethod
+    @backoff.on_exception(backoff.fibo, Exception, max_tries=4)
+    def invoke_method(method, *args, **kwargs):
+        """To improve stability of navigator we need to use backoff"""
+        method(*args, **kwargs)
 
 
 class NavigationStepNotFound(Exception):
