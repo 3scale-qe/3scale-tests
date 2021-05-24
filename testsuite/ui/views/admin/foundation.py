@@ -69,10 +69,6 @@ class BaseAdminView(View, Navigable):
 class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on path"""
     path_pattern = '/p/admin/dashboard'
-    products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
-    create_product_button_link = Button(locator="//a[@href='/apiconfig/services/new']")
-    backend_title = Text(locator='//*[@id="backends-widget"]/article/div[1]/div[1]/h1')
-    create_backend_button_link = Button(locator='//a[@href="/p/admin/backend_apis/new"]')
     account_link = Link('//a[@href="/buyers/accounts"]')
     application_link = Link('//a[@href="/buyers/applications"]')
     billing_link = Link('//a[@href="/finance"]')
@@ -81,14 +77,35 @@ class DashboardView(BaseAdminView):
     explore_all_products = Link('//a[@href="/apiconfig/services"]')
     explore_all_backends = Link('//a[@href="/p/admin/backend_apis"]')
 
+    @View.nested
+    # pylint: disable=invalid-name
+    class backends(View):
+        """Backends page object"""
+        backend_title = Text(locator='//*[@id="backends-widget"]/article/div[1]/div[1]/h1')
+        create_backend_button = Button(locator='//a[@href="/p/admin/backend_apis/new"]')
+
+        @property
+        def is_displayed(self):
+            return self.backend_title.is_displayed and self.create_backend_button.is_displayed
+
+    @View.nested
+    # pylint: disable=invalid-name
+    class products(View):
+        """Products page object"""
+        products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
+        create_product_button = Button(locator="//a[@href='/apiconfig/services/new']")
+
+        @property
+        def is_displayed(self):
+            return self.products_title.is_displayed and self.create_product_button.is_displayed
+
     def prerequisite(self):
         return BaseAdminView
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.message_link.is_displayed and \
-               self.products_title.is_displayed and self.create_product_button_link.is_displayed \
-               and self.backend_title.is_displayed and self.create_backend_button_link.is_displayed \
+        return self.path in self.browser.url and self.message_link.is_displayed \
+               and self.products.is_displayed and self.backends.is_displayed \
                and self.account_link.is_displayed and self.application_link.is_displayed \
                and self.billing_link.is_displayed and self.develop_portal_link.is_displayed
 
