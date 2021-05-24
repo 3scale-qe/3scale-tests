@@ -20,7 +20,7 @@ def my_services(custom_service, service, request):
 def my_accounts(custom_account, account, request):
     """Accounts fixture"""
     iname = blame(request, "id")
-    return (account, custom_account(params=dict(name=iname, username=iname, org_name=iname)))
+    return (account, custom_account(dict(name=iname, username=iname, org_name=iname)))
 
 
 @pytest.fixture(scope="module")

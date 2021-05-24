@@ -36,9 +36,6 @@ from testsuite.utils import blame
 # https://issues.redhat.com/browse/THREESCALE-5919
 
 
-# TODO add copying of oas files into server to be able to use current version of oas file
-
-
 OAS_FILES = {'oas2': ['testsuite.resources.oas2', 'uber.json'],
              'oas3': ['testsuite.resources.oas3', 'petstore-expanded.yaml']}
 USER_KEY = '123456'
@@ -96,6 +93,7 @@ def import_oas(dest_client, request, oas):
     yield (ret, service_id, service_name, service)
     if not settings["skip_cleanup"]:
         service.delete()
+        toolbox.run_cmd('rm -f ' + oas['file_name'], False)
 
 
 @pytest.fixture(scope="module")
