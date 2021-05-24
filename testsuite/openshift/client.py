@@ -4,10 +4,10 @@ import enum
 import json
 from contextlib import ExitStack
 import os
+from datetime import timezone
 from typing import List, Dict, Union, Any, Optional, Callable
 
 import openshift as oc
-from dateutil.tz import UTC
 
 from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.env import Environ
@@ -350,7 +350,7 @@ class OpenShiftClient:
         """
         cmd_args = []
         if since_time is not None:
-            d_with_timezone = since_time.replace(tzinfo=UTC)
+            d_with_timezone = since_time.replace(tzinfo=timezone.utc)
             time = d_with_timezone.isoformat()
             cmd_args.append(f"--since-time={time}")
         pod_selector = self.get_pod(deployment_name)
