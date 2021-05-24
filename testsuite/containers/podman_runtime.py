@@ -3,8 +3,8 @@ This module contains everything what is needed for Podman implementation of Cont
 Depends on podman library
 """
 
-from podman import ImageNotFound
-from podman.client import Client
+from podman.errors import ImageNotFound
+from podman import PodmanClient
 
 from testsuite.containers.container_runtime import ContainerRuntime, ContainerConfig, Container
 
@@ -14,7 +14,7 @@ class PodmanRuntime(ContainerRuntime):
 
     def __init__(self, remote_uri: str, identity_file: str = "~/.ssh/id_master", uri: str = "unix:/tmp/podman.sock"):
         super().__init__()
-        self._client = Client(uri=uri, remote_uri=remote_uri, identity_file=identity_file)
+        self._client = PodmanClient(uri=uri, remote_uri=remote_uri, identity_file=identity_file)
 
     def run(self, container_config: ContainerConfig) -> Container:
         try:
