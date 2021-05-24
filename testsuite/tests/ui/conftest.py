@@ -3,9 +3,11 @@
 import os
 
 import pytest
+from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
 
 from testsuite import rawobj
+from testsuite.auth0 import auth0_token
 from testsuite.config import settings
 from testsuite.tests.ui import Sessions
 from testsuite.ui.browser import ThreeScaleBrowser
@@ -367,3 +369,45 @@ def custom_ui_app_plan(custom_admin_login, navigator):
         return app_plan
 
     return _custom_ui_app_plan
+
+
+@pytest.fixture(scope="module")
+def auth0_client(testconfig):
+    """
+    API client for Auth0
+    """
+    return auth0.Auth0(testconfig["auth0"]["domain"], auth0_token())
+
+
+@pytest.fixture(scope="module")
+def set_callback_urls(auth0_client):
+    """
+    Set callback urls for Auth0 application
+    """
+
+    def _set_callback_urls(client_id, urls: list):
+        auth0_client.clients.update(client_id, body={"callbacks": urls})
+
+    return _set_callback_urls
+
+
+@pytest.fixture
+def auth0_user_password():
+    """Password for auth0 user"""
+    return "RedHat123"
+
+
+@pytest.fixture
+def auth0_user(auth0_client, request, testconfig, auth0_user_password):
+    """
+    Create Auth0 user via Auth0 API
+    """
+    name = blame(request, "auth_user")
+    user = auth0_client.users.create({"email": f"{name}@anything.invalid", "password": auth0_user_password,
+                                      "connection": "Username-Password-Authentication", "email_verified": True})
+    if not testconfig["skip_cleanup"]:
+        def _delete():
+            auth0_client.users.delete(user["user_id"])
+
+        request.addfinalizer(_delete)
+    return user

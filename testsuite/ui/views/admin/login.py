@@ -2,8 +2,8 @@
 from widgetastic.widget import TextInput, View, Text
 
 from testsuite.ui.navigation import Navigable
-from testsuite.ui.views.admin.settings.sso_integrations import Auth0View, RhssoView
 from testsuite.ui.views.admin.wizard import WizardIntroView
+from testsuite.ui.views.auth import Auth0View, RhssoView
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -53,7 +53,7 @@ class LoginView(View, Navigable):
 
     def do_rhsso_login(self, username, password):
         """
-        Method handle login to 3scale admin portal via Auth0
+        Method handle login to 3scale admin portal via RHSSO
         :param email: User email for login
         :param password: User password for login
         :return DashboardView page object

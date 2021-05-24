@@ -1,13 +1,10 @@
 """View representations of SSO Integrations pages"""
 from urllib.parse import urlparse
 
-from weakget import weakget
-from widgetastic.widget import TextInput, GenericLocatorWidget, View, Text
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable, Button
 
-from testsuite import settings
-from testsuite.ui.navigation import step, Navigable
-from testsuite.ui.views.admin.foundation import BaseAdminView
+from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleEditButton, ThreescaleDeleteButton
@@ -136,48 +133,3 @@ class SSOIntegrationEditView(BaseSettingsView):
     def is_displayed(self):
         return BaseSettingsView.is_displayed.fget(self) and self.path in self.browser.url \
                and self.delete_button.is_displayed
-
-
-class Auth0View(View, Navigable):
-    """View representation of 3rd party Auth0 provider page"""
-    url_domain = weakget(settings)["auth0"]["domain"] % None
-    email = TextInput(name="email")
-    password = TextInput(name="password")
-    login_button = GenericLocatorWidget(locator="//button[@aria-label='Log In']")
-    last_login_button = GenericLocatorWidget(locator="//*[contains(@class,'auth0-lock-social-button')]")
-    not_my_account = GenericLocatorWidget(locator="//*[@class='auth0-lock-alternative-link']")
-
-    def login(self, email, password):
-        """Login to 3scale via Auth0"""
-        self.last_login_button.wait_displayed()
-        if self.email.is_displayed:
-            self.email.fill(email)
-            self.password.fill(password)
-            self.login_button.click()
-        else:
-            self.last_login_button.click()
-
-    @property
-    def is_displayed(self):
-        return self.email.is_displayed and self.password.is_displayed and self.login_button.is_displayed and \
-               self.url_domain in self.browser.url
-
-
-class RhssoView(View, Navigable):
-    """View representation of 3rd party RHSSO provider page"""
-    username = TextInput(name="username")
-    password = TextInput(name="password")
-    login_button = GenericLocatorWidget(locator="//*[@name='login']")
-
-    def login(self, username, password):
-        """Login to 3scale via Auth0"""
-        is_logged_in = BaseAdminView(self.browser.root_browser).is_displayed
-        if not is_logged_in:
-            self.username.wait_displayed()
-            self.username.fill(username)
-            self.password.fill(password)
-            self.login_button.click()
-
-    @property
-    def is_displayed(self):
-        return self.username.is_displayed and self.password.is_displayed and self.login_button.is_displayed
