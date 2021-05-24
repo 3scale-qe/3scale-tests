@@ -5,8 +5,7 @@ from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.backend import BackendsView, BaseBackendView
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.widgets import Link
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
-    ThreescaleCreateButton
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, ThreescaleSubmitButton
 
 
 class BackendNewView(BaseAdminView):
@@ -16,7 +15,7 @@ class BackendNewView(BaseAdminView):
     system_name = TextInput(id="backend_api_system_name")
     description = TextInput(id="backend_api_description")
     endpoint = TextInput(id="backend_api_private_endpoint")
-    create_button = ThreescaleCreateButton()
+    create_button = ThreescaleSubmitButton()
 
     def create(self, name: str, system_name: str, desc: str, endpoint: str):
         """Create new  Backend"""

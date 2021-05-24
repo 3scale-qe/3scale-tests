@@ -1,11 +1,10 @@
 """View representations of products integration backends section pages"""
 from widgetastic.widget import TextInput
-from widgetastic_patternfly4 import PatternflyTable
+from widgetastic_patternfly4 import PatternflyTable, Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import Link, GenericLocatorWidget, ThreescaleDropdown
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton
+from testsuite.ui.widgets import Link, GenericLocatorWidget, ThreescaleSelect
 
 
 class ProductBackendsView(BaseProductView):
@@ -36,13 +35,13 @@ class ProductBackendsView(BaseProductView):
 class ProductAddBackendView(BaseProductView):
     """View representation of Product's Backends add page"""
     path_pattern = "/apiconfig/services/{product_id}/backend_usages/new"
-    backend = ThreescaleDropdown("//*[id='backend_api_config_backend_api_id']")
+    backend = ThreescaleSelect(locator="//label[@for='backend_api_config_backend_api_id']/../div[1]")
     backend_path = TextInput(id="backend_api_config_path")
-    add_button = ThreescaleCreateButton()
+    add_button = Button(locator="//*[@data-testid='addBackend-buttonSubmit']")
 
     def add_backend(self, backend, path):
         """Add backend"""
-        self.backend.select_by_value(backend.entity_id)
+        self.backend.item_select(backend.entity_name)
         self.backend_path.fill(path)
         self.add_button.click()
 

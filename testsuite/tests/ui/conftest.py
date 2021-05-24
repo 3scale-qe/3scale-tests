@@ -2,7 +2,7 @@
 
 import os
 import pytest
-from threescale_api.resources import Account, ApplicationPlan
+from threescale_api.resources import Account, ApplicationPlan, Service
 
 from testsuite import rawobj
 from testsuite.config import settings
@@ -167,6 +167,7 @@ def ui_backend(custom_ui_backend, request):
 @pytest.fixture(scope="module")
 def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, request):
     """Parametrized custom Product created via UI"""
+
     def _custom_ui_product(name: str, system_name: str, description: str = "", autoclean=True):
         custom_admin_login()
         product = navigator.navigate(ProductNewView)
@@ -192,6 +193,7 @@ def custom_ui_account(custom_admin_login, navigator, threescale, request, testco
     """
     Create a custom account
     """
+
     def _custom_account(name: str, email: str, password: str, org_name: str, autoclean=True):
         custom_admin_login()
         account = navigator.navigate(AccountNewView)
@@ -218,10 +220,12 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
     """
     :return: params for custom application
     """
-    def _custom_ui_application(name: str, description: str, plan: ApplicationPlan, account: Account, autoclean=True):
+
+    def _custom_ui_application(name: str, description: str, plan: ApplicationPlan, account: Account, service: Service,
+                               autoclean=True):
         custom_admin_login()
         app = navigator.navigate(ApplicationNewView, account=account)
-        app.create(name, description, plan)
+        app.create(name, description, plan, service)
         application = account.applications.read_by_name(name)
 
         application.api_client_verify = testconfig["ssl_verify"]
@@ -241,7 +245,7 @@ def ui_application(service, custom_app_plan, custom_ui_application, account, req
     """Create an application through UI"""
     name = blame(request, "ui_account")
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    return custom_ui_application(name, "description", plan, account)
+    return custom_ui_application(name, "description", plan, account, service)
 
 
 def pytest_exception_interact(node, call, report):

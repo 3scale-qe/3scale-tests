@@ -5,6 +5,7 @@ from widgetastic.widget import TextInput, GenericLocatorWidget
 
 from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import CheckBoxGroup
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
 class WebhooksView(BaseSettingsView):
@@ -27,7 +28,7 @@ class WebhooksView(BaseSettingsView):
                       "Keys": ["web_hook_application_key_created_on", "web_hook_application_key_deleted_on",
                                "web_hook_application_key_updated_on"]}
     url = TextInput(id='web_hook_url')
-    update = GenericLocatorWidget(locator="//input[contains(@type, 'submit')]")
+    update = ThreescaleUpdateButton()
 
     def webhook_check(self, webhook_type: str, requestbin: str):
         """Configure given webhooks"""

@@ -1,10 +1,13 @@
 """ 3scale specific widgets"""
-import backoff
+# pylint: disable=arguments-differ
 
-from widgetastic.widget import Text, GenericLocatorWidget, Widget, TextInput
-from widgetastic.utils import ParametrizedLocator
+import backoff
 from widgetastic.exceptions import NoSuchElementException
+from widgetastic.utils import ParametrizedLocator
+from widgetastic.widget import Text, GenericLocatorWidget, Widget
+from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import ContextSelector, Navigation, PatternflyTable
+from widgetastic_patternfly4 import Select
 from widgetastic_patternfly4.navigation import check_nav_loaded
 
 from testsuite.ui.exception import ItemNotPresentException
@@ -14,7 +17,7 @@ class Link(Text):
     """
     Clickable/readable link representation accessible via the standard view functions read/fill.
     """
-    # pylint: disable=arguments-differ
+
     def fill(self, value):
         if value:
             self.browser.click(self)
@@ -74,15 +77,8 @@ class ContextMenu(ContextSelector):
     ContextMenu that extends ContextSelector lactated in Widgetastic PF4 libraries, but briefly adjusted
     to fit 3scale needs.
     """
-    ROOT = './/div[contains(@class, "PopNavigation--context")]'
-    DEFAULT_LOCATOR = './/div[contains(@class, "PopNavigation--context")]'
+    DEFAULT_LOCATOR = './/div[contains(@class, "pf-c-context-selector")]'
     BUTTON_LOCATOR = './/a[@href="#context-menu"]'
-
-    ITEMS_LOCATOR = ".//ul[@class='PopNavigation-list']/li"
-    ITEM_LOCATOR = (
-        ".//*[contains(@class, 'PopNavigation-listItem')"
-        " and normalize-space(.)={}]"
-    )
 
 
 # pylint: disable=abstract-method
@@ -272,6 +268,11 @@ class PolicySection(Widget):
         if not self.has_item(item):
             raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
         self.browser.click(self.item_element(item))
+
+
+class ThreescaleSelect(Select):
+    """Specific select for 3scale pages"""
+    BUTTON_LOCATOR = "./div/button"
 
 
 class DivBasedEditor(TextInput):

@@ -69,7 +69,7 @@ def test_wizard_bad_request(navigator, login, request, private_base_url):
         - Edit api with correct backend API
         - Assert that response page is displayed with successful request
     """
-    wrong_backend_url = "https://wrong_url.api"
+    wrong_backend_url = "https://wrong_url.invalid"
     correct_backend_url = private_base_url("echo-api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")

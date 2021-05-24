@@ -2,8 +2,8 @@
 from widgetastic.widget import TextInput
 
 from testsuite.ui.navigation import step
-from testsuite.ui.views.admin.product import BaseProductView, ProductsView
 from testsuite.ui.views.admin.foundation import BaseAdminView
+from testsuite.ui.views.admin.product import BaseProductView, ProductsView
 from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton
 

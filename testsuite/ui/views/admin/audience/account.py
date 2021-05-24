@@ -6,8 +6,8 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import Link, ThreescaleDropdown, AudienceTable, ThreescaleCheckBox
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton, \
-    ThreescaleEditButton
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
+    ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
 
 
 class AccountsView(BaseAudienceView):
@@ -15,7 +15,7 @@ class AccountsView(BaseAudienceView):
     path_pattern = '/buyers/accounts'
     new_account = Link("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
-    search_button = GenericLocatorWidget("//*[@value='Search']")
+    search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
 
     def search(self, value: str):
@@ -96,7 +96,7 @@ class AccountNewView(BaseAudienceView):
     email = TextInput(id='account_user_email')
     password = TextInput(id='account_user_password')
     organization = TextInput(id='account_org_name')
-    create_button = ThreescaleCreateButton()
+    create_button = ThreescaleSubmitButton()
 
     def create(self, username: str, email: str, password: str, organization: str):
         """Crate new account"""
@@ -119,7 +119,7 @@ class AccountEditView(BaseAudienceView):
     """View representation of Edit Account page"""
     path_pattern = "/buyers/accounts/{account_id}/edit"
     org_name = TextInput(id="account_org_name")
-    update_button = ThreescaleUpdateButton()
+    update_button = GenericLocatorWidget("//input[@value='Update Account']")
     delete_button = ThreescaleDeleteButton()
 
     def __init__(self, parent, account):
