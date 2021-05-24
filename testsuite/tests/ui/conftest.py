@@ -303,7 +303,7 @@ def get_resultsdir_path(node):
 
 
 @pytest.fixture(scope="module")
-def custom_auth0_login(browser, navigator, threescale, request):
+def custom_auth0_login(browser, navigator, threescale, request, testconfig):
     """
     Login fixture for admin portal via Auth0.
     :param browser: Browser instance
@@ -313,7 +313,7 @@ def custom_auth0_login(browser, navigator, threescale, request):
     :return: Login to Admin portal with custom credentials
     """
 
-    def _login(email=None, password=None):
+    def _login(email=None, password=None, autoclean=True):
         browser.selenium.delete_all_cookies()
         browser.refresh()
         browser.url = settings["threescale"]["admin"]["url"]
@@ -325,13 +325,14 @@ def custom_auth0_login(browser, navigator, threescale, request):
             user = threescale.provider_account_users.read_by_name(name)
             user.delete()
 
-        request.addfinalizer(_delete)
+        if not testconfig["skip_cleanup"] and autoclean:
+            request.addfinalizer(_delete)
 
     return _login
 
 
 @pytest.fixture(scope="module")
-def custom_rhsso_login(browser, navigator, threescale, request):
+def custom_rhsso_login(browser, navigator, threescale, request, testconfig):
     """
     Login fixture for admin portal via RHSSO.
     :param browser: Browser instance
@@ -341,7 +342,7 @@ def custom_rhsso_login(browser, navigator, threescale, request):
     :return: Login to Admin portal with custom credentials
     """
 
-    def _login(username, password, rhsso_username):
+    def _login(username, password, rhsso_username=None):
         browser.selenium.delete_all_cookies()
         browser.refresh()
         browser.url = settings["threescale"]["admin"]["url"]
@@ -352,7 +353,8 @@ def custom_rhsso_login(browser, navigator, threescale, request):
             user = threescale.provider_account_users.read_by_name(rhsso_username)
             user.delete()
 
-        request.addfinalizer(_delete)
+        if not testconfig["skip_cleanup"] and rhsso_username:
+            request.addfinalizer(_delete)
 
     return _login
 
@@ -391,13 +393,13 @@ def set_callback_urls(auth0_client):
     return _set_callback_urls
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def auth0_user_password():
     """Password for auth0 user"""
     return "RedHat123"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def auth0_user(auth0_client, request, testconfig, auth0_user_password):
     """
     Create Auth0 user via Auth0 API
