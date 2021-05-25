@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import importlib_resources as resources
 import pytest
 import yaml
-from dynaconf import settings
+from testsuite.config import settings
 
 import testsuite.toolbox.constants as constants
 from testsuite import rawobj
