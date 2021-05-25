@@ -6,7 +6,7 @@ import string
 import re
 import pytest
 
-from dynaconf import settings
+from testsuite.config import settings
 from testsuite.toolbox import toolbox
 import testsuite.toolbox.constants as constants
 from testsuite.utils import blame
