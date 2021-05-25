@@ -81,6 +81,23 @@ These variables are to enable/disable some testsuite options:
 
 - `_3SCALE_TESTS_ssl_verify(bool)`: To not verify SSL certs
 
+## Required Services
+
+To run all the tests various services must be deployed. If mentioned services
+are deployed in `tools` namespace (name can be changed in config) on same
+openshift, then they are auto-discovered, otherwise they have to be properly
+set in configuration.
+
+Here is the list of services:
+
+ * docker.io/eloycoto/apicast:tinyproxy
+ * docker.io/jsmadis/echo-api:latest
+ * docker.io/jsmadis/go-httpbin:latest
+ * docker.io/jsmadis/httpbin:latest
+ * docker.io/sxmichael/requestbin:latest
+ * quay.io/rh_integration/3scale-fuse-camel-proxy:latest
+ * registry.redhat.io/rh-sso-7/sso74-openshift-rhel8:7.4
+
 ## Run the Tests
 
 Testsuite is using the `pytest` as a testing framework, couple of `make`
@@ -116,6 +133,29 @@ Targets can be combined
 The arguments to pytest can be passed as `flags=` variable:
 
 `make smoke NAMESPACE=3scale flags=--junitxml=junit.xml`
+
+## Run the tests in container
+
+Assuming the container is called `3scale-py-testsuite` the docker command is:
+
+```
+docker run \
+	-v $HOME/.kube/config:/opt/kubeconfig:z \
+	-v $PWD/config/settings.local.yaml:/opt/settings.local.yaml:z \
+	-v $PWD/results:/test-run-results:z \
+	-e KUBECONFIG=/opt/kubeconfig \
+	-e SECRETS_FOR_DYNACONF=/opt/settings.local.yaml \
+	-e NAMESPACE=3scale \
+	3scale-py-testsuite
+```
+
+ * `/test-run-results` is container directory where all the results are stored
+ * `$KUBECONFIG` is highly recommended as much less configruration is needed
+ * `$SECRETS_FOR_DYNACONF` and relevant bind provide way how pass extra configuration
+ * `$NAMESPACE` with project name where 3scale is installed
+
+Without any args smoke tests are executed. Any arg as for `make` from examples
+above can be passed to run appropriate set.
 
 ## Debugging
 
