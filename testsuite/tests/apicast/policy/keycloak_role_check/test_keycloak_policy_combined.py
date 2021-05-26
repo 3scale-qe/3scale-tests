@@ -7,8 +7,8 @@ spec/functional_specs/policies/keycloak_role_check/realm_roles/keycloak_realm_co
 """
 
 import pytest
-
-from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
+import pytest_cases
+from pytest_cases import fixture_ref
 
 from testsuite.capabilities import Capability
 from testsuite.utils import randomize
@@ -21,7 +21,7 @@ pytestmark = [pytest.mark.disruptive,
               pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client_scope(application, rhsso_service_info, client_role):
     """
     :return scope of policy for client role
@@ -34,7 +34,7 @@ def client_scope(application, rhsso_service_info, client_role):
     return _client_scope
 
 
-@fixture_plus
+@pytest_cases.fixture
 def realm_scope(realm_role):
     """
     :return scope of policy for client role
@@ -59,9 +59,9 @@ def policy_config_combined(list_type: str, scope: dict):
     return rawobj.PolicyConfig("keycloak_role_check", configuration)
 
 
-@fixture_plus
-@parametrize_plus("scope", [fixture_ref(client_scope), fixture_ref(realm_scope)])
-@parametrize_plus("first,second", [("whitelist", "blacklist"), ("blacklist", "whitelist")])
+@pytest_cases.fixture
+@pytest_cases.parametrize("scope", [fixture_ref(client_scope), fixture_ref(realm_scope)])
+@pytest_cases.parametrize("first,second", [("whitelist", "blacklist"), ("blacklist", "whitelist")])
 def config(service, scope, first, second):
     """
     Add keycloak policies to policy chain

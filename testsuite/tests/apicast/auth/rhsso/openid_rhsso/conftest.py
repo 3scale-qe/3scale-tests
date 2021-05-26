@@ -3,10 +3,10 @@ Conftest for the openid rhsso credentials locations tests
 """
 
 import pytest
-from pytest_cases import fixture_plus
+import pytest_cases
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def staging_client(api_client):
     """
     Staging client
@@ -20,7 +20,7 @@ def staging_client(api_client):
 
 
 # Used for parametrize_plus, because normal fixture doesn't work with @parametrize_plus
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def production_client(prod_client):
     """
     Production client

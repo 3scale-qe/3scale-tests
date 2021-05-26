@@ -3,7 +3,7 @@ Conftest for keycloak policy
 """
 
 import backoff
-from pytest_cases import fixture_plus
+import pytest_cases
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
@@ -11,7 +11,7 @@ from testsuite.utils import randomize, blame
 
 
 # pylint: disable=unused-argument
-@fixture_plus
+@pytest_cases.fixture
 def service(rhsso_setup, service_proxy_settings, custom_service, lifecycle_hooks, request):
     """Service configured with config"""
     service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
@@ -25,21 +25,21 @@ def service(rhsso_setup, service_proxy_settings, custom_service, lifecycle_hooks
 
 
 # pylint: disable=unused-argument, too-many-arguments
-@fixture_plus
+@pytest_cases.fixture
 def application(rhsso_setup, service, custom_application, custom_app_plan, lifecycle_hooks, request):
     """application bound to the account and service existing over whole testing session"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
     return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
 
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
-@fixture_plus
+@pytest_cases.fixture
 def create_users(rhsso_service_info):
     """
     Create 2 rhsso users
@@ -52,7 +52,7 @@ def create_users(rhsso_service_info):
     return user_with_role, user_without_role
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client_role(application, rhsso_service_info, create_users):
     """
     Create client role and add it to user_with_role
@@ -69,7 +69,7 @@ def client_role(application, rhsso_service_info, create_users):
     return _client_role
 
 
-@fixture_plus
+@pytest_cases.fixture
 def realm_role(rhsso_service_info, create_users):
     """
     Create realm role and add it to user_with_role
@@ -86,7 +86,7 @@ def realm_role(rhsso_service_info, create_users):
     return _realm_role
 
 
-@fixture_plus()
+@pytest_cases.fixture()
 def prod_client(application, production_gateway):
     """
     Prepares application and service for production use and creates new production client

@@ -2,7 +2,7 @@
 Default conftest for rate limit tests
 """
 import pytest
-from pytest_cases import fixture_plus
+import pytest_cases
 
 from testsuite import rawobj
 from testsuite.utils import blame
@@ -19,7 +19,7 @@ def policy_settings():
     """all has to be function-scoped in this namespace"""
 
 
-@fixture_plus
+@pytest_cases.fixture
 def service_plus(custom_service, service_proxy_settings, request, policy_settings):
     """Usual service with policy_settings added to the policy_chain. function-scoped"""
 
@@ -31,7 +31,7 @@ def service_plus(custom_service, service_proxy_settings, request, policy_setting
     return svc
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application(service_plus, custom_app_plan, custom_application, request):
     """function-scoped application"""
 
@@ -39,7 +39,7 @@ def application(service_plus, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client(application):
     """function-scoped api_client
 
@@ -52,7 +52,7 @@ def client(application):
     client.close()
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client2(application2):
     """
     Sets ssl_verify for api client

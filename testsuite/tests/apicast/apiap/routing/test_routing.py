@@ -2,7 +2,8 @@
 Test that request to product with specific paths to backends will be routed to correct backend
 """
 import pytest
-from pytest_cases import fixture_plus, parametrize_with_cases
+import pytest_cases
+from pytest_cases import parametrize_with_cases
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj
@@ -16,7 +17,7 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4937")]
 
 
-@fixture_plus
+@pytest_cases.fixture
 def service(backends_mapping, service_proxy_settings, custom_service, request, lifecycle_hooks):
     """Service configured with all backends that are connected via each path from paths"""
     return custom_service({"name": blame(request, "svc")},
@@ -25,14 +26,14 @@ def service(backends_mapping, service_proxy_settings, custom_service, request, l
                           hooks=lifecycle_hooks)
 
 
-@fixture_plus
+@pytest_cases.fixture
 @parametrize_with_cases("case_data", cases=routing_cases)
 def paths(case_data):
     """Array of paths that are used for backend usages (for each path connect product with new backend)"""
     return case_data
 
 
-@fixture_plus
+@pytest_cases.fixture
 def backends_mapping(custom_backend, paths, private_base_url):
     """
     Backend mapping for each path is created new backend
@@ -46,7 +47,7 @@ def backends_mapping(custom_backend, paths, private_base_url):
     return mappings
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application(service, custom_app_plan, custom_application, lifecycle_hooks, request):
     """application bound to the account and service"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
@@ -54,7 +55,7 @@ def application(service, custom_app_plan, custom_application, lifecycle_hooks, r
 
 
 # pylint: disable=unused-argument
-@fixture_plus
+@pytest_cases.fixture
 def client(staging_gateway, application):
     """
     Local replacement for default api_client.
