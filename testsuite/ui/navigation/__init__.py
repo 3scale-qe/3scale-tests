@@ -173,7 +173,7 @@ class Navigator:
         return False
 
     @staticmethod
-    @backoff.on_exception(backoff.fibo, Exception, max_tries=4)
+    @backoff.on_exception(backoff.fibo, Exception, max_tries=4, jitter=None)
     def invoke_method(method, *args, **kwargs):
         """To improve stability of navigator we need to use backoff"""
         method(*args, **kwargs)

@@ -15,7 +15,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 
 
 # Zync is sometimes too slow to create the RHSSO client.
-@backoff.on_predicate(backoff.fibo, lambda x: x is None, 7)
+@backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
 def get_rhsso_client(application, rhsso_service_info):
     """
     Retries until the RHSSO client is created

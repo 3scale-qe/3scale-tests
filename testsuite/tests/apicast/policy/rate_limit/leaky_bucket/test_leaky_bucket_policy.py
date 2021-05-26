@@ -93,7 +93,7 @@ def client2(application2):
     client.close()
 
 
-@backoff.on_predicate(backoff.fibo, lambda x: x[0], 7)
+@backoff.on_predicate(backoff.fibo, lambda x: x[0], 8, jitter=None)
 def retry_requests(client, client2, rate_limit_applied):
     """
     Retries requests to both clients
