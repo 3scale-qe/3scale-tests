@@ -84,7 +84,7 @@ def _docker_image(ocp, name):
     return [i for i in lookup if i.get("from", {}).get("kind") == "DockerImage"][-1]
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
     """Reads and loads in to "settings" a single key or all keys from vault
 
@@ -112,6 +112,11 @@ def load(obj, env=None, silent=None, key=None):
         admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
         master_url = _route2url(ocp.routes.for_service("system-master")[0])
         master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
+        try:
+            backend_route = ocp.routes.for_service("backend-listener")[0]
+        except IndexError:
+            # RHOAM changed service name owning the route
+            backend_route = ocp.routes.for_service("backend-listener-proxy")[0]
 
         # all this or nothing
         if None in (project, admin_url, admin_token, master_url, master_token):
@@ -147,7 +152,7 @@ def load(obj, env=None, silent=None, key=None):
                 "gateway": {
                     "image": _apicast_image(ocp)},
                 "backend_internal_api": {
-                    "route": ocp.routes.for_service("backend-listener")[0],
+                    "route": backend_route,
                     "username": ocp.secrets["backend-internal-api"]["username"],
                     "password": ocp.secrets["backend-internal-api"]["password"]
                 }
@@ -166,6 +171,6 @@ def load(obj, env=None, silent=None, key=None):
         log.info("dynamic dynaconf loader successfully got data from openshift")
     except Exception as err:
         if silent:
-            log.debug("'%s' appeared with message: %s", type(err).__name__, err)
+            log.exception("'%s' appeared with message: %s", type(err).__name__, err)
             return
         raise err
