@@ -82,7 +82,7 @@ def change_flows(application, flow_to_update, request):
 
 
 # Zync is sometimes too slow to update the RHSSO client.
-@backoff.on_predicate(backoff.fibo, lambda x: x != TESTING_FLOWS, 7)
+@backoff.on_predicate(backoff.fibo, lambda x: x != TESTING_FLOWS, 8, jitter=None)
 def get_flows(rhsso_client):
     """
     Retries until the changed flows appear on the RHSSO side.
@@ -98,7 +98,7 @@ def get_flows(rhsso_client):
     }
 
 
-@backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8)
+@backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8, jitter=None)
 def realm_client_by_id(realm, client_id):
     """Helper to have reliable sso/oauth client getter"""
 

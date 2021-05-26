@@ -108,7 +108,7 @@ class HttpxClient:
         This method is needed for compatibility with HttpClient
         """
 
-    @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8)
+    @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8, jitter=None)
     def request(self, method, path,
                 content=None, data=None, files=None, json=None,
                 params=None, headers=None, cookies=None,
