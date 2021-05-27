@@ -91,6 +91,7 @@ set in configuration.
 Here is the list of services:
 
  * docker.io/eloycoto/apicast:tinyproxy
+ * docker.io/jaegertracing/all-in-one:latest
  * docker.io/jsmadis/echo-api:latest
  * docker.io/jsmadis/go-httpbin:latest
  * docker.io/jsmadis/httpbin:latest
