@@ -9,7 +9,7 @@ from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import AudienceTable, Link, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
-    ThreescaleCreateButton, ThreescaleEditButton
+    ThreescaleCreateButton, ThreescaleEditButton, ThreescaleSubmitButton
 
 
 class ApplicationsView(BaseAudienceView):
@@ -40,11 +40,18 @@ class ApplicationDetailView(BaseProductView):
     api_credentials_table = PatternflyTable("//*[@id='keys']", column_widgets={
         1: Link("./span/a[contains(@class, 'delete')]")
     })
+    referer_filters_input = TextInput(id="referrer_filter")
+    add_referer_filter_btn = ThreescaleSubmitButton()
     plan_dropdown = ThreescaleDropdown("//*[@id='cinstance_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change Plan']")
 
     def __init__(self, parent, product, application):
         super().__init__(parent, product, application_id=application.entity_id)
+
+    def add_referer_filter(self, filter_domain):
+        """Add referer filter when referer policy is applied"""
+        self.referer_filters_input.fill(filter_domain)
+        self.add_referer_filter_btn.click()
 
     def suspend(self):
         """Suspend application plan"""

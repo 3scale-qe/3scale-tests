@@ -15,3 +15,7 @@ class DestinationNotDisplayedError(Exception):
 
 class WebDriverError(Exception):
     """Raised when webdriver problem occurs"""
+
+
+class ItemNotPresentException(Exception):
+    """Raised when item in element is not present"""
