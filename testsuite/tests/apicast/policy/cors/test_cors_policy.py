@@ -1,4 +1,5 @@
-""""testing proper function of the CORS policy
+""""
+testing proper function of the CORS policy
 
 Rewrite: ./spec/functional_specs/policies/cors/cors_policy_spec.rb
 """
@@ -7,12 +8,20 @@ from testsuite import rawobj
 
 
 @pytest.fixture(scope="module")
-def policy_settings():
-    """config of cors policy"""
-    return rawobj.PolicyConfig("cors", {
+def service(service):
+    """
+    Set the cors policy to allow requests with "localhost" origin.
+    Also sets the headers policy to remove the "Access-Control-Allow-Origin" header from
+    the upstream API, so we can test that this header is added by the cors policy.
+    """
+    proxy = service.proxy.list()
+    proxy.policies.insert(0, rawobj.PolicyConfig("cors", {
         "allow_methods": ["GET", "POST"],
         "allow_credentials": True,
-        "allow_origin": "localhost"})
+        "allow_origin": "localhost"}))
+    proxy.policies.insert(0, rawobj.PolicyConfig("headers", {
+        "response": [{"op": "delete", "header": "Access-Control-Allow-Origin"}]}))
+    return service
 
 
 def test_cors_headers_for_same_origin(api_client):
@@ -26,12 +35,17 @@ def test_cors_headers_for_same_origin(api_client):
 
 
 def test_no_cors_headers_with_none_origin(api_client):
-    """Request without origin header"""
+    """
+    Access-Control-Allow-Origin is not added to a request without origin header
+    """
     response = api_client().get("/get")
     assert "Access-Control-Allow-Origin" not in response.headers
 
 
 def test_cors_headers_for_different_origin(api_client):
-    """Request with different origin"""
+    """
+    Access-Control-Allow-Origin is not added to a request with origin header with
+    not allowed origin
+    """
     response = api_client().get("/get", headers=dict(origin="foo.bar.example.com"))
-    assert "Access-Control-Allow-Origin" in response.headers
+    assert "Access-Control-Allow-Origin" not in response.headers

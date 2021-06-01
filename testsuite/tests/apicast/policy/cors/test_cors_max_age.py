@@ -7,15 +7,22 @@ from testsuite import rawobj
 
 
 @pytest.fixture(scope="module")
-def policy_settings():
-    """config of cors policy"""
-
-    return rawobj.PolicyConfig("cors", {
+def service(service):
+    """
+    Set the cors policy to allow requests with "localhost" origin with custom max_age header.
+    Also sets the headers policy to remove the "Access-Control-Allow-Origin" header from
+    the upstream API, so we can test that this header is not added by the cors policy.
+    """
+    proxy = service.proxy.list()
+    proxy.policies.insert(0, rawobj.PolicyConfig("cors", {
         "allow_methods": ["GET", "POST"],
         "allow_credentials": True,
         "allow_origin": "localhost",
         "max_age": 2500
-    })
+    }))
+    proxy.policies.insert(0, rawobj.PolicyConfig("headers", {
+        "response": [{"op": "delete", "header": "Access-Control-Allow-Origin"}]}))
+    return service
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6556")
