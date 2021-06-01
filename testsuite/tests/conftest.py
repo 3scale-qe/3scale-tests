@@ -21,9 +21,10 @@ import testsuite.tools
 from testsuite import rawobj, CONFIGURATION, HTTP2
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
+from testsuite.prometheus import PrometheusClient
 from testsuite.requestbin import RequestBinClient
 from testsuite.httpx import HttpxHook
-from testsuite.utils import blame, blame_desc
+from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso.rhsso import RHSSOServiceConfiguration, RHSSO, add_realm_management_role, create_rhsso_user
 
 pytest_plugins = ("testsuite.gateway_logs",)
@@ -763,3 +764,25 @@ def custom_tenant(testconfig, master_threescale, request):
         return tenant
 
     return _custom_tenant
+
+
+@pytest.fixture(scope="session")
+def prometheus(testconfig, openshift):
+    """
+    Returns an instance of Prometheus client.
+    Skips the tests when Prometheus is not present in the project.
+    """
+    if "prometheus" in testconfig:
+        return PrometheusClient(testconfig["prometheus"]["url"])
+
+    routes = openshift().routes.for_service('prometheus-operated')
+    if len(routes) == 0:
+        routes = openshift().routes.for_service('prometheus')
+
+    if len(routes) == 0:
+        warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")
+
+    protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
+    prometheus_url = protocol + routes[0]['spec']['host']
+
+    return PrometheusClient(prometheus_url)

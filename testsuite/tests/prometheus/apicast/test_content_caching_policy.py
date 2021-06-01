@@ -53,7 +53,7 @@ def api_client(api_client):
 @pytest.mark.parametrize(("client", "apicast"), [("api_client", "3scale Apicast Staging"),
                                                  ("prod_client", "3scale Apicast Production")],
                          ids=["Staging Apicast", "Production Apicast"])
-def test_content_caching(request, prometheus_client, client, apicast):
+def test_content_caching(request, prometheus, client, apicast):
     """
     Test if cache works correctly and if prometheus contains content_caching metric.
     """
@@ -67,7 +67,7 @@ def test_content_caching(request, prometheus_client, client, apicast):
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 
-    metrics = prometheus_client.get_metrics(apicast)
+    metrics = prometheus.get_metrics(apicast)
     metrics = [m["metric"] for m in metrics["data"]]
 
     assert "content_caching" in metrics
