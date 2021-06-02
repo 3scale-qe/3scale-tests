@@ -11,8 +11,8 @@ spec/functional_specs/policies/keycloak_role_check/realm_roles/keycloak_realm_wh
 """
 
 import pytest
-
-from pytest_cases import fixture_plus, parametrize_plus, fixture_ref
+import pytest_cases
+from pytest_cases import fixture_ref
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
@@ -23,7 +23,7 @@ pytestmark = [pytest.mark.disruptive,
               pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client_scope(application, rhsso_service_info, client_role):
     """
     :return scope of policy for client role
@@ -32,7 +32,7 @@ def client_scope(application, rhsso_service_info, client_role):
     return {"client_roles": [{"name": client_role(), "client": client}]}
 
 
-@fixture_plus
+@pytest_cases.fixture
 def realm_scope(realm_role):
     """
     :return scope of policy for client role
@@ -53,10 +53,10 @@ def policy_config(list_type: str, scope: dict, method: dict):
 
 
 # pylint: disable=too-many-arguments
-@fixture_plus
-@parametrize_plus("list_type,code1,code2", [("whitelist", 200, 403), ("blacklist", 403, 200)])
-@parametrize_plus("scope", [fixture_ref(client_scope), fixture_ref(realm_scope)])
-@parametrize_plus("method", [{}, {"methods": ["GET"]}])
+@pytest_cases.fixture
+@pytest_cases.parametrize("list_type,code1,code2", [("whitelist", 200, 403), ("blacklist", 403, 200)])
+@pytest_cases.parametrize("scope", [fixture_ref(client_scope), fixture_ref(realm_scope)])
+@pytest_cases.parametrize("method", [{}, {"methods": ["GET"]}])
 def config(service, list_type, scope, method, code1, code2):
     """
     Add keycloak policy to policy chain

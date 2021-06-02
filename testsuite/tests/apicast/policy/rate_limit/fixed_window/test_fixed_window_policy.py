@@ -19,8 +19,8 @@ spec/functional_specs/policies/rate_limit/fixed_window/
 import time
 import backoff
 import pytest
-
-from pytest_cases import fixture_plus, parametrize_with_cases
+import pytest_cases
+from pytest_cases import parametrize_with_cases
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
@@ -30,13 +30,13 @@ from testsuite.utils import blame
 pytestmark = pytest.mark.flaky
 
 
-@fixture_plus
+@pytest_cases.fixture
 def service_plus2(service_proxy_settings, custom_service, request):
     """Service configured with parametrized config"""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
-@fixture_plus
+@pytest_cases.fixture
 @parametrize_with_cases("case_data", cases=config_cases)
 def config(case_data, service_plus, service_plus2):
     """Configuration for rate limit policy"""
@@ -50,7 +50,7 @@ def config(case_data, service_plus, service_plus2):
     return status_code, service_plus2
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application2(config, custom_app_plan, custom_application, request):
     """Second application bound to the account and service_plus"""
     service = config[1]

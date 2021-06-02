@@ -2,7 +2,8 @@
 Rewrite of spec/functional_specs/auth/app_id_spec.rb
 """
 import pytest
-from pytest_cases import parametrize_plus, fixture_ref, fixture_plus
+import pytest_cases
+from pytest_cases import fixture_ref
 from threescale_api.resources import Service
 
 from testsuite import rawobj
@@ -41,7 +42,7 @@ def application2(service2, custom_application, custom_app_plan, lifecycle_hooks,
     return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def client(application, prod_client):
     """
     Production client for first application. It won't redeploy gateway since it will be done in client2.
@@ -58,7 +59,7 @@ def client(application, prod_client):
 
 # Client2 is calling a client in order to assure that the service was promoted
 # and we can make the only single redeploy request
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def client2(prod_client, application2, client):  # pylint: disable=unused-argument
     """
     Production client for second application.
@@ -73,35 +74,38 @@ def client2(prod_client, application2, client):  # pylint: disable=unused-argume
     return client
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def app_id(application):
     """App id of first service"""
     return application["application_id"]
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def app_key(application):
     """App key of first service"""
     return application.keys.list()["keys"][0]["key"]["value"]
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def app_id2(application2):
     """App id of second service"""
     return application2["application_id"]
 
 
-@fixture_plus(scope="module")
+@pytest_cases.fixture(scope="module")
 def app_key2(application2):
     """App key of second service"""
     return application2.keys.list()["keys"][0]["key"]["value"]
 
 
-@parametrize_plus('test_client,application_id,key',
-                  [(fixture_ref(client), fixture_ref(app_id), fixture_ref(app_key)),
-                   (fixture_ref(client2), fixture_ref(app_id2), fixture_ref(app_key2))],
-                  ids=["service_with_valid_credentials",
-                       "service2_with_valid_credentials"])
+@pytest_cases.parametrize(
+    'test_client,application_id,key',
+    [
+        (fixture_ref(client), fixture_ref(app_id), fixture_ref(app_key)),
+        (fixture_ref(client2), fixture_ref(app_id2), fixture_ref(app_key2))],
+    ids=[
+        "service_with_valid_credentials",
+        "service2_with_valid_credentials"])
 def test_successful_requests(test_client, application_id, key):
     """Test checks if applications with correct auth params will return 200"""
     response = test_client.get('/get', params={"app_id": application_id, "app_key": key})
@@ -112,17 +116,20 @@ def test_successful_requests(test_client, application_id, key):
     assert echoed_request.params['app_id'] == application_id
 
 
-@parametrize_plus('test_client,application_id,key',
-                  [(fixture_ref(client), fixture_ref(app_id2), fixture_ref(app_key2)),
-                   (fixture_ref(client2), fixture_ref(app_id), fixture_ref(app_key)),
-                   (fixture_ref(client), "", ""),
-                   (fixture_ref(client), fixture_ref(app_id), ""),
-                   (fixture_ref(client), "", fixture_ref(app_key))],
-                  ids=["credentials_from_another_service",
-                       "credentials_from_another_service",
-                       "empty_id_and_key",
-                       "empty_app_key",
-                       "empty_app_id"])
+@pytest_cases.parametrize(
+    'test_client,application_id,key',
+    [
+        (fixture_ref(client), fixture_ref(app_id2), fixture_ref(app_key2)),
+        (fixture_ref(client2), fixture_ref(app_id), fixture_ref(app_key)),
+        (fixture_ref(client), "", ""),
+        (fixture_ref(client), fixture_ref(app_id), ""),
+        (fixture_ref(client), "", fixture_ref(app_key))],
+    ids=[
+        "credentials_from_another_service",
+        "credentials_from_another_service",
+        "empty_id_and_key",
+        "empty_app_key",
+        "empty_app_id"])
 def test_failed_requests(test_client, application_id, key):
     """Test checks if different invalid auth params returns 403 status code"""
     response = test_client.get('/get', params={"app_id": application_id, "app_key": key})

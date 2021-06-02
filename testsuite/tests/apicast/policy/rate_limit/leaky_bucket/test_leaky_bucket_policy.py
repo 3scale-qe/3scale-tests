@@ -23,7 +23,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 import backoff
 import pytest
-from pytest_cases import fixture_plus, parametrize_with_cases
+import pytest_cases
+from pytest_cases import parametrize_with_cases
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
@@ -36,19 +37,19 @@ TOTAL_REQUESTS = 6
 pytestmark = pytest.mark.flaky
 
 
-@fixture_plus
+@pytest_cases.fixture
 def service(service_proxy_settings, custom_service, request):
     """Service configured with config"""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
-@fixture_plus
+@pytest_cases.fixture
 def service2(service_proxy_settings, custom_service, request):
     """Service configured with parametrized config"""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
-@fixture_plus
+@pytest_cases.fixture
 @parametrize_with_cases('case_data', cases=config_cases)
 def config(case_data, service, service2):
     """Configuration for rate limit policy"""
@@ -62,14 +63,14 @@ def config(case_data, service, service2):
     return apply_rate_limit, service2
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application(service, custom_app_plan, custom_application, request):
     """First application bound to the account and service_plus"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application2(config, custom_app_plan, custom_application, request):
     """Second application bound to the account and service_plus"""
     svc = config[1]
@@ -77,7 +78,7 @@ def application2(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client(application):
     """api client for application"""
     client = application.api_client()
@@ -85,7 +86,7 @@ def client(application):
     client.close()
 
 
-@fixture_plus
+@pytest_cases.fixture
 def client2(application2):
     """api client for application2"""
     client = application2.api_client()

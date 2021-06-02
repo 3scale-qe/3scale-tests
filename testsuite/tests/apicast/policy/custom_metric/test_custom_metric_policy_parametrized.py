@@ -4,8 +4,9 @@ The policy enables to decide whether to increase a
 metric based on the response from the upstream API
 """
 import pytest
+import pytest_cases
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from pytest_cases import fixture_plus, parametrize_with_cases
+from pytest_cases import parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
@@ -26,7 +27,7 @@ def service_proxy_settings(private_base_url):
     return rawobj.Proxy(private_base_url("httpbin"))
 
 
-@fixture_plus
+@pytest_cases.fixture
 @parametrize_with_cases("case_data", cases=config_cases)
 def config(custom_service, case_data, request, service_proxy_settings, lifecycle_hooks):
     """
@@ -48,7 +49,7 @@ def config(custom_service, case_data, request, service_proxy_settings, lifecycle
     return service, calls, metrics
 
 
-@fixture_plus
+@pytest_cases.fixture
 def application(config, custom_app_plan, custom_application, request):
     """
     An application bound to the service created in the config fixture
@@ -59,7 +60,7 @@ def application(config, custom_app_plan, custom_application, request):
 
 
 # pylint: disable=unused-argument
-@fixture_plus
+@pytest_cases.fixture
 def client(staging_gateway, application):
     """
     Local replacement for default api_client.
