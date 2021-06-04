@@ -171,6 +171,6 @@ def load(obj, env=None, silent=None, key=None):
         log.info("dynamic dynaconf loader successfully got data from openshift")
     except Exception as err:
         if silent:
-            log.exception("'%s' appeared with message: %s", type(err).__name__, err)
+            log.debug("'%s' appeared with message: %s", type(err).__name__, err, exc_info=True)
             return
         raise err
