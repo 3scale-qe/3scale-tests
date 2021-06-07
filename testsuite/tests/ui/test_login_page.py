@@ -19,16 +19,17 @@ def refreshed_browser(browser):
     This fixture will reload login page to overcome problem of reseting text
     input
     """
+    browser.selenium.delete_all_cookies()
     browser.selenium.refresh()
     return browser
 
 
 @pytest.mark.smoke
-def test_login_page_text(browser):
+def test_login_page_text(refreshed_browser):
     """
     Test expected strings on the Login page
     """
-    assert LoginView(browser).is_displayed
+    assert LoginView(refreshed_browser).is_displayed
 
 
 @pytest.mark.smoke
