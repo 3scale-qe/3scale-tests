@@ -4,6 +4,8 @@ This module contains wrapper for the Mailhog API
 
 import json
 import requests
+from openshift import OpenShiftPythonException
+from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient  # pylint: disable=unused-import
 
 
@@ -14,10 +16,13 @@ class MailhogClient:
                  mailhog_service_name: str = "mailhog"):
         """Initializes the client, the mailhog app has to be running in the
             same openshift as 3scale, and has to be named 'mailhog'"""
-        mailhog_routes = openshift.routes.for_service(mailhog_service_name)
-        assert len(mailhog_routes) > 0, "Mailhog is misconfigured or missing"
-        self._url = \
-            "http://" + mailhog_routes[0]["spec"]["host"]
+        try:
+            mailhog_routes = openshift.routes.for_service(mailhog_service_name)
+            assert len(mailhog_routes) > 0, "Mailhog is misconfigured or missing"
+            self._url = \
+                "http://" + mailhog_routes[0]["spec"]["host"]
+        except OpenShiftPythonException:
+            warn_and_skip("Can't find mailhog, skipping mailhog related tests")
 
     @property
     def url(self) -> str:
