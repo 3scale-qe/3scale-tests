@@ -32,6 +32,7 @@ def browser(request):
                                remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
                                binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
     webdriver.get_driver()
+    webdriver.post_init()
     started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
     request.addfinalizer(webdriver.finalize)
     return started_browser
