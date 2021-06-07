@@ -8,7 +8,8 @@ import importlib_resources as resources
 
 
 from testsuite.capabilities import Capability
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
 
@@ -56,19 +57,14 @@ def build_images(openshift, request, image_stream_amp_apicast_custom_policy):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, settings_block,
-                    image_stream_amp_apicast_custom_policy) -> TemplateApicast:
-    """Deploy an apicast gateway with custom image from image_stream_amp_apicast_custom_policy"""
+def staging_gateway(request, image_stream_amp_apicast_custom_policy) -> TemplateApicast:
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-
-    request.addfinalizer(gateway.destroy)
-
-    gateway.create()
-
-    gateway.update_image_stream(image_stream_amp_apicast_custom_policy)
-    return gateway
+    gw.update_image_stream(image_stream_amp_apicast_custom_policy)
+    return gw
 
 
 @pytest.fixture

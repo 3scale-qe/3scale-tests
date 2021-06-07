@@ -1,7 +1,6 @@
 """This module is where most of the capability providers should be to not have them scattered around"""
-from testsuite import CONFIGURATION
+from testsuite import CONFIGURATION, gateways
 from testsuite.capabilities import CapabilityRegistry, Capability
-from testsuite.gateways import configuration
 
 
 def _rhoam():
@@ -17,10 +16,7 @@ def _rhoam():
 
 def gateway_capabilities():
     """Adds capabilities provided by gateways"""
-    staging = configuration.staging.CAPABILITIES
-    if configuration.production:
-        staging.update(configuration.production.CAPABILITIES)
-    return staging
+    return gateways.default.CAPABILITIES
 
 
 CapabilityRegistry().register_provider(gateway_capabilities,

@@ -178,8 +178,17 @@ def load(obj, env=None, silent=None, key=None):
                 "devel": {
                     "url": devel_url},
                 "gateway": {
-                    "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
-                    "image": _apicast_image(ocp)},
+                    "default": {
+                        "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
+                        "image": _apicast_image(ocp),
+                        "openshift": ocp
+                    },
+                    "TemplateApicast": {
+                        "image": apicast_image,
+                        "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
+                        "openshift": ocp
+                    },
+                },
                 "backend_internal_api": {
                     "route": backend_route,
                     "username": ocp.secrets["backend-internal-api"]["username"],

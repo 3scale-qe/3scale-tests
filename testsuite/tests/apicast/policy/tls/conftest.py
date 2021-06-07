@@ -4,7 +4,8 @@ from weakget import weakget
 import pytest
 
 from testsuite.certificates import Certificate
-from testsuite.gateways import TLSApicastOptions, TLSApicast
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.tls import TLSApicast
 from testsuite.openshift.objects import SecretKinds
 from testsuite.utils import blame, warn_and_skip
 
@@ -16,21 +17,31 @@ def require_openshift(testconfig):
         warn_and_skip("All from tls skipped due to missing openshift")
 
 
-@pytest.fixture(scope="module")
-def staging_gateway(request, configuration):
-    """Deploy tls apicast gateway. We need APIcast listening on https port"""
-    settings_block = {
-        "deployments": {
-            "staging": blame(request, "tls-apicast"),
-            "production": blame(request, "tls-apicast"),
-        }
-    }
-    options = TLSApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TLSApicast(requirements=options)
+@pytest.fixture(scope="session")
+def server_authority(request, configuration):
+    """CA Authority to be used in the gateway"""
+    wildcard_domain = "*." + configuration.superdomain
+    authority = configuration.manager.get_or_create_ca("server-ca",
+                                                       hosts=[wildcard_domain])
+    request.addfinalizer(authority.delete_files)
+    return authority
 
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
-    return gateway
+
+@pytest.fixture(scope="module")
+def staging_gateway(request, testconfig, server_authority, configuration):
+    """Deploy tls apicast gateway. We need APIcast listening on https port"""
+    kwargs = dict(
+        name=blame(request, "tls-gw"),
+        manager=configuration.manager,
+        server_authority=server_authority,
+        superdomain=configuration.superdomain,
+        **testconfig["threescale"]["gateway"]["TemplateApicast"],
+    )
+    gw = gateway(kind=TLSApicast, staging=True, **kwargs)
+
+    request.addfinalizer(gw.destroy)
+    gw.create()
+    return gw
 
 
 @pytest.fixture(scope="session")

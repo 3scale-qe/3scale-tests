@@ -1,11 +1,13 @@
 """Provide custom gateway for tests changing apicast parameters."""
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.capabilities import Capability
-from testsuite.utils import randomize, warn_and_skip
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.utils import blame
+from testsuite.utils import warn_and_skip
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
@@ -18,18 +20,10 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(configuration, request):
-    """Deploy template apicast gateway."""
-    settings_block = {
-        "deployments": {
-            "staging": randomize("retry-policy-staging"),
-            "production": randomize("retry-policy-production")
-        }
-    }
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
+def staging_gateway(request):
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
-
-    return gateway
+    return gw

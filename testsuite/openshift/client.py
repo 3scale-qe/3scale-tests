@@ -46,12 +46,15 @@ class OpenShiftClient:
         stack.enter_context(oc.project(self.project_name))
 
     def do_action(self, verb: str, cmd_args: List[Union[str, List[str]]] = None,
-                  auto_raise: bool = True) -> "oc.Selector":
+                  auto_raise: bool = True, parse_output: bool = False):
         """Run an oc command."""
         cmd_args = cmd_args or []
         with ExitStack() as stack:
             self.prepare_context(stack)
-            return oc.invoke(verb, cmd_args, auto_raise=auto_raise)
+            result = oc.invoke(verb, cmd_args, auto_raise=auto_raise)
+            if parse_output:
+                return oc.APIObject(string_to_model=result.out())
+            return result
 
     @property
     def is_operator_deployment(self):

@@ -9,8 +9,7 @@ It tests only embedded type as path requires manipulation with the deployment
 """
 import pytest
 
-from testsuite import gateways
-from testsuite import rawobj
+from testsuite import rawobj, gateways
 from testsuite.capabilities import Capability
 from testsuite.certificates import Certificate
 from testsuite.tests.apicast.policy.tls import embedded
@@ -29,15 +28,10 @@ def invalid_authority(request, configuration) -> Certificate:
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request, testconfig, configuration):
-    """Standard gateway, copied from root conftest.
-     Not ideal, but since I need this file in this directory, this is the least amount of code duplication I managed"""
-    options = gateways.configuration.options(staging=True,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateways.configuration.staging(options)
+def staging_gateway(request,):
+    """Standard gateway, copied from root conftest."""
+    gateway = gateways.gateway(staging=True)
     request.addfinalizer(gateway.destroy)
-
     gateway.create()
 
     return gateway

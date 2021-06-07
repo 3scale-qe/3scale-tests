@@ -1,27 +1,13 @@
 """System Apicast that comes deployed with 3scale"""
-from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from testsuite.gateways.gateways import AbstractApicast, GatewayRequirements
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.env import Environ
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
-
-
-class SystemApicastRequirements(GatewayRequirements, ABC):
-    """Requirements for SystemApicast"""
-    @property
-    @abstractmethod
-    def staging_deployment(self) -> str:
-        """Returns staging deployment"""
-
-    @property
-    @abstractmethod
-    def production_deployment(self) -> str:
-        """Returns production deployment"""
 
 
 class SystemApicast(AbstractApicast):
@@ -34,15 +20,13 @@ class SystemApicast(AbstractApicast):
                     Capability.STANDARD_GATEWAY,
                     Capability.LOGS,
                     Capability.JAEGER}
+    HAS_PRODUCTION = True
 
-    def __init__(self, requirements: SystemApicastRequirements):
-        if requirements.staging:
-            self.deployment = requirements.staging_deployment
-        else:
-            self.deployment = requirements.production_deployment
-        self.openshift: "OpenShiftClient" = requirements.current_openshift
+    def __init__(self, staging, openshift):
+        self.staging = staging
+        self.deployment = "apicast-staging" if staging else "apicast-production"
+        self.openshift: "OpenShiftClient" = openshift
         self.name = self.deployment
-        self.options = requirements
 
     @property
     def environ(self) -> Environ:

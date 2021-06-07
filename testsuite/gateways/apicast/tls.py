@@ -1,61 +1,50 @@
 """Apicast with TLS certificates configured"""
 import logging
-from abc import ABC, abstractmethod
 from typing import Dict
-from urllib.parse import urlparse
 
 from threescale_api.resources import Application
 
 from testsuite.openshift.objects import Routes, SecretKinds
-from .template import TemplateApicastRequirements, TemplateApicast
+from .template import TemplateApicast
 from ...certificates import Certificate
-from ...requirements import CertificateManagerRequirement
 
 LOGGER = logging.getLogger(__name__)
 
 
-# I am 100% positive that that class is abstract and because of that it doesnt have to implement all the methods..
-# pylint: disable=abstract-method, too-many-ancestors
-class TLSApicastRequirements(CertificateManagerRequirement, TemplateApicastRequirements, ABC):
-    """Requirements for running TLS Apicast"""
-
-    @property
-    @abstractmethod
-    def server_authority(self) -> Certificate:
-        """Returns certificate authority the gateway should use"""
-
-
 class TLSApicast(TemplateApicast):
-    """Gateway deployed with TLS certificates."""
+    """APIcast deployed with TLS certificates."""
 
-    def __init__(self, requirements: TLSApicastRequirements) -> None:
-        super().__init__(requirements)
-        self.requirements: TLSApicastRequirements = requirements
-
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
+    def __init__(self, staging, openshift, template, name, image, portal_endpoint, superdomain,
+                 server_authority, manager, path_routing=False) -> None:
+        super().__init__(staging, openshift, template, name, image, portal_endpoint, path_routing)
         self.service_name = self.deployment
-        self.secret_name = f"{self.deployment}-secret"
+        self.superdomain = superdomain
+        self.server_authority = server_authority
+        self.manager = manager
+        self.secret_name = f"{self.deployment}-server-authority"
         self.volume_name = f"{self.deployment}-volume"
         self.mount_path = "/var/apicast/secrets"
         self.https_port = 8443
-        self.route_type = Routes.Types.PASSTHROUGH
 
     @property
     def _hostname(self):
-        fragments = urlparse(self.endpoint % "*")
-        return fragments.netloc
-
-    @property
-    def server_authority(self) -> Certificate:
-        """Returns server certificate currently in-use"""
-        return self.requirements.server_authority
+        return f"*.{self.superdomain}"
 
     @property
     def server_certificate(self) -> Certificate:
         """Returns server certificate currently in-use"""
-        return self.requirements.manager.get_or_create("server",
-                                                       self._hostname,
-                                                       hosts=[self._hostname],
-                                                       certificate_authority=self.server_authority)
+        return self.manager.get_or_create("server",
+                                          self._hostname,
+                                          hosts=[self._hostname],
+                                          certificate_authority=self.server_authority)
+
+    def add_route(self, name, kind=Routes.Types.PASSTHROUGH):
+        """Adds new route for this APIcast"""
+        hostname = f"{name}.{self.superdomain}"
+        result = self.openshift.routes.create(name, kind, hostname=hostname, service=self.deployment, port="https")
+        self._routes.append(name)
+        return result
 
     def on_application_create(self, application: Application):
         application.api_client_verify = self.server_authority.files["certificate"]
@@ -88,9 +77,7 @@ class TLSApicast(TemplateApicast):
     def _create_secret(self):
         LOGGER.debug('Creating tls secret "%s"...', self.secret_name)
 
-        cert = self.server_certificate
-
-        self.openshift.secrets.create(name=self.secret_name, kind=SecretKinds.TLS, certificate=cert)
+        self.openshift.secrets.create(name=self.secret_name, kind=SecretKinds.TLS, certificate=self.server_certificate)
 
     def create(self):
         """Deploy TLS Apicast."""
@@ -121,5 +108,4 @@ class TLSApicast(TemplateApicast):
 
         LOGGER.debug('TLS apicast "%s" has been destroyed!', self.deployment)
 
-        self.server_authority.delete_files()
         self.server_certificate.delete_files()

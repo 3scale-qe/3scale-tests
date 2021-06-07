@@ -10,13 +10,10 @@ default:
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
     gateway:
-      type: apicast
-      template: apicast.yml
-      # 'image:' missing!!! will be determined based on openshift
-      # otherwise needs to be defined in .local. file
-      configuration:
-        staging_deployment: apicast-staging
-        production_deployment: apicast-production
+      TemplateApicast:
+        template: apicast.yml
+      default:
+        kind: "SystemApicast"
   rhsso:
     username: admin
     test_user:

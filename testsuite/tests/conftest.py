@@ -377,31 +377,23 @@ def custom_provider_account_user(request, threescale, testconfig):
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request, testconfig, configuration):
+def staging_gateway(request):
     """Staging gateway"""
-    options = gateways.configuration.options(staging=True,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateways.configuration.staging(options)
+    gateway = gateways.gateway(staging=True)
     request.addfinalizer(gateway.destroy)
-
     gateway.create()
 
     return gateway
 
 
 @pytest.fixture(scope="session")
-def production_gateway(request, testconfig, configuration):
+def production_gateway(request, testconfig, configuration, openshift):
     """Production gateway"""
-    gateway = gateways.configuration.production
-    if gateway is None:
+    if not gateways.default.HAS_PRODUCTION:
         return None
-    options = gateways.configuration.options(staging=False,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateway(options)
-    request.addfinalizer(gateway.destroy)
 
+    gateway = gateways.gateway(staging=False)
+    request.addfinalizer(gateway.destroy)
     gateway.create()
 
     return gateway

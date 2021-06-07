@@ -1,69 +1,45 @@
 """Apicast deployed with ApicastOperator"""
 import time
-from abc import ABC, abstractmethod
-from urllib.parse import urlparse
-
-from threescale_api.resources import Service
+from testsuite import utils
 
 from testsuite.capabilities import Capability
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
+from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.crd.apicast import APIcast
 from testsuite.openshift.env import Environ
-from testsuite.requirements import ThreeScaleAuthDetails
 
-
-class OperatorApicastRequirements(SelfManagedApicastRequirements, ABC):
-    """Requirements for OperatorApicast"""
-    @property
-    @abstractmethod
-    def auth_details(self) -> ThreeScaleAuthDetails:
-        """3scale Auth details"""
+from .selfmanaged import SelfManagedApicast
 
 
 class OperatorApicast(SelfManagedApicast):
-    """Gateway for use with Apicast deployed by operator"""
+    """Gateway for use with APIcast deployed by operator"""
     CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY}
 
-    def __init__(self, requirements: OperatorApicastRequirements) -> None:
-        super().__init__(requirements)
-        self.auth = requirements.auth_details
-        self.name = f"apicast-{self.deployment}"
+    # pylint: disable=too-many-arguments
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, randomize=False) -> None:
+        # APIcast operator prepends apicast in front the deployment name
+        super().__init__(staging, openshift, f"{name}-stage" if staging else name, randomize)
+        self.portal_endpoint = portal_endpoint
         self.apicast = None
 
-    def _route_name(self, entity_id):
-        if self.staging:
-            return f"{entity_id}-staging"
-        return f"{entity_id}-production"
+    @property
+    def deployment(self):
+        return f"apicast-{super().deployment}"
 
     @property
     def environ(self) -> Environ:
         raise NotImplementedError("Operator doesn't support environment")
 
-    def on_service_create(self, service: Service):
-        super().on_service_create(service)
-        entity_id = service.entity_id
-        url = urlparse(self.endpoint % entity_id)
-        name = self._route_name(entity_id)
-        self.openshift.routes.create(name=name,
-                                     service=self.name, hostname=url.hostname)
-
-    def on_service_delete(self, service: Service):
-        super().on_service_delete(service)
-        del self.openshift.routes[self._route_name(service.entity_id)]
-
     def reload(self):
         self.openshift.do_action("delete", ["pod", "--force",
-                                            "--grace-period=0", "-l", f"deployment={self.name}"])
+                                            "--grace-period=0", "-l", f"deployment={self.deployment}"])
         # pylint: disable=protected-access
-        self.openshift.wait_for_ready(self.name)
+        self.openshift.wait_for_ready(self.deployment)
 
     def create(self):
-        provider_url = self.auth.url.replace('https://', f'https://{self.auth.token}@')
-
         apicast = APIcast.create_instance(
             openshift=self.openshift,
-            name=self.deployment,
-            provider_url=provider_url
+            name=self.name,
+            provider_url=self.portal_endpoint
         )
         apicast["logLevel"] = "info"
         apicast["openSSLPeerVerificationEnabled"] = False
@@ -79,7 +55,7 @@ class OperatorApicast(SelfManagedApicast):
         # is created
         time.sleep(2)
         # pylint: disable=protected-access
-        self.openshift.wait_for_ready(self.name)
+        self.openshift.wait_for_ready(self.deployment)
 
     def destroy(self):
         if self.apicast:

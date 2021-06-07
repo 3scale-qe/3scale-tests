@@ -15,13 +15,9 @@ default:
         httpbin: https://httpbin.org:443
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
-    gateway:
-      template: "{DEFAULT_APICAST_TEMPLATE}"
-      image: "{DEFAULT_APICAST_IMAGE}"
-      type: "apicast"
-      configuration:
-        staging_deployment: "apicast-staging"
-        production_deployment: "apicast-production"
+    gateway:  # More info at GATEWAYS.md
+      default:
+        kind: "SystemApicast"
   openshift:
     servers:
       default:

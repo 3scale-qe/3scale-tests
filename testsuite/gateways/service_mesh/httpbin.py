@@ -53,14 +53,3 @@ class Httpbin:
     def remove_policy(self, name: str):
         """Removes existing policy"""
         self.openshift.delete("Policy", name)
-
-
-# pylint: disable=too-few-public-methods
-class HttpbinFactory:
-    """Factory for creating Httpbin instances"""
-    def __init__(self, openshift) -> None:
-        self.openshift = openshift
-
-    def create(self, identifier, credentials) -> Httpbin:
-        """Creates new Httpbin instance"""
-        return Httpbin(self.openshift, identifier, credentials)

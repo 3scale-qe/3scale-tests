@@ -1,21 +1,20 @@
 """
 Sets up gateway defined in testsuite settings
 """
-from typing import Tuple, Optional, Dict, Type, NamedTuple
 import importlib
 import inspect
 import pkgutil
+from typing import Type, TypeVar, Union
 
 from testsuite.config import settings
-from testsuite.gateways.apicast import SystemApicast, SelfManagedApicast, OperatorApicast, TemplateApicast, TLSApicast
-from testsuite.gateways.apicast.containers import ContainerizedApicast
+from testsuite.configuration import SettingsParser
 from testsuite.gateways.gateways import AbstractGateway
-from testsuite.gateways.options import GatewayOptions, SystemApicastOptions, SelfManagedApicastOptions, \
-    OperatorApicastOptions, TemplateApicastOptions, TLSApicastOptions, ServiceMeshGatewayOptions
-from testsuite.gateways.service_mesh import ServiceMeshGateway
 
 # walk through all sub-packages and import all gateway classes
-__all__ = ["gateway", "Gateway", "Options", "GATEWAYS", "GatewayConfiguration", "load_gateway", "configuration"]
+__all__ = ["gateway", "default"]
+
+Gateway = TypeVar("Gateway", bound=AbstractGateway)
+
 for _, module, _ in pkgutil.walk_packages(__path__, "testsuite.gateways."):  # type: ignore
     imported = importlib.import_module(module)
     for item in dir(imported):
@@ -26,45 +25,36 @@ for _, module, _ in pkgutil.walk_packages(__path__, "testsuite.gateways."):  # t
                 __all__.append(item)
 
 
-def gateway(kind, **kwargs):
-    """Return instance of given kind"""
-    cls = globals()[kind]
-    expected = inspect.signature(cls.__init__).parameters.keys()
-    gwargs = {k: v for k, v in kwargs.items() if k in expected}
-    return cls(**gwargs)
+def load_type():
+    """Loads currently selected global gateway"""
+    return globals()[settings["threescale"]["gateway"]["default"]["kind"]]
 
 
-Gateway = Type[AbstractGateway]
-Options = Type[GatewayOptions]
-
-GATEWAYS: Dict[str, Tuple[Gateway, Optional[Gateway], Options]] = {
-    "apicast": (SystemApicast, SystemApicast, SystemApicastOptions),
-    "apicast-container": (ContainerizedApicast, None, SelfManagedApicastOptions),
-    "apicast-selfmanaged": (SelfManagedApicast, SelfManagedApicast, SelfManagedApicastOptions),
-    "apicast-operator": (OperatorApicast, OperatorApicast, OperatorApicastOptions),
-    "apicast-template": (TemplateApicast, TemplateApicast, TemplateApicastOptions),
-    "apicast-tls": (TLSApicast, TLSApicast, TLSApicastOptions),
-    "service-mesh": (ServiceMeshGateway, None, ServiceMeshGatewayOptions)
-}
+# Best name would be type, but that is a function. I also oppose clazz
+default = load_type()
 
 
-class GatewayConfiguration(NamedTuple):
-    """Current gateway configuration for use in testsuite, this class is mostly there because of typing"""
-    staging: Gateway
-    production: Optional[Gateway]
-    options: Options
+# This could be written much more cleanly without specifying kind,
+# but this version enables typing support if kind is a class
+def gateway(kind: Union[Type[Gateway], str] = None, staging: bool = True, **kwargs) -> Gateway:
+    """
+    Return gateway instance of given kind
+    Settings priority:
+    1. Function arguments
+    2. Settings block named after the class name (TemplateApicast)
+    3. default settings block
+    """
+    configuration = settings["threescale"]["gateway"]["default"].copy()
+    kind = kind or configuration["kind"]
+    clazz = globals()[kind] if not inspect.isclass(kind) else kind  # type: ignore
+    name = kind.__name__ if inspect.isclass(kind) else kind  # type: ignore
 
+    named_settings = {}
+    if name in settings["threescale"]["gateway"]:
+        named_settings = settings["threescale"]["gateway"][name]
 
-def load_gateway() -> GatewayConfiguration:
-    """Gateway that is used to run tests"""
-    gateway = settings["threescale"]["gateway"]
+    configuration.update(named_settings)
+    configuration.update(kwargs)
+    configuration["kind"] = clazz
 
-    gateway_type = gateway["type"]
-    if gateway_type not in GATEWAYS:
-        raise ValueError(f"Gateway {gateway_type} is not supported")
-
-    return GatewayConfiguration(*GATEWAYS[gateway_type])
-
-
-# For this specific use case, I like the lower case names better
-configuration = load_gateway()
+    return SettingsParser().process(global_kwargs={"staging": staging}, **configuration)
