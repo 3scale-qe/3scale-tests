@@ -25,17 +25,23 @@ def my_app_plans(request, custom_app_plan, service):
 
 
 @pytest.fixture(scope="module")
-def empty_list(service, my_app_plans):
+def empty_list(service, my_app_plans, create_cmd):
     """Fixture for empty list constant"""
     # these fixtures should be created for being able to list empty list
     # pylint: disable=unused-argument
     return toolbox.run_cmd(create_cmd('list', f"{service['id']}"))['stdout']
 
 
-def create_cmd(cmd, args=None):
-    """Creates command for app. plans."""
-    args = args or ''
-    return f"application-plan {cmd} {constants.THREESCALE_SRC1} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of app. plans command creation """
+
+    def _create_cmd(cmd, args=None):
+        """Creates command for app. plans."""
+        args = args or ''
+        return f"application-plan {cmd} {threescale_src1} {args}"
+
+    return _create_cmd
 
 
 def parse_create_command_out(output):
@@ -47,7 +53,7 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-def test_list1(empty_list, service, my_app_plans):
+def test_list1(empty_list, service, my_app_plans, create_cmd):
     """Run command 'list'"""
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('list', f"{service['id']}"))
@@ -62,7 +68,7 @@ def test_list1(empty_list, service, my_app_plans):
         ret['stdout'])
 
 
-def test_create1(service):
+def test_create1(service, create_cmd):
     """Run command 'create' to create first application plan"""
     cmd = f"{service['id']} plan1 --approval-required=true --cost-per-month=11.1 "
     cmd += '--default --disabled --publish --setup-fee=22.2 '
@@ -75,7 +81,7 @@ def test_create1(service):
     out_variables['plan1_entity'] = service.app_plans[int(out_variables['plan1'][0])].entity
 
 
-def test_create2(service):
+def test_create2(service, create_cmd):
     """Run command 'create' to create second application plan"""
     cmd = f"{service['id']} plan2 --approval-required=false --cost-per-month=0 "
     cmd += '--setup-fee=0 --system-name=plan2sysname --trial-period-days=0'
@@ -86,7 +92,7 @@ def test_create2(service):
     out_variables['plan2_entity'] = service.app_plans[int(out_variables['plan2'][0])].entity
 
 
-def test_list2(empty_list, service, my_app_plans):
+def test_list2(empty_list, service, my_app_plans, create_cmd):
     """Run command 'list' application plans"""
     ret = toolbox.run_cmd(create_cmd('list', f"{service['id']}"))
     assert not ret['stderr']
@@ -100,7 +106,7 @@ def test_list2(empty_list, service, my_app_plans):
         ret['stdout'])
 
 
-def test_show1(service):
+def test_show1(service, create_cmd):
     """Run command 'show' to show first application"""
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('show', f"{service['id']} plan1sysname"))
@@ -116,7 +122,7 @@ def test_show1(service):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_update1(service):
+def test_update1(service, create_cmd):
     """Run command 'update' to update first application plan"""
     cmd = f"{service['id']} plan1sysname --approval-required=false --cost-per-month=44 "
     cmd += r'--enabled --setup-fee=55 --trial-period-days=66 --hide'
@@ -131,21 +137,21 @@ def test_update1(service):
     out_variables['plan3_entity'] = service.app_plans[int(out_variables['plan3'][0])].entity
 
 
-def test_delete1(service):
+def test_delete1(service, create_cmd):
     """Run command 'delete' to delete first application plan"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{service['id']} {out_variables['plan1'][0]}"))
     assert not ret['stderr']
     assert f"Application plan id: {out_variables['plan1'][0]} deleted" in ret['stdout']
 
 
-def test_delete2(service):
+def test_delete2(service, create_cmd):
     """Run command 'delete' to delete second application plan"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{service['id']} {out_variables['plan2'][0]}"))
     assert not ret['stderr']
     assert f"Application plan id: {out_variables['plan2'][0]} deleted" in ret['stdout']
 
 
-def test_list3(empty_list, service):
+def test_list3(empty_list, service, create_cmd):
     """Run command 'list' application plans"""
     ret = toolbox.run_cmd(create_cmd('list', f"{service['id']}"))
     assert not ret['stderr']

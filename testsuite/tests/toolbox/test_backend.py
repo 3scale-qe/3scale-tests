@@ -8,7 +8,6 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.config import settings
-import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 import testsuite.utils
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
@@ -91,11 +90,13 @@ def my_backend_mappings(my_backend, my_backend_metrics):
             mapp.delete()
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def toolbox_copy(my_backend, my_backend_metrics, my_backend_methods, my_backend_mappings):
+def toolbox_copy(threescale_src1, threescale_dst1, my_backend, my_backend_metrics, my_backend_methods,
+                 my_backend_mappings):
     """Toolbox copies backend from one 3scale instance to another one"""
     # pylint: disable=unused-argument
-    copy_cmd = f"backend copy -s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} "
+    copy_cmd = f"backend copy -s {threescale_src1} -d {threescale_dst1} "
     copy_cmd += f"{my_backend['system_name']}"
     ret = toolbox.run_cmd(copy_cmd)
     return ret

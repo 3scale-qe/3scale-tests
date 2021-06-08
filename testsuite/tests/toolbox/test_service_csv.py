@@ -8,7 +8,6 @@ import pytest
 
 from testsuite.config import settings
 from testsuite.toolbox import toolbox
-import testsuite.toolbox.constants as constants
 from testsuite.utils import blame
 
 
@@ -53,9 +52,9 @@ def copy_string_to_remote(import_data):
 
 
 @pytest.fixture(scope="module")
-def import_csv(copy_string_to_remote):
+def import_csv(threescale_dst1, copy_string_to_remote):
     """Import CSV by Toolbox"""
-    import_cmd = f"import csv -d {constants.THREESCALE_DST1} -f "
+    import_cmd = f"import csv -d {threescale_dst1} -f "
     import_cmd += copy_string_to_remote
     ret = toolbox.run_cmd(import_cmd)
 

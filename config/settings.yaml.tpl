@@ -99,6 +99,8 @@ development:
     # 'ruby_version' should be defined for "gem" option
     # 'podman_image' should be defined for "podman" option
     # 'podman_cert_dir' should be defined for "podman" option
+    # 'destination_endpoint' url to destination 3scale api, if empty new tenant is created
+    # 'destination_provider_key' personal access key for destination tenant/3scale with rw to all scopes
     # cmd: "rpm"
     # cmd: "gem"
     # ruby_version: "rh-ruby24"

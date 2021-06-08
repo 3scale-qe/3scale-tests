@@ -29,17 +29,22 @@ def my_activedoc(request, service, oas3_body, custom_active_doc):
 
 
 @pytest.fixture(scope="module")
-def empty_list(service, my_app_plan, my_activedoc):
+def empty_list(service, my_app_plan, my_activedoc, create_cmd):
     """Fixture for empty list constant"""
     # these fixtures should be created for being able to list empty list
     # pylint: disable=unused-argument
     return toolbox.run_cmd(create_cmd('list'))['stdout']
 
 
-def create_cmd(cmd, args=None):
-    """Creates command for activedocs"""
-    args = args or ''
-    return f"activedocs {cmd} {constants.THREESCALE_SRC1} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of activedocs command creation """
+
+    def _create_cmd(cmd, args=None):
+        args = args or ''
+        return f"activedocs {cmd} {threescale_src1} {args}"
+
+    return _create_cmd
 
 
 def parse_create_command_out(output):
@@ -51,7 +56,7 @@ def parse_create_command_out(output):
 out_variables = {}
 
 
-def test_list1(empty_list, service, my_app_plan, my_activedoc):
+def test_list1(empty_list, service, my_app_plan, my_activedoc, create_cmd):
     """Run command 'list'"""
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -65,7 +70,7 @@ def test_list1(empty_list, service, my_app_plan, my_activedoc):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_create1(threescale):
+def test_create1(threescale, create_cmd):
     """Run command 'create' to create first activedoc"""
     out_variables['ac1_name'] = randomize('activedoc1', 3)
     ret = toolbox.run_cmd(create_cmd('create', f"{out_variables['ac1_name']} {SWAGGER_LINK}"))
@@ -75,7 +80,7 @@ def test_create1(threescale):
     out_variables['ac1_entity'] = threescale.active_docs[int(out_variables['ac1'][1])].entity
 
 
-def test_create2(service, threescale):
+def test_create2(service, threescale, create_cmd):
     """Run command 'create' to create second activedoc"""
     out_variables['ac2_name'] = randomize('activedoc2', 3)
     cmd = f"{out_variables['ac2_name']} {SWAGGER_LINK} --service-id {service['id']} "
@@ -88,7 +93,7 @@ def test_create2(service, threescale):
     out_variables['ac2_entity'] = threescale.active_docs[int(out_variables['ac2'][1])].entity
 
 
-def test_list2(empty_list, service, my_activedoc):
+def test_list2(empty_list, service, my_activedoc, threescale, create_cmd):
     """Run command 'list' active docs"""
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('list'))
@@ -104,7 +109,7 @@ def test_list2(empty_list, service, my_activedoc):
     assert re.findall(to_cmp, ret['stdout'])
 
 
-def test_apply1(service, threescale):
+def test_apply1(service, threescale, create_cmd):
     """Run command 'apply' to update first activedoc"""
     cmd = fr"{out_variables['ac1_entity']['system_name']} --description='updated' "
     cmd += fr"--publish --service-id={service['id']} --name={out_variables['ac1_entity']['name'] + '_updated'} "
@@ -116,21 +121,21 @@ def test_apply1(service, threescale):
     out_variables['ac3_entity'] = threescale.active_docs[int(out_variables['ac3'])].entity
 
 
-def test_delete1():
+def test_delete1(create_cmd):
     """Run command 'delete' to delete first active doc"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{out_variables['ac1'][1]}"))
     assert not ret['stderr']
     assert f"ActiveDocs with id: {out_variables['ac1'][1]} deleted" in ret['stdout']
 
 
-def test_delete2():
+def test_delete2(create_cmd):
     """Run command 'delete' to delete second active doc"""
     ret = toolbox.run_cmd(create_cmd('delete', f"{out_variables['ac2'][1]}"))
     assert not ret['stderr']
     assert f"ActiveDocs with id: {out_variables['ac2'][1]} deleted" in ret['stdout']
 
 
-def test_list3(empty_list):
+def test_list3(empty_list, create_cmd):
     """Run command 'list' active doc"""
     ret = toolbox.run_cmd(create_cmd('list'))
     assert not ret['stderr']

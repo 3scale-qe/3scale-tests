@@ -30,9 +30,6 @@ default:
     cmd: "podman"
     podman_cert_dir: "/var/data"
     podman_cert_name: "ca-bundle.crt"
-    # obviously follwing won't work but is needed because its usage isn't lazy loading
-    destination_endpoint: URL
-    destination_provider_key: KEY
   fixtures:
     tools:
       namespace: tools

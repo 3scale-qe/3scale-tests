@@ -5,24 +5,28 @@ import json
 import pytest
 
 from testsuite import rawobj
-import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 
 
-def create_cmd(service, cmd, args=None):
-    """Creates command for proxy-config."""
-    args = args or ''
-    return f"proxy-config {cmd} {constants.THREESCALE_SRC1} {service['id']} {args}"
+@pytest.fixture(scope="module")
+def create_cmd(threescale_src1):
+    """ Returns function of proxycfg command creation """
+
+    def _create_cmd(service, cmd, args=None):
+        args = args or ''
+        return f"proxy-config {cmd} {threescale_src1} {service['id']} {args}"
+
+    return _create_cmd
 
 
 @pytest.fixture(scope="module")
-def empty_list_staging(service):
+def empty_list_staging(service, create_cmd):
     """Fixture for empty list command for staging"""
     return toolbox.run_cmd(create_cmd(service, 'list', 'staging'))['stdout']
 
 
 @pytest.fixture(scope="module")
-def empty_list_production(service):
+def empty_list_production(service, create_cmd):
     """Fixture for empty list command for production"""
     return toolbox.run_cmd(create_cmd(service, 'list', 'production'))['stdout']
 
@@ -37,7 +41,7 @@ def hits(service):
 out_variables = {}
 
 
-def test_list_staging1(service, empty_list_staging):
+def test_list_staging1(service, empty_list_staging, create_cmd):
     """Run command 'list' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'staging'))
     assert not ret['stderr']
@@ -46,7 +50,7 @@ def test_list_staging1(service, empty_list_staging):
     assert re.findall(r'\d+\t1\tsandbox', ret['stdout'])
 
 
-def test_list_production1(service, empty_list_production):
+def test_list_production1(service, empty_list_production, create_cmd):
     """Run command 'list' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'production'))
     assert not ret['stderr']
@@ -54,14 +58,14 @@ def test_list_production1(service, empty_list_production):
     assert re.findall(r'ID\tVERSION\tENVIRONMENT', ret['stdout'])
 
 
-def test_show_staging1(service):
+def test_show_staging1(service, create_cmd):
     """Run command 'show' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'staging'))
     assert not ret['stderr']
     out_variables['staging'] = json.loads(ret['stdout'])
 
 
-def test_promote1(service):
+def test_promote1(service, create_cmd):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
     assert not ret['stderr']
@@ -69,14 +73,14 @@ def test_promote1(service):
     assert re.findall("Proxy Configuration version 2 promoted to 'production'", ret['stdout'])
 
 
-def test_show_production1(service):
+def test_show_production1(service, create_cmd):
     """Run command 'show' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'production'))
     assert not ret['stderr']
     out_variables['production'] = json.loads(ret['stdout'])
 
 
-def test_update_staging_and_list1(service, hits, empty_list_staging):
+def test_update_staging_and_list1(service, hits, empty_list_staging, create_cmd):
     """Update staging environment and list staging"""
     # update proxy
     params = {}
@@ -118,21 +122,21 @@ def test_update_staging_and_list1(service, hits, empty_list_staging):
     assert re.findall(r'\d+\t2\tsandbox', ret['stdout'])
 
 
-def test_show_staging2(service):
+def test_show_staging2(service, create_cmd):
     """Run command 'show' staging"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'staging'))
     assert not ret['stderr']
     out_variables['staging_updated'] = json.loads(ret['stdout'])
 
 
-def test_promote2(service):
+def test_promote2(service, create_cmd):
     """Run command 'promote'"""
     ret = toolbox.run_cmd(create_cmd(service, 'promote'))
     assert not ret['stderr']
     assert re.findall("Proxy Configuration version 5 promoted to 'production'", ret['stdout'])
 
 
-def test_list_production2(service, empty_list_production):
+def test_list_production2(service, empty_list_production, create_cmd):
     """Run command 'list' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'list', 'production'))
     assert not ret['stderr']
@@ -141,7 +145,7 @@ def test_list_production2(service, empty_list_production):
     assert re.findall(r'\d+\t2\tproduction', ret['stdout'])
 
 
-def test_show_production2(service):
+def test_show_production2(service, create_cmd):
     """Run command 'show' production"""
     ret = toolbox.run_cmd(create_cmd(service, 'show', 'production'))
     assert not ret['stderr']

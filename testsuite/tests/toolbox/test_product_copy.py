@@ -5,7 +5,6 @@ import re
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-import testsuite.toolbox.constants as constants
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
@@ -188,8 +187,10 @@ def my_activedoc(request, service, oas3_body, custom_active_doc):
     return custom_active_doc(rawad)
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def toolbox_copy(service, my_applications, my_activedoc, product_service):
+def toolbox_copy(threescale_src1, threescale_dst1, service, my_applications, my_activedoc,
+                 product_service):
     """Toolbox copies product from one 3scale instance to another one"""
     # pylint: disable=unused-argument
     copy_cmd = ''
@@ -199,7 +200,7 @@ def toolbox_copy(service, my_applications, my_activedoc, product_service):
         copy_cmd = 'service copy '
     else:
         copy_cmd = 'copy service '
-    copy_cmd += f"-s {constants.THREESCALE_SRC1} -d {constants.THREESCALE_DST1} {service['id']}"
+    copy_cmd += f"-s {threescale_src1} -d {threescale_dst1} {service['id']}"
     ret = toolbox.run_cmd(copy_cmd)
     return (ret['stdout'], ret['stderr'])
 
