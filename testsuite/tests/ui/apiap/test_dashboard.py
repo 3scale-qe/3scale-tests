@@ -5,7 +5,7 @@ import pytest
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.audience.billing import BillingView
-from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalView
+from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalContentView
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.backend import BackendsView
 from testsuite.ui.views.admin.backend.backend import BackendNewView
@@ -34,7 +34,7 @@ def test_dashboard_is_loaded_correctly(login, navigator):
                                                 ("account_link", None, AccountsView),
                                                 ("application_link", None, ApplicationsView),
                                                 ("billing_link", None, BillingView),
-                                                ("develop_portal_link", None, DeveloperPortalView),
+                                                ("develop_portal_link", None, DeveloperPortalContentView),
                                                 ("message_link", None, MessagesView)])
 def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
     """
