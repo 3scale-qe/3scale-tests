@@ -1,7 +1,6 @@
 """Rewrite of spec/ui_specs/dashboard_spec.rb"""
 import pytest
 
-
 # pylint: disable=unused-argument
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
@@ -27,23 +26,26 @@ def test_dashboard_is_loaded_correctly(login, navigator):
 
 
 # pylint: disable=unused-argument
-@pytest.mark.parametrize("link,view", [("create_product_button_link", ProductNewView),
-                                       ("create_backend_button_link", BackendNewView),
-                                       ("explore_all_products", ProductsView),
-                                       ("explore_all_backends", BackendsView),
-                                       ("account_link", AccountsView),
-                                       ("application_link", ApplicationsView),
-                                       ("billing_link", BillingView),
-                                       ("develop_portal_link", DeveloperPortalView),
-                                       ("message_link", MessagesView)])
-def test_audience_navigation_bar(login, navigator, browser, link, view):
+# pylint: disable=too-many-arguments
+@pytest.mark.parametrize("link, nested, view", [("create_product_button", "products", ProductNewView),
+                                                ("create_backend_button", "backends", BackendNewView),
+                                                ("explore_all_products", None, ProductsView),
+                                                ("explore_all_backends", None, BackendsView),
+                                                ("account_link", None, AccountsView),
+                                                ("application_link", None, ApplicationsView),
+                                                ("billing_link", None, BillingView),
+                                                ("develop_portal_link", None, DeveloperPortalView),
+                                                ("message_link", None, MessagesView)])
+def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
     """
     Test:
         - Navigates to Dashboard
         - tests whether the buttons "account, application, billings ..." navigates to correct endpoints
     """
     dashboard = navigator.navigate(DashboardView)
-
-    getattr(dashboard, link, None).click()
+    if nested:
+        getattr(getattr(dashboard, nested, None), link, None).click()
+    else:
+        getattr(dashboard, link, None).click()
 
     assert view(browser).is_displayed
