@@ -47,7 +47,7 @@ def test_cli_cmd_list():
     lines = out.split(os.linesep)
     begin = lines.index('COMMANDS')
     end = lines.index('OPTIONS')
-    toolbox_cmds = sorted([RE_EXPR.findall(line)[0] for line in lines[(begin + 1):(end - 1)] if line])
+    toolbox_cmds = sorted([RE_EXPR.findall(line)[0] for line in lines[(begin + 2):(end - 3)] if line])
     assert TOOLBOX_COMMANDS == toolbox_cmds
 
 
