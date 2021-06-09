@@ -1,12 +1,20 @@
 """Provide custom gateway for tests changing apicast parameters."""
 
+from weakget import weakget
 import pytest
 
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.capabilities import Capability
-from testsuite.utils import randomize
+from testsuite.utils import randomize, warn_and_skip
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def require_openshift(testconfig):
+    """These tests require openshift available"""
+    if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
+        warn_and_skip("All retry_policy tests skipped due to missing openshift")
 
 
 @pytest.fixture(scope="module")

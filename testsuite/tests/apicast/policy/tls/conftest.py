@@ -1,11 +1,19 @@
 """Module for setting up test that require TLS gateway and/or certificates"""
 
+from weakget import weakget
 import pytest
 
 from testsuite.certificates import Certificate
 from testsuite.gateways import TLSApicastOptions, TLSApicast
 from testsuite.openshift.objects import SecretKinds
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
+
+
+@pytest.fixture(scope="module", autouse=True)
+def require_openshift(testconfig):
+    """These tests require openshift available"""
+    if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
+        warn_and_skip("All from tls skipped due to missing openshift")
 
 
 @pytest.fixture(scope="module")
