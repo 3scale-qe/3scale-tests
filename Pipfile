@@ -4,6 +4,9 @@ mypy = "*"
 pylint = "*"
 ipdb = "*"
 web-pdb = "*"
+types-requests = "*"
+types-PyYAML = "*"
+types-paramiko = "*"
 # Have commented out python-language-server to make it available quickly
 # for the development
 #python-language-server = "*"
