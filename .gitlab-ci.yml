@@ -1,4 +1,4 @@
-image: "registry.access.redhat.com/ubi8/python-36"
+image: "quay.io/centos7/python-38-centos7"
 before_script:
   - pip install -q pipenv
 acceptance:
