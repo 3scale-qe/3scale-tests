@@ -26,7 +26,7 @@ def dest_client(custom_tenant, request) -> client.ThreeScaleClient:
 
         token_name = blame(request, "at")
 
-        @backoff.on_exception(backoff.fibo(), errors.ApiClientError, max_time=8)
+        @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
         def _wait_on_ready_tenant():
             unprivileged_client.services.list()
 
