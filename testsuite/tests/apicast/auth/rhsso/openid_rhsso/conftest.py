@@ -32,5 +32,4 @@ def production_client(prod_client):
 @pytest.fixture
 def token(application, rhsso_service_info):
     """Access token for 3scale application that is connected with RHSSO"""
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
-    return rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
+    return rhsso_service_info.access_token(application)

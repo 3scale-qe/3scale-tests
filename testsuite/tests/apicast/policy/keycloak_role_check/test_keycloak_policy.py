@@ -16,20 +16,18 @@ from pytest_cases import fixture_ref
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
-from .conftest import get_rhsso_client, token
-
+from .conftest import token
 
 pytestmark = [pytest.mark.disruptive,
               pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
 @pytest_cases.fixture
-def client_scope(application, rhsso_service_info, client_role):
+def client_scope(application, client_role):
     """
     :return scope of policy for client role
     """
-    client = get_rhsso_client(application, rhsso_service_info).entity["clientId"]
-    return {"client_roles": [{"name": client_role(), "client": client}]}
+    return {"client_roles": [{"name": client_role(), "client": application["client_id"]}]}
 
 
 @pytest_cases.fixture
@@ -89,8 +87,8 @@ def test_separated(rhsso_service_info, application, config, create_users, prod_c
     """
     list_type, method, code1, code2 = config
     user_with_role, user_without_role = create_users
-    user_key_with_role = token(application, rhsso_service_info, user_with_role.entity["username"])
-    user_key_without_role = token(application, rhsso_service_info, user_without_role.entity["username"])
+    user_key_with_role = token(application, rhsso_service_info, user_with_role["username"])
+    user_key_without_role = token(application, rhsso_service_info, user_without_role["username"])
     request = prod_client.get(f"/anything/{list_type}", headers={'authorization': "Bearer " + user_key_with_role})
     assert request.status_code == code1
     request = prod_client.get(f"/anything/{list_type}", headers={'authorization': "Bearer " + user_key_without_role})

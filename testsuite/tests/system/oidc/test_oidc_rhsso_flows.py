@@ -13,12 +13,11 @@ import backoff
 import pytest
 from threescale_api.resources import Service
 
-from testsuite.rhsso.rhsso import OIDCClientAuth
+from testsuite.rhsso import OIDCClientAuth
 from testsuite.utils import blame_desc
 
 
 pytestmark = [
-    pytest.mark.flaky,
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1948"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1949"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951")]
@@ -30,8 +29,6 @@ DEFAULT_FLOWS = {
     "direct_access_grants_enabled": False,
     "service_accounts_enabled": False
 }
-
-TESTING_FLOWS = {}
 
 
 @pytest.fixture(scope="module")
@@ -74,7 +71,6 @@ def change_flows(application, flow_to_update, request):
     :return: updated application
     """
     params = {**DEFAULT_FLOWS, **flow_to_update}
-    TESTING_FLOWS.update(params)
     update = application.service.proxy.oidc.update(params={"oidc_configuration": params})
     application["description"] = blame_desc(request, "description")
     application.update()
@@ -82,27 +78,27 @@ def change_flows(application, flow_to_update, request):
 
 
 # Zync is sometimes too slow to update the RHSSO client.
-@backoff.on_predicate(backoff.fibo, lambda x: x != TESTING_FLOWS, 8, jitter=None)
-def get_flows(rhsso_client):
+@backoff.on_exception(backoff.fibo, Exception, 8, jitter=None)
+def get_flows(realm, client_id, expected_flow, expected_value):
     """
     Retries until the changed flows appear on the RHSSO side.
     Expected flows are in the TESTING_FLOWS global variable.
     :param rhsso_client: Rhsso client to get flows from
     :return: dictionary with flows
     """
-    return {
-        "implicit_flow_enabled": rhsso_client.implicitFlowEnabled,
-        "standard_flow_enabled": rhsso_client.standardFlowEnabled,
-        "direct_access_grants_enabled": rhsso_client.directAccessGrantsEnabled,
-        "service_accounts_enabled": rhsso_client.serviceAccountsEnabled
+
+    rhsso_client = realm.admin.get_client(client_id)
+
+    flows = {
+        "implicit_flow_enabled": rhsso_client["implicitFlowEnabled"],
+        "standard_flow_enabled": rhsso_client["standardFlowEnabled"],
+        "direct_access_grants_enabled": rhsso_client["directAccessGrantsEnabled"],
+        "service_accounts_enabled": rhsso_client["serviceAccountsEnabled"]
     }
 
-
-@backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8, jitter=None)
-def realm_client_by_id(realm, client_id):
-    """Helper to have reliable sso/oauth client getter"""
-
-    return realm.clients.by_client_id(client_id)
+    if flows[expected_flow] != expected_value:
+        raise ValueError(f"Flow {expected_flow} was not changed, expected {expected_value} got {flows[expected_flow]}")
+    return flows
 
 
 @pytest.mark.parametrize("flow_type,expected", [
@@ -119,8 +115,8 @@ def test(application, rhsso_service_info, request, flow_type, expected):
     result = change_flows(application, {flow_type: True}, request)
     assert result is not None
 
-    rhsso_client = realm_client_by_id(rhsso_service_info.realm, application["client_id"])
-    flows = get_flows(rhsso_client)
+    client_id = rhsso_service_info.get_application_client(application)
+    flows = get_flows(rhsso_service_info.realm, client_id, flow_type, True)
 
     assert flows['implicit_flow_enabled'] is expected[0]
     assert flows['standard_flow_enabled'] is expected[1]

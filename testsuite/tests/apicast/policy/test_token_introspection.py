@@ -22,9 +22,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 @pytest.fixture(scope="module")
 def access_token(application, rhsso_service_info):
     """get RHSSO access token"""
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
-    return rhsso_service_info.password_authorize(application["client_id"],
-                                                 app_key).token['access_token']
+    return rhsso_service_info.access_token(application)
 
 
 @pytest.fixture(scope="module")
@@ -51,7 +49,7 @@ def update_policies(service, application, rhsso_service_info):
         "max_cached_tokens": 10,
         "client_id": application["client_id"],
         "client_secret": application["client_secret"],
-        "introspection_url": rhsso_service_info.oidc_client.get_url("token_introspection_endpoint")
+        "introspection_url": rhsso_service_info.oidc_client.well_know()["token_introspection_endpoint"]
     })
 
     service.proxy.list().policies.append(policy_setting)
@@ -71,7 +69,7 @@ def test_rhsso_logout(client, access_token, rhsso_service_info, update_policies)
     response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert response.status_code == 200
 
-    rhsso_service_info.user.logout()
+    rhsso_service_info.realm.admin.logout(rhsso_service_info.user)
 
     new_response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert new_response.status_code == 403

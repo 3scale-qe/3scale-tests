@@ -2,7 +2,6 @@
 Conftest for keycloak policy
 """
 
-import backoff
 import pytest_cases
 
 from testsuite import rawobj
@@ -45,10 +44,12 @@ def create_users(rhsso_service_info):
     Create 2 rhsso users
     """
     realm = rhsso_service_info.realm
-    user_with_role = realm.users.create(randomize("user_with_role"), enabled=True)
-    user_with_role.reset_password("testUser", temporary=False)
-    user_without_role = realm.users.create(randomize("user_without_role"), enabled=True)
-    user_without_role.reset_password("testUser", temporary=False)
+    user_with_role = realm.create_user(randomize("user_with_role"), rhsso_service_info.password)
+    user_without_role = realm.create_user(randomize("user_without_role"), rhsso_service_info.password)
+
+    user_with_role = realm.admin.get_user(user_with_role)
+    user_without_role = realm.admin.get_user(user_without_role)
+
     return user_with_role, user_without_role
 
 
@@ -61,9 +62,11 @@ def client_role(application, rhsso_service_info, create_users):
     def _client_role(role_name=randomize("client-role")):
         user_with_role, _ = create_users
         client = get_rhsso_client(application, rhsso_service_info)
-        client.roles.create(role_name)
-        role = client.roles.by_name(role_name)
-        user_with_role.role_mappings.client(client).add([role.entity])
+        admin = rhsso_service_info.realm.admin
+
+        admin.create_client_role(client, {"name": role_name})
+        role = admin.get_client_role(client, role_name)
+        admin.assign_client_role(user_with_role["id"], client, role)
         return role_name
 
     return _client_role
@@ -75,12 +78,14 @@ def realm_role(rhsso_service_info, create_users):
     Create realm role and add it to user_with_role
     """
 
-    def _realm_role(role_name=randomize("realm-role")):
+    def _realm_role(role_name=None):
+        role_name = role_name or randomize("realm-role")
         user_with_role, _ = create_users
-        realm = rhsso_service_info.realm
-        realm.roles.create(role_name)
-        role = realm.roles.by_name(role_name)
-        user_with_role.role_mappings.realm.add([role.entity])
+
+        admin = rhsso_service_info.realm.admin
+        admin.create_realm_role({"name": role_name})
+        role = admin.get_realm_role(role_name)
+        admin.assign_realm_roles(user_with_role["id"], "", role)
         return role_name
 
     return _realm_role
@@ -103,7 +108,6 @@ def prod_client(application, production_gateway):
 
 
 # Zync is sometimes too slow to create the RHSSO client.
-@backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
 def get_rhsso_client(application, rhsso_service_info):
     """
     Retries until the RHSSO client is created
@@ -111,12 +115,10 @@ def get_rhsso_client(application, rhsso_service_info):
     :param rhsso_service_info: RHSSO service info
     :return: RHSSO client
     """
-    return rhsso_service_info.realm.clients.by_client_id(application["client_id"])
+    return rhsso_service_info.get_application_client(application)
 
 
 def token(application, rhsso_service_info, username):
     """Access token for 3scale application that is connected with RHSSO"""
     app_key = application.keys.list()["keys"][0]["key"]["value"]
-    auth = rhsso_service_info.rhsso.password_authorize(rhsso_service_info.realm, application["client_id"], app_key,
-                                                       username, "testUser")
-    return auth.token['access_token']
+    return rhsso_service_info.password_authorize(application["client_id"], app_key, username)["access_token"]
