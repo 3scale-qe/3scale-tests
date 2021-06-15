@@ -39,11 +39,13 @@ def gateway_environment(gateway_environment, testconfig):
       APICAST_LOAD_SERVICES_WHEN_NEEDED fixes the problem
     """
     rhsso_url = urlparse(testconfig["rhsso"]["url"]).hostname
+    superdomain = testconfig["threescale"]["superdomain"]
     proxy_endpoint = testconfig["proxy"]
 
     gateway_environment.update({"HTTP_PROXY": proxy_endpoint['http'],
                                 "HTTPS_PROXY": proxy_endpoint['https'],
-                                "NO_PROXY": f"backend-listener,system-master,system-provider,{rhsso_url}",
+                                "NO_PROXY":
+                                    f"backend-listener,system-master,system-provider,{rhsso_url},{superdomain}",
                                 "APICAST_LOAD_SERVICES_WHEN_NEEDED": 1})
     return gateway_environment
 
