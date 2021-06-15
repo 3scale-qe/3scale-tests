@@ -47,10 +47,16 @@ class BaseDevelView(View, Navigable):
 class LandingView(BaseDevelView):
     """Developer portal landing page"""
     sign_in_btn = Link("//a[contains(@href, '/login')]")
+    close_csm = GenericLocatorWidget('//*[@id="cms-toolbar-menu-right"]/li/a')
 
     @property
     def is_displayed(self):
         return self.sign_in_btn.is_displayed
+
+    def post_navigate(self, **kwargs):
+        super().post_navigate(**kwargs)
+        if self.close_csm.is_displayed:
+            self.close_csm.click()
 
 
 class AccessView(View):

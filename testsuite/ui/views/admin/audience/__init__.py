@@ -11,16 +11,11 @@ class BaseAudienceView(BaseAdminView):
 
     def visit_portal(self):
         """
-        Directly visit Devel portal.
+        Directly visit Devel portal - opens new tab with Devel portal!
         The same could be done with step function and href argument that would contain Devel portal url or access_code.
         This method provides simple solution that does not need any information mentioned above.
-        In addition, this function change focus to newly opened tab.
-        TODO: add tab management to the navigator (try with key-word)
         """
-        tabs = self.browser.window_handles
         self.nav.select("Developer Portal", "Visit Portal")
-        new_tab = [t for t in self.browser.window_handles if t not in tabs]
-        self.browser.switch_to_window(new_tab[0])
 
     @step("@href")
     def step(self, href, **kwargs):
