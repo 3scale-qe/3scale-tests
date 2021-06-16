@@ -97,6 +97,7 @@ reportportal:
 testsuite/resources/apicast.yml: FORCE VERSION-required
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/$(VERSION).GA/apicast-gateway/apicast.yml > $@ || \
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/apicast-gateway/apicast.yml > $@
+	sed -i "s/imagePullPolicy:.*/imagePullPolicy: Always/g" $@
 
 release: ## Create branch of new VERSION (and tag VERSION)
 release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
