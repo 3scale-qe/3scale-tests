@@ -30,6 +30,9 @@ default:
     cmd: "podman"
     podman_cert_dir: "/var/data"
     podman_cert_name: "ca-bundle.crt"
+  integration:
+    service:
+      proxy_service: "@format fuse-camel-proxy.{this.FIXTURES.tools.namespace}.svc:8088"
   fixtures:
     tools:
       namespace: tools

@@ -2,55 +2,42 @@
 # Example template to create local configuration with custom environment
 # envsubst can be used to fill this
 
-${ENVIRONMENT}:
+${DYNACONF_ENVIRONMENT}:  # default env is called 'development'
   threescale:
     version: "${THREESCALE_VERSION}"
-    # url & token doesn't have to be specified explicitly unless intended
-    # in such case login to openshift is a must
-    # admin:
-      # url: https://3scale-admin.${THREESCALE_SUPERDOMAIN}
-      # token: "${ADMIN_ACCESS_TOKEN}"
+    superdomain: ${THREESCALE_SUPERDOMAIN}
+    admin:
+      url: ${ADMIN_URL}
+      username: ${ADMIN_USER}
+      password: ${ADMIN_PASSWORD}
+      token: ${ADMIN_ACCESS_TOKEN}
+    master:
+      url: ${MASTER_URL}
+      username: ${MASTER_USER}
+      password: ${MASTER_PASSWORD}
+      token: ${MASTER_ACCESS_TOKEN}
+    gateway:
+      image: ${APICAST_IMAGE}
     service:
       backends:
-        primary: https://httpbin.${TESTENV_DOMAIN}:443
-        httpbin_go: https://httpbingo.${TESTENV_DOMAIN}:443
+        echo_api: https://${ECHO_API_HOSTNAME}:443
+        httpbin_go: https://${GO_HTTPBIN_HOSTNAME}:443
+        httpbin: https://${HTTPBIN_HOSTNAME}:443
+        httpbin_nossl: http://${HTTPBIN_HOSTNAME}:80
   rhsso:
-    # admin credentials
-    username: "${RHSSO_ADMIN_USERNAME}"
-    password: "${RHSSO_ADMIN_PASSWORD}"
-  openshift:
-    servers:
-      default:
-        server_url: "${OPENSHIFT_URL}"
-    projects:
-      threescale:
-        name: "${OPENSHIFT_THREESCALE_PROJECT}"
+    url: http://${RHSSO_HOSTNAME}:80
+    username: ${RHSSO_ADMIN}
+    password: ${RHSSO_USERNAME}
   proxy:
-    # http proxy settings
-    http: http://tinyproxy-service.tiny-proxy.svc:8888
-    https: http://tinyproxy-service.tiny-proxy.svc:8888
-  toolbox:
-    destination_endpoint: "" # url to 3scale api
-    destination_provider_key: "" # token
-    machine_ip: "" # where the container is
-    ssh_user: "" # user at the machine where the container is
-    ssh_passwd: "" # password for above user
-    podman_image: "" # container image ID
+    http: ${HTTP_PROXY}
+    https: ${HTTP_PROXY}
+  integration:
+    service:
+      proxy_service: ${FUSE_CAMEL_URL}
   fixtures:
     jaeger:
-      url: "" # route to the jaeger-query service for the querying of traces
       config:
         reporter:
-            localAgentHostPort: "" # route to the jaeger-agent (may be internal)
+          localAgentHostPort: ${JAEGER_AGENT_URL}
         baggage_restrictions:
-            hostPort: "" # route to the jaeger-query (may be internal)
-    ui:
-      browser:
-        source: "" #local ,remote or binary
-        webdriver: "" #chrome , firefox or edge(edge with remote drivers)
-        remote_url: "" #URL and port to remote selenium instance e.g. http://127.0.0.1:4444
-  hyperfoil:
-    url: "" # URL for hyperfoil controller
-    shared_template: #template that will be added to each hyperfoil benchmark definition
-  cfssl:
-    binary: "cfssl" # Path to the cfssl binary
+          hostPort: ${JAEGER_BAGGAGE_RESTRICTIONS_URL}
