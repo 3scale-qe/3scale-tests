@@ -275,11 +275,20 @@ def master_threescale(testconfig):
 
 
 @pytest.fixture(scope="session")
-def account(custom_account, request, testconfig):
+def account_password():
+    """Default password for Accounts"""
+    return '123456'
+
+
+@pytest.fixture(scope="session")
+def account(custom_account, request, testconfig, account_password):
     "Preconfigured account existing over whole testing session"
     iname = blame(request, "id")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
-    account.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
+    account.update(dict(
+        name=iname, username=iname,
+        email=f"{iname}@anything.invalid",
+        password=account_password))
     account = custom_account(params=account)
 
     return account
@@ -334,28 +343,34 @@ def custom_user(request, testconfig):  # pylint: disable=unused-argument
 
 
 @pytest.fixture(scope="module")
-def provider_account(custom_provider_account, request, testconfig):
-    """Preconfigured provider account existing over whole testing session"""
-    username = blame(request, 'pa')
-    account = rawobj.AccountUser(username=username, email=f"{username}@example.com", password="123456")
-    account = custom_provider_account(account)
-
-    return account
+def provider_account(threescale):
+    """Returns current Provider Account (current Tenant)"""
+    return threescale.provider_accounts.fetch()
 
 
 @pytest.fixture(scope="module")
-def custom_provider_account(request, testconfig, threescale):
+def provider_account_user(custom_provider_account_user, account_password, request):
+    """Preconfigured provider account existing over whole testing session"""
+    username = blame(request, 'pa')
+    user = rawobj.AccountUser(username=username, email=f"{username}@example.com", password=account_password)
+    user = custom_provider_account_user(user)
+
+    return user
+
+
+@pytest.fixture(scope="module")
+def custom_provider_account_user(request, testconfig):
     """Parametrized custom Provider account user
     Args:
         :param params: dict for remote call, rawobj.AccountUser should be used
     """
-    def _custom_account(params, autoclean=True):
-        acc = threescale.provider_accounts.create(params=params)
+    def _custom_user(params, autoclean=True):
+        user = threescale.provider_account_users.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(acc.delete)
-        return acc
+            request.addfinalizer(user.delete)
+        return user
 
-    return _custom_account
+    return _custom_user
 
 
 @pytest.fixture(scope="session")

@@ -9,6 +9,14 @@ class BaseAudienceView(BaseAdminView):
     NAV_ITEMS = ['Accounts', 'Applications', 'Billing', 'Developer Portal', 'Messages']
     nav = NavigationMenu(id='mainmenu')
 
+    def visit_portal(self):
+        """
+        Directly visit Devel portal - opens new tab with Devel portal!
+        The same could be done with step function and href argument that would contain Devel portal url or access_code.
+        This method provides simple solution that does not need any information mentioned above.
+        """
+        self.nav.select("Developer Portal", "Visit Portal")
+
     @step("@href")
     def step(self, href, **kwargs):
         """

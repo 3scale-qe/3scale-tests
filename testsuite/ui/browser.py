@@ -1,5 +1,5 @@
 """Plug-in for Widgetastic browser with 3scale specific environment settings"""
-
+from contextlib import contextmanager
 from datetime import datetime
 import os
 from urllib import parse
@@ -103,3 +103,27 @@ class ThreeScaleBrowser(Browser):
         )
         path = os.path.join(path, filename)
         self.selenium.save_screenshot(path)
+
+    @contextmanager
+    def new_tab(self, trigger, keep_tab=False):
+        """
+        Context manager for UI operations which result in new tab (window_handle).
+        Only one tab wil remain open after this context manager.
+        Set `keep_tab` to:
+            True - if newly opened tab should be preserved.
+            False - if newly opened tab should be closed
+        :param trigger: Method that triggers tew tab opening
+        :param keep_tab: keep tab flag
+        :return: result of the `trigger` method
+        """
+        old_handles = self.browser.window_handles
+        current_handle = self.browser.current_window_handle
+        returned_object = trigger()
+        new_handle = [t for t in self.browser.window_handles if t not in old_handles][0]
+        self.browser.switch_to_window(new_handle)
+        yield returned_object
+        if keep_tab:
+            self.browser.close_window(current_handle)
+        else:
+            self.browser.close_window(new_handle)
+            self.browser.switch_to_window(current_handle)
