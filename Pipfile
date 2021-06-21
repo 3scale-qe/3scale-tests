@@ -21,7 +21,7 @@ pytest = "*"
 pytest-cases = "*"
 pytest-html = "*"
 requests = "*"
-3scale-api = "*"
+#3scale-api = "*"
 dynaconf = "*"
 python-keycloak-client = {git = "https://github.com/pehala/python-keycloak-client.git", editable = true}
 backoff = "*"
@@ -35,7 +35,7 @@ widgetastic-patternfly = "*"
 # For developing purposes should be added 3scale-api library from source or
 # from github repository
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
-# 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
+ 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
 openshift-client = ">=1.0.9"
 hyperfoil-client="*"
@@ -46,6 +46,7 @@ jsondiff = "*"
 weakget = {editable = true,git = "https://github.com/mangan/weakget.git"}
 flaky = "*"
 lxml = "*"
+self = "*"
 
 [requires]
 python_version = "3"

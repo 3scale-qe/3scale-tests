@@ -1,11 +1,11 @@
 """Contains basic views for Developer portal"""
 from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 
-from testsuite.ui.navigation import Navigable
+from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.widgets import Link
 
 
-class Navbar(View):
+class Navbar(View, Navigable):
     """Represents top navigation menu for logged in Devel Views
     TODO: When browser is not maximized, this menu is collapsed. Add dynamical interaction"""
     ROOT = "//nav[@role='navigation']"
@@ -16,6 +16,10 @@ class Navbar(View):
     messages_btn = Link("//a[contains(@href, '/admin/messages/received')]")
     settings_btn = Link("//a[@href='/admin/account']")
     sign_out_btn = Link("//a[contains(@href, '/logout')]")
+
+    @step("SettingsTabs")
+    def settings(self):
+        self.settings_btn.click()
 
     @property
     def is_displayed(self):

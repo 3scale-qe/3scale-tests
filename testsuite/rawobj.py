@@ -199,3 +199,50 @@ def AccountUser(username: str, email: str, password: str) -> dict:
         "password": password}
 
     return obj
+
+
+def BillingAddress(
+        name: str, address: str, city: str, country: str, state: str, phone: str, zip: str
+) -> dict:
+    """builder of params to store billing address for billing purposes
+    Args:
+        :param name: name
+        :param address: street name and house number
+        :param city: city
+        :param country: country
+        :param state: usually the 2 letter code for US states
+        :param phone: phone
+        :param zip: postal/zip code
+    """
+
+    obj = {
+        "billing_address_name": name,
+        "billing_address_address": address,
+        "billing_address_city": city,
+        "billing_address_country": country,
+        "billing_address_state": state,
+        "billing_address_phone": phone,
+        "billing_address_zip": zip,
+    }
+
+    return obj
+
+
+def CreditCardDetails(number: str, cvc: str, year: str, month: str):
+    """builder of params to store credit card details for billing purposes
+    Args:
+        :param number: credit card number
+        :param cvc: credit card cvc
+        :param year: expiration year
+        :param month: expiration month
+    """
+
+    obj = {
+        "credit_card_number": number,
+        "credit_card_partial_number": number[-4:],  # Last four digits on the credit card
+        "credit_card_cvc": cvc,
+        "credit_card_expiration_year": year,
+        "credit_card_expiration_month": month,
+    }
+
+    return obj
