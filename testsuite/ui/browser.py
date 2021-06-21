@@ -1,7 +1,5 @@
 """Plug-in for Widgetastic browser with 3scale specific environment settings"""
 from contextlib import contextmanager
-from datetime import datetime
-import os
 from urllib import parse
 from time import sleep
 from widgetastic.browser import Browser, DefaultPlugin
@@ -82,27 +80,6 @@ class ThreeScaleBrowser(Browser):
     def set_path(self, path):
         """Change path for the current browser.url"""
         self.url = parse.urlparse(self.url)._replace(path=path).geturl()
-
-    def take_screenshot(self, error_type):
-        """
-        Take screen shot from the current browser window.
-
-        This method is called automatically in case any exception during UI
-        session happens.
-        """
-        now = datetime.now()
-        if os.environ.get('resultsdir') is not None:
-            path = os.environ['resultsdir']
-        else:
-            path = "./test-run-results"
-        if not os.path.exists(path):
-            os.makedirs(path)
-        filename = '{0}-screenshot-{1}.png'.format(
-            error_type,
-            now.strftime('%Y-%m-%d_%H:%M:%S')
-        )
-        path = os.path.join(path, filename)
-        self.selenium.save_screenshot(path)
 
     @contextmanager
     def new_tab(self, trigger, keep_tab=False):
