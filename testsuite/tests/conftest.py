@@ -133,6 +133,7 @@ def pytest_report_header(config):
     project = _oc_3scale_project()
     threescale = settings["threescale"]["admin"]["url"]
     version = settings["threescale"]["version"]
+    catalogsource = weakget(settings)["threescale"]["catalogsource"] % "UNKNOWN"
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
@@ -143,6 +144,7 @@ def pytest_report_header(config):
 
     _global_property(config, "openshift-url", openshift)
     _global_property(config, "openshift-namespace", project)
+    _global_property(config, "openshift-catalogsource", catalogsource)
     _global_property(config, "testsuite-version", testsuite_version)
     _global_property(config, "polarion-project-id", projectid)
     _global_property(config, "polarion-response-myteamsname", team)
@@ -159,6 +161,7 @@ def pytest_report_header(config):
         f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
+        f"testsuite: catalogsource = {catalogsource}",
         ""]
 
 
