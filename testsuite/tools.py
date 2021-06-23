@@ -68,4 +68,6 @@ class OpenshiftProject:
 class Settings:
     """Get testenv tools from testsuite settings"""
     def __getitem__(self, name):
+        if name == "no-ssl-sso":
+            return settings["rhsso"]["url"]
         return settings["threescale"]["service"]["backends"][name]

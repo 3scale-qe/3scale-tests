@@ -405,13 +405,13 @@ def production_gateway(request, testconfig, configuration):
 
 
 @pytest.fixture(scope="module")
-def rhsso_service_info(request, testconfig):
+def rhsso_service_info(request, testconfig, tools):
     """
     Set up client for zync
     :return: dict with all important details
     """
     cnf = testconfig["rhsso"]
-    rhsso = RHSSO(server_url=cnf["url"],
+    rhsso = RHSSO(server_url=tools["no-ssl-sso"],
                   username=cnf["username"],
                   password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)

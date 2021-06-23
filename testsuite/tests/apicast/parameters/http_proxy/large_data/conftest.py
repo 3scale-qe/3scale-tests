@@ -29,7 +29,7 @@ def settings_block(settings_block, configuration, protocol):
 
 
 @pytest.fixture(scope="module")
-def gateway_environment(gateway_environment, testconfig):
+def gateway_environment(gateway_environment, testconfig, tools):
     """
     Adds HTTP proxy to the staging gateway
 
@@ -38,7 +38,7 @@ def gateway_environment(gateway_environment, testconfig):
     - Those tests will fail on 504 when 3scale has a lot of products, because configuration takes a lot of time to load
       APICAST_LOAD_SERVICES_WHEN_NEEDED fixes the problem
     """
-    rhsso_url = urlparse(testconfig["rhsso"]["url"]).hostname
+    rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
     superdomain = testconfig["threescale"]["superdomain"]
     proxy_endpoint = testconfig["proxy"]
 
