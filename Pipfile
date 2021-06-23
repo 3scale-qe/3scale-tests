@@ -35,7 +35,7 @@ widgetastic-patternfly = "*"
 # For developing purposes should be added 3scale-api library from source or
 # from github repository
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
- 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
+3scale-api = {git = "https://github.com/pehala/3scale-api-python.git", editable = true, ref="invoice_fix"}
 cfssl = "==0.0.3b243"
 openshift-client = ">=1.0.9"
 hyperfoil-client="*"

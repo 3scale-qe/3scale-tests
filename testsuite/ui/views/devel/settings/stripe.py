@@ -89,7 +89,7 @@ class StripeCCView(BaseDevelView):
         self.cc_form.add(cc, address.zip)
         if otp:
             self.otp_form.complete_auth()
-        print("aaa")
+        self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
     def prerequisite(self):
         return SettingsTabs
