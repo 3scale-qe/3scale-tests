@@ -1,3 +1,4 @@
+"""Tests simple billing using both API and UI"""
 import time
 
 import pytest
@@ -11,11 +12,12 @@ from testsuite.utils import randomize
 
 @pytest.fixture(scope="module")
 def cc_details():
+    """Credit card details"""
     return CreditCard("4000002500003155", "123", 10, 25)
 
 
 @pytest.fixture(scope="function")
-def account(threescale, custom_account, request, testconfig, account_password):
+def account(threescale, custom_account, request, account_password):
     """Preconfigured account existing over whole testing session"""
     iname = randomize("id")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=False, monthly_charging_enabled=False)
@@ -40,7 +42,9 @@ def account(threescale, custom_account, request, testconfig, account_password):
     "api_invoice",
     "ui_invoice"
 ])
+# pylint: disable=too-many-arguments,unused-argument
 def test_stripe(devel_login, navigator, billing_address, cc_details, request, account, threescale, invoice_provider):
+    """Tests stripe billing"""
     cc_view = navigator.navigate(StripeCCView)
     cc_view.add_cc_details(billing_address, cc_details, otp=True)
 

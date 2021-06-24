@@ -19,6 +19,7 @@ class Navbar(View, Navigable):
 
     @step("SettingsTabs")
     def settings(self):
+        """Settings"""
         self.settings_btn.click()
 
     @property

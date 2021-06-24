@@ -202,7 +202,7 @@ def AccountUser(username: str, email: str, password: str) -> dict:
 
 
 def BillingAddress(
-        name: str, address: str, city: str, country: str, state: str, phone: str, zip: str
+        name: str, address: str, city: str, country: str, state: str, phone: str, zip_code: str
 ) -> dict:
     """builder of params to store billing address for billing purposes
     Args:
@@ -212,7 +212,7 @@ def BillingAddress(
         :param country: country
         :param state: usually the 2 letter code for US states
         :param phone: phone
-        :param zip: postal/zip code
+        :param zip_code: postal/zip code
     """
 
     obj = {
@@ -222,7 +222,7 @@ def BillingAddress(
         "billing_address_country": country,
         "billing_address_state": state,
         "billing_address_phone": phone,
-        "billing_address_zip": zip,
+        "billing_address_zip": zip_code,
     }
 
     return obj

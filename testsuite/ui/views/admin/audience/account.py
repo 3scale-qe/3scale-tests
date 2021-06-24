@@ -1,8 +1,8 @@
 """View representations of Accounts pages"""
 import time
 
-from widgetastic.widget import TextInput, GenericLocatorWidget, Table, Text, View
-from widgetastic_patternfly4 import PatternflyTable, Button
+from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -77,7 +77,7 @@ class AccountsDetailView(BaseAudienceView):
         self.users_button.click()
 
     @step("AccountInvoicesView")
-    def users(self):
+    def invoices(self):
         """Open account's users"""
         self.invoices_button.click()
 
@@ -194,6 +194,7 @@ class AccountInvoicesView(BaseAudienceView):
 
 
 class InvoiceDetailView(BaseAudienceView):
+    """Invoice Detail page"""
     issue_button = Link("//form[contains(@action, 'issue.js')]/button")
     charge_button = Link("//form[contains(@action, 'charge.js')]/button")
     add_line_item = Link("a.action.add")
@@ -205,6 +206,7 @@ class InvoiceDetailView(BaseAudienceView):
 
     @View.nested
     class LineItemForm(View):
+        """Nested view for a Line add form"""
         name_input = TextInput("line_item[name]")
         quantity_input = TextInput("line_item[quantity]")
         description_input = TextInput("line_item[description]")
@@ -213,23 +215,28 @@ class InvoiceDetailView(BaseAudienceView):
         submit = Link("//form[@id='new_line_item']//input[@type='submit']")
 
         def add_item(self, name, quantity, cost, description):
-            self.name_input.fill(name),
+            """Adds item to an invoice"""
+            self.name_input.fill(name)
             self.quantity_input.fill(quantity)
             self.cost_input.fill(cost)
             self.description_input.fill(description)
             self.submit.click()
 
     def add_item(self, name, quantity, cost, description):
+        """Adds item to an invoice"""
         self.add_line_item.click()
         # TODO: Remove sleep
         time.sleep(2)
+        # pylint: disable=no-value-for-parameter
         self.LineItemForm.add_item(name, quantity, cost, description)
 
     def issue(self):
+        """Issues the invoices (OPEN -> PENDING)"""
         self.issue_button.click(handle_alert=True)
         self.browser.wait_for_element(self.charge_button, timeout=10)
 
     def charge(self):
+        """Charges the invoices (PENDING -> PAID)"""
         # Charge button has two alerts which completely messed up with widgetastic
         # TODO: insert JIRA
         self.browser.click(self.charge_button, ignore_ajax=True)

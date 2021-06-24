@@ -44,6 +44,7 @@ class Sessions:
 
 
 class BillingAddress(NamedTuple):
+    """Billing address"""
     name: str
     address: str
     city: str
@@ -54,6 +55,7 @@ class BillingAddress(NamedTuple):
 
 
 class CreditCard(NamedTuple):
+    """Credit card"""
     number: str
     cvc: str
     exp_month: int

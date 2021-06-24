@@ -1,18 +1,14 @@
-import time
-from collections import namedtuple
-from dataclasses import dataclass
-from typing import Union
-
+"""View for Stripe manipulation"""
 import backoff
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget
 
-from testsuite.rawobj import BillingAddress, CreditCardDetails
 from testsuite.ui.views.devel import BaseDevelView
 from testsuite.ui.views.devel.settings import SettingsTabs
 from testsuite.ui.widgets import Link
 
 
 class BillingAddressForm(View):
+    """Billing Address form"""
     ROOT = "//form[@action='/admin/account/payment_details']"
     name = TextInput(id="account_billing_address_name")
     address1 = TextInput(id="account_billing_address_address1")
@@ -24,7 +20,8 @@ class BillingAddressForm(View):
     postal = TextInput(id="account_billing_address_zip")
     submit = GenericLocatorWidget(".//input[@type='submit']")
 
-    def add(self, address: BillingAddress):
+    def add(self, address):
+        """Adds billing address"""
         self.name.fill(address.name)
         self.address1.fill(address.address)
         self.city.fill(address.city)
@@ -36,14 +33,16 @@ class BillingAddressForm(View):
 
 
 class StripeCCForm(View):
+    """Stripe Credit card form"""
     submit_btn = GenericLocatorWidget("//button[@id='stripe-submit']")
 
-    def add(self, cc: CreditCardDetails, postal):
+    def add(self, credit_card, postal):
+        """Adds a new card to the Stripe form"""
         stripe_frame = self.browser.selenium.find_elements_by_tag_name("iframe")[0]
         self.browser.selenium.switch_to.frame(stripe_frame)
-        self._element('cardnumber').send_keys(cc.number)
-        self._element('exp-date').send_keys(f"{cc.exp_month}{cc.exp_year}")
-        self._element('cvc').send_keys(cc.cvc)
+        self._element('cardnumber').send_keys(credit_card.number)
+        self._element('exp-date').send_keys(f"{credit_card.exp_month}{credit_card.exp_year}")
+        self._element('cvc').send_keys(credit_card.cvc)
         self._element('postal').send_keys(postal)
         self.browser.selenium.switch_to.default_content()
         self.submit_btn.click()
@@ -53,7 +52,9 @@ class StripeCCForm(View):
 
 
 class OTPForm(View):
+    """3DS verification form"""
     def complete_auth(self):
+        """Completes the authentication"""
         self._switch()
         self.browser.selenium.find_element_by_id('test-source-authorize-3ds').click()
         self.browser.selenium.switch_to.default_content()
@@ -62,6 +63,7 @@ class OTPForm(View):
         self.browser.selenium.switch_to.frame(self.browser.selenium.find_element_by_xpath(name))
 
     def _switch(self):
+        # pylint: disable=unused-argument
         def _switch_default(detail):
             self.browser.selenium.switch_to.default_content()
 
@@ -75,6 +77,7 @@ class OTPForm(View):
 
 
 class StripeCCView(BaseDevelView):
+    """View for adding credit card to the stripe"""
     path_pattern = '/admin/account/stripe'
     tabs = View.nested(SettingsTabs)
     add_billing_address_btn = Link("//a[@href='/admin/account/stripe/edit']")
@@ -82,11 +85,12 @@ class StripeCCView(BaseDevelView):
     cc_form = View.nested(StripeCCForm)
     otp_form = View.nested(OTPForm)
 
-    def add_cc_details(self, address: BillingAddress, cc: CreditCardDetails, otp=False):
+    def add_cc_details(self, address, credit_card, otp=False):
+        """Adds credit card details"""
         if self.add_billing_address_btn.is_displayed:
             self.add_billing_address_btn.click()
         self.address_form.add(address)
-        self.cc_form.add(cc, address.zip)
+        self.cc_form.add(credit_card, address.zip_code)
         if otp:
             self.otp_form.complete_auth()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)

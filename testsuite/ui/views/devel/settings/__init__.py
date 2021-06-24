@@ -1,3 +1,4 @@
+"""Devel account settings"""
 from widgetastic.widget import View
 
 from testsuite.ui.navigation import step, Navigable
@@ -6,6 +7,7 @@ from testsuite.ui.widgets import Link
 
 
 class SettingsTabs(View, Navigable):
+    """Account settings in Devel portal"""
     ROOT = "//ul[contains(@class, 'nav-tabs')]"
     details_tab = Link("//a[@href='/admin/account']")
     users_tab = Link("//a[@href='/admin/account/users']")
@@ -16,10 +18,12 @@ class SettingsTabs(View, Navigable):
 
     @step("InvoicesView")
     def invoices(self):
+        """Invoices tab"""
         self.invoices_tab.click()
 
     @step("StripeCCView")
     def stripe(self):
+        """Stripe tab"""
         self.stripe_cc_tab.click()
 
     def prerequisite(self):
@@ -32,6 +36,7 @@ class SettingsTabs(View, Navigable):
 
 
 class InvoicesView(BaseDevelView):
+    """List of all invoices for an account"""
     path_pattern = '/admin/account/invoices'
     tabs = View.nested(SettingsTabs)
 
