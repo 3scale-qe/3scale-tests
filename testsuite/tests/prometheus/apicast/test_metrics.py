@@ -57,7 +57,7 @@ def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metr
 
 
 # there is certain delay before all appears in Prometheus
-@backoff.on_predicate(backoff.fibo, lambda x: sorted(x.keys()) == STATUSES, 8, jitter=None)
+@backoff.on_predicate(backoff.fibo, lambda x: sorted(x.keys()) != STATUSES, max_tries=8, jitter=None)
 def apicast_status_metrics(prometheus):
     """Reliable gathering of prometheus metrics
 
