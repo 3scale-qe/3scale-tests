@@ -2,6 +2,7 @@
 
 import logging
 import os
+import socket
 import sys
 import time
 
@@ -24,6 +25,25 @@ from packaging.version import Version  # noqa
 
 from testsuite.config import settings  # noqa
 from testsuite.configuration import CommonConfiguration  # noqa
+
+
+# To avoid indefinite waiting on socket issues default timeout is used.
+# Furthermore to avoid reset of timeout, monkey patching is used to alter
+# socket.settimeout behavior
+socket.setdefaulttimeout(60)
+_socket_settimeout = socket.socket.settimeout
+
+
+def _settimeout(self, timeout):
+    """Monkey patch wrapper over original socket.settimeout
+
+    This is to prevent disabling timeout on socket connection"""
+    if timeout is None:
+        timeout = socket.getdefaulttimeout()
+    _socket_settimeout(self, timeout)
+
+
+socket.socket.settimeout = _settimeout  # type: ignore
 
 
 # Monkey patching! Yes! True power of dynamic language
