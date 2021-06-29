@@ -33,9 +33,11 @@ class Realm:
         """Creates new user"""
         kwargs["username"] = username
         kwargs["enabled"] = True
+        kwargs["email"] = f"{username}@anything.invalid"
         self.admin.create_user(kwargs)
         user_id = self.admin.get_user_id(username)
         self.admin.set_user_password(user_id, password, temporary=False)
+        self.admin.update_user(user_id, {"emailVerified": True})
         return user_id
 
     def oidc_client(self, client_id, client_secret):
@@ -100,8 +102,17 @@ class RHSSO:
                               realm_name=realm,
                               client_secret_key=secret)
 
-    # pylint: disable=too-many-arguments
-    def password_authorize(self, realm, client_id, secret, username, password):
-        """Returns token retrieved by password authentication"""
-        oidc = self.create_oidc_client(realm, client_id, secret)
-        return oidc.token(username, password, grant_type="password")
+
+# pylint: disable=too-few-public-methods
+class Token:
+    """
+    Class for backwards compatibility for RHSSO token manipulation
+    The right way is password_authorize()["access_token"],
+    old way was password_authorize().token["access_token"]
+    """
+
+    def __init__(self, token) -> None:
+        self.token = token
+
+    def __getitem__(self, item):
+        return self.token[item]

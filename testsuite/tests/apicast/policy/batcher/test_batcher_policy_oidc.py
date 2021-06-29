@@ -7,6 +7,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
+
 BATCH_REPORT_SECONDS = 50
 
 
@@ -27,7 +28,7 @@ def policy_settings():
 def test_batcher_policy_oidc(api_client, application, rhsso_service_info):
     """Test if return correct number of usages of a service in batch"""
     app_key = application.keys.list()["keys"][0]["key"]["value"]
-    token = rhsso_service_info.password_authorize(application["client_id"], app_key)['access_token']
+    token = rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     client = api_client()

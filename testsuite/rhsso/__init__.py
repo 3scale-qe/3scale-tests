@@ -8,7 +8,7 @@ from threescale_api.resources import Service
 from threescale_api.utils import HttpClient
 
 from testsuite.httpx import HttpxOidcClientAuth
-from testsuite.rhsso.objects import Realm, Client, RHSSO
+from testsuite.rhsso.objects import Realm, Client, RHSSO, Token
 
 
 class RHSSOServiceConfiguration:
@@ -64,7 +64,7 @@ class RHSSOServiceConfiguration:
         """Returns token retrieved by password authentication"""
         username = username or self.username
         password = password or self.password
-        return self.realm.oidc_client(client_id, secret).token(username, password)
+        return Token(self.realm.oidc_client(client_id, secret).token(username, password))
 
     # Not sure if backoff is needed, disabling for now
     @backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
