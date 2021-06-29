@@ -2,7 +2,7 @@
 import pytest
 from threescale_api.resources import InvoiceState
 
-from testsuite.rawobj import BillingAddress
+from testsuite.ui.objects import BillingAddress
 from testsuite.ui.views.admin.audience.account import InvoiceDetailView
 
 

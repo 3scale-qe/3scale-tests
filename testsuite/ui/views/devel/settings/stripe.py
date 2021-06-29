@@ -1,10 +1,15 @@
 """View for Stripe manipulation"""
+import logging
+
 import backoff
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget
 
+from testsuite.ui.objects import CreditCard, BillingAddress
 from testsuite.ui.views.devel import BaseDevelView
 from testsuite.ui.views.devel.settings import SettingsTabs
 from testsuite.ui.widgets import Link
+
+logger = logging.getLogger(__name__)
 
 
 class BillingAddressForm(View):
@@ -55,16 +60,17 @@ class OTPForm(View):
     """3DS verification form"""
     def complete_auth(self):
         """Completes the authentication"""
-        self._switch()
-        self.browser.selenium.find_element_by_id('test-source-authorize-3ds').click()
+        self._switch_to_otp_frame()
+        self.browser.wait_for_element("//*[@id='test-source-authorize-3ds']").click()
         self.browser.selenium.switch_to.default_content()
 
     def _switch_frame(self, name):
         self.browser.selenium.switch_to.frame(self.browser.selenium.find_element_by_xpath(name))
 
-    def _switch(self):
-        # pylint: disable=unused-argument
-        def _switch_default(detail):
+    def _switch_to_otp_frame(self):
+        def _switch_default(details):
+            logger.debug("Switching focus into the 3DS form iFrame. "
+                         "Backing off {wait:0.1f} seconds afters {tries} tries.".format(**details))
             self.browser.selenium.switch_to.default_content()
 
         @backoff.on_exception(backoff.fibo, Exception, max_tries=8, jitter=None, on_backoff=_switch_default)
@@ -85,13 +91,13 @@ class StripeCCView(BaseDevelView):
     cc_form = View.nested(StripeCCForm)
     otp_form = View.nested(OTPForm)
 
-    def add_cc_details(self, address, credit_card, otp=False):
+    def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details"""
         if self.add_billing_address_btn.is_displayed:
             self.add_billing_address_btn.click()
         self.address_form.add(address)
-        self.cc_form.add(credit_card, address.zip_code)
-        if otp:
+        self.cc_form.add(credit_card, address.zip)
+        if credit_card.sca:
             self.otp_form.complete_auth()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 

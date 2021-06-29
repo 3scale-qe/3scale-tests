@@ -45,9 +45,6 @@ default:
           localAgentHostPort: "@format jaeger-agent.{this.FIXTURES.tools.namespace}.svc:6831"
         baggage_restrictions:
           hostPort: "@format jaeger-query.{this.FIXTURES.tools.namespace}.svc:5778"
-    test_values:
-      account:
-        password: '123456'
     ui:
       browser:
         source: local

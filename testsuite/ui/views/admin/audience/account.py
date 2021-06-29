@@ -1,5 +1,4 @@
 """View representations of Accounts pages"""
-import time
 
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import PatternflyTable
@@ -193,42 +192,41 @@ class AccountInvoicesView(BaseAudienceView):
                self.path in self.browser.url
 
 
+class LineItemForm(View):
+    """Nested view for a Line add form"""
+    ROOT = "//div[@id='colorbox']"
+    name_input = TextInput("line_item[name]")
+    quantity_input = TextInput("line_item[quantity]")
+    description_input = TextInput("line_item[description]")
+    cost_input = TextInput("line_item[cost]")
+    submit = Link("//input[@type='submit']")
+
+    def add_item(self, name, quantity, cost, description):
+        """Adds item to an invoice"""
+        self.name_input.fill(name)
+        self.quantity_input.fill(quantity)
+        self.cost_input.fill(cost)
+        self.description_input.fill(description)
+        self.submit.click()
+
+
 class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
     issue_button = Link("//form[contains(@action, 'issue.js')]/button")
     charge_button = Link("//form[contains(@action, 'charge.js')]/button")
-    add_line_item = Link("a.action.add")
     id_field = Text(".field-friendly_id")
     state_field = Text("#field-state")
 
     # Selector which we can use to check if the charge has finished
     paid_field = Text("//td[@id='field-state' and text()='Paid']")
-
-    @View.nested
-    class LineItemForm(View):
-        """Nested view for a Line add form"""
-        name_input = TextInput("line_item[name]")
-        quantity_input = TextInput("line_item[quantity]")
-        description_input = TextInput("line_item[description]")
-        cost_input = TextInput("line_item[cost]")
-
-        submit = Link("//form[@id='new_line_item']//input[@type='submit']")
-
-        def add_item(self, name, quantity, cost, description):
-            """Adds item to an invoice"""
-            self.name_input.fill(name)
-            self.quantity_input.fill(quantity)
-            self.cost_input.fill(cost)
-            self.description_input.fill(description)
-            self.submit.click()
+    add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
+    line_item_form = View.nested(LineItemForm)
 
     def add_item(self, name, quantity, cost, description):
         """Adds item to an invoice"""
-        self.add_line_item.click()
-        # TODO: Remove sleep
-        time.sleep(2)
-        # pylint: disable=no-value-for-parameter
-        self.LineItemForm.add_item(name, quantity, cost, description)
+        self.add_item_btn.click()
+        self.line_item_form.wait_displayed()
+        self.line_item_form.add_item(name, quantity, cost, description)
 
     def issue(self):
         """Issues the invoices (OPEN -> PENDING)"""
@@ -238,7 +236,7 @@ class InvoiceDetailView(BaseAudienceView):
     def charge(self):
         """Charges the invoices (PENDING -> PAID)"""
         # Charge button has two alerts which completely messed up with widgetastic
-        # TODO: insert JIRA
+        # https://issues.redhat.com/browse/THREESCALE-7276
         self.browser.click(self.charge_button, ignore_ajax=True)
         self.browser.get_alert().accept()
         self.browser.get_alert().accept()

@@ -1,19 +1,21 @@
 """Tests simple billing using both API and UI"""
-import time
 
 import pytest
 from threescale_api.resources import InvoiceState
 
 from testsuite import rawobj
-from testsuite.tests.ui import CreditCard
+from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
 from testsuite.utils import randomize
 
 
-@pytest.fixture(scope="module")
-def cc_details():
+@pytest.fixture(scope="module", params=[
+    pytest.param(("4000002500003155", True)),
+    pytest.param(("4242424242424242", False)),
+])
+def cc_details(request):
     """Credit card details"""
-    return CreditCard("4000002500003155", "123", 10, 25)
+    return CreditCard(request.param[0], 123, 10, 25, request.param[1])
 
 
 @pytest.fixture(scope="function")
@@ -46,10 +48,9 @@ def account(threescale, custom_account, request, account_password):
 def test_stripe(devel_login, navigator, billing_address, cc_details, request, account, threescale, invoice_provider):
     """Tests stripe billing"""
     cc_view = navigator.navigate(StripeCCView)
-    cc_view.add_cc_details(billing_address, cc_details, otp=True)
+    cc_view.add_cc_details(billing_address, cc_details)
 
     request.getfixturevalue(invoice_provider)
-    time.sleep(5)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) == 1
     assert acc_invoices[0]['state'] == InvoiceState.PAID.value

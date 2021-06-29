@@ -1,6 +1,6 @@
 """UI tests module"""
 
-from typing import List, Dict, NamedTuple
+from typing import List, Dict
 
 
 class Sessions:
@@ -41,35 +41,3 @@ class Sessions:
         :param values: cookies
         """
         self.sessions[(username, password, url)] = values
-
-
-class BillingAddress(NamedTuple):
-    """Billing address"""
-    name: str
-    address: str
-    city: str
-    country: str
-    state: str
-    phone: str
-    zip: str
-
-
-class CreditCard(NamedTuple):
-    """Credit card"""
-    number: str
-    cvc: str
-    exp_month: int
-    exp_year: int
-
-    # def stripe(self):
-    #     obj = {
-    #         "name": self.name,
-    #         "address1": self.address,
-    #         "city": self.city,
-    #         "country": self.country,
-    #         "state": self.state,
-    #         "phone": self.phone,
-    #         "postal": self.zip,
-    #     }
-    #
-    #     return obj
