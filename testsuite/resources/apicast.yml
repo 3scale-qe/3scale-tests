@@ -64,7 +64,7 @@ objects:
           - name: OPENSSL_VERIFY
             value: "${OPENSSL_VERIFY}"
           image: ${AMP_APICAST_IMAGE}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: "${APICAST_NAME}"
           livenessProbe:
             httpGet:
