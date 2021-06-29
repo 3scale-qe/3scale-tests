@@ -27,6 +27,7 @@ from packaging.version import Version, InvalidVersion
 
 import yaml
 
+from openshift import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
 
 
@@ -118,6 +119,11 @@ def load(obj, env=None, silent=None, key=None):
         except IndexError:
             # RHOAM changed service name owning the route
             backend_route = ocp.routes.for_service("backend-listener-proxy")[0]
+        catalogsource = "UNKNOWN"
+        try:
+            catalogsource = ocp.do_action("get", ["catalogsource", "-o=jsonpath={.items[0].spec.image}"]).out().strip()
+        except OpenShiftPythonException:
+            pass
 
         # all this or nothing
         if None in (project, admin_url, admin_token, master_url, master_token, devel_url):
@@ -140,6 +146,7 @@ def load(obj, env=None, silent=None, key=None):
             "threescale": {
                 "version": _guess_version(ocp),
                 "superdomain": ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"],
+                "catalogsource": catalogsource,
                 "admin": {
                     "url": admin_url,
                     "username": ocp.secrets["system-seed"]["ADMIN_USER"].decode("utf-8"),
