@@ -6,7 +6,7 @@ from io import BytesIO
 
 import jsondiff
 import paramiko
-import testsuite.toolbox.constants as constants
+from testsuite.toolbox import constants
 from testsuite.config import settings
 
 

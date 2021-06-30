@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING, Optional, List
 
 if TYPE_CHECKING:
-    import threescale_api.resources as resources
+    from threescale_api import resources
 
 
 def PolicyConfig(name: str, configuration: dict, version: str = "builtin", enabled: bool = True) -> dict:

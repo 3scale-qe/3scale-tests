@@ -5,7 +5,7 @@ import logging
 
 import pytest
 
-import testsuite.toolbox.constants as constants
+from testsuite.toolbox import constants
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
 from testsuite import rawobj

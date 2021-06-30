@@ -3,7 +3,7 @@ Test for product metrics combined with routing policy.
 """
 import pytest
 
-import testsuite.rawobj as rawobj
+from testsuite import rawobj
 
 
 pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
