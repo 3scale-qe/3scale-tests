@@ -11,7 +11,7 @@ the request matching that mapping rule is not evaluated by other mapping rules.
 
 import pytest
 
-import testsuite.rawobj as rawobj
+from testsuite import rawobj
 
 
 @pytest.fixture(scope="module")

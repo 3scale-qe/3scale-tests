@@ -355,10 +355,7 @@ class OpenShiftClient:
             cmd_args.append(f"--since-time={time}")
         pod_selector = self.get_pod(deployment_name)
         logs = pod_selector.logs(tail, cmd_args=cmd_args)
-        logs_merged = ""
-        for key in logs:
-            logs_merged += logs[key]
-        return logs_merged
+        return "".join(logs.values())
 
     def get_pod(self, deployment_name: str):
         """

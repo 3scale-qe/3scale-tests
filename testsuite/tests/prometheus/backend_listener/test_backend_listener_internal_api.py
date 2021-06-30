@@ -214,5 +214,5 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
                     int(count_after[request_type][response_code]) - int(count_before[request_type][response_code])
                  == NUM_OF_REQUESTS)
 
-    for request_type_response_code in results:
-        assert results[request_type_response_code], f"{results}"
+    for request_type_response_code in results.values():
+        assert request_type_response_code, f"{results}"

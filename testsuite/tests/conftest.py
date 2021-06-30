@@ -15,10 +15,9 @@ from weakget import weakget
 # to actually initialize all the providers
 # pylint: disable=unused-import
 import testsuite.capabilities.providers
-import testsuite.gateways as gateways
 import testsuite.tools
 
-from testsuite import rawobj, CONFIGURATION, HTTP2
+from testsuite import rawobj, CONFIGURATION, HTTP2, gateways
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.prometheus import PrometheusClient

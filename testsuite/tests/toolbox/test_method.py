@@ -8,7 +8,7 @@ from testsuite.config import settings
 import testsuite
 from testsuite import rawobj
 from testsuite.utils import blame
-import testsuite.toolbox.constants as constants
+from testsuite.toolbox import constants
 from testsuite.toolbox import toolbox
 
 

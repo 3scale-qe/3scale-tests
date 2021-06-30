@@ -85,8 +85,8 @@ def test_cli_subcmd_list():
 def test_cli_subcmd_list_help():
     """Check help page of subcommands"""
     batch_cmds = []
-    for cmd in TOOLBOX_SUBCOMMANDS:
-        for subcmd in TOOLBOX_SUBCOMMANDS[cmd]:
+    for cmd, value in TOOLBOX_SUBCOMMANDS.items():
+        for subcmd in value:
             batch_cmds.append(' '.join([' help', cmd, subcmd]))
             for help_cmd in [' --help', ' -h']:
                 batch_cmds.append(' '.join([cmd, subcmd, help_cmd]))
@@ -97,8 +97,8 @@ def test_cli_subcmd_list_help():
     grouped_return_values = [ret_val[i*3:i*3+3] for i in range(int(len(ret_val)/3))]
 
     index = 0
-    for cmd in TOOLBOX_SUBCOMMANDS:
-        for subcmd in TOOLBOX_SUBCOMMANDS[cmd]:
+    for cmd in TOOLBOX_SUBCOMMANDS.values():
+        for _ in cmd:
             cmd_set = grouped_return_values[index]
             assert cmd_set[0]['stdout'] == cmd_set[1]['stdout'] == cmd_set[2]['stdout']
             index += 1
