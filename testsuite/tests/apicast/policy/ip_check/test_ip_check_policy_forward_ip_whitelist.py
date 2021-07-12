@@ -24,9 +24,10 @@ def test_ip_check_policy_ip_blacklisted(api_client):
 @pytest.mark.parametrize("ip_addresses,status_code",
                          [(None, 200),
                           (["10.10.10.10"], 403),
-                          pytest.param([",10.10.10.10"], 403,
-                                       marks=[pytest.mark.xfail,
-                                       pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075")])])
+                          pytest.param([","], 403, marks=[
+                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076")]),
+                          pytest.param([",10.10.10.10"], 403, marks=[
+                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075")])])
 def test_ips_with_random_port(ip_addresses, status_code, api_client, ip4_addresses):
     """
     Test must pass all the ip4 addresses with port because that are white listed.
