@@ -104,6 +104,7 @@ def custom_devel_login(browser, sessions, navigator, provider_account, account_p
             page.do_login(name, password)
             cookies = [browser.selenium.get_cookie('access_code'),
                        browser.selenium.get_cookie('user_session')]
+            cookies = [cookie for cookie in cookies if cookie is not None]
             sessions.save(name, password, url, values=cookies)
 
     return _login

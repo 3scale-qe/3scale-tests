@@ -1,5 +1,7 @@
 """View representations of Accounts pages"""
-from widgetastic.widget import TextInput, GenericLocatorWidget
+
+from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -48,6 +50,7 @@ class AccountsDetailView(BaseAudienceView):
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
     applications_button = Link("//*[contains(@title,'applications')]")
     users_button = Link("//*[contains(@title,'users')]")
+    invoices_button = Link("//*[contains(@title,'invoices')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -71,6 +74,11 @@ class AccountsDetailView(BaseAudienceView):
     def users(self):
         """Open account's users"""
         self.users_button.click()
+
+    @step("AccountInvoicesView")
+    def invoices(self):
+        """Open account's users"""
+        self.invoices_button.click()
 
     def prerequisite(self):
         return AccountsView
@@ -155,6 +163,89 @@ class AccountApplicationsView(BaseAudienceView):
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.create_button.is_displayed and \
                self.path in self.browser.url
+
+
+class AccountInvoicesView(BaseAudienceView):
+    """View representation of Account's Applications page"""
+    path_pattern = "/buyers/accounts/{account_id}/invoices"
+    create_button = Link(".action.new")
+    table = PatternflyTable(".data")
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
+
+    @step("InvoiceDetailView")
+    def new_invoice(self):
+        """
+        Creates new invoice
+        Note: It creates new open invoice, without any form with random ID
+        """
+        self.create_button.click()
+        next(self.table.rows()).id.click()
+
+    def prerequisite(self):
+        return AccountsDetailView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.create_button.is_displayed and \
+               self.path in self.browser.url
+
+
+class LineItemForm(View):
+    """Nested view for a Line add form"""
+    ROOT = "//div[@id='colorbox']"
+    name_input = TextInput("line_item[name]")
+    quantity_input = TextInput("line_item[quantity]")
+    description_input = TextInput("line_item[description]")
+    cost_input = TextInput("line_item[cost]")
+    submit = Link("//input[@type='submit']")
+
+    def add_item(self, name, quantity, cost, description):
+        """Adds item to an invoice"""
+        self.name_input.fill(name)
+        self.quantity_input.fill(quantity)
+        self.cost_input.fill(cost)
+        self.description_input.fill(description)
+        self.submit.click()
+
+
+class InvoiceDetailView(BaseAudienceView):
+    """Invoice Detail page"""
+    issue_button = Link("//form[contains(@action, 'issue.js')]/button")
+    charge_button = Link("//form[contains(@action, 'charge.js')]/button")
+    id_field = Text(".field-friendly_id")
+    state_field = Text("#field-state")
+
+    # Selector which we can use to check if the charge has finished
+    paid_field = Text("//td[@id='field-state' and text()='Paid']")
+    add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
+    line_item_form = View.nested(LineItemForm)
+
+    def add_item(self, name, quantity, cost, description):
+        """Adds item to an invoice"""
+        self.add_item_btn.click()
+        self.line_item_form.wait_displayed()
+        self.line_item_form.add_item(name, quantity, cost, description)
+
+    def issue(self):
+        """Issues the invoices (OPEN -> PENDING)"""
+        self.issue_button.click(handle_alert=True)
+        self.browser.wait_for_element(self.charge_button, timeout=10)
+
+    def charge(self):
+        """Charges the invoices (PENDING -> PAID)"""
+        # Charge button has two alerts which completely messed up with widgetastic
+        # https://issues.redhat.com/browse/THREESCALE-7276
+        self.browser.click(self.charge_button, ignore_ajax=True)
+        self.browser.get_alert().accept()
+        self.browser.get_alert().accept()
+
+        # Wait until charge is done
+        self.browser.wait_for_element(self.paid_field, timeout=5)
+
+    def prerequisite(self):
+        return AccountInvoicesView
 
 
 class UsageRulesView(BaseAudienceView):
