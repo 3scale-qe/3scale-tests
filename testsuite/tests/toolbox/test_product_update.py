@@ -12,76 +12,6 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
 
 
-@pytest.fixture(scope="module")
-def my_policy_configs():
-    """Configuration of most of the available policies."""
-    return [
-        rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": 50}),
-        rawobj.PolicyConfig("caching", {"caching_type": "allow"}),
-        rawobj.PolicyConfig("content_caching", {"rules": [
-            {"cache": True, "header": "X-Cache-Status", "condition": {
-                "combine_op": "and", "operations": [
-                    {"left": "oo", "op": "==", "right": "oo"}
-                ]
-            }}]}),
-        rawobj.PolicyConfig("headers", {
-            "response": [{"op": "add", "header": "X-RESPONSE-CUSTOM-ADD", "value_type": "plain",
-                          "value": "Additional response header"}],
-            "request": [{"op": "add", "header": "X-REQUEST-CUSTOM-ADD", "value_type": "plain",
-                         "value": "Additional request header"}],
-            "enable": True}),
-        rawobj.PolicyConfig("ip_check", {
-            "check-type": "whitelist",
-            "client_ip_sources": ["X-Forwarded-For"],
-            "ips_list": ['0.0.0.0']
-            }),
-        rawobj.PolicyConfig("jwt_claim_check", {
-            "rules": [
-                {
-                    "methods": ['GET'],
-                    "operations": [{
-                        "op": "==",
-                        "jwt_claim": "azp",
-                        "value": "client_id",
-                        "value_type": "plain",
-                        "jwt_claim_type": "plain",
-                        }],
-                    "combine_op": "and",
-                    "resource": "/get",
-                    "resource_type": "plain",
-                    }
-                ],
-            "error_message": "error message",
-            }),
-        rawobj.PolicyConfig("retry", {"retries": 5}),
-        rawobj.PolicyConfig("routing", {"rules": [
-            {"url": "http://url1.org", "condition": {"operations": [
-                {"op": "==", "value": "/anything/anything", "match": "path"}]},
-             "replace_path": "{{ original_request.path | remove_first: '/anything' }}"}]}),
-        rawobj.PolicyConfig("soap", {
-            "mapping_rules": [{"pattern": "soap_policy_action", "metric_system_name": "hits", "delta": "3"},
-                              {"pattern": "soap_policy_ctype", "metric_system_name": "hits", "delta": "5"}]}),
-        rawobj.PolicyConfig("cors", {
-            "allow_methods": ["GET", "POST"], "allow_credentials": True, "allow_origin": "localhost"}),
-        rawobj.PolicyConfig("liquid_context_debug", {}),
-        rawobj.PolicyConfig("default_credentials", {
-            "auth_type": "user_key", "user_key": "sdfsdfsofhsdkfjhjksdhf"}),
-        rawobj.PolicyConfig("headers", {
-            "response": [{"op": "set", "header": "X-RESPONSE-CUSTOM-SET", "value_type": "plain",
-                          "value": "Response set header"}],
-            "request": [{"op": "set", "header": "X-REQUEST-CUSTOM-SET", "value_type": "plain",
-                         "value": "Request set header"}]}),
-        rawobj.PolicyConfig("maintenance_mode", {
-            "message_content_type": "text/plain; charset=utf-8",
-            "status": 328, "message": "Service Unavailable - Maintenance"}),
-        rawobj.PolicyConfig("rewrite_url_captures", {"transformations": [
-            {"match_rule": "/{var_1}/{var_2}", "template": "/{var_2}?my_arg={var_1}"},
-            {"match_rule": "/{var_1}/{var_2}", "template": "/my_arg={var_2}?my_arg2={var_1}"}]}),
-        rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5}),
-        rawobj.PolicyConfig("url_rewriting", {"commands": [{"op": "gsub", "regex": "hello", "replace": "get"}]}),
-        ]
-
-
 @pytest.fixture(scope="module", params=['copy_service', 'product_copy', 'service_copy'])
 def product_service(request):
     """Test copying of service or product"""
@@ -107,10 +37,10 @@ def service_settings(request, product_service):
 
 
 @pytest.fixture(scope="module")
-def service(testconfig, custom_service, my_backends_mapping, service_settings, my_policy_configs):
+def service(testconfig, custom_service, my_backends_mapping, service_settings, policy_configs):
     """Service fixture"""
     service = custom_service(service_settings, backends=my_backends_mapping)
-    service.proxy.list().policies.append(*my_policy_configs)
+    service.proxy.list().policies.append(*policy_configs)
     yield service
     if not testconfig["skip_cleanup"]:
         for back_usage in service.backend_usages.list():
