@@ -268,17 +268,12 @@ def threescale(testconfig):
 
 @pytest.fixture(scope="session")
 def master_threescale(testconfig):
-    """
-    Threescale client using master url and token
-    It returns functions which creates client on demand.
-    """
+    """Threescale client using master url and token"""
 
-    def _master_threescale():
-        return client.ThreeScaleClient(
-            testconfig["threescale"]["master"]["url"],
-            testconfig["threescale"]["master"]["token"],
-            ssl_verify=testconfig["ssl_verify"])
-    return _master_threescale
+    return client.ThreeScaleClient(
+        testconfig["threescale"]["master"]["url"],
+        testconfig["threescale"]["master"]["token"],
+        ssl_verify=testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="session")

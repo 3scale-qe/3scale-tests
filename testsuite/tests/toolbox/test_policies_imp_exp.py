@@ -12,11 +12,11 @@ from testsuite.toolbox import toolbox
 @pytest.fixture(scope="module")
 def policy_file(policy_configs):
     """Create file with policies definition"""
-    fil_name = settings['toolbox']['podman_cert_dir'] + '/'
-    fil_name += ''.join(random.choice(string.ascii_letters) for _ in range(16))
-    toolbox.copy_string_to_remote_file(json.dumps(policy_configs), fil_name)
+    file_name = settings['toolbox']['podman_cert_dir'] + '/'
+    file_name += ''.join(random.choice(string.ascii_letters) for _ in range(16))
+    toolbox.copy_string_to_remote_file(json.dumps(policy_configs), file_name)
 
-    return fil_name
+    return file_name
 
 
 @pytest.fixture(scope="module")
