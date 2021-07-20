@@ -242,6 +242,8 @@ def add_realm_management_role(role_name, client, realm):
 
 def create_rhsso_user(realm, username, password):
     "Creates new user in RHSSO"
-    user = realm.users.create(username, enabled=True)
+    email = f"{username}@anything.invalid"
+    user = realm.users.create(username, email=email, enabled=True)
+    user.update(emailVerified=True)
     user.reset_password(password, temporary=False)
     return RHSSOUser(user, username, password)

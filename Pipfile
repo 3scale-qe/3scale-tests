@@ -46,6 +46,7 @@ jsondiff = "*"
 weakget = {editable = true,git = "https://github.com/mangan/weakget.git"}
 flaky = "*"
 lxml = "*"
+auth0-python= "*"
 
 [requires]
 python_version = "3"

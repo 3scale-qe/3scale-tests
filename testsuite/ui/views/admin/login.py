@@ -2,6 +2,7 @@
 from widgetastic.widget import TextInput, View, Text
 
 from testsuite.ui.navigation import Navigable
+from testsuite.ui.views.admin.settings.sso_integrations import Auth0View, RhssoView
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
@@ -21,6 +22,8 @@ class LoginView(View, Navigable):
     password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
     submit = ThreescaleSubmitButton()
     password_reset_link = Link("//a[@href='/p/password/reset']")
+    auth0_link = Link("//*[@class='login-provider-link' and contains(@href,'auth0')]")
+    rhsso_link = Link("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
 
     def do_login(self, name, password):
         """
@@ -35,6 +38,32 @@ class LoginView(View, Navigable):
         if '/p/admin/onboarding/wizard/intro' in self.browser.url:
             wizard = WizardIntroView(self.browser.root_browser)
             wizard.close_wizard()
+
+    def do_auth0_login(self, email, password):
+        """
+        Method handle login to 3scale admin portal via Auth0
+        :param email: User email for login
+        :param password: User password for login
+        :return DashboardView page object
+        """
+        if not self.auth0_link.is_displayed:
+            raise Exception("Auth0 provider is not configured for admin portal")
+        self.auth0_link.click()
+        auth = Auth0View(self.browser.root_browser)
+        auth.login(email, password)
+
+    def do_rhsso_login(self, username, password):
+        """
+        Method handle login to 3scale admin portal via Auth0
+        :param email: User email for login
+        :param password: User password for login
+        :return DashboardView page object
+        """
+        if not self.rhsso_link.is_displayed:
+            raise Exception("RHSSO provider is not configured for admin portal")
+        self.rhsso_link.click()
+        auth = RhssoView(self.browser.root_browser)
+        auth.login(username, password)
 
     @property
     def is_displayed(self):
