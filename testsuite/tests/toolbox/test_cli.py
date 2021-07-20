@@ -30,7 +30,7 @@ TOOLBOX_SUBCOMMANDS = {
     'policies': ['export', 'import'],
     'policy-registry': ['copy'],
     'product': ['copy'],
-    'proxy-config': ['export', 'list', 'promote', 'show'],
+    'proxy-config': ['deploy', 'export', 'list', 'promote', 'show'],
     'remote': ['add', 'list', 'remove', 'rename'],
     'service': ['apply', 'copy', 'create', 'delete', 'list', 'show'],
     'update': ['service']
