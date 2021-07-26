@@ -1,8 +1,11 @@
 """
 Rewrite spec/functional_specs/policies/ip_check/ip_check_forward_whitelist_spec.rb
 """
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+
 import pytest
-from testsuite import rawobj
+
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 @pytest.fixture(scope="module")
@@ -25,9 +28,13 @@ def test_ip_check_policy_ip_blacklisted(api_client):
                          [(None, 200),
                           (["10.10.10.10"], 403),
                           pytest.param([","], 403, marks=[
-                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076")]),
+                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076"),
+                              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+                          ]),
                           pytest.param([",10.10.10.10"], 403, marks=[
-                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075")])])
+                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075"),
+                              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+                          ])])
 def test_ips_with_random_port(ip_addresses, status_code, api_client, ip4_addresses):
     """
     Test must pass all the ip4 addresses with port because that are white listed.
