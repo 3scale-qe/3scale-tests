@@ -13,7 +13,7 @@ pytestmark = [
 
 
 # pylint: disable=unused-argument
-def test_no_access_message(login, custom_admin_login, navigator, provider_account, browser):
+def test_no_access_message(login, custom_admin_login, navigator, provider_account_user, browser):
     """
     Test:
         - Navigate to Support Emails view
@@ -25,8 +25,8 @@ def test_no_access_message(login, custom_admin_login, navigator, provider_accoun
     """
     email = navigator.navigate(SupportEmailsView)
     email = email.support_email.read()
-    provider_account.activate()
-    custom_admin_login(provider_account.entity_name, "123456")
+    provider_account_user.activate()
+    custom_admin_login(provider_account_user.entity_name, "123456")
     dashboard = navigator.navigate(DashboardView)
     assert not dashboard.products.is_displayed
     assert not dashboard.backends.is_displayed
