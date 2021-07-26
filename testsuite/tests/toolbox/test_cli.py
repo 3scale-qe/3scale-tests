@@ -29,7 +29,7 @@ TOOLBOX_SUBCOMMANDS = {
     'metric': ['apply', 'create', 'delete', 'list'],
     'policies': ['export', 'import'],
     'policy-registry': ['copy'],
-    'product': ['copy'],
+    'product': ['copy', 'export', 'import'],
     'proxy-config': ['deploy', 'export', 'list', 'promote', 'show'],
     'remote': ['add', 'list', 'remove', 'rename'],
     'service': ['apply', 'copy', 'create', 'delete', 'list', 'show'],
