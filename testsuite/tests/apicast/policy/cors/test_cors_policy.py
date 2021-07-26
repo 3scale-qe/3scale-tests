@@ -3,8 +3,9 @@ testing proper function of the CORS policy
 
 Rewrite: ./spec/functional_specs/policies/cors/cors_policy_spec.rb
 """
+from packaging.version import Version
 import pytest
-from testsuite import rawobj
+from testsuite import rawobj, TESTED_VERSION
 
 
 @pytest.fixture(scope="module")
@@ -29,7 +30,10 @@ def test_cors_headers_for_same_origin(api_client):
     response = api_client().get("/get", headers=dict(origin="localhost"))
     assert response.headers.get("Access-Control-Allow-Origin") == "localhost"
     assert response.headers.get("Access-Control-Allow-Credentials") == 'true'
-    assert response.headers.get('Access-Control-Max-Age') == "600"
+
+    if TESTED_VERSION >= Version("2.11"):
+        assert response.headers.get('Access-Control-Max-Age') == "600"
+
     allow_method = {x.strip() for x in response.headers.get("Access-Control-Allow-Methods").split(",")}
     assert allow_method == {"GET", "POST"}
 
