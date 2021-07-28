@@ -1,8 +1,11 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_service_spec.rb"""
 import pytest
 
-from testsuite.ui.views.admin.product.product import ProductEditView, ProductSettingsView, ProductAddBackendView, \
-    ProductBackendsView, ProductConfigurationView, ApplicationPlanDetailView
+from testsuite.ui.views.admin.product.product import ProductEditView
+from testsuite.ui.views.admin.product.application import ApplicationPlanDetailView
+from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
+from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
+from testsuite.ui.views.admin.product.integration.backends import ProductBackendsView, ProductAddBackendView
 from testsuite import rawobj
 from testsuite.utils import blame
 
@@ -97,7 +100,7 @@ def test_out_of_date_config(service, login, navigator, browser):
     """
     settings = navigator.navigate(ProductSettingsView, product=service)
     settings.update_button.click()
-    assert "outdated-config" in browser.elements("//*[contains(@href, '/integration')]")[0].get_attribute("class")
+    assert settings.outdated_config.is_displayed
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3576")

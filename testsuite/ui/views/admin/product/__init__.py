@@ -1,4 +1,5 @@
 """Essential Views for Product Views"""
+from widgetastic.widget import GenericLocatorWidget
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
@@ -40,6 +41,7 @@ class BaseProductView(BaseAdminView):
     """
     NAV_ITEMS = ['Overview', 'Analytics', 'Applications', 'ActiveDocs', 'Integration']
     nav = NavigationMenu(id='mainmenu')
+    outdated_config = GenericLocatorWidget(locator="//*/li/a[contains(@class, 'outdated-config')]")
 
     def __init__(self, parent, product, **kwargs):
         super().__init__(parent, product_id=product.entity_id, **kwargs)
