@@ -5,8 +5,19 @@ from threescale_api.resources import InvoiceState
 
 from testsuite import rawobj
 from testsuite.ui.objects import CreditCard
+from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
 from testsuite.utils import randomize
+
+
+@pytest.fixture(scope="module", autouse=True)
+def set_stripe_gateway(custom_admin_login, navigator, testconfig):
+    """Ensure, that Stripe is used as billing gateway"""
+    custom_admin_login()
+    billing = navigator.navigate(BillingSettingsView)
+    billing.stripe(testconfig["stripe"]["secret_key"],
+                   testconfig["stripe"]["publishable_key"],
+                   "empty-webhook")
 
 
 @pytest.fixture(scope="module", params=[
