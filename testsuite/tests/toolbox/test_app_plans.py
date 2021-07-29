@@ -112,12 +112,12 @@ def test_show1(service, create_cmd):
     ret = toolbox.run_cmd(create_cmd('show', f"{service['id']} plan1sysname"))
     assert not ret['stderr']
 
-    to_cmp = r'ID\tNAME\tSYSTEM_NAME\tAPPROVAL_REQUIRED\tEND_USER_REQUIRED\t'
+    to_cmp = r'ID\tNAME\tSYSTEM_NAME\tAPPROVAL_REQUIRED\t'
     to_cmp += r'COST_PER_MONTH\tSETUP_FEE\tTRIAL_PERIOD_DAYS'
     assert re.findall(to_cmp, ret['stdout'])
 
     # https://issues.redhat.com/browse/THREESCALE-5542
-    to_cmp = fr"{out_variables['plan1'][0]}\tplan1\tplan1sysname\ttrue\t\(empty\)\t11.1\t22.2\t33"
+    to_cmp = fr"{out_variables['plan1'][0]}\tplan1\tplan1sysname\ttrue\t11.1\t22.2\t33"
     logging.error(to_cmp)
     assert re.findall(to_cmp, ret['stdout'])
 
