@@ -1,9 +1,8 @@
 "Toolbox conftest"
 
-import backoff
 import pytest
 
-from threescale_api import client, errors
+from threescale_api import client
 
 from testsuite import rawobj
 from testsuite.config import settings
@@ -25,12 +24,6 @@ def dest_client(custom_tenant, request) -> client.ThreeScaleClient:
         unprivileged_client = client.ThreeScaleClient(destination_endpoint, destination_provider, ssl_verify=False)
 
         token_name = blame(request, "at")
-
-        @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
-        def _wait_on_ready_tenant():
-            unprivileged_client.services.list()
-
-        _wait_on_ready_tenant()
 
         access_token = unprivileged_client.access_tokens.create(rawobj.AccessToken(
             token_name, "rw", ["finance", "account_management",
