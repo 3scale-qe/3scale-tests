@@ -10,13 +10,13 @@ from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def dest_client(custom_tenant, request) -> client.ThreeScaleClient:
+def dest_client(request) -> client.ThreeScaleClient:
     """ Returns threescale client to destination instance """
     if 'toolbox' in settings and 'destination_endpoint' in settings['toolbox']:
         destination_endpoint = settings['toolbox']['destination_endpoint']
         destination_provider = settings['toolbox']['destination_provider_key']
     else:
-        tenant = custom_tenant()
+        tenant = request.getfixturevalue("custom_tenant")()
 
         destination_endpoint = tenant.entity["signup"]["account"]["admin_base_url"]
         destination_provider = tenant.entity["signup"]["access_token"]["value"]
