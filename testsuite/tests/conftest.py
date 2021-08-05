@@ -268,17 +268,12 @@ def threescale(testconfig):
 
 @pytest.fixture(scope="session")
 def master_threescale(testconfig):
-    """
-    Threescale client using master url and token
-    It returns functions which creates client on demand.
-    """
+    """Threescale client using master url and token"""
 
-    def _master_threescale():
-        return client.ThreeScaleClient(
-            testconfig["threescale"]["master"]["url"],
-            testconfig["threescale"]["master"]["token"],
-            ssl_verify=testconfig["ssl_verify"])
-    return _master_threescale
+    return client.ThreeScaleClient(
+        testconfig["threescale"]["master"]["url"],
+        testconfig["threescale"]["master"]["token"],
+        ssl_verify=testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="session")
@@ -775,14 +770,13 @@ def custom_tenant(testconfig, master_threescale, request):
     Custom Tenant
     """
     def _custom_tenant(name="t", autoclean=True, wait=True):
-        master_client = master_threescale()
         user_name = blame(request, name)
-        tenant = master_client.tenants.create(rawobj.CustomTennant(user_name))
+        tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
 
-        master_client.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
+        master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
 
         if wait:
             admin_base_url = tenant.entity["signup"]["account"]["admin_base_url"]
