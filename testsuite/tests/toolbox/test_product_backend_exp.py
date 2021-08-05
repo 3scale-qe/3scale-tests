@@ -1,4 +1,4 @@
-"""Tests for importing service(not product) from CSV Toolbox feature"""
+"""Tests for importing/exporting product from/to CRD."""
 
 import random
 import string
@@ -14,10 +14,10 @@ from testsuite import rawobj
 @pytest.fixture(scope="module")
 def export_import_file():
     """Create file for exporting CRD and to import it into dst tenant."""
-    fil_name = settings['toolbox']['podman_cert_dir'] + '/'
-    fil_name += ''.join(random.choice(string.ascii_letters) for _ in range(16))
+    file_name = settings['toolbox']['podman_cert_dir'] + '/'
+    file_name += ''.join(random.choice(string.ascii_letters) for _ in range(16))
 
-    return fil_name
+    return file_name
 
 
 @pytest.fixture(scope="module")
@@ -139,8 +139,12 @@ def export_dst_product(threescale_dst1, export_import_file, import_product):
 def test_compare_two_exports(export_product, export_dst_product, export_import_file):
     """Test compares two exported products."""
     # pylint: disable=unused-argument
-    grep_cmd = "grep -E -v '3scale_toolbox_created_at:|name:' {export_import_file}"
-    toolbox.run_cmd(f"{grep_cmd} > {export_import_file}_1", False)
-    toolbox.run_cmd(f"{grep_cmd}_exp2 > {export_import_file}_2", False)
-    ret = toolbox.run_cmd(f"diff {export_import_file}_1 {export_import_file}_2", scale_cmd=False)
+    grep_cmd = "grep -E -v '3scale_toolbox_created_at:|name:' "
+    output_grep_filename1 = f"{export_import_file}_1"
+    input_grep_filename1 = export_import_file
+    toolbox.run_cmd(f"{grep_cmd} {input_grep_filename1} > {output_grep_filename1}", False)
+    output_grep_filename2 = f"{export_import_file}_2"
+    input_grep_filename2 = f"{export_import_file}_exp2"
+    toolbox.run_cmd(f"{grep_cmd} {input_grep_filename2} > {output_grep_filename2}", False)
+    ret = toolbox.run_cmd(f"diff {output_grep_filename1} {output_grep_filename2}", scale_cmd=False)
     assert list(ret.values()) == ['', '']

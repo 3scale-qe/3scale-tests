@@ -49,6 +49,10 @@ def my_metrics(service, testconfig):
     """Fixture creates metrics for service."""
     proxy = service.proxy.list()
 
+    hits = service.metrics.read_by_name('hits')
+    hits.methods.create(rawobj.Method("method1"))
+    hits.methods.create(rawobj.Method("method2", "Method 2"))
+
     metric1 = service.metrics.create(rawobj.Metric("metric1"))
     proxy.mapping_rules.create(
         rawobj.Mapping(
@@ -193,15 +197,19 @@ def test_backends(toolbox_copy, service, my_applications, my_activedoc, dest_cli
 
 def test_metrics_methods_maps_in_backends(
         toolbox_copy, service, my_applications, my_activedoc, dest_client,
-        my_metrics, dst_product):
+        my_metrics, dst_product, product_service):
     """Test metrics, methods and mapping rules for backedn of product"""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
+    if product_service in ['service_copy', 'copy_service']:
+        pytest.skip("If copying 'service' one backend is copied in background.")
     stdout = toolbox_copy[0]
 
-    metrics_cnt_txt = sum(map(int, re.findall(r'created (\d+) missing metrics', stdout)))
-    methods_cnt_txt = sum(map(int, re.findall(r'created (\d+) missing methods', stdout)))
+    regular = r'target backend ID: \d+ system_name: .*\n\ncreated (\d+) missing metrics'
+    metrics_cnt_txt = sum(map(int, re.findall(regular, stdout)))
+    regular = r'target backend ID: \d+ system_name: .*\n\ncreated \d+ missing metrics\n\ncreated (\d+) missing methods'
+    methods_cnt_txt = sum(map(int, re.findall(regular, stdout)))
     maps_cnt_txt = sum(map(int, re.findall(r'missing methods\n\ncreated (\d+) mapping rules', stdout, re.MULTILINE)))
 
     metrics_cnt = 0
@@ -242,17 +250,23 @@ def test_metrics_methods_maps_in_product(
     dst_hits = dst_product.metrics.read_by(**{'friendly_name': 'Hits'})
     (dst_hits_id, dst_number_meth) = re.findall(r'target service hits metric (\d+) has (\d+) methods', stdout)[0]
     assert int(dst_hits_id) == dst_hits['id']
-    assert int(dst_number_meth) == len(dst_hits.methods.list())
+    # there is no method on target metric Hits
+    assert int(dst_number_meth) == 0
 
     missing = int(re.findall(r'created (\d+) missing methods on target service', stdout)[0])
     assert missing == len(dst_hits.methods.list())
 
-    assert int(re.findall(r'original service has (\d+) metrics', stdout)[0]) == len(service.metrics.list())
+    # plus methods because of bug, where methods are part of list of metrics
+    # see https://issues.redhat.com/browse/THREESCALE-4938
+    # https://issues.redhat.com/browse/THREESCALE-3053
+    # and https://issues.redhat.com/browse/THREESCALE-7474
+    assert int(re.findall(r'original service has (\d+) metrics', stdout)[0]) + missing == len(service.metrics.list())
     # target product has precreated metric Hits
     assert int(re.findall(r'target service has (\d+) metrics', stdout)[0]) == 1
     # number of metrics in source product minus precreated Hits metric in target product
     metrs = int(re.findall(r'created (\d+) metrics on the target service', stdout)[0])
-    assert metrs == len(dst_product.metrics.list()) - 1
+    # minus 2 methods
+    assert metrs == len(dst_product.metrics.list()) - 1 - 2
 
     assert int(re.findall(r'destroying all mapping rules\n\ncreated (\d+) mapping rules',
                           stdout, re.MULTILINE)[0]) == len(dst_product.mapping_rules.list())
@@ -285,8 +299,8 @@ def test_app_plans_limits_pricing_rules(
                 and dst_plan['system_name'].startswith('silver')
         ):
             src_limits = src_plan.limits(my_metrics[0]).list()
-            # hits is first
-            dst_limits = dst_plan.limits(dst_metrics[1]).list()
+            # hits is first + two methods
+            dst_limits = dst_plan.limits(dst_metrics[3]).list()
             assert len(src_limits) == int(cnt_limits)
             assert len(dst_limits) == int(cnt_limits)
         elif (
@@ -294,8 +308,8 @@ def test_app_plans_limits_pricing_rules(
                 and dst_plan['system_name'].startswith('gold')
         ):
             src_limits = src_plan.limits(my_metrics[1]).list()
-            # hits is first
-            dst_limits = dst_plan.limits(dst_metrics[2]).list()
+            # hits is first + two methods
+            dst_limits = dst_plan.limits(dst_metrics[4]).list()
             assert len(src_limits) == int(cnt_limits)
             assert len(dst_limits) == int(cnt_limits)
         else:
@@ -312,8 +326,8 @@ def test_app_plans_limits_pricing_rules(
                 and dst_plan['system_name'].startswith('silver')
         ):
             src_prices = src_plan.pricing_rules(my_metrics[0]).list()
-            # hits is first
-            dst_prices = dst_plan.pricing_rules(dst_metrics[1]).list()
+            # hits is first + two methods
+            dst_prices = dst_plan.pricing_rules(dst_metrics[3]).list()
             assert len(src_prices) == int(cnt_pricings)
             assert len(dst_prices) == int(cnt_pricings)
         elif (
@@ -321,8 +335,8 @@ def test_app_plans_limits_pricing_rules(
                 and dst_plan['system_name'].startswith('gold')
         ):
             src_prices = src_plan.pricing_rules(my_metrics[1]).list()
-            # hits is first
-            dst_prices = dst_plan.pricing_rules(dst_metrics[2]).list()
+            # hits is first + two methods
+            dst_prices = dst_plan.pricing_rules(dst_metrics[4]).list()
             assert len(src_prices) == int(cnt_pricings)
             assert len(dst_prices) == int(cnt_pricings)
         else:
