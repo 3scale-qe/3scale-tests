@@ -13,8 +13,8 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
 
 TOOLBOX_COMMANDS = [
     'account', 'activedocs', 'application', 'application-plan', 'backend',
-    'copy', 'help', 'import', 'method', 'metric', 'policy-registry', 'product',
-    'proxy-config', 'remote', 'service', 'update'
+    'copy', 'help', 'import', 'method', 'metric', 'policies', 'policy-registry',
+    'product', 'proxy-config', 'remote', 'service', 'update'
     ]
 
 TOOLBOX_SUBCOMMANDS = {
@@ -27,6 +27,7 @@ TOOLBOX_SUBCOMMANDS = {
     'import': ['csv', 'openapi'],
     'method': ['apply', 'create', 'delete', 'list'],
     'metric': ['apply', 'create', 'delete', 'list'],
+    'policies': ['export', 'import'],
     'policy-registry': ['copy'],
     'product': ['copy'],
     'proxy-config': ['export', 'list', 'promote', 'show'],
