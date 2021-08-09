@@ -80,8 +80,8 @@ def test_show_production1(service, create_cmd):
     out_variables['production'] = json.loads(ret['stdout'])
 
 
-def test_update_staging_and_list1(service, hits, empty_list_staging, create_cmd):
-    """Update staging environment and list staging"""
+def test_update_staging(service):
+    """Update staging environment"""
     # update proxy
     params = {}
 
@@ -92,8 +92,18 @@ def test_update_staging_and_list1(service, hits, empty_list_staging, create_cmd)
     params['api_test_path'] = '/post'
     proxy = service.proxy.list()
     proxy.update(params)
-    proxy.deploy()
 
+
+def test_deploy(service, create_cmd):
+    """Test 'deploy' command. """
+    ret = toolbox.run_cmd(create_cmd(service, 'deploy'))
+    proxy = service.proxy.list()
+    assert not ret['stderr']
+    assert proxy.entity == json.loads(ret['stdout'])
+
+
+def test_list1(service, hits, empty_list_staging, create_cmd):
+    """List staging"""
     # adding new policy increases cfg version
     new_policy = rawobj.PolicyConfig("headers", {
         "response": [{"op": "add",
@@ -106,6 +116,7 @@ def test_update_staging_and_list1(service, hits, empty_list_staging, create_cmd)
                      "value": "Additional request header"}],
         "enable": True})
 
+    proxy = service.proxy.list()
     proxy.policies.append(new_policy)
 
     mapping_rules = proxy.mapping_rules.list()
@@ -152,25 +163,22 @@ def test_show_production2(service, create_cmd):
     out_variables['production_updated'] = json.loads(ret['stdout'])
 
 
-def check_proxy_configurations():
+def test_check_proxy_configurations():
     """Check values of created and updated proxy configurations."""
     assert out_variables['staging']['environment'] == 'sandbox'
     assert out_variables['production']['environment'] == 'production'
 
-    assert out_variables['staging']['environment'] == out_variables['production']['environment']
-    assert out_variables['staging']['id'] == out_variables['production']['id']
+    assert int(out_variables['staging']['id']) + 1 == int(out_variables['production']['id'])
     assert out_variables['staging']['content']['proxy']['id'] == \
         out_variables['production']['content']['proxy']['id']
 
-    assert out_variables['staging'] == out_variables['production']
+    assert out_variables['staging']['content'] == out_variables['production']['content']
 
     assert out_variables['staging_updated']['environment'] == 'sandbox'
     assert out_variables['production_updated']['environment'] == 'production'
 
-    assert out_variables['staging_updated']['environment'] == \
-        out_variables['production_updated']['environment']
-    assert out_variables['staging_updated']['id'] == out_variables['production_updated']['id']
+    assert int(out_variables['staging_updated']['id']) + 1 == int(out_variables['production_updated']['id'])
     assert out_variables['staging_updated']['content']['proxy']['id'] == \
         out_variables['production_updated']['content']['proxy']['id']
 
-    assert out_variables['staging_updated'] == out_variables['production_updated']
+    assert out_variables['staging_updated']['content'] == out_variables['production_updated']['content']
