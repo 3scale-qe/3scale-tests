@@ -292,3 +292,58 @@ def get_resultsdir_path(node):
         os.makedirs(path)
 
     return path
+
+
+@pytest.fixture(scope="module")
+def custom_auth0_login(browser, navigator, threescale, request):
+    """
+    Login fixture for admin portal via Auth0.
+    :param browser: Browser instance
+    :param navigator: Navigator Instance
+    :param threescale: 3scale API client
+    :param request: We need this to be able to delete automatic created user after tests.
+    :return: Login to Admin portal with custom credentials
+    """
+
+    def _login(email=None, password=None):
+        browser.selenium.delete_all_cookies()
+        browser.refresh()
+        browser.url = settings["threescale"]["admin"]["url"]
+        page = navigator.open(LoginView)
+        page.do_auth0_login(email, password)
+
+        def _delete():
+            name = email.split("@")[0]
+            user = threescale.provider_account_users.read_by_name(name)
+            user.delete()
+
+        request.addfinalizer(_delete)
+
+    return _login
+
+
+@pytest.fixture(scope="module")
+def custom_rhsso_login(browser, navigator, threescale, request):
+    """
+    Login fixture for admin portal via RHSSO.
+    :param browser: Browser instance
+    :param navigator: Navigator Instance
+    :param threescale: 3scale API client
+    :param request: We need this to be able to delete automatic created user after tests.
+    :return: Login to Admin portal with custom credentials
+    """
+
+    def _login(username, password, rhsso_user):
+        browser.selenium.delete_all_cookies()
+        browser.refresh()
+        browser.url = settings["threescale"]["admin"]["url"]
+        page = navigator.open(LoginView)
+        page.do_rhsso_login(username, password)
+
+        def _delete():
+            user = threescale.provider_account_users.read_by_name(rhsso_user.entity["username"])
+            user.delete()
+
+        request.addfinalizer(_delete)
+
+    return _login
