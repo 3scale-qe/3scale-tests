@@ -11,6 +11,9 @@ from os import urandom
 
 import pytest
 
+from testsuite.config import settings
+
+
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 
@@ -27,6 +30,8 @@ def randomize(name, tail=5):
 
 def _whoami():
     """Returns username"""
+    if 'tester' in settings:
+        return settings['tester']
 
     try:
         return os.getlogin()
