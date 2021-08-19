@@ -1,0 +1,44 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "httpbin.org",
+    "description": "API Management facade for a very handy and free online HTTP tool.",
+    "version": "1.0"
+  },
+  "host": "httpbin.org",
+  "basePath": "",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/get": {
+      "get": {
+        "description": "Returns GET data.",
+        "operationId": "/get",
+        "responses": {}
+      }
+    },
+    "/post": {
+      "post": {
+        "description": "Returns POST data.",
+        "operationId": "/post",
+        "responses": {}
+      }
+    },
+    "/put": {
+      "put": {
+        "description": "Returns PUT data.",
+        "operationId": "/put",
+        "responses": {}
+      }
+    },
+    "/delete": {
+      "delete": {
+        "description": "Returns DELETE data.",
+        "operationId": "/delete",
+        "responses": {}
+      }
+    }
+  }
+}

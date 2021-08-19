@@ -13,7 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 
 
 class ApplicationsView(BaseAudienceView):
-    """View representation of Accounts Listing page"""
+    """View representation of Application Listing page"""
     path_pattern = '/buyers/applications'
     table = AudienceTable("//*[@class='data']")
 
@@ -31,7 +31,7 @@ class ApplicationsView(BaseAudienceView):
 
 
 class ApplicationDetailView(BaseProductView):
-    """View representation of Account detail page"""
+    """View representation of Application detail page"""
     path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}'
     edit_button = ThreescaleEditButton()
     suspend_button = Link("//*[contains(@class, 'suspend')]")

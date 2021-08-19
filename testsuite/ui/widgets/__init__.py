@@ -1,7 +1,7 @@
 """ 3scale specific widgets"""
-# pylint: disable=arguments-differ
+import backoff
 
-from widgetastic.widget import Text, GenericLocatorWidget, Widget
+from widgetastic.widget import Text, GenericLocatorWidget, Widget, TextInput
 from widgetastic.utils import ParametrizedLocator
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic_patternfly4 import ContextSelector, Navigation, PatternflyTable
@@ -14,7 +14,7 @@ class Link(Text):
     """
     Clickable/readable link representation accessible via the standard view functions read/fill.
     """
-
+    # pylint: disable=arguments-differ
     def fill(self, value):
         if value:
             self.browser.click(self)
@@ -272,3 +272,51 @@ class PolicySection(Widget):
         if not self.has_item(item):
             raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
         self.browser.click(self.item_element(item))
+
+
+class DivBasedEditor(TextInput):
+    """Widget of Div Based editor used to load Active doc specification"""
+
+    def fill(self, value):
+        """Fill value to Div Based Editor"""
+        self.browser.click(self)
+        self.browser.send_keys_to_focused_element(value)
+
+
+class ActiveDocV2Section(Widget):
+    """Active Doc V2 preview section"""
+    ROOT = ParametrizedLocator('//*[@id="default_endpoint_list"]')
+    ENDPOINTS_LIST = './li'
+    ITEMS_LOCATOR = './li/ul/li/div/h3/span[2]/a'
+    ITEMS_BUTTON_LOCATOR = './li/ul/li/div/h3/span[2]/a[text()="{}"]/ancestor::li/div[2]/form/div/input'
+    RESPONSE_CODE_LOCATOR = './/*[contains(@class, "response_code")]/pre'
+
+    def __init__(self, parent=None, logger=None):
+        Widget.__init__(self, parent, logger=logger)
+
+    @property
+    def endpoints(self):
+        """Returns a list of all endpoints registry items as strings."""
+        return [self.browser.text(el) for el in self.browser.elements(self.ITEMS_LOCATOR, parent=self)]
+
+    # pylint: disable=raise-missing-from
+    def item_element(self, item):
+        """Returns a WebElement for given item name.
+        :return WebElement
+        """
+        try:
+            return self.browser.element(self.ITEMS_BUTTON_LOCATOR.format(item), parent=self)
+        except NoSuchElementException:
+            raise NoSuchElementException('Item {!r} not found.'.format(item))
+
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
+    def try_it_out(self, method):
+        """Make test request
+        :param method string eg. /post, /get
+        """
+        self.browser.click(self.item_element(method))
+
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
+    def get_response_code(self):
+        """Return response code called by method try_it_out"""
+        return self.browser.text(self.RESPONSE_CODE_LOCATOR, parent=self)
