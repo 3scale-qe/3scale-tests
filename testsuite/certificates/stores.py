@@ -8,12 +8,12 @@ from testsuite.certificates import CertificateStore, Certificate
 
 
 def _persist(path, name: str, ext: str, content: str):
-    with open(os.path.join(path, f"{name}.{ext}"), "w") as file:
+    with open(os.path.join(path, f"{name}.{ext}"), "w", encoding="utf8") as file:
         file.write(content)
 
 
 def _read(path, name: str, ext: str) -> str:
-    with open(os.path.join(path, f"{name}.{ext}"), "r") as file:
+    with open(os.path.join(path, f"{name}.{ext}"), "r", encoding="utf8") as file:
         content = file.read()
     return content
 

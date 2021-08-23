@@ -183,7 +183,7 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
     # wait to update metrics triggered by previous tests
     sleep(PROMETHEUS_REFRESH)
 
-    count_before = dict()
+    count_before = {}
     for request_type in data:
         count_before[request_type] = prometheus_response_codes_for_metric(internal_backend_api_query(request_type))
         for method, endpoint, response_code in data[request_type]:
@@ -200,8 +200,8 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
     # wait to update metrics in prometheus
     sleep(PROMETHEUS_REFRESH)
 
-    count_after = dict()
-    results = dict()
+    count_after = {}
+    results = {}
 
     for request_type in data:
         count_after[request_type] = prometheus_response_codes_for_metric(internal_backend_api_query(request_type))

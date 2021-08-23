@@ -11,7 +11,7 @@ from hyperfoil.factories import HyperfoilFactory, Benchmark
 
 def _load_benchmark(filename):
     """Loads benchmark"""
-    with open(filename) as file:
+    with open(filename, encoding="utf8") as file:
         benchmark = Benchmark(yaml.load(file, Loader=yaml.Loader))
     return benchmark
 
@@ -51,7 +51,7 @@ class HyperfoilUtils:
     def add_file(self, path):
         """Adds file to the benchmark"""
         filename = os.path.basename(path)
-        with open(path, 'r') as file:
+        with open(path, 'r', encoding="utf8") as file:
             self.factory.file(filename, file)
 
     def generate_random_file(self, filename: str, size: int):

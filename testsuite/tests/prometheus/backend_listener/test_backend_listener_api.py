@@ -175,7 +175,7 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request):
     # wait to update metrics triggered by previous tests
     sleep(PROMETHEUS_REFRESH)
 
-    count_before = dict()
+    count_before = {}
     for request_type in data:
         count_before[request_type] = prometheus_response_codes_for_metric(authrep_backend_api_query(request_type))
         method, endpoint, params = data[request_type]
@@ -188,12 +188,12 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request):
     # wait for prometheus to collect the metrics
     sleep(PROMETHEUS_REFRESH)
 
-    count_after = dict()
-    results = dict()
+    count_after = {}
+    results = {}
 
     for request_type in data:
         count_after[request_type] = prometheus_response_codes_for_metric(authrep_backend_api_query(request_type))
-        for response_code in {"2xx", "403"}:
+        for response_code in ["2xx", "403"]:
             results[request_type + response_code] = \
                 response_code in count_after[request_type] and \
                 ((response_code not in count_before[request_type] and

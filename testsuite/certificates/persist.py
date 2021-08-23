@@ -27,7 +27,7 @@ class TmpFilePersist(ABC):
         files = {}
         for key, value in kwargs.items():
             path = os.path.join(self._directory, key)
-            with open(path, "w") as file:
+            with open(path, "w", encoding="utf8") as file:
                 file.write(value)
             files[key] = path
         return files

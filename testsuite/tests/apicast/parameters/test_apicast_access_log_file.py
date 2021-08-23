@@ -51,7 +51,7 @@ def read_log(staging_gateway, tmpdir):
         # copy log file from apicast to local
         staging_gateway.openshift.rsync(staging_gateway.deployment, source, tmpdir)
 
-        with open(dest) as file:
+        with open(dest, encoding="utf8") as file:
             content = file.read()
         # last empty item of the array is ignored
         lines = len(content.split("\n")) - 1
