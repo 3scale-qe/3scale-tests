@@ -45,7 +45,7 @@ def _testsuite_version():
     """Get testsuite version string"""
 
     path = os.path.join(Path(os.path.abspath(__file__)).parent, "VERSION")
-    with open(path) as version:
+    with open(path, encoding="utf8") as version:
         return version.read().strip()
 
 

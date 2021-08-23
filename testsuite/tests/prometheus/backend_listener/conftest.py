@@ -45,7 +45,7 @@ def prometheus_response_codes_for_metric(prometheus):
     """
     def response_codes_for_metric(query):
         metric_response_codes = prometheus.get_metric(query)
-        response_codes_count = dict()
+        response_codes_count = {}
         for response_code_metric in metric_response_codes:
             response_codes_count[response_code_metric['metric']['resp_code']] \
                 = response_code_metric['value'][1]

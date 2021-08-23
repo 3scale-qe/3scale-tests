@@ -36,7 +36,7 @@ def account(account):
 def mail_template(account, testconfig) -> dict:
     """loads the mail templates and substitutes the variables"""
     dirname = os.path.dirname(__file__)
-    with open(f"{dirname}/mail_templates.yml") as stream:
+    with open(f"{dirname}/mail_templates.yml", encoding="utf8") as stream:
         yaml_string = stream.read()
         yaml_string = yaml_string.replace("<test_account>", account.entity_name) \
             .replace("<test_group>", account.entity['org_name']) \
@@ -77,7 +77,7 @@ def test_emails_after_account_creation(mailhog_delete_all, mailhog_client, accou
             .replace("=\r\n", "").replace("\r\n", "")
         headers = message["Content"]["Headers"]
 
-        for address_type in {"To", "From", "Return-Path"}:
+        for address_type in ["To", "From", "Return-Path"]:
             assert headers[address_type][0] == mail_template["equal_templates"][address_type], \
                 f"The {address_type} address should be {mail_template['equal_templates'][address_type]} " \
                 f"instead of {headers[address_type][0]}"
