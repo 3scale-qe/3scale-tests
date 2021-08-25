@@ -1,11 +1,11 @@
 "These are constants used for Toolbox testing."
 
 # 'name', 'state', 'end_user_registration_required', 'backend_version',
-# 'deployment_option', 'support_email', 'buyer_can_select_plan',
+# 'deployment_option', 'buyer_can_select_plan',
 # 'buyer_key_regenerate_enabled', 'buyer_plan_change_permission',
 # 'buyers_manage_apps', 'buyers_manage_keys', 'custom_keys_enabled','intentions_required',
 # 'mandatory_app_key', 'referrer_filters_required'
-SERVICE_CMP_ATTRS = {'created_at', 'id', 'links', 'system_name', 'updated_at'}
+SERVICE_CMP_ATTRS = {'created_at', 'id', 'links', 'system_name', 'support_email', 'updated_at'}
 
 # 'admin_support_email', 'backend_authentication_type', 'backend_version',
 # 'buyer_can_select_plan', 'buyer_key_regenerate_enabled', 'buyer_plan_change_permission',
@@ -15,12 +15,12 @@ SERVICE_CMP_ATTRS = {'created_at', 'id', 'links', 'system_name', 'updated_at'}
 # 'draft_name', 'end_user_registration_required', 'infobar', 'intentions_required',
 # 'kubernetes_service_link', 'logo_content_type', 'logo_file_name', 'logo_file_size',
 # 'mandatory_app_key', 'name', 'notification_settings', 'oneline_description', 'proxiable?',
-# 'referrer_filters_required', 'state', 'support_email', 'system_name', 'tech_support_email',
+# 'referrer_filters_required', 'state', 'system_name', 'tech_support_email',
 # 'terms', 'txt_api', 'txt_features', 'txt_support'
 
 PROXY_CONFIG_CONTENT_CMP_ATTRS = {
         'account_id', 'backend_authentication_value',
-        'created_at', 'id', 'proxy', 'tenant_id', 'updated_at'}
+        'created_at', 'id', 'proxy', 'support_email', 'tenant_id', 'updated_at'}
 
 # 'api_backend', 'api_test_path', 'api_test_success', 'apicast_configuration_driven',
 # 'auth_app_id', 'auth_app_key', 'auth_user_key', 'authentication_method',

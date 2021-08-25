@@ -237,8 +237,8 @@ def cmp_proxies(proxy1, proxy2, product_service):
     """
     assert len(proxy1.entity.keys()) == len(proxy2.entity.keys())
     cmp_ents(proxy1.entity, proxy2.entity, set(proxy1.entity.keys()) - constants.PROXY_CMP_ATTRS)
-
-    assert not jsondiff.diff(proxy1.entity['policies_config'], proxy2.entity['policies_config'])
+    # this cannot be used for copying via CRDs(toolbox product export/import) and it seems from code it is not used
+    # assert not jsondiff.diff(proxy1.entity['policies_config'], proxy2.entity['policies_config'])
     assert not jsondiff.diff(proxy1.policies_registry.list(), proxy2.policies_registry.list())
 
     # do not check 'production' because proxies are not promoted in src and dst
