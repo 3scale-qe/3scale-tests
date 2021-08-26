@@ -205,8 +205,8 @@ class LineItemForm(View):
         """Adds item to an invoice"""
         self.name_input.fill(name)
         self.quantity_input.fill(quantity)
-        self.cost_input.fill(cost)
         self.description_input.fill(description)
+        self.cost_input.fill(cost)
         self.submit.click()
 
 
@@ -214,7 +214,7 @@ class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
     issue_button = Text("//form[contains(@action, 'issue.js')]/button")
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
-    id_field = Text(".field-friendly_id")
+    id_field = Text("#field-friendly_id")
     state_field = Text("#field-state")
 
     # Selector which we can use to check if the charge has finished

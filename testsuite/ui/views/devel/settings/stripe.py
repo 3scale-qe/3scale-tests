@@ -1,4 +1,4 @@
-"""View for Stripe manipulation"""
+"""Settings Devel portal View containing credit card details for Stripe payment gateway"""
 import logging
 
 import backoff
@@ -56,7 +56,7 @@ class StripeCCForm(View):
 
 
 class OTPForm(View):
-    """3DS verification form"""
+    """3DS Stripe verification form"""
     def complete_auth(self):
         """Completes the authentication"""
         self._switch_to_otp_frame()
@@ -82,20 +82,25 @@ class OTPForm(View):
 
 
 class StripeCCView(BaseDevelView):
-    """View for adding credit card to the stripe"""
+    """View for adding credit card to the Stripe payment gateway"""
     path_pattern = '/admin/account/stripe'
     tabs = View.nested(SettingsTabs)
     add_billing_address_btn = Text("//a[@href='/admin/account/stripe/edit']")
+    add_cc_details_btn = GenericLocatorWidget("//*[normalize-space(.)='Edit Credit Card Details']")
     address_form = View.nested(BillingAddressForm)
     cc_form = View.nested(StripeCCForm)
     otp_form = View.nested(OTPForm)
 
     def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
-        """Adds credit card details"""
+        """Adds credit card details for the user"""
         if self.add_billing_address_btn.is_displayed:
             self.add_billing_address_btn.click()
         self.address_form.add(address)
+
+        if self.add_cc_details_btn.is_displayed:
+            self.add_cc_details_btn.click()
         self.cc_form.add(credit_card, address.zip)
+
         if credit_card.sca:
             self.otp_form.complete_auth()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)

@@ -39,7 +39,7 @@ class ThreescaleEditButton(Button):
 class ThreescaleSubmitButton(Button):
     """Specific Submit button of 3scale pages"""
 
-    def __init__(self, parent=None, locator="//*[(self::input or self::button) and @type='submit']", logger=None):
+    def __init__(self, parent=None, locator=".//*[(self::input or self::button) and @type='submit']", logger=None):
         super().__init__(parent, locator=locator, logger=logger)
 
 
