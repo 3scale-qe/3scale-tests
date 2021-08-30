@@ -1,6 +1,7 @@
 """View representations of SSO Integrations pages"""
 from urllib.parse import urlparse
 
+from weakget import weakget
 from widgetastic.widget import TextInput, GenericLocatorWidget, View, Text
 from widgetastic_patternfly4 import PatternflyTable, Button
 
@@ -139,7 +140,7 @@ class SSOIntegrationEditView(BaseSettingsView):
 
 class Auth0View(View, Navigable):
     """View representation of 3rd party Auth0 provider page"""
-    url_domain = settings["auth0"]["domain"]
+    url_domain = weakget(settings)["auth0"]["domain"] % None
     email = TextInput(name="email")
     password = TextInput(name="password")
     login_button = GenericLocatorWidget(locator="//button[@aria-label='Log In']")
