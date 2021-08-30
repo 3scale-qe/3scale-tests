@@ -33,4 +33,4 @@ reportportal = args.reportportal.rstrip("/")
 auth = {"Authorization": f"Bearer {token}"}
 launch_import = f"{reportportal}/api/v1/{project}/launch/import"
 
-requests.post(launch_import, files={"file": (f"{launch}.zip", stream.getbuffer(), "application/zip")}, headers=auth)
+print(requests.post(launch_import, files={"file": (f"{launch}.zip", stream.getbuffer(), "application/zip")}, headers=auth).text)
