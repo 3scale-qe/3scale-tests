@@ -92,13 +92,13 @@ Here is the list of services:
 
  * docker.io/eloycoto/apicast:tinyproxy
  * docker.io/jaegertracing/all-in-one:latest
- * docker.io/jsmadis/echo-api:latest
  * docker.io/jsmadis/go-httpbin:latest
  * docker.io/jsmadis/httpbin:latest
  * docker.io/mailhog/mailhog:latest
  * docker.io/prom/prometheus
  * docker.io/sxmichael/requestbin:latest
  * quay.io/rh_integration/3scale-fuse-camel-proxy:latest
+ * quay.io/3scale/echoapi:stable
  * registry.redhat.io/rhscl/redis-32-rhel7:3.2
  * registry.redhat.io/rh-sso-7/sso74-openshift-rhel8:7.4
 
