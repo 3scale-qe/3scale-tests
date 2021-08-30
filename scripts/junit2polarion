@@ -57,10 +57,13 @@ for xmlfile in args.junitfile:
     requirements = Requirements(polished, approver=f"'{username}'")
 
     response = session.post(f"{polarion}/import/requirement", files=files(requirements))
+    print(response.text)
     wait(searchlist(response), f"{polarion}/import/requirement-queue")
 
     response = session.post(f"{polarion}/import/testcase", files=files(testcases))
+    print(response.text)
     wait(searchlist(response), f"{polarion}/import/testcase-queue")
 
     response = session.post(f"{polarion}/import/xunit", files=files(polished))
+    print(response.text)
     wait(searchlist(response), f"{polarion}/import/xunit-queue")
