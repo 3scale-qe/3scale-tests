@@ -37,7 +37,7 @@ from testsuite import rawobj
 from testsuite.utils import randomize, blame
 
 
-pytestmark = pytest.mark.flaky
+pytestmark = pytest.mark.disruptive
 
 
 TOTAL_REQUESTS = 20
@@ -240,13 +240,13 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 
 
 @pytest.fixture
-def client2(key_scope, request):
+def client2(key_scope, request, prod_client):
     """A client of app2 to verify 'global' key_scope functionality"""
 
     if key_scope == "global":
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
-        client = app2.api_client()
+        client = prod_client(app2)
         request.addfinalizer(client.close)
         return client
 
