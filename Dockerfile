@@ -1,8 +1,10 @@
 FROM quay.io/centos7/python-38-centos7
-LABEL description="Required env variables: \
-_3SCALE_TESTS_OPENSHIFT__servers__default__server_url={OPENSHIFT_URL}; \
-_3SCALE_TESTS_OPENSHIFT__servers__default__token={OPENSHIFT_TOKEN}; \
-_3SCALE_TESTS_OPENSHIFT__projects__threescale__name={OPENSHIFT_PROJECT}"
+LABEL description="Run 3scale integration tests \
+Default ENTRYPOINT: 'make' and CMD: 'smoke' \
+Bind dynaconf settings to /opt/secrets.yaml \
+Bind kubeconfig to /opt/kubeconfig \
+Bind a dir to /test-run-results to get reports \
+Set NAMESPACE env variable"
 
 USER root
 
@@ -22,17 +24,19 @@ RUN yum install -y docker-client openssh-clients && \
 
 RUN pip3 --no-cache-dir install pipenv
 
-RUN mkdir -m 0770 /test-run-results
-RUN mkdir -m 0770 -p /opt/workdir/virtualenvs
-
 WORKDIR /opt/workdir/3scale-py-testsuite
 
 COPY . .
 
-RUN chmod -R g+w /opt/workdir/*
+RUN mkdir -m 0770 /test-run-results && \
+	mkdir -m 0770 -p /opt/workdir/virtualenvs && \
+	chmod -R g+w /opt/workdir/* && \
+	chmod g+w /opt
 
 USER default
 
+ENV KUBECONFIG=/opt/kubeconfig
+ENV SECRETS_FOR_DYNACONF=/opt/secrets.yaml
 ENV PIPENV_IGNORE_VIRTUALENVS=1
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
