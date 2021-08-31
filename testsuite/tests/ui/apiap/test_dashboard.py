@@ -2,6 +2,7 @@
 import pytest
 
 # pylint: disable=unused-argument
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.audience.billing import BillingView
@@ -49,3 +50,15 @@ def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
         getattr(dashboard, link, None).click()
 
     assert view(browser).is_displayed
+
+
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6209")
+def test_3scale_version_in_ui(login, navigator):
+    """
+    Test:
+        - Navigate to Dashboard
+        - Assert that 3scale version is displayed and is correct
+    """
+    dashboard = navigator.open(DashboardView)
+    assert dashboard.threescale_version.is_displayed
+    assert dashboard.threescale_version.text == f'Version {TESTED_VERSION} -'

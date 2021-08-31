@@ -23,6 +23,7 @@ class BaseAdminView(View, Navigable):
     support_link = Link("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
     user_session = GenericLocatorWidget("//a[@href='#session-menu']")
     user_logout_link = Link("//a[@href='/p/logout']")
+    threescale_version = Text("//*[contains(@class,'powered-by-3scale')]/span")
 
     context_menu = ContextMenu()
 
