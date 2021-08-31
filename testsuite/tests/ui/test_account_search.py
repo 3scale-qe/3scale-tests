@@ -17,7 +17,7 @@ def ui_application(service, custom_app_plan, custom_ui_application, request):
     def _ui_application(account):
         name = blame(request, "ui_account")
         plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-        return custom_ui_application(name, "description", plan, account)
+        return custom_ui_application(name, "description", plan, account, service)
 
     return _ui_application
 

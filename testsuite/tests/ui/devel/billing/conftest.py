@@ -15,7 +15,7 @@ def line_items():
 @pytest.fixture(scope="module")
 def billing_address():
     """Billing address"""
-    return BillingAddress("aaa", "bbb", "Brno", "Czechia", "", "123456789", "12345")
+    return BillingAddress("aaa", "bbb", "Brno", "Czech Republic", "", "123456789", "12345")
 
 
 @pytest.fixture

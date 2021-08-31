@@ -70,7 +70,7 @@ class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on path"""
     path_pattern = '/p/admin/dashboard'
     account_link = Link('//a[@href="/buyers/accounts"]')
-    application_link = Link('//a[@href="/buyers/applications"]')
+    application_link = Link('//a[@href="/p/admin/applications"]')
     billing_link = Link('//a[@href="/finance"]')
     develop_portal_link = Link('//a[@href="/p/admin/cms"]')
     message_link = Link('//a[@href="/p/admin/messages"]')

@@ -5,6 +5,7 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import Link
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class AccountPlansView(BaseAudienceView):
@@ -40,7 +41,7 @@ class NewAccountPlanView(BaseAudienceView):
     trial_period = TextInput(id='account_plan_trial_period_days')
     setup_fee = TextInput(id='account_plan_setup_fee')
     cost = TextInput(id='account_plan_cost_per_month')
-    create_button = GenericLocatorWidget(locator="//input[contains(@class, 'create')]")
+    create_button = ThreescaleSubmitButton()
 
     # pylint: disable=too-many-arguments
     @step("AccountPlansView")

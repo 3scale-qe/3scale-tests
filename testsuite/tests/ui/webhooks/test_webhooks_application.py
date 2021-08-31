@@ -115,7 +115,7 @@ def test_application_plan_changed(custom_app_plan, request, login, navigator, se
     application = custom_app()
     app_plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app_plan")), service)
     app = navigator.navigate(ApplicationDetailView, application=application, product=service)
-    app.change_plan(app_plan.entity_id)
+    app.change_plan(app_plan['name'])
 
     webhook = requestbin.get_webhook("plan_changed", str(application.entity_id))
     assert webhook is not None

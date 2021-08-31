@@ -3,19 +3,21 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import GenericLocatorWidget
+from testsuite.ui.widgets import GenericLocatorWidget, Link
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
 class ApplicationPlansView(BaseProductView):
     """View representation of Application plans page"""
     path_pattern = "/apiconfig/services/{product_id}/application_plans"
-    table = PatternflyTable(".//*[@id='plans']")
+    table = PatternflyTable(".//*[@aria-label='Plans Table']", column_widgets={
+        "Name": Link("./a")
+    })
 
     @step("ApplicationPlanDetailView")
     def detail(self, application_plan):
         """Detail of Application plan"""
-        next(row for row in self.table.rows() if row[0].text == application_plan["name"]).name.click()
+        self.table.row(name__contains=application_plan["name"]).name.widget.click()
 
     def prerequisite(self):
         return BaseProductView

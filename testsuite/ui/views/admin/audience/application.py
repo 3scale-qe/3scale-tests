@@ -1,20 +1,20 @@
 """View representations of Applications pages"""
 
-from widgetastic.widget import TextInput, GenericLocatorWidget, Text
+from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, Link, ThreescaleDropdown
+from testsuite.ui.widgets import AudienceTable, Link, ThreescaleSelect
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleCreateButton, ThreescaleEditButton, ThreescaleSubmitButton
 
 
 class ApplicationsView(BaseAudienceView):
     """View representation of Application Listing page"""
-    path_pattern = '/buyers/applications'
+    path_pattern = '/p/admin/applications'
     table = AudienceTable("//*[@class='data']")
 
     @step("ApplicationDetailView")
@@ -32,7 +32,7 @@ class ApplicationsView(BaseAudienceView):
 
 class ApplicationDetailView(BaseProductView):
     """View representation of Application detail page"""
-    path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}'
+    path_pattern = '/p/admin/applications/{application_id}'
     edit_button = ThreescaleEditButton()
     suspend_button = Link("//*[contains(@class, 'suspend')]")
     regenerate_button = Link("//*[contains(@class, 'refresh')]")
@@ -42,8 +42,8 @@ class ApplicationDetailView(BaseProductView):
     })
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
-    plan_dropdown = ThreescaleDropdown("//*[@id='cinstance_plan_id']")
-    change_plan_button = GenericLocatorWidget("//*[@value='Change Plan']")
+    plan_dropdown = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
+    change_plan_button = ThreescaleSubmitButton()
 
     def __init__(self, parent, product, application):
         super().__init__(parent, product, application_id=application.entity_id)
@@ -71,7 +71,7 @@ class ApplicationDetailView(BaseProductView):
 
     def change_plan(self, value):
         """Change application plan"""
-        self.plan_dropdown.select_by_value(value)
+        self.plan_dropdown.item_select(value)
         self.change_plan_button.click(handle_alert=True)
 
     @step("ApplicationEditView")
@@ -90,24 +90,21 @@ class ApplicationDetailView(BaseProductView):
 
 class ApplicationNewView(BaseAudienceView):
     """View representation of New Application page"""
-    path_pattern = 'buyers/accounts/{account_id}/applications/new'
-    username = TextInput(id='cinstance_name')
-    description = TextInput(id='cinstance_description')
-    app_plan = Text("//*[@id='select2-cinstance_plan_id-container']")
+    path_pattern = '/buyers/accounts/{account_id}/applications/new'
+    username = TextInput(id='cinstance[name]')
+    description = TextInput(id='cinstance[description]')
+    app_plan = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
+    product = ThreescaleSelect(locator="//label[@for='product']/../div[1]")
+    service_plan = ThreescaleSelect(locator="//label[@for='cinstance_service_plan_id']/../div[1]")
     create_button = ThreescaleCreateButton()
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
 
-    def create(self, username: str, description: str, plan):
+    def create(self, username: str, description: str, plan, service):
         """Create Application"""
-        plan_name = plan["name"]
-        if self.app_plan.text is not plan_name:
-            self.app_plan.click()
-            self.browser.element(f".//*[contains(text(),'{plan['name']}')]").click()
-            # Since this element is totally different from patternfly 4 and
-            # select options and root element are in different html trees, we need to do this 'hack' to make it work.
-            self.app_plan.click()
+        self.product.item_select(service["name"])
+        self.app_plan.item_select(plan["name"])
         self.username.fill(username)
         self.description.fill(description)
         self.create_button.click()
@@ -123,7 +120,7 @@ class ApplicationNewView(BaseAudienceView):
 
 class ApplicationEditView(BaseProductView):
     """View representation of Edit Application page"""
-    path_pattern = '/apiconfig/services/{product_id}/applications/{application_id}/edit'
+    path_pattern = '/p/admin/applications/{application_id}/edit'
     username = TextInput(id='cinstance_name')
     description = TextInput(id='cinstance_description')
     update_button = ThreescaleUpdateButton()

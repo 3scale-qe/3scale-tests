@@ -1,9 +1,11 @@
 """View representations of products integration policies section pages"""
 import enum
+
 from widgetastic.widget import TextInput, View
+from widgetastic_patternfly4 import Button
 
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import Link, PolicySection
+from testsuite.ui.widgets import PolicySection
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleSubmitButton
 
 
@@ -36,7 +38,7 @@ class ProductPoliciesView(BaseProductView):
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
     update_policy_chain_button = ThreescaleUpdateButton()
-    remove_policy_btn = Link("//*[contains(@class, 'PolicyConfiguration-remove')]")
+    remove_policy_btn = Button(locator="//*[contains(text(), 'Remove')]")
     policy_section = PolicySection()
     echo_policy_view = View.nested(EchoPolicyView)
 

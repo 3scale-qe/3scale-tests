@@ -20,7 +20,7 @@ def test_application_create(service, custom_app_plan, custom_ui_application, acc
     """
     name = blame(request, "ui_account")
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    app = custom_ui_application(name, "description", plan, account)
+    app = custom_ui_application(name, "description", plan, account, service)
 
     assert app["name"] == name
     assert app["description"] == "description"
@@ -61,7 +61,7 @@ def test_application_delete(service, custom_app_plan, custom_ui_application, acc
     """
     name = blame(request, "ui_account")
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    app = custom_ui_application(name, "description", plan, account, autoclean=False)
+    app = custom_ui_application(name, "description", plan, account, service, autoclean=False)
 
     application = navigator.navigate(ApplicationEditView, application=app, product=service)
     application.delete()

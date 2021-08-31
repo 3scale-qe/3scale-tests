@@ -8,7 +8,7 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import Link, RadioGroup, ThreescaleDropdown
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class TokensView(BaseSettingsView):
@@ -45,7 +45,7 @@ class TokenNewView(BaseSettingsView):
     name = TextInput(id='access_token_name')
     scopes = RadioGroup("//*[@id='access_token_scopes_input']/fieldset/ol")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
-    create_button = ThreescaleCreateButton()
+    create_button = ThreescaleSubmitButton()
     token_value = Text(".//code[contains(@class,'AccessTokenBox-token')]")
 
     def create(self, name: str, scopes: List[Scopes], write: bool):
