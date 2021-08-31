@@ -1,17 +1,16 @@
 """View representations of Account plan pages"""
-from widgetastic.widget import TextInput, GenericLocatorWidget
+from widgetastic.widget import TextInput, GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class AccountPlansView(BaseAudienceView):
     """View representation of Account Plans Listing page"""
     path_pattern = '/buyers/account_plans'
-    new_plan = Link("//a[@href='/admin/buyers/account_plans/new']")
+    new_plan = Text("//a[@href='/admin/buyers/account_plans/new']")
     table = PatternflyTable("//*[@id='plans']")
 
     def publish(self, plan_id):

@@ -6,7 +6,6 @@ from widgetastic.widget import Text, ParametrizedView, ParametrizedLocator
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import Link
 
 
 class APIDocsView(BaseSettingsView):
@@ -15,9 +14,9 @@ class APIDocsView(BaseSettingsView):
     """
     path_pattern = '/p/admin/api_docs'
     page_title = Text(locator='//*[@id="content"]/h1')
-    service_management_api_category = Link(locator='//*[@data-name="service_management_api"]')
-    account_management_api_category = Link(locator='//*[@data-name="account_management_api"]')
-    policy_registry_api_category = Link(locator='//*[@data-name="policy_registry_api"]')
+    service_management_api_category = Text(locator='//*[@data-name="service_management_api"]')
+    account_management_api_category = Text(locator='//*[@data-name="account_management_api"]')
+    policy_registry_api_category = Text(locator='//*[@data-name="policy_registry_api"]')
 
     def get_id_input_by_name(self, name):
         """

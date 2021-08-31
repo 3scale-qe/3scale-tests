@@ -4,7 +4,6 @@ from widgetastic_patternfly import Text
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step, Navigable
-from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -12,7 +11,7 @@ class WizardCommonView(View, Navigable):
     """
     All wizard pages common objects
     """
-    close_wizard_link = Link("//a[@href='/p/admin/dashboard']")
+    close_wizard_link = Text("//a[@href='/p/admin/dashboard']")
     logo = GenericLocatorWidget(locator="//*[@id='logo']/span")
 
     # pylint: disable=pointless-statement
@@ -80,7 +79,7 @@ class WizardBackendApiView(WizardCommonView, Navigable):
     backend_name_field = TextInput(id='backend_api_name')
     base_url_field = TextInput(id='backend_api_private_endpoint')
     add_backend_btn = ThreescaleSubmitButton()
-    use_echo_api_link = Link("//a[@href='#']")
+    use_echo_api_link = Text("//a[@href='#']")
 
     def set_echo_api(self):
         """Set base_url to predefined value"""
@@ -209,7 +208,7 @@ class WizardResponseView(WizardCommonView, Navigable):
     page_title = Text("//main/h1")
     what_next_btn = Button(locator="//a[@href='/p/admin/onboarding/wizard/outro']")
     base_url = TextInput(id='request_api_base_url')
-    try_again_btn = Link('//*[contains(@class,"request")]/fieldset/ol/input')
+    try_again_btn = Text('//*[contains(@class,"request")]/fieldset/ol/input')
 
     def try_again(self, url):
         """Fill backend api url with 'url' and click to navigate to next page"""
@@ -238,7 +237,7 @@ class WizardOutroView(WizardCommonView, Navigable):
     """
     path = '/p/admin/onboarding/wizard/outro'
 
-    continue_button = Link("/html/body/main/a")
+    continue_button = Text("/html/body/main/a")
     page_title = Text("//main/h1")
 
     def next_page(self):

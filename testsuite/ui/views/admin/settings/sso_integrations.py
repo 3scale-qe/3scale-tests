@@ -9,14 +9,14 @@ from testsuite import settings
 from testsuite.ui.navigation import step, Navigable
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import Link, ThreescaleDropdown
+from testsuite.ui.widgets import ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleEditButton, ThreescaleDeleteButton
 
 
 class SSOIntegrationsView(BaseSettingsView):
     """View representation of SSO Integrations page"""
     path_pattern = "/p/admin/account/authentication_providers"
-    new_integration = Link("//a[@href='/p/admin/account/authentication_providers/new']")
+    new_integration = Text("//a[@href='/p/admin/account/authentication_providers/new']")
     table = PatternflyTable("//table[@class='data']")
 
     @step("NewSSOIntegrationView")
@@ -79,7 +79,7 @@ class NewSSOIntegrationView(BaseSettingsView):
 class SSOIntegrationDetailView(BaseSettingsView):
     """View representation of detail SSO Integrations page"""
     path_pattern = "/p/admin/account/authentication_providers/{integration_id}"
-    test_flow_link = Link(".//*[normalize-space(.)='Test authentication flow now']")
+    test_flow_link = Text(".//*[normalize-space(.)='Test authentication flow now']")
     callback_url = Text("//dl[2]//*[2]")
     callback_url_for_flow_test = Text("//dl[2]//*[4]")
     edit_button = ThreescaleEditButton()

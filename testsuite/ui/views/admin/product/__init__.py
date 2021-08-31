@@ -1,18 +1,18 @@
 """Essential Views for Product Views"""
-from widgetastic.widget import GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import Link, NavigationMenu
+from testsuite.ui.widgets import NavigationMenu
 
 
 class ProductsView(BaseAdminView):
     """View representation of Product Listing page"""
     path_pattern = "/apiconfig/services"
-    create_product_button = Link("//a[@href='/apiconfig/services/new']")
+    create_product_button = Text("//a[@href='/apiconfig/services/new']")
     table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
-        "Name": Link("./a")
+        "Name": Text("./a")
     })
 
     @step("BaseProductView")

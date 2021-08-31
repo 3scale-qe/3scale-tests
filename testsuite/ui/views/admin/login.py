@@ -4,7 +4,6 @@ from widgetastic.widget import TextInput, View, Text
 from testsuite.ui.navigation import Navigable
 from testsuite.ui.views.admin.settings.sso_integrations import Auth0View, RhssoView
 from testsuite.ui.views.admin.wizard import WizardIntroView
-from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -21,9 +20,9 @@ class LoginView(View, Navigable):
     password_field = TextInput(id='session_password')
     password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
     submit = ThreescaleSubmitButton()
-    password_reset_link = Link("//a[@href='/p/password/reset']")
-    auth0_link = Link("//*[@class='login-provider-link' and contains(@href,'auth0')]")
-    rhsso_link = Link("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
+    password_reset_link = Text("//a[@href='/p/password/reset']")
+    auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
+    rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
 
     def do_login(self, name, password):
         """

@@ -1,13 +1,13 @@
 """View representations of Applications pages"""
 
-from widgetastic.widget import TextInput
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, Link, ThreescaleSelect
+from testsuite.ui.widgets import AudienceTable, ThreescaleSelect
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleCreateButton, ThreescaleEditButton, ThreescaleSubmitButton
 
@@ -34,11 +34,11 @@ class ApplicationDetailView(BaseProductView):
     """View representation of Application detail page"""
     path_pattern = '/p/admin/applications/{application_id}'
     edit_button = ThreescaleEditButton()
-    suspend_button = Link("//*[contains(@class, 'suspend')]")
-    regenerate_button = Link("//*[contains(@class, 'refresh')]")
-    add_random_app_key_button = Link("//*[contains(@class, 'create_key')]")
+    suspend_button = Text("//*[contains(@class, 'suspend')]")
+    regenerate_button = Text("//*[contains(@class, 'refresh')]")
+    add_random_app_key_button = Text("//*[contains(@class, 'create_key')]")
     api_credentials_table = PatternflyTable("//*[@id='keys']", column_widgets={
-        1: Link("./span/a[contains(@class, 'delete')]")
+        1: Text("./span/a[contains(@class, 'delete')]")
     })
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()

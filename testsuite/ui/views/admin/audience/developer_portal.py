@@ -1,9 +1,9 @@
 """View representations of Developer Portal section pages"""
-from widgetastic.widget import GenericLocatorWidget, TextInput
+from widgetastic.widget import GenericLocatorWidget, TextInput, Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import Link, ThreescaleDropdown, DivBasedEditor
+from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton
 
 
@@ -11,7 +11,7 @@ class DeveloperPortalContentView(BaseAudienceView):
     """View representation of Developer Portal Content page"""
     # path can be different when clicking from dashboard is '/p/admin/cms' and from menu is '/p/admin/cms/templates'
     path_pattern = '/p/admin/cms'
-    open_portal_to_world_btn = Link("//a[@href='/site/dns/open_portal']")
+    open_portal_to_world_btn = Text("//a[@href='/site/dns/open_portal']")
 
     def prerequisite(self):
         return BaseAudienceView
@@ -25,7 +25,7 @@ class DeveloperPortalContentView(BaseAudienceView):
 class ActiveDocsView(BaseAudienceView):
     """View representation of Active Docs list page"""
     path_pattern = '/admin/api_docs/services'
-    create_new_spec_link = Link("//a[@href='/admin/api_docs/services/new']")
+    create_new_spec_link = Text("//a[@href='/admin/api_docs/services/new']")
 
     @step("ActiveDocsNewView")
     def create_new_spec(self):

@@ -1,10 +1,9 @@
 """ 3scale specific widgets"""
-# pylint: disable=arguments-differ
 
 import backoff
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
-from widgetastic.widget import Text, GenericLocatorWidget, Widget
+from widgetastic.widget import GenericLocatorWidget, Widget
 from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import ContextSelector, Navigation, PatternflyTable
 from widgetastic_patternfly4 import Select
@@ -13,16 +12,8 @@ from widgetastic_patternfly4.navigation import check_nav_loaded
 from testsuite.ui.exception import ItemNotPresentException
 
 
-class Link(Text):
-    """
-    Clickable/readable link representation accessible via the standard view functions read/fill.
-    """
-
-    def fill(self, value):
-        if value:
-            self.browser.click(self)
-
-
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 # pylint: disable=abstract-method
 class RadioGroup(GenericLocatorWidget):
     """
@@ -66,12 +57,14 @@ class RadioGroup(GenericLocatorWidget):
         element.click()
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class CheckBoxGroup(RadioGroup):
     """CheckBox group of 3scale pages"""
     OPTIONS_BY_ID = './ol/li/label/input[@id="{}"]'
 
 
-# pylint: disable=too-many-ancestors
 class ContextMenu(ContextSelector):
     """
     ContextMenu that extends ContextSelector lactated in Widgetastic PF4 libraries, but briefly adjusted
@@ -82,6 +75,8 @@ class ContextMenu(ContextSelector):
 
 
 # pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class NavigationMenu(Navigation):
     """
     Navigation menu for 3scale Views (menu on the left side of Audience, Product, Backend and Settings Views).
@@ -140,6 +135,9 @@ class NavigationMenu(Navigation):
         return self.browser.element(self.RELATED_RESOURCE).text
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class ThreescaleDropdown(GenericLocatorWidget):
     """Specific dropdown of 3scale pages"""
 
@@ -150,6 +148,8 @@ class ThreescaleDropdown(GenericLocatorWidget):
 
 
 # pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class AudienceTable(PatternflyTable):
     """
     Table defined by 3scale in Accounts view contains two headers: classic table header and header dedicated
@@ -159,6 +159,9 @@ class AudienceTable(PatternflyTable):
     HEADERS = "./thead/tr[1]/th"
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class ThreescaleCheckBox(GenericLocatorWidget):
     """Specific CheckBox button of 3scale pages"""
 
@@ -174,6 +177,9 @@ class ThreescaleCheckBox(GenericLocatorWidget):
         return self.__element__().get_attribute("checked") == "true"
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class DeploymentRadio(RadioGroup):
     """Variation of 3scale radio group"""
     OPTIONS_SECTION = './/li[@id="{}"]/fieldset/ol'
@@ -182,6 +188,9 @@ class DeploymentRadio(RadioGroup):
     OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class PolicySection(Widget):
     """Widget representing Policies table section"""
     ROOT = ParametrizedLocator("//*[@id='policies']/div/section")
@@ -285,6 +294,9 @@ class DivBasedEditor(TextInput):
         self.browser.send_keys_to_focused_element(value)
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
 class ActiveDocV2Section(Widget):
     """Active Doc V2 preview section"""
     ROOT = ParametrizedLocator('//*[@id="default_endpoint_list"]')

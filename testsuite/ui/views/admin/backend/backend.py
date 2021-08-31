@@ -1,10 +1,10 @@
 """View representations of Backend pages"""
 from widgetastic.widget import TextInput
+from widgetastic.widget import Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.backend import BackendsView, BaseBackendView
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, ThreescaleSubmitButton
 
 
@@ -37,7 +37,7 @@ class BackendNewView(BaseAdminView):
 class BackendDetailView(BaseBackendView):
     """View representation of Backend detail page"""
     path_pattern = "p/admin/backend_apis/{backend_id}"
-    edit_button = Link("//*[contains(@href,'edit')]")
+    edit_button = Text("//*[contains(@href,'edit')]")
 
     @step("BackendEditView")
     def edit(self):

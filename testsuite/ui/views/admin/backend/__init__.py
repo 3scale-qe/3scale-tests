@@ -1,17 +1,18 @@
 """Essential Views for Backends Views"""
 from widgetastic_patternfly4 import PatternflyTable
+from widgetastic.widget import Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import NavigationMenu, Link
+from testsuite.ui.widgets import NavigationMenu
 
 
 class BackendsView(BaseAdminView):
     """View representation of Backend Listing page"""
     path_pattern = "p/admin/backend_apis"
-    create_backend_button = Link("//a[@href='/p/admin/backend_apis/new']")
+    create_backend_button = Text("//a[@href='/p/admin/backend_apis/new']")
     table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={
-        "Name": Link("./a")
+        "Name": Text("./a")
     })
 
     @step("BaseBackendView")

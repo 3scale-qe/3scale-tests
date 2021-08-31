@@ -1,9 +1,10 @@
 """View representations of products application section pages"""
 from widgetastic_patternfly4 import PatternflyTable
+from widgetastic.widget import Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import GenericLocatorWidget, Link
+from testsuite.ui.widgets import GenericLocatorWidget
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
@@ -11,7 +12,7 @@ class ApplicationPlansView(BaseProductView):
     """View representation of Application plans page"""
     path_pattern = "/apiconfig/services/{product_id}/application_plans"
     table = PatternflyTable(".//*[@aria-label='Plans Table']", column_widgets={
-        "Name": Link("./a")
+        "Name": Text("./a")
     })
 
     @step("ApplicationPlanDetailView")
