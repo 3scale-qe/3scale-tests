@@ -127,6 +127,7 @@ class NavigationMenu(Navigation):
             if item:
                 if "pf-m-expanded" not in element.get_attribute("class").split():
                     self.browser.click(element)
+                    self.browser.wait_for_element(self.HREF_LOCATOR.format(href), parent=element, visible=True)
                 self.browser.click(item[0])
                 return
 
