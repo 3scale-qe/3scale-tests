@@ -11,7 +11,9 @@ import pytest
 
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6193")]
+
 
 ACCESS_LOG_FILE = "access.log"
 
@@ -30,7 +32,10 @@ def make_requests(api_client):
 
     def run(hits):
         for _ in range(hits):
-            assert client.get("/get").status_code == 200
+            retval = client.get("/get")
+            assert retval.status_code == 200
+
+        return retval.url
 
     return run
 
@@ -61,23 +66,22 @@ def read_log(staging_gateway, tmpdir):
     return read
 
 
-@pytest.fixture
-def api_backend_host(private_base_url):
+def apicast_host(url):
     """Return only the hostname from private_base_url."""
-    return urlparse(private_base_url()).hostname
+    return urlparse(url).hostname
 
 
-def assert_backend_hosts_match(api_backend, content, hits):
+def assert_apicast_host_match(apicast_url, content, hits):
     """Assert number of backend hosts hit matches hits."""
-    assert len(re.findall(f"({api_backend})", content)) == hits
+    assert len(re.findall(f"({apicast_url})", content)) == hits
 
 
-def test_access_log_lines_match_requests_hits(api_backend_host, make_requests, read_log):
+def test_access_log_lines_match_requests_hits(make_requests, read_log):
     """Logs appended to access log file match number of requests made against gateway."""
-    make_requests(3)
+    url = make_requests(3)
 
     content, lines = read_log(ACCESS_LOG_FILE)
 
     assert lines == 3
 
-    assert_backend_hosts_match(api_backend_host, content, 3)
+    assert_apicast_host_match(apicast_host(url), content, 3)
