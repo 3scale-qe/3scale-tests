@@ -38,6 +38,7 @@ def _log_response(response):
     class Response:
         """attr reason is needed"""
         def __init__(self, response):
+            response.read()
             self.__response = response
             self.reason = response.reason_phrase
 
