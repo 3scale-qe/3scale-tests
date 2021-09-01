@@ -35,7 +35,7 @@ objects:
         name: '${IMAGE_STREAM_APICAST_POLICY}:example'
     source:
       git:
-        uri: https://github.com/mganisin/apicast-example-policy
+        uri: https://github.com/3scale-qe/apicast-example-policy
         ref: 'master'
       type: Git
     strategy:
