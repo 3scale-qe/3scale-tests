@@ -62,7 +62,7 @@ default:
       # keys and some special key to add extra information. so 'httpbin+https' returns https:// url based on route
       # to httpbin. There is also logic to define openshift service url e.g. 'httpbin+svc:8888'
       # returns 'httpbin.{tools-namespace}.svc:8888
-      sources: [ OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
+      sources: [ Rhoam, OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
       namespace: tools # openshift namespace/project where the testenv tools are deployed
     private_base_url:
       default: echo_api # tool name to be used by default for backend

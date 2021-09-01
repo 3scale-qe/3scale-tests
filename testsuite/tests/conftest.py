@@ -211,7 +211,7 @@ def tools(testconfig, configuration):
                     pass
             raise KeyError(name)
 
-    sources = options.get("sources", ["OpenshiftProject", "Settings"])
+    sources = options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
     sources = [_init_source(getattr(testsuite.tools, t)) for t in sources]
     return _Tools(sources)
 
