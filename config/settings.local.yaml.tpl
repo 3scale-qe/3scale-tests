@@ -2,7 +2,7 @@
 # Example template to create local configuration with custom environment
 # envsubst can be used to fill this
 
-${DYNACONF_ENVIRONMENT}:  # default env is called 'development'
+development:  # default dynaconf env
   threescale:
     version: "${THREESCALE_VERSION}"
     superdomain: ${THREESCALE_SUPERDOMAIN}
