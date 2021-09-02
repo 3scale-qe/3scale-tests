@@ -48,6 +48,7 @@ def auth0_user(auth0_client, request, testconfig):
 
 
 # pylint: disable=unused-argument, too-many-arguments
+@pytest.mark.disruptive
 def test_provider_auth0(login, navigator, ui_sso_integration, testconfig, auth0_user, set_callback_urls,
                         custom_auth0_login):
     """

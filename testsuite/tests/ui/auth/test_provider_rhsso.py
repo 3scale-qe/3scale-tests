@@ -1,11 +1,14 @@
 """
 Rewrite of spec/ui_specs/oauth/provider_rhsso_spec.rb
 """
+import pytest
+
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.settings.sso_integrations import SSOIntegrationDetailView, RhssoView
 
 
 # pylint: disable=unused-argument, too-many-arguments, too-many-locals
+@pytest.mark.disruptive
 def test_provider_rhsso(login, navigator, ui_sso_integration, rhsso_service_info, testconfig, custom_rhsso_login):
     """
     Preparation:
