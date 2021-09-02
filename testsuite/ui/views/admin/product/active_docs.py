@@ -1,10 +1,10 @@
 """View representations of Product Active docs pages"""
 from widgetastic_patternfly4 import PatternflyTable
-from widgetastic.widget import View
+from widgetastic.widget import View, Text
 
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, ThreescaleEditButton
-from testsuite.ui.widgets import Link, ActiveDocV2Section
+from testsuite.ui.widgets import ActiveDocV2Section
 from testsuite.ui.navigation import step
 
 
@@ -40,8 +40,8 @@ class ActiveDocsDetailView(BaseProductView):
     # pylint: disable=invalid-name
     class oas2(View):
         """OAS version 2 section"""
-        expand_operations_link = Link(locator="//*[contains(@class, 'expandResource')]")
-        collapse_operations_link = Link(locator="//*[contains(@class, 'collapseResource')]")
+        expand_operations_link = Text(locator="//*[contains(@class, 'expandResource')]")
+        collapse_operations_link = Text(locator="//*[contains(@class, 'collapseResource')]")
         active_docs_section = ActiveDocV2Section()
 
         def make_request(self, endpoint):

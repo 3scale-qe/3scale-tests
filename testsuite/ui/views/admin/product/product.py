@@ -1,10 +1,9 @@
 """View representations of Product pages"""
-from widgetastic.widget import TextInput
+from widgetastic.widget import TextInput, Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.product import BaseProductView, ProductsView
-from testsuite.ui.widgets import Link
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton
 
 
@@ -35,7 +34,7 @@ class ProductNewView(BaseAdminView):
 class ProductDetailView(BaseProductView):
     """View representation of Product detail page (Overview page)"""
     path_pattern = "/apiconfig/services/{product_id}"
-    edit_button = Link(locator="//*[@id='content']/section/div/a")
+    edit_button = Text(locator="//*[@id='content']/section/div/a")
 
     @step("ProductEditView")
     def edit(self):

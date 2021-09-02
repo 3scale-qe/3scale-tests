@@ -5,7 +5,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import Link, ThreescaleDropdown, AudienceTable, ThreescaleCheckBox
+from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
 
@@ -13,7 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 class AccountsView(BaseAudienceView):
     """View representation of Accounts Listing page"""
     path_pattern = '/buyers/accounts'
-    new_account = Link("//a[@href='/buyers/accounts/new']")
+    new_account = Text("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
@@ -48,9 +48,9 @@ class AccountsDetailView(BaseAudienceView):
     edit_button = ThreescaleEditButton()
     plan_dropdown = ThreescaleDropdown("//*[@id='account_contract_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
-    applications_button = Link("//*[contains(@title,'applications')]")
-    users_button = Link("//*[contains(@title,'users')]")
-    invoices_button = Link("//*[contains(@title,'invoices')]")
+    applications_button = Text("//*[contains(@title,'applications')]")
+    users_button = Text("//*[contains(@title,'users')]")
+    invoices_button = Text("//*[contains(@title,'invoices')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -146,7 +146,7 @@ class AccountEditView(BaseAudienceView):
 class AccountApplicationsView(BaseAudienceView):
     """View representation of Account's Applications page"""
     path_pattern = "/buyers/accounts/{account_id}/applications"
-    create_button = Link("//*[contains(@href,'/applications/new')]")
+    create_button = Text("//*[contains(@href,'/applications/new')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -168,7 +168,7 @@ class AccountApplicationsView(BaseAudienceView):
 class AccountInvoicesView(BaseAudienceView):
     """View representation of Account's Applications page"""
     path_pattern = "/buyers/accounts/{account_id}/invoices"
-    create_button = Link(".action.new")
+    create_button = Text(".action.new")
     table = PatternflyTable(".data")
 
     def __init__(self, parent, account):
@@ -199,7 +199,7 @@ class LineItemForm(View):
     quantity_input = TextInput("line_item[quantity]")
     description_input = TextInput("line_item[description]")
     cost_input = TextInput("line_item[cost]")
-    submit = Link("//input[@type='submit']")
+    submit = Text("//input[@type='submit']")
 
     def add_item(self, name, quantity, cost, description):
         """Adds item to an invoice"""
@@ -212,8 +212,8 @@ class LineItemForm(View):
 
 class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
-    issue_button = Link("//form[contains(@action, 'issue.js')]/button")
-    charge_button = Link("//form[contains(@action, 'charge.js')]/button")
+    issue_button = Text("//form[contains(@action, 'issue.js')]/button")
+    charge_button = Text("//form[contains(@action, 'charge.js')]/button")
     id_field = Text(".field-friendly_id")
     state_field = Text("#field-state")
 

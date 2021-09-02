@@ -2,12 +2,11 @@
 import logging
 
 import backoff
-from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget
+from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 
 from testsuite.ui.objects import CreditCard, BillingAddress
 from testsuite.ui.views.devel import BaseDevelView
 from testsuite.ui.views.devel.settings import SettingsTabs
-from testsuite.ui.widgets import Link
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +85,7 @@ class StripeCCView(BaseDevelView):
     """View for adding credit card to the stripe"""
     path_pattern = '/admin/account/stripe'
     tabs = View.nested(SettingsTabs)
-    add_billing_address_btn = Link("//a[@href='/admin/account/stripe/edit']")
+    add_billing_address_btn = Text("//a[@href='/admin/account/stripe/edit']")
     address_form = View.nested(BillingAddressForm)
     cc_form = View.nested(StripeCCForm)
     otp_form = View.nested(OTPForm)

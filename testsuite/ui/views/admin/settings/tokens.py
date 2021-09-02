@@ -7,14 +7,14 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import Link, RadioGroup, ThreescaleDropdown
+from testsuite.ui.widgets import RadioGroup, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class TokensView(BaseSettingsView):
     """View representation of Tokens page"""
     path_pattern = '/p/admin/user/access_tokens'
-    add_token = Link(locator="//*[@href='/p/admin/user/access_tokens/new']")
+    add_token = Text(locator="//*[@href='/p/admin/user/access_tokens/new']")
     token_table = PatternflyTable("//*[@id='access-tokens']/table")
 
     @step("TokenNewView")

@@ -2,7 +2,6 @@
 from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 
 from testsuite.ui.navigation import Navigable, step
-from testsuite.ui.widgets import Link
 
 
 class Navbar(View, Navigable):
@@ -10,12 +9,12 @@ class Navbar(View, Navigable):
     TODO: When browser is not maximized, this menu is collapsed. Add dynamical interaction"""
     ROOT = "//nav[@role='navigation']"
 
-    applications_btn = Link("//a[@href='/admin/applications']")
-    statistics_btn = Link("//a[@href='/buyer/stats']")
-    documentation_btn = Link("//a[@href='/docs']")
-    messages_btn = Link("//a[contains(@href, '/admin/messages/received')]")
-    settings_btn = Link("//a[@href='/admin/account']")
-    sign_out_btn = Link("//a[contains(@href, '/logout')]")
+    applications_btn = Text("//a[@href='/admin/applications']")
+    statistics_btn = Text("//a[@href='/buyer/stats']")
+    documentation_btn = Text("//a[@href='/docs']")
+    messages_btn = Text("//a[contains(@href, '/admin/messages/received')]")
+    settings_btn = Text("//a[@href='/admin/account']")
+    sign_out_btn = Text("//a[contains(@href, '/logout')]")
 
     @step("SettingsTabs")
     def settings(self):
@@ -51,7 +50,7 @@ class BaseDevelView(View, Navigable):
 
 class LandingView(BaseDevelView):
     """Developer portal landing page"""
-    sign_in_btn = Link("//a[contains(@href, '/login')]")
+    sign_in_btn = Text("//a[contains(@href, '/login')]")
     close_csm = GenericLocatorWidget('//*[@id="cms-toolbar-menu-right"]/li/a')
 
     @property

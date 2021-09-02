@@ -1,16 +1,16 @@
 """View representations of products integration backends section pages"""
-from widgetastic.widget import TextInput
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable, Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import Link, GenericLocatorWidget, ThreescaleSelect
+from testsuite.ui.widgets import GenericLocatorWidget, ThreescaleSelect
 
 
 class ProductBackendsView(BaseProductView):
     """View representation of Product's Backends page"""
     path_pattern = "/apiconfig/services/{product_id}/backend_usages"
-    add_backend_button = Link("//*[contains(@href,'/backend_usages/new')]")
+    add_backend_button = Text("//*[contains(@href,'/backend_usages/new')]")
     backend_table = PatternflyTable("//*[@id='backend_api_configs']", column_widgets={
         "Add Backend": GenericLocatorWidget("./a[contains(@class, 'delete')]")})
 

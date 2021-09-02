@@ -9,7 +9,7 @@ from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step, Navigable
-from testsuite.ui.widgets import Link, ContextMenu
+from testsuite.ui.widgets import ContextMenu
 
 
 class BaseAdminView(View, Navigable):
@@ -18,11 +18,11 @@ class BaseAdminView(View, Navigable):
     All admin portal page should inherits from this class.
     """
     path_pattern = ''
-    explorer_menu = Link("//div[@id='api_selector']//a[@title='Context Selector']/span")
+    explorer_menu = Text("//div[@id='api_selector']//a[@title='Context Selector']/span")
     threescale_menu_logo = GenericLocatorWidget('//*[@id="user_widget"]/a/div')
-    support_link = Link("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
+    support_link = Text("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
     user_session = GenericLocatorWidget("//a[@href='#session-menu']")
-    user_logout_link = Link("//a[@href='/p/logout']")
+    user_logout_link = Text("//a[@href='/p/logout']")
     threescale_version = Text("//*[contains(@class,'powered-by-3scale')]/span")
 
     context_menu = ContextMenu()
@@ -70,13 +70,13 @@ class BaseAdminView(View, Navigable):
 class DashboardView(BaseAdminView):
     """Dashboard view page object that can be found on path"""
     path_pattern = '/p/admin/dashboard'
-    account_link = Link('//a[@href="/buyers/accounts"]')
-    application_link = Link('//a[@href="/p/admin/applications"]')
-    billing_link = Link('//a[@href="/finance"]')
-    develop_portal_link = Link('//a[@href="/p/admin/cms"]')
-    message_link = Link('//a[@href="/p/admin/messages"]')
-    explore_all_products = Link('//a[@href="/apiconfig/services"]')
-    explore_all_backends = Link('//a[@href="/p/admin/backend_apis"]')
+    account_link = Text('//a[@href="/buyers/accounts"]')
+    application_link = Text('//a[@href="/p/admin/applications"]')
+    billing_link = Text('//a[@href="/finance"]')
+    develop_portal_link = Text('//a[@href="/p/admin/cms"]')
+    message_link = Text('//a[@href="/p/admin/messages"]')
+    explore_all_products = Text('//a[@href="/apiconfig/services"]')
+    explore_all_backends = Text('//a[@href="/p/admin/backend_apis"]')
 
     @View.nested
     # pylint: disable=invalid-name

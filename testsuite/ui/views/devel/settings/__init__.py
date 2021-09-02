@@ -1,20 +1,19 @@
 """Devel account settings"""
-from widgetastic.widget import View
+from widgetastic.widget import View, Text
 
 from testsuite.ui.navigation import step, Navigable
 from testsuite.ui.views.devel import BaseDevelView, Navbar
-from testsuite.ui.widgets import Link
 
 
 class SettingsTabs(View, Navigable):
     """Account settings in Devel portal"""
     ROOT = "//ul[contains(@class, 'nav-tabs')]"
-    details_tab = Link("//a[@href='/admin/account']")
-    users_tab = Link("//a[@href='/admin/account/users']")
-    invitations_tab = Link("//a[ends-with(@href, '/invitations')]")
-    invoices_tab = Link("//a[@href='/admin/account/invoices']")
-    stripe_cc_tab = Link("//a[@href='/admin/account/stripe']")
-    braintree_cc_tab = Link("//a[@href='/admin/account/braintree']")
+    details_tab = Text("//a[@href='/admin/account']")
+    users_tab = Text("//a[@href='/admin/account/users']")
+    invitations_tab = Text("//a[ends-with(@href, '/invitations')]")
+    invoices_tab = Text("//a[@href='/admin/account/invoices']")
+    stripe_cc_tab = Text("//a[@href='/admin/account/stripe']")
+    braintree_cc_tab = Text("//a[@href='/admin/account/braintree']")
 
     @step("InvoicesView")
     def invoices(self):
