@@ -26,7 +26,7 @@ def import_policies(threescale_src1, policy_file, service):
     import_cmd += policy_file
     ret = toolbox.run_cmd(import_cmd)
 
-    assert len(ret['stderr']) == 0
+    assert not ret['stderr']
 
     yield ret['stdout']
     if not settings["skip_cleanup"]:
@@ -40,7 +40,7 @@ def export_policies(threescale_src1, service, import_policies):
     export_cmd = f"policies export {threescale_src1} {service['id']} -o json"
     ret = toolbox.run_cmd(export_cmd)
 
-    assert len(ret['stderr']) == 0
+    assert not ret['stderr']
 
     return ret['stdout']
 
