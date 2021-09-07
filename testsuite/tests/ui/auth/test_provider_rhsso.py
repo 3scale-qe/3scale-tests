@@ -17,14 +17,15 @@ def test_provider_rhsso(login, navigator, ui_sso_integration, rhsso_service_info
         - login to 3scale via RHSSO
         - assert that you are logged in
     """
-    client = rhsso_service_info.client.entity["id"]
-    client_secret = rhsso_service_info.client.secret["value"]
-    realm = f"{rhsso_service_info.rhsso.server_url}auth/realms/{rhsso_service_info.realm.entity['realm']}"
-    integration = ui_sso_integration('keycloak', client, client_secret, realm)
+    admin = rhsso_service_info.realm.admin
+    client_id = rhsso_service_info.client.client_id
+    client = admin.get_client(client_id)["clientId"]
+    client_secret = admin.get_client_secrets(client_id)["value"]
+    integration = ui_sso_integration('keycloak', client, client_secret, rhsso_service_info.issuer_url())
 
     sso = navigator.navigate(SSOIntegrationDetailView, integration=integration)
     urls = sso.callback_urls()
-    rhsso_service_info.client.update(standardFlowEnabled=True, redirectUris=urls)
+    admin.update_client(client_id, payload={"standardFlowEnabled": True, "redirectUris": urls})
 
     test_user = testconfig["rhsso"]["test_user"]
     username = test_user["username"]
@@ -32,6 +33,6 @@ def test_provider_rhsso(login, navigator, ui_sso_integration, rhsso_service_info
     sso.test_flow(RhssoView, username, password)
     sso.publish()
 
-    custom_rhsso_login(username, password, rhsso_service_info.user)
+    custom_rhsso_login(username, password, admin.get_user(rhsso_service_info.user)["username"])
     admin_view = navigator.navigate(BaseAdminView)
     assert admin_view.is_displayed

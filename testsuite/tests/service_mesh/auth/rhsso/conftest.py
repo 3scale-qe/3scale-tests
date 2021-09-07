@@ -4,12 +4,16 @@ from threescale_api.resources import Service
 
 from testsuite.gateways import ServiceMeshGateway
 from testsuite.lifecycle_hook import LifecycleHook
-from testsuite.rhsso.rhsso import OIDCClientAuthHook, OIDCClientAuth
+from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 
 
 # pylint: disable=too-few-public-methods
 class ServiceMeshOIDCClientAuth(OIDCClientAuth):
     """Authentication class for OIDC based authorization for ServiceMesh"""
+
+    def __init__(self, service_rhsso_info, application, location=None) -> None:
+        super().__init__(service_rhsso_info, application, location)
+        self.app_key = application.keys.list()["keys"][0]["key"]["value"]
 
     def __call__(self, request):
         request = super().__call__(request)

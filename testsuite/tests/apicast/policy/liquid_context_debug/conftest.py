@@ -24,6 +24,4 @@ def service(service):
 @pytest.fixture(scope="module")
 def access_token(application, rhsso_service_info):
     """get rhsso access token"""
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
-    return rhsso_service_info.password_authorize(application["client_id"],
-                                                 app_key).token['access_token']
+    return rhsso_service_info.access_token(application)

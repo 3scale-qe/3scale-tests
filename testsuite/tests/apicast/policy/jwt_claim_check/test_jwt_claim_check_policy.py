@@ -46,12 +46,10 @@ def test_application_matching_jwt_operation(api_client, application, application
     client_match = api_client()
     client_doesnt_match = api_client(application_doesnt_match)
 
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
-    token = rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
+    token = rhsso_service_info.access_token(application)
     assert client_match.get('/get', params={'access_token': token}).status_code == 200
 
-    app_key = application_doesnt_match.keys.list()["keys"][0]["key"]["value"]
-    token = rhsso_service_info.password_authorize(application_doesnt_match["client_id"], app_key).token['access_token']
+    token = rhsso_service_info.access_token(application)
     response = client_doesnt_match.get('/get', params={'access_token': token})
 
     assert response.status_code == 403

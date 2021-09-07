@@ -337,7 +337,7 @@ def custom_rhsso_login(browser, navigator, threescale, request):
     :return: Login to Admin portal with custom credentials
     """
 
-    def _login(username, password, rhsso_user):
+    def _login(username, password, rhsso_username):
         browser.selenium.delete_all_cookies()
         browser.refresh()
         browser.url = settings["threescale"]["admin"]["url"]
@@ -345,7 +345,7 @@ def custom_rhsso_login(browser, navigator, threescale, request):
         page.do_rhsso_login(username, password)
 
         def _delete():
-            user = threescale.provider_account_users.read_by_name(rhsso_user.entity["username"])
+            user = threescale.provider_account_users.read_by_name(rhsso_username)
             user.delete()
 
         request.addfinalizer(_delete)
