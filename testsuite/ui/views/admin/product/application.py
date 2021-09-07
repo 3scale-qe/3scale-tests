@@ -1,11 +1,11 @@
 """View representations of products application section pages"""
+from widgetastic.widget import Text, TextInput
 from widgetastic_patternfly4 import PatternflyTable
-from widgetastic.widget import Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import GenericLocatorWidget
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleCreateButton
 
 
 class ApplicationPlansView(BaseProductView):
@@ -14,11 +14,17 @@ class ApplicationPlansView(BaseProductView):
     table = PatternflyTable(".//*[@aria-label='Plans Table']", column_widgets={
         "Name": Text("./a")
     })
+    create_button = ThreescaleCreateButton()
 
     @step("ApplicationPlanDetailView")
     def detail(self, application_plan):
         """Detail of Application plan"""
         self.table.row(name__contains=application_plan["name"]).name.widget.click()
+
+    @step("ApplicationPlanNewView")
+    def create(self):
+        """Create new Application plan"""
+        self.create_button.click()
 
     def prerequisite(self):
         return BaseProductView
@@ -61,5 +67,27 @@ class UsageRulesView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.update_btn.is_displayed\
+        return BaseProductView.is_displayed.fget(self) and self.update_btn.is_displayed \
                and self.path in self.browser.url
+
+
+class ApplicationPlanNewView(BaseProductView):
+    """View representation of New Application Plan page"""
+    path_pattern = "/apiconfig/services/{product_id}/application_plans/new"
+    name = TextInput(id="application_plan_name")
+    system_name = TextInput(id="application_plan_system_name")
+    create_button = GenericLocatorWidget("//input[contains(@class,'create')]")
+
+    def create(self, name: str, system_name: str):
+        """Create application plan"""
+        self.name.fill(name)
+        self.system_name.fill(system_name)
+        self.create_button.click()
+
+    def prerequisite(self):
+        return ApplicationPlansView
+
+    @property
+    def is_displayed(self):
+        return BaseProductView.is_displayed.fget(self) and self.create_button.is_displayed and self.name.is_displayed \
+               and self.system_name.is_displayed and self.path in self.browser.url

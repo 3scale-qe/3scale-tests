@@ -1,6 +1,7 @@
 "UI conftest"
 
 import os
+
 import pytest
 from threescale_api.resources import Account, ApplicationPlan, Service
 
@@ -14,6 +15,7 @@ from testsuite.ui.views.admin.audience.application import ApplicationNewView
 from testsuite.ui.views.admin.backend.backend import BackendNewView
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.login import LoginView
+from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
 from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
 from testsuite.ui.webdriver import SeleniumDriver
@@ -351,3 +353,17 @@ def custom_rhsso_login(browser, navigator, threescale, request):
         request.addfinalizer(_delete)
 
     return _login
+
+
+@pytest.fixture(scope="module")
+def custom_ui_app_plan(custom_admin_login, navigator):
+    """Create custom application plan via UI"""
+
+    def _custom_ui_app_plan(name: str, service: Service):
+        plan = navigator.navigate(ApplicationPlanNewView, product=service)
+        plan.create(name, name)
+        app_plan = service.app_plans.read_by_name(name)
+
+        return app_plan
+
+    return _custom_ui_app_plan
