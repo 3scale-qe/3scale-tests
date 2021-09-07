@@ -58,7 +58,7 @@ def import_csv(threescale_dst1, copy_string_to_remote):
     import_cmd += copy_string_to_remote
     ret = toolbox.run_cmd(import_cmd)
 
-    assert len(ret['stderr']) == 0
+    assert not ret['stderr']
 
     yield ret['stdout']
     if not settings["skip_cleanup"]:

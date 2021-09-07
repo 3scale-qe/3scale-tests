@@ -108,8 +108,8 @@ def export_product(threescale_src1, export_import_file, service, my_backends_map
     # pylint: disable=too-many-arguments
     ret = toolbox.run_cmd(f"product export {threescale_src1} {service['id']} -f {export_import_file}")
 
-    assert len(ret['stderr']) == 0
-    assert len(ret['stdout']) == 0
+    assert not ret['stderr']
+    assert not ret['stdout']
 
 
 @pytest.fixture(scope="module")
@@ -118,7 +118,7 @@ def import_product(threescale_dst1, export_import_file, export_product, dest_cli
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(f"product import {threescale_dst1} -f {export_import_file}")
 
-    assert len(ret['stderr']) == 0
+    assert not ret['stderr']
     imported_json = json.loads(ret['stdout'])
     dst_prod_id = int(list(imported_json.values())[0]['product_id'])
     dst_product = dest_client.services.read(dst_prod_id)
@@ -132,8 +132,8 @@ def export_dst_product(threescale_dst1, export_import_file, import_product):
     export_cmd += f"-f {export_import_file}_exp2"
     ret = toolbox.run_cmd(export_cmd)
 
-    assert len(ret['stderr']) == 0
-    assert len(ret['stdout']) == 0
+    assert not ret['stderr']
+    assert not ret['stdout']
 
 
 def test_compare_two_exports(export_product, export_dst_product, export_import_file):
