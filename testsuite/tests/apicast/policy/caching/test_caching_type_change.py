@@ -6,10 +6,37 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
+from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.utils import blame
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
               pytest.mark.disruptive,
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4464")]
+
+
+@pytest.fixture(scope="module")
+def staging_gateway(request, configuration):
+    """Deploy template apicast gateway."""
+
+    options = TemplateApicastOptions(staging=True, settings_block={
+        "deployments": {
+            "staging": blame(request, "staging"),
+            "production": blame(request, "production")
+        }
+    }, configuration=configuration)
+    gateway = TemplateApicast(requirements=options)
+
+    request.addfinalizer(gateway.destroy)
+
+    gateway.create()
+
+    return gateway
+
+
+@pytest.fixture(scope="module")
+def production_gateway():
+    """returns None because test is written for staging gateway"""
+    return None
 
 
 @pytest.fixture(scope="module")
@@ -21,11 +48,12 @@ def service(service):
     service.proxy.list().policies.append(
         rawobj.PolicyConfig("caching", {"caching_type": "strict"}))
     service.proxy.list().update()
+
     return service
 
 
 @pytest.mark.required_capabilities(Capability.SCALING)
-def test_caching_policy_allow_mod(openshift, api_client, service):
+def test_caching_policy_strict_mod(openshift, api_client, service):
     """
     Tests:
         - if response with valid credentials as before have status_code == 200
