@@ -68,6 +68,7 @@ pipenv: .make-pipenv-sync
 pipenv-dev: .make-pipenv-sync-dev
 
 container-image: ## Build container image
+container-image: fetch-tools
 	docker build -t 3scale-py-testsuite .
 
 clean: ## clean pip deps
@@ -112,11 +113,18 @@ release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
 
 dist: ## Build (and push optionally) distribution-ready container image
 dist: IMAGENAME ?= 3scale-py-testsuite
-dist: pipenv
+dist: pipenv fetch-tools
 	git checkout `$(RUNSCRIPT)docker-tags -1`
 	test -e VERSION
 	$(RUNSCRIPT)docker-build $(IMAGENAME) `$(RUNSCRIPT)docker-tags`
 	-[ -n "$$NOSWITCH" ] || git checkout -
+
+fetch-tools:
+	-rm -Rf testsuite-tools/
+	-curl $(fetch_tools) | tar -xz
+
+tools:
+	./testsuite-tools/run.sh
 
 VERSION-required:
 ifndef VERSION
