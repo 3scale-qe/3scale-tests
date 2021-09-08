@@ -37,6 +37,29 @@ configuration points to some publicly available services. However it is
 **highly desirable** to deploy own instance(s) of suitable service and change
 configuration to use this (through `config/settings.local.yaml`
 
+### make tools
+
+Container image can be built with script that provisions necessary
+tools/services to openshift in tools project, `make tools` does the job. To
+have it functional, tools namespace has to exist and pull secret linked to
+relevant service accounts, e.g.:
+
+```bash
+oc create -f pull-secret.yaml -n tools
+oc secrets link default pull-secret --for=pull -n tools
+oc secrets link deployer pull-secret --for=pull -n tools
+```
+
+Pull secret should contain credentials to registries from which particular
+images of tools are got. It is typically:
+
+ * docker.io
+ * quay.io
+ * registry.redhat.io
+
+Provisioning script(s) isn't part of codebase and it can be added just when
+building the image!
+
 ### config/.secrets.yaml
 
 **BEWARE!** If you are not blessed person with access to encrypted
