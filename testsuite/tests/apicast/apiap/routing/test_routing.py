@@ -64,12 +64,20 @@ def client(staging_gateway, application):
     return application.api_client()
 
 
-def test(client, paths):
+@pytest_cases.parametrize("append_slash", [
+    pytest.param(True, id="2.10_legacy", marks=[pytest.mark.skipif("TESTED_VERSION >= Version('2.11')")]),
+    pytest.param(False, id="",
+                 marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7146"),
+                        pytest.mark.skipif("TESTED_VERSION < Version('2.11')")]),
+])
+def test(client, paths, append_slash):
     """
     Test that  for each path from paths, the request will be routed to correct backend.
     Each backend is connected to product via 'path' and has url that has suffix "/anything{i}"
         in order to know that it was routed to correct backend
-    :param application: application
+    In 2.10 an earlier the APIcast appended slash even if it wasn't present in the path,
+     see https://issues.redhat.com/browse/THREESCALE-7146 for more details
+    :param client: api client
     :param paths: array of used paths
     """
     for i, path in enumerate(paths):
@@ -77,4 +85,7 @@ def test(client, paths):
         assert response.status_code == 200, f"Path {path} was not mapped to any backend"
 
         echoed_request = EchoedRequest.create(response)
-        assert echoed_request.path == f"/anything/{i}/", f"Path {path} was routed incorrectly"
+        if append_slash:
+            assert echoed_request.path == f"/anything/{i}/", f"Path {path} was routed incorrectly"
+        else:
+            assert echoed_request.path == f"/anything/{i}", f"Path {path} was routed incorrectly"
