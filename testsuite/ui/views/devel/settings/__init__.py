@@ -13,7 +13,7 @@ class SettingsTabs(View, Navigable):
     invitations_tab = Text("//a[ends-with(@href, '/invitations')]")
     invoices_tab = Text("//a[@href='/admin/account/invoices']")
     stripe_cc_tab = Text("//a[@href='/admin/account/stripe']")
-    braintree_cc_tab = Text("//a[@href='/admin/account/braintree']")
+    braintree_cc_tab = Text("//a[@href='/admin/account/braintree_blue']")
 
     @step("InvoicesView")
     def invoices(self):
@@ -24,6 +24,11 @@ class SettingsTabs(View, Navigable):
     def stripe(self):
         """Stripe tab"""
         self.stripe_cc_tab.click()
+
+    @step("BraintreeCCView")
+    def braintree(self):
+        """Braintree tab"""
+        self.braintree_cc_tab.click()
 
     def prerequisite(self):
         return Navbar

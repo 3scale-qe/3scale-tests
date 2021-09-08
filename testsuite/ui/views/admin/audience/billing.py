@@ -7,7 +7,7 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class BillingView(BaseAudienceView):
-    """View representation of Accounts Listing page"""
+    """View representation of Earnings by Month page"""
     path_pattern = '/finance'
     table = AudienceTable("//*[@class='data']")
 
@@ -21,7 +21,7 @@ class BillingView(BaseAudienceView):
 
 class ChargingForm(View):
     """Charging form for 3scale billing"""
-    ROOT = '//form[@id="edit_finance_billing_strategy_1"]'
+    ROOT = '//form[contains(@id, "edit_finance_billing_strategy")]'
     charging = ThreescaleCheckBox('//input[@id="finance_billing_strategy_charging_enabled"]')
     save_btn = ThreescaleSubmitButton()
 
@@ -54,6 +54,7 @@ class GatewayForm(View):
         public_key = TextInput(id='account_payment_gateway_options_public_key')
         merchant_id = TextInput(id='account_payment_gateway_options_merchant_id')
         private_key = TextInput(id='account_payment_gateway_options_private_key')
+        three_ds = ThreescaleCheckBox('//input[@id="account_payment_braintree_blue_three_ds_enabled"]')
 
     @property
     def is_displayed(self):
@@ -68,8 +69,9 @@ class BillingSettingsView(BaseAudienceView):
 
     def charging(self, enable: bool):
         """Enable/disable charging"""
-        self.charging_form.charging.check(enable)
-        self.charging_form.save_btn.click()
+        if enable != self.charging_form.charging.is_checked():
+            self.charging_form.charging.check(enable)
+            self.charging_form.save_btn.click()
 
     def stripe(self, secret_key: str, pub_key: str, webhook: str):
         """Set up Stripe as billing gateway if not already enabled"""
@@ -81,19 +83,28 @@ class BillingSettingsView(BaseAudienceView):
             'publishable_key': pub_key,
             'webhook': webhook,
         })
-        self.gateway_form.save_btn.click()
+        self.save_changes()
 
-    def braintree(self, pub_key: str, merch_id: str, private_key: str):
-        """Set up Braintree as billing gateway if not already enabled"""
-        if self.gateway_form.gateway.all_selected_values[0] == 'braintree_blue':
-            return
+    def braintree(self, pub_key: str, merch_id: str, private_key: str, three_ds: bool):
+        """
+        Set up Braintree as billing gateway if not already enabled.
+        Method also ensures if 3D Secure is correctly selected.
+        """
         self.gateway_form.gateway.select_by_value('braintree_blue')
         self.gateway_form.options.fill({
             'public_key': pub_key,
             'merchant_id': merch_id,
             'private_key': private_key,
         })
-        self.gateway_form.save_btn.click()
+        self.gateway_form.options.three_ds.check(three_ds)
+        self.save_changes()
+
+    def save_changes(self):
+        """Save changes for billing settings View"""
+        self.browser.click(self.gateway_form.save_btn, ignore_ajax=True)
+        if self.browser.alert_present:
+            self.browser.get_alert().accept()
+            self.browser.get_alert().accept()
 
     def prerequisite(self):
         return BaseAudienceView
