@@ -13,16 +13,23 @@ class MailhogClient:
     """Wrapper for the mailhog API"""
 
     def __init__(self, openshift: 'OpenShiftClient',
-                 mailhog_service_name: str = "mailhog"):
+                 mailhog_service_name: str = "mailhog", fallback=None):
         """Initializes the client, the mailhog app has to be running in the
             same openshift as 3scale, and has to be named 'mailhog'"""
+        # mailhog is first searched in 3scale namespace, if that fails
+        # tools is second choice, this is intentional order, tests assume
+        # exclusive mailhog instance, therefore a 'private' instance is always
+        # first choice
         try:
             mailhog_routes = openshift.routes.for_service(mailhog_service_name)
             assert len(mailhog_routes) > 0, "Mailhog is misconfigured or missing"
             self._url = \
                 "http://" + mailhog_routes[0]["spec"]["host"]
         except OpenShiftPythonException:
-            warn_and_skip("Can't find mailhog, skipping mailhog related tests")
+            if fallback:
+                self._url = fallback
+            else:
+                warn_and_skip("Can't find mailhog, skipping mailhog related tests")
 
     @property
     def url(self) -> str:
