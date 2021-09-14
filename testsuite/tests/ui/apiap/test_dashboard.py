@@ -61,4 +61,4 @@ def test_3scale_version_in_ui(login, navigator):
     """
     dashboard = navigator.open(DashboardView)
     assert dashboard.threescale_version.is_displayed
-    assert dashboard.threescale_version.text == f'Version {TESTED_VERSION} -'
+    assert dashboard.threescale_version.text == f'Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -'
