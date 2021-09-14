@@ -8,17 +8,10 @@ from testsuite.ui.views.admin.settings.tokens import Scopes, TokenNewView
 from testsuite.utils import blame
 
 
-@pytest.fixture(scope="module",
-                params=[pytest.param((False, 403), id='Read Only'), pytest.param((True, 201), id='Read and Write')])
-def permission(request):
-    """Permission of token"""
-    return request.param
-
-
 @pytest.fixture(scope="module")
 def token(custom_admin_login, navigator, request, threescale, permission):
     """
-    Create token with scope set to 'Billing' and permission 'Read Only'
+    Create token with scope set to 'Billing'
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
@@ -30,7 +23,6 @@ def token(custom_admin_login, navigator, request, threescale, permission):
         threescale.access_tokens.delete(token.entity_id)
 
     request.addfinalizer(_delete)
-
     return token
 
 
@@ -84,3 +76,21 @@ def test_create_invoice_line_item(invoice, token, api_client, request, permissio
     params = {"invoice_id": invoice.entity_id, "name": name, "description": "description", "quantity": '1', "cost": 1}
     response = api_client("POST", f"/api/invoices/{invoice.entity_id}/line_items", token, json=params)
     assert response.status_code == permission[1]
+
+
+def test_get_registry_policies_list(token, api_client):
+    """
+    Request to get list of registry policies should have status code 403
+    """
+
+    response = api_client("GET", "/admin/api/registry/policies", token)
+    assert response.status_code == 403
+
+
+def test_create_registry_policy(token, api_client, schema):
+    """
+    Request to create policy registry should have status code 403
+    """
+    params = {"name": "policy_registry", "version": "0.1", "schema": schema}
+    response = api_client("POST", "/admin/api/registry/policies", token, json=params)
+    assert response.status_code == 403

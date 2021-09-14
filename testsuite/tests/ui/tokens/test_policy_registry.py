@@ -1,7 +1,5 @@
 """
-Rewrite of :
-    spec/ui_specs/tokens/analytics_write_spec.rb
-    spec/ui_specs/tokens/analytics_read_spec.rb
+Tests for policy registry token permissions
 """
 
 import pytest
@@ -10,15 +8,15 @@ from testsuite.ui.views.admin.settings.tokens import Scopes, TokenNewView
 from testsuite.utils import blame
 
 
-@pytest.fixture(scope="module", params=[pytest.param(False, id='Read Only'), pytest.param(True, id='Read and Write')])
-def token(custom_admin_login, navigator, request, threescale):
+@pytest.fixture(scope="module")
+def token(custom_admin_login, navigator, request, threescale, permission):
     """
-    Create token with scope set to 'Analytics'
+    Create token with scope set to 'Policy Registry'
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
     name = blame(request, "token")
-    token = new.create(name, [Scopes.ANALYTICS.value], request.param)
+    token = new.create(name, [Scopes.POLICY.value], permission[0])
 
     def _delete():
         token = list(filter(lambda x: x["name"] == name, threescale.access_tokens.list()))[0]
@@ -51,12 +49,12 @@ def test_create_account_user(account, token, api_client, request):
 
 def test_get_service_top_applications(service, token, api_client):
     """
-    Request to get top applications should have status code 200
+    Request to get top applications should have status code 403
     """
 
     params = {"service_id": service.entity_id, "since": "2012-02-22 00:00:00", "period": "year", "metric_name": "hits"}
     response = api_client("GET", f"/stats/services/{service.entity_id}/top_applications", token, params)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 def test_get_invoice_list(account, token, api_client):
@@ -82,17 +80,19 @@ def test_create_invoice_line_item(invoice, token, api_client, request):
 
 def test_get_registry_policies_list(token, api_client):
     """
-    Request to get list of registry policies should have status code 403
+    Request to get list of registry policies should have status code 200
     """
 
     response = api_client("GET", "/admin/api/registry/policies", token)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
-def test_create_registry_policy(token, api_client, schema):
+def test_create_registry_policy(threescale, token, api_client, schema, permission):
     """
-    Request to create policy registry should have status code 403
+    Request to create policy registry should have status code 403 (201 for write permission)
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
-    assert response.status_code == 403
+    assert response.status_code == permission[1]
+    if response.status_code == 201:
+        threescale.policy_registry.delete("policy_registry-0.1")
