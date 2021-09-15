@@ -2,7 +2,7 @@
 
 from selenium import webdriver
 from msedge.selenium_tools import EdgeOptions
-from msedge.selenium_tools.remote_connection import EdgeRemoteConnection
+from msedge.selenium_tools.remote_connection import RemoteConnection, EdgeRemoteConnection
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 from testsuite.ui.exception import WebDriverError
@@ -149,10 +149,10 @@ class SeleniumDriver:
         """
         if self.driver == 'chrome':
             browser_options = webdriver.ChromeOptions()
-            command_executor = self.remote_url + '/wd/hub'
+            command_executor = RemoteConnection(self.remote_url + '/wd/hub', resolve_ip=False)
         elif self.driver == 'firefox':
             browser_options = webdriver.FirefoxOptions()
-            command_executor = self.remote_url + '/wd/hub'
+            command_executor = RemoteConnection(self.remote_url + '/wd/hub', resolve_ip=False)
         elif self.driver == 'edge':
             browser_options = EdgeOptions()
             browser_options.use_chromium = True
