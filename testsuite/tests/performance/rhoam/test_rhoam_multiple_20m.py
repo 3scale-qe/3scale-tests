@@ -4,10 +4,10 @@
 import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
+from urllib.parse import urlparse
 
 import backoff
 import pytest
-from urllib.parse import urlparse
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
@@ -100,7 +100,8 @@ def template(root_path):
 def setup_benchmark(hyperfoil_utils, rhsso_service_info, applications, shared_template, promoted_services):
     """Setup of benchmark. It will add necessary host connections, csv data and files."""
     hyperfoil_utils.add_hosts(promoted_services, shared_connections=1000)
-    hyperfoil_utils.add_host(urlparse(rhsso_service_info.rhsso.server_url)._replace(path="").geturl(), shared_connections=500)
+    hyperfoil_utils.add_host(
+        urlparse(rhsso_service_info.rhsso.server_url)._replace(path="").geturl(), shared_connections=500)
     hyperfoil_utils.add_oidc_auth(rhsso_service_info, applications, 'auth_oidc.csv')
     hyperfoil_utils.generate_random_files(PAYLOAD_FILES)
     hyperfoil_utils.add_shared_template(shared_template)

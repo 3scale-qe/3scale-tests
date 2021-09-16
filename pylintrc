@@ -141,6 +141,7 @@ disable=print-statement,
         comprehension-escape,
         duplicate-code,  # reports false alarms AND can't be disabled locally; pylint issue #214
         fixme,  # ignore TODOs
+	consider-using-f-string,  # % string operator is absolutely fine
         redefined-outer-name
 
 # Enable the message, report, category or checker with the given id(s). You can
