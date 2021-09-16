@@ -5,10 +5,10 @@
     This test shows usage how to write test where access token is created by performance test.
 """
 import os
+from urllib.parse import urlparse
 
 import backoff
 import pytest
-from urllib.parse import urlparse
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
@@ -51,7 +51,8 @@ def template(root_path):
 def setup_benchmark(hyperfoil_utils, promoted_services, applications, rhsso_service_info, shared_template):
     """Setup of benchmark. It will add necessary host connections, csv data and files."""
     hyperfoil_utils.add_hosts(promoted_services, shared_connections=1000)
-    hyperfoil_utils.add_host(urlparse(rhsso_service_info.rhsso.server_url)._replace(path="").geturl(), shared_connections=500)
+    hyperfoil_utils.add_host(
+        urlparse(rhsso_service_info.rhsso.server_url)._replace(path="").geturl(), shared_connections=500)
     hyperfoil_utils.add_token_creation_data(rhsso_service_info, applications, 'rhsso_auth.csv')
     hyperfoil_utils.generate_random_files(PAYLOAD_FILES)
     hyperfoil_utils.add_shared_template(shared_template)
