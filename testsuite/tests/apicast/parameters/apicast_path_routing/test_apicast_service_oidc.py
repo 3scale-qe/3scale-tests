@@ -4,6 +4,7 @@ Test for using OIDC with apicast env_variable 'APICAST_SERVICES_FILTER_BY_URL' a
 import pytest
 
 from testsuite import rawobj
+from testsuite.utils import blame
 from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.capabilities import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
@@ -13,12 +14,18 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Cap
 
 
 @pytest.fixture(scope="module")
-def production_gateway(request, configuration, settings_block, gateway_environment, route_name):
+def production_route(request):
+    """Have different route name for production gateway"""
+    return blame(request, "path-routing")
+
+
+@pytest.fixture(scope="module")
+def production_gateway(request, configuration, settings_block, gateway_environment, production_route):
     """Deploy template apicast production gateway."""
     options = TemplateApicastOptions(staging=False, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
     gateway.create()
-    gateway.add_route(route_name)
+    gateway.add_route(production_route)
 
     if len(gateway_environment) > 0:
         gateway.environ.set_many(gateway_environment)
@@ -35,9 +42,9 @@ def endpoint():
 
 
 @pytest.fixture(scope="module")
-def prod_endpoint(production_gateway, route_name):
+def prod_endpoint(production_gateway, production_route):
     """Returns gateway endpoint."""
-    return production_gateway.endpoint % route_name
+    return production_gateway.endpoint % production_route
 
 
 @pytest.fixture(scope="module", autouse=True)
