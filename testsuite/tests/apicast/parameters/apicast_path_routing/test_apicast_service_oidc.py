@@ -17,13 +17,12 @@ def production_gateway(request, configuration, settings_block, gateway_environme
     """Deploy template apicast production gateway."""
     options = TemplateApicastOptions(staging=False, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
+    request.addfinalizer(gateway.destroy)
     gateway.create()
     gateway.add_route(route_name)
 
     if len(gateway_environment) > 0:
         gateway.environ.set_many(gateway_environment)
-
-    request.addfinalizer(gateway.destroy)
 
     return gateway
 
