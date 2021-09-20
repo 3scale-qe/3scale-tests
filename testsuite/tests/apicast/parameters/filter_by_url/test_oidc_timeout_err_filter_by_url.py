@@ -59,11 +59,11 @@ def production_gateway(request, configuration):
     }
     options = TemplateApicastOptions(staging=False, settings_block=settings_block, configuration=configuration)
     gateway = TemplateApicast(requirements=options)
+    request.addfinalizer(gateway.destroy)
     gateway.create()
 
     gateway.environ["APICAST_SERVICES_FILTER_BY_URL"] = ".*.doesnt.exist"
 
-    request.addfinalizer(gateway.destroy)
     return gateway
 
 

@@ -84,15 +84,15 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
             "CA_CERTIFICATE": upstream_authority.certificate,
         }
 
-        def _delete():
-            staging_gateway.openshift.delete_app(name, "all")
-        request.addfinalizer(_delete)
+        request.addfinalizer(
+            lambda: staging_gateway.openshift.delete_template(path, parameters))
 
         staging_gateway.openshift.new_app(path, parameters)
         # pylint: disable=protected-access
         staging_gateway.openshift._wait_for_deployment(name)
 
         if tls_route_type is not None:
+            request.addfinalizer(lambda: openshift.delete("route", name))
             openshift.routes.create(name, tls_route_type, service=name)
             routes = openshift.routes[name]
             return f"https://{routes['spec']['host']}:443"

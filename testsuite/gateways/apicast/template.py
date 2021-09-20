@@ -112,7 +112,7 @@ class TemplateApicast(SelfManagedApicast):
         identifier = name or url_fragment
         url = urlparse(self.endpoint % url_fragment)
         if url.scheme == "https":
-            self.openshift.routes.create(name, self.route_type,
+            self.openshift.routes.create(identifier, self.route_type,
                                          service=self.service_name, hostname=url.hostname)
         elif url.scheme == "http":
             self.openshift.routes.expose(name=identifier,
