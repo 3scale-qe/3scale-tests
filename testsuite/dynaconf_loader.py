@@ -85,6 +85,17 @@ def _docker_image(ocp, name):
     return [i for i in lookup if i.get("from", {}).get("kind") == "DockerImage"][-1]
 
 
+def _rhsso_password(server_url, token):
+    """Search for SSO admin password"""
+    try:
+        # was it deployed as part of tools?
+        tools = OpenShiftClient(
+            project_name="tools", server_url=server_url, token=token)
+        return tools.environ("sso")["SSO_ADMIN_PASSWORD"]
+    except (OpenShiftPythonException, KeyError):
+        return None
+
+
 # pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
     """Reads and loads in to "settings" a single key or all keys from vault
@@ -166,6 +177,9 @@ def load(obj, env=None, silent=None, key=None):
                     "username": ocp.secrets["backend-internal-api"]["username"],
                     "password": ocp.secrets["backend-internal-api"]["password"]
                 }
+            },
+            "rhsso": {
+                "password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))
             }}
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated

@@ -18,6 +18,7 @@ default:
         staging_deployment: apicast-staging
         production_deployment: apicast-production
   rhsso:
+    username: admin
     test_user:
       username: testUser
       password: testUser
