@@ -23,7 +23,10 @@ def gateway_capabilities():
     return staging
 
 
-CapabilityRegistry().register_provider(gateway_capabilities)
+CapabilityRegistry().register_provider(gateway_capabilities,
+                                       {Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY, Capability.APICAST,
+                                        Capability.CUSTOM_ENVIRONMENT, Capability.JAEGER, Capability.SAME_CLUSTER,
+                                        Capability.SERVICE_MESH, Capability.LOGS})
 
 
 def ocp_version():
@@ -36,7 +39,7 @@ def ocp_version():
     return {Capability.OCP3}
 
 
-CapabilityRegistry().register_provider(ocp_version)
+CapabilityRegistry().register_provider(ocp_version, {Capability.OCP3, Capability.OCP4})
 
 
 def scaling():
@@ -46,4 +49,4 @@ def scaling():
     return {Capability.SCALING} if not _rhoam() else {}
 
 
-CapabilityRegistry().register_provider(scaling)
+CapabilityRegistry().register_provider(scaling, {Capability.SCALING})

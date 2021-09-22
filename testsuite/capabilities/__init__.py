@@ -6,7 +6,7 @@ In tests you can use it with pytest.mark.require_capabilities(capability1, capab
 Capabilities are provider by a functions annotated with @capability_provider and should return Set of capabilities
 """
 import enum
-from typing import Set, Callable, Any
+from typing import Set, Callable, Any, Tuple, List
 
 # Users should have access only to these public methods/decorators
 __all__ = ["CapabilityRegistry", "Capability"]
@@ -37,24 +37,39 @@ class Singleton(type):
         return cls._instance
 
 
+Provider = Callable[[], Set[Any]]
+
+
 class CapabilityRegistry(metaclass=Singleton):
     """Registry for all the capabilities testsuite has"""
     def __init__(self) -> None:
         super().__init__()
-        self.providers: Set[Callable[[], Set[Any]]] = set()
-        self._capabilities = None
+        self.providers: List[Tuple[Set[Any], Provider]] = []
+        self.discovered: Set[Any] = set()
+        self.capabilities: Set[Any] = set()
 
-    @property
-    def capabilities(self):
-        """Returns all capabilites"""
-        if self._capabilities is None:
-            sets = [provider() for provider in self.providers]
-            self._capabilities = set().union(*sets)
-        return self._capabilities
-
-    def register_provider(self, provider: Callable[[], Set[Any]]):
+    def register_provider(self, provider: Provider, provides: Set[Any]):
         """Register new capability provider"""
-        self.providers.add(provider)
+        self.providers.append((provides, provider))
+
+    def _find_provider(self, capability):
+        """
+        Returns provider and all capabilities it can provide based on the capability requested
+        Runs in O(n) due to discrepancy between discovered capabilities (=those whose providers have been run)
+        and actual capabilities (=those that are present). Still faster than if all providers were run at all times.
+        """
+        for capabilities, provider in self.providers:
+            if capability in capabilities:
+                return capabilities, provider
+        return None
 
     def __contains__(self, item):
+        if item not in self.discovered:
+            capabilities, provider = self._find_provider(item)
+            if provider is None:
+                # Capability is unknown and not provided by anyone
+                return False
+            new_capabilities = provider()
+            self.discovered.update(capabilities)
+            self.capabilities.update(new_capabilities)
         return item in self.capabilities
