@@ -85,7 +85,7 @@ def realm_role(rhsso_service_info, create_users):
         admin = rhsso_service_info.realm.admin
         admin.create_realm_role({"name": role_name})
         role = admin.get_realm_role(role_name)
-        admin.assign_realm_roles(user_with_role["id"], "", role)
+        admin.assign_realm_roles(user_with_role["id"], role)
         return role_name
 
     return _realm_role
