@@ -12,7 +12,7 @@ class ProductBackendsView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/backend_usages"
     add_backend_button = Text("//*[contains(@href,'/backend_usages/new')]")
     backend_table = PatternflyTable("//*[@id='backend_api_configs']", column_widgets={
-        "Add Backend": GenericLocatorWidget("./a[contains(@class, 'delete')]")})
+        3: GenericLocatorWidget("./a[contains(@class, 'delete')]")})
 
     @step("ProductAddBackendView")
     def add_backend(self):
