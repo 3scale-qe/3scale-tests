@@ -53,7 +53,7 @@ def invalid_upstream_hostname():
         pytest.param(("valid_authority", "valid_upstream_hostname", 200), id="Matching authority"),
         pytest.param(("invalid_authority", "valid_upstream_hostname", 502), id="Mismatched authority"),
         pytest.param((None, "valid_upstream_hostname", 502), id="No provided authority",
-                     marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7508")]),
+                     marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7508")]),
         pytest.param(("valid_authority", "invalid_upstream_hostname", 502), id="Invalid upstream hostname",
                      marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-768")]),
 ])
