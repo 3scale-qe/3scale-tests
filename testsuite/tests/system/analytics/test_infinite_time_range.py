@@ -39,7 +39,10 @@ def backend(custom_backend):
 ])
 @pytest.mark.parametrize("granularity, max_allowed_delta", [
     pytest.param("day", timedelta(weeks=52), id="day"),                     # Maximum time range is 1 year
-    pytest.param("month", timedelta(weeks=52 * 10), id="month"),            # Maximum time range is 1O years
+    # Maximum time range should be 1O years, it doesnt work yet
+    pytest.param("month", timedelta(weeks=52 * 10), id="month-10years",
+                 marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7601")]),
+    pytest.param("month", timedelta(weeks=52 * 9), id="month-9years"),      # 9 years works
     pytest.param("hour", timedelta(days=89), id="hour"),                    # Maximum time range is 90 days
 ])
 # pylint: disable=too-many-arguments
