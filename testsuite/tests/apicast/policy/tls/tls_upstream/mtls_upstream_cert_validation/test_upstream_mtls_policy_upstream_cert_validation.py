@@ -54,10 +54,9 @@ def invalid_upstream_hostname():
         pytest.param(("invalid_authority", "valid_upstream_hostname", 502), id="Mismatched authority"),
         pytest.param((None, "valid_upstream_hostname", 502), id="No provided authority",
                      marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7508")]),
-        pytest.param(("valid_authority", "invalid_upstream_hostname", 502), id="Invalid upstream hostname",
-                     marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-768")]),
+        pytest.param((None, "valid_upstream_hostname", 200), id="No provided authority"),
 ])
-def apicast_auth_httpbin_host_expected_code(request):
+def apicast_authority_httpbin_host_and_code_policy_settings(request):
     """
     Returns authority for setting the ca_certificates in the policy settings at APIcast,
     hostname used by the upstream certificate and the expected return code.
@@ -67,20 +66,20 @@ def apicast_auth_httpbin_host_expected_code(request):
 
 
 @pytest.fixture(scope="module")
-def apicast_authority(apicast_auth_httpbin_host_expected_code):
+def apicast_authority(apicast_authority_httpbin_host_and_code_policy_settings):
     """
     Authority of the upstream API used to validate certificates sent from APIcast
     """
-    authority, _, _ = apicast_auth_httpbin_host_expected_code
+    authority, _, _ = apicast_authority_httpbin_host_and_code_policy_settings
     return authority
 
 
 @pytest.fixture(scope="module")
-def upstream_cert_hostname(apicast_auth_httpbin_host_expected_code):
+def upstream_cert_hostname(apicast_authority_httpbin_host_and_code_policy_settings):
     """
     Hostname of the certificate used by upstream
     """
-    _, upstream_cert_hostname, _ = apicast_auth_httpbin_host_expected_code
+    _, upstream_cert_hostname, _ = apicast_authority_httpbin_host_and_code_policy_settings
     return upstream_cert_hostname
 
 
@@ -113,11 +112,11 @@ def httpbin(custom_httpbin, request):
     return custom_httpbin(blame(request, "httpbin-mtls"), Routes.Types.PASSTHROUGH)
 
 
-def test_mtls_upstream_cert_validation(api_client, apicast_auth_httpbin_host_expected_code):
+def test_mtls_upstream_cert_validation(api_client, apicast_authority_httpbin_host_and_code_policy_settings):
     """
     Test that APIcast correctly validates the certificate sent by the upstream
     """
-    _, _, expected_response_code = apicast_auth_httpbin_host_expected_code
+    _, _, expected_response_code = apicast_authority_httpbin_host_and_code_policy_settings
     response = api_client().get("/get")
 
     assert response.status_code == expected_response_code
