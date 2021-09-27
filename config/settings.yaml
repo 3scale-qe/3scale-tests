@@ -37,7 +37,6 @@ default:
   fixtures:
     tools:
       namespace: tools
-      sources: ["OpenshiftProject", "Settings"]
     lifecycle_hooks:
       defaults: [staging_gateway, production_gateway]
     jaeger:

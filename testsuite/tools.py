@@ -71,3 +71,16 @@ class Settings:
         if name == "no-ssl-sso":
             return settings["rhsso"]["url"]
         return settings["threescale"]["service"]["backends"][name]
+
+
+class Rhoam(OpenshiftProject):
+    """Read SSO from rhoam specific location"""
+
+    def __init__(self):
+        super().__init__("redhat-rhoam-user-sso")
+
+    def __getitem__(self, name):
+        if name != "no-ssl-sso":
+            raise KeyError(name)
+        # rhoam doesn't have http:// sso route
+        return super().__getitem__("keycloak+ssl")
