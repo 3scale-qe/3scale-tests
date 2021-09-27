@@ -27,7 +27,7 @@ class PrometheusClient:
             :param target: target.
         """
         params = {
-            "match_target": "{job='%s'}" % target,
+            "match_target": "{container='%s'}" % target,
         }
         response = requests.get(f"{self.endpoint}/api/v1/targets/metadata", params=params)
         response.raise_for_status()

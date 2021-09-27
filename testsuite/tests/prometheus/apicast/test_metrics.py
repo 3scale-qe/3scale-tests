@@ -40,8 +40,8 @@ def warmup_prod_gateway(client):
 
 
 # pylint: disable=unused-argument
-@pytest.fixture(scope="module", params=["3scale Apicast Staging", "3scale Apicast Production"])
-def metrics(request, warmup_prod_gateway, prometheus):
+@pytest.fixture(scope="module", params=["apicast-staging", "apicast-production"])
+def metrics(request, client, warmup_prod_gateway, prometheus):
     """Return all metrics from target defined of staging and also production apicast."""
     metrics = prometheus.get_metrics(request.param)
     return [m["metric"] for m in metrics["data"]]

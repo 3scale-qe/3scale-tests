@@ -7,6 +7,7 @@ import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite.prometheus import PROMETHEUS_REFRESH
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
@@ -47,13 +48,13 @@ def prod_client(prod_client):
 def api_client(api_client):
     """Apicast needs to load configuration in order to cache incoming requests"""
     client = api_client()
-    client.get("/anything")
+    assert client.get("/anything").status_code == 200
     return client
 
 
 @pytest.mark.disruptive
-@pytest.mark.parametrize(("client", "apicast"), [("api_client", "3scale Apicast Staging"),
-                                                 ("prod_client", "3scale Apicast Production")
+@pytest.mark.parametrize(("client", "apicast"), [("api_client", "apicast-staging"),
+                                                 ("prod_client", "apicast-production")
                                                  ],
                          ids=["Staging Apicast", "Production Apicast"])
 def test_content_caching(request, prometheus, client, apicast):
@@ -71,8 +72,8 @@ def test_content_caching(request, prometheus, client, apicast):
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 
-    # prometheus is downloading this metrics each 5 seconds, we need to wait
-    time.sleep(10)
+    # prometheus is downloading metrics periodicity, we need to wait for next fetch
+    time.sleep(PROMETHEUS_REFRESH)
 
     metrics = prometheus.get_metrics(apicast)
     metrics = [m["metric"] for m in metrics["data"]]
@@ -91,7 +92,7 @@ def extract_caching(prometheus, query, apicast):
     metric_response_codes = prometheus.get_metric(query)
     key_value_map = {'EXPIRED': 0, 'HIT': 0, 'MISS': 0}
     for response_code_metric in metric_response_codes:
-        if apicast != response_code_metric['metric']['job']:
+        if apicast != response_code_metric['metric']['container']:
             continue
 
         key_value_map[response_code_metric['metric']['status']] \
