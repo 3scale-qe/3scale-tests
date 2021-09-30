@@ -34,3 +34,40 @@ def invoice(threescale, account):
     yield invoice
 
     invoice.state_update(InvoiceState.CANCELLED)
+
+
+@pytest.fixture(scope="module",
+                params=[pytest.param((False, 403), id='Read Only'), pytest.param((True, 201), id='Read and Write')])
+def permission(request):
+    """Permission of token"""
+    return request.param
+
+
+@pytest.fixture
+def schema():
+    """
+    :return: Schema of custom policy
+    """
+    return {
+        "$schema": "http://apicast.io/policy-v1/schema#manifest#",
+        "name": "APIcast Example Policy",
+        "summary": "This is just an example.",
+        "description": "This policy is just an example how to write your custom policy.",
+        "version": "0.1",
+        "configuration": {
+            "type": "object",
+            "properties": {
+                "property1": {
+                    "type": "array",
+                    "description": "list of properties1",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "value1": {"type": "string", "description": "Value1"},
+                            "value2": {"type": "string", "description": "Value2"}
+                        },
+                        "required": ["value1"]
+                    }
+                }
+            }
+        }}
