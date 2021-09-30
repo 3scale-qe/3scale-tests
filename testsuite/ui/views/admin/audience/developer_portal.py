@@ -1,10 +1,10 @@
 """View representations of Developer Portal section pages"""
-from widgetastic.widget import GenericLocatorWidget, TextInput, Text
+from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput, Image
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton
+from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleSubmitButton, ThreescaleDeleteButton
 
 
 class DeveloperPortalContentView(BaseAudienceView):
@@ -20,6 +20,28 @@ class DeveloperPortalContentView(BaseAudienceView):
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.open_portal_to_world_btn.is_displayed and \
                self.path in self.browser.url
+
+
+class DeveloperPortalLogoView(BaseAudienceView):
+    """View representation of Developer Portal Logo edit page"""
+    path_pattern = '/p/admin/account/logo/edit'
+    file_input = FileInput(id="profile_logo")
+    upload_button = ThreescaleSubmitButton()
+    delete_logo_button = ThreescaleDeleteButton()
+    logo = Image('//*[@id="logo_container"]/img')
+
+    def upload_logo(self, file):
+        """Method choose logo and uploads it"""
+        self.file_input.fill(file)
+        self.upload_button.click()
+
+    def prerequisite(self):
+        return BaseAudienceView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.file_input.is_displayed and \
+               self.upload_button.is_displayed and self.path in self.browser.url
 
 
 class ActiveDocsView(BaseAudienceView):
