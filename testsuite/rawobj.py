@@ -199,3 +199,18 @@ def AccountUser(username: str, email: str, password: str) -> dict:
         "password": password}
 
     return obj
+
+
+def ApiDocParams(token: str, params: dict = None) -> dict:
+    """builder of params for endpoints in API Docs
+    Args:
+        :param token: access_token
+        :param params: dict of params defined in api endpoint
+    """
+    obj = {
+        "access_token": token
+    }
+    if params:
+        obj.update(params)
+
+    return obj
