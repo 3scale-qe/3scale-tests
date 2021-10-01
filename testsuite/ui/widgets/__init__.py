@@ -334,3 +334,18 @@ class ActiveDocV2Section(Widget):
     def get_response_code(self):
         """Return response code called by method try_it_out"""
         return self.browser.text(self.RESPONSE_CODE_LOCATOR, parent=self)
+
+
+class ThreescaleAnalyticsDropdown(GenericLocatorWidget):
+    """Specific Dropdown menu of 3scale analytics pages"""
+
+    def select(self, value):
+        """Select specific metric to be displayed"""
+        self.wait_displayed()
+        self.click()
+        self.browser.selenium.find_element_by_xpath(f"//*[text()='{value}']").click()
+
+    def text(self):
+        """Get text of metric"""
+        self.wait_displayed()
+        return self.browser.element(self.locator).text
