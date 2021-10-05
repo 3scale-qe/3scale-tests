@@ -3,6 +3,7 @@ import functools
 
 import backoff
 from keycloak import KeycloakOpenID
+from keycloak.exceptions import KeycloakGetError
 from threescale_api.auth import BaseClientAuth
 from threescale_api.resources import Service
 from threescale_api.utils import HttpClient
@@ -60,6 +61,7 @@ class RHSSOServiceConfiguration:
         secret = self.oidc_client.client_secret_key
         return url.replace("://", f"://{client_id}:{secret}@", 1)
 
+    @backoff.on_exception(backoff.fibo, KeycloakGetError, 8, jitter=None)
     def password_authorize(self, client_id, secret, username=None, password=None):
         """Returns token retrieved by password authentication"""
         username = username or self.username
