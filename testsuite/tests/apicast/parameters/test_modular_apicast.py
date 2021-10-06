@@ -4,6 +4,8 @@ substituted for the image of the deployed apicast and the custom policies
 are working as expected.
 """
 
+import backoff
+
 import pytest
 import importlib_resources as resources
 from testsuite import rawobj
@@ -91,14 +93,19 @@ def service(service, policy_settings):
     return service
 
 
-# likely requires policy to register first
-@pytest.mark.flaky
+# for some reason first requests do not seem to be modified, policy is applied later
+@backoff.on_predicate(backoff.fibo, lambda x: "X-Example-Policy-Response" not in x.headers, 8, jitter=None)
+def get(api_client, url):
+    """Resilient get to ensure apicast has time to initalize policy chain"""
+    return api_client.get(url)
+
+
 # pylint: disable=unused-argument
 def test_modular_apicast(build_images, api_client):
     """
     Sends a request.
     Asserts that the header added by the example policy is present.
     """
-    response = api_client().get("/")
+    response = get(api_client(), "/")
     assert response.status_code == 200
     assert 'X-Example-Policy-Response' in response.headers
