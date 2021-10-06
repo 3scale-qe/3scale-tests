@@ -3,7 +3,7 @@ Test for product metrics combined with routing policy.
 """
 import pytest
 
-from testsuite import rawobj
+from testsuite import rawobj, resilient
 
 
 pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
@@ -201,7 +201,9 @@ def test(request, backend_usages, application, client, setup, expect_ok, expect_
         response = client.get(path)
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
-        hits_after = hits(application, analytics)
+        hits_after = resilient.stats_service_usage(
+            application.threescale_client, application["service_id"], "hits", "total", hits_before+1)
+
         assert hits_before + 1 == hits_after, f"For path {path} expected hits to be increased by 1"
 
     for path in expect_not_found:

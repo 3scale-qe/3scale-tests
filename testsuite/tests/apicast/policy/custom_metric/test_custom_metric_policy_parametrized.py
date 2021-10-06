@@ -10,7 +10,7 @@ from pytest_cases import parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, resilient, TESTED_VERSION # noqa # pylint: disable=unused-import
 
 
 pytestmark = [
@@ -93,8 +93,10 @@ def test_custom_policy(application, threescale, config, client):
         assert response.status_code == status_code
 
         hits_after = []
-        for metric in metrics:
-            hits_after.append(analytics.list_by_service(application["service_id"], metric_name=metric)["total"])
+        for i, metric in enumerate(metrics):
+            threshold = hits_before[i] + increments[i]
+            hits_after.append(
+                resilient.stats_service_usage(threescale, application["service_id"], metric, "total", threshold))
 
         for i, increment in enumerate(increments):
             assert hits_after[i] - hits_before[i] == increment
