@@ -1,11 +1,18 @@
 """
 Tests that services with istio integration are automatically promoted to production instead of sandbox
 """
+import backoff
 import pytest
 
 pytestmark = [pytest.mark.required_capabilities(),
               pytest.mark.smoke,
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7424")]
+
+
+@backoff.on_predicate(backoff.fibo, lambda configs: len(configs) > 0, 8, jitter=None)
+def fetch_production_configuration(service):
+    """Safely fetches production configuration from 3scale"""
+    return service.proxy.list().configs.list(env="production")
 
 
 @pytest.fixture(scope="module")
@@ -23,4 +30,4 @@ def service2(backends_mapping, custom_service, service_settings):
 
 def test_promote_istio_service(service2):
     """Tests that service has production configuration after config promotion"""
-    assert len(service2.proxy.list().configs.list(env="production")) > 0
+    assert len(fetch_production_configuration(service2)) > 0
