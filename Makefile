@@ -8,6 +8,10 @@ TB ?= short
 LOGLEVEL ?= INFO
 resultsdir ?= .
 
+PIPENV_VERBOSITY ?= -1
+PIPENV_VENV_IN_PROJECT ?= 1
+PIPENV_IGNORE_VIRTUALENVS ?= 1
+
 ifdef junit
 flags += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
 endif
