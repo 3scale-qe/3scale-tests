@@ -103,7 +103,7 @@ which can be passed to View and make tweaks
     param: `url=None` can override default url which will be used
 
 * `login` - Do basic login using `username` and `password` variable. If not provided 
-credentials from secret file will be used.
+credentials from secret file will be used. 
 
 * `custom_login` Do login with provided credentials.
 
@@ -113,8 +113,12 @@ credentials from secret file will be used.
     
     param: `finalizer_request=None` can override default finalizer which is invoked at the end of the
     fixture scope, if not set default scope (module) will be applied
-    
-    See example
+  
+######Notice :
+* UI tests which using login fixture need to add `#pylint: disable=unused-argument` (login is called by 
+fixture inicialization)
+  
+See example
     
  ```python
 def test_custom_login_example(navigator, custom_login, request):
