@@ -34,7 +34,7 @@ gateway:
     endpoints:
         sandbox: "http://%s-staging.localhost:8080"                 # Wildcard address for staging address for service
         production: "http://%s-production.localhost:8080"           # Wildcard address for production address for service
-    deployment:                                                     # DeploymentConfigs
+    deployments:                                                     # DeploymentConfigs
         staging: "selfmanaged-staging"
         production: "selfmanaged-production"
     project: "threescale"                                           # OpenShift project containing the apicasts
@@ -64,12 +64,12 @@ gateway:
     endpoints:
         sandbox: "http://%s-staging.localhost:8080"                 # Wildcard address for staging address for service
         production: "http://%s-production.localhost:8080"           # Wildcard address for production address for service
-    deployment:                                                     # Deployments names for the newly created apicasts
+    deployments:                                                     # Deployments names for the newly created apicasts
         staging: "apicast-staging"
         production: "apicast-production"
     project: "threescale"
     server: "server"                                
-    randomized: False                                               # True, if endpoints and deployments should be blamed 
+    randomize: False                                               # True, if endpoints and deployments should be blamed 
 ```
 ## Template APIcast
 *Description*: Self-managed APIcast deployed by testsuite from template.
@@ -90,7 +90,7 @@ gateway:
         production: "https://%s.localhost:8080"                                          # Optional: Wildcard address for production address for service
     apicast_configuration_url: "https://<admin access token>@<3scale admin URL>"         # Optional: Apicast config. URL
     service_routes: True                                                                 # Optional: If Apicats should create automatic route for each service
-    randomized: False                                                                    # True, if endpoints and deployments should be blamed 
+    randomize: False                                                                    # True, if endpoints and deployments should be blamed 
 ```
 ## TLS APIcast
 *Description*: Extension to Template APIcast, which sets up APIcast for TLS communication
@@ -110,7 +110,7 @@ gateway:
         production: "https://%s.localhost:8080"                                          # Optional: Wildcard address for production address for service
     apicast_configuration_url: "https://<admin access token>@<3scale admin URL>"         # Optional: Apicast config. URL
     service_routes: True                                                                 # Optional: If Apicats should create automatic route for each service
-    randomized: False                                                                    # True, if endpoints and deployments should be blamed 
+    randomize: False                                                                    # True, if endpoints and deployments should be blamed 
 ```
 
 ## Service Mesh gateway
