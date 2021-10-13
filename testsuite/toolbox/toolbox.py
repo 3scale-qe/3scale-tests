@@ -19,8 +19,8 @@ def get_toolbox_cmd(cmd_in):
         return f"3scale {cmd_in}"
     if settings['toolbox']['cmd'] == 'gem':
         return f"scl enable {settings['toolbox']['ruby_version']} '3scale {cmd_in}'"
-    if settings['toolbox']['cmd'] == 'podman':
-        ret = 'podman run --interactive --rm --privileged=true '
+    if settings['toolbox']['cmd'] == 'podman' or settings['toolbox']['cmd'] == 'docker':
+        ret = f"{settings['toolbox']['cmd']} run --interactive --rm --privileged=true "
         ret += f"--mount type=bind,src={settings['toolbox']['podman_cert_dir']},"
         ret += f"target={settings['toolbox']['podman_cert_dir']} "
         ret += f"-e SSL_CERT_FILE={settings['toolbox']['podman_cert_dir']}/"

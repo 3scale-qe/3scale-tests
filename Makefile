@@ -56,6 +56,9 @@ performance-smoke: pipenv
 ui: pipenv
 	$(PYTEST) --ui $(flags) testsuite/tests/ui
 
+toolbox: pipenv
+	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
+
 Pipfile.lock: Pipfile
 	pipenv lock
 
