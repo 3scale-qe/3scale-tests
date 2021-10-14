@@ -128,7 +128,7 @@ class HttpxClient:
             params=params,
             headers=headers,
             cookies=cookies,
-            allow_redirects=allow_redirects,
+            follow_redirects=allow_redirects,
             timeout=timeout)
 
         if response.status_code in self._status_forcelist:
