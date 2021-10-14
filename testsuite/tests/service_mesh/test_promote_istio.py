@@ -5,7 +5,6 @@ import backoff
 import pytest
 
 pytestmark = [pytest.mark.required_capabilities(),
-              pytest.mark.smoke,
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7424")]
 
 
