@@ -12,6 +12,6 @@ def check_availability(api_client, prod_client, prometheus):
 
     if not prometheus.has_metric(
             "apicast_status",
-            lambda: (api_client.get('/anything'), prod_client.get('/anything'))):
+            lambda: (api_client().get('/anything'), prod_client().get('/anything'))):
         warn_and_skip("The Prometheus is not configured to run this test. The collection"
                       " of basic metrics is not set up. The test has been skipped.")
