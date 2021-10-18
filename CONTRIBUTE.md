@@ -3,7 +3,7 @@
  - each test must have reasonable docstring (to reproduce action(s) manually)
  - test module docstring for highlevel description of purpose is highly desirable
  - [doc/examples.py] is collection of code snippets showing common actions
- - `./quality-check` or `make check` has to be used for lint analysis
+ - `./quality-check` or `make commit-acceptance` has to be used for lint analysis
 
 ## Merge Requests
  - Commit(s) for MR should be pushed to new branch within this project
