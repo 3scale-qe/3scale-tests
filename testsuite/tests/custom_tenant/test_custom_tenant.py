@@ -22,8 +22,9 @@ def threescale(custom_tenant, testconfig):
     return get_custom_client(url, access_token, verify)
 
 
-@backoff.on_predicate(backoff.constant, lambda x: not x.account_plans.exists() or
-                      len(x.account_plans.fetch()["plans"]) < 1, interval=5, max_time=60)
+@backoff.on_predicate(backoff.fibo,
+                      lambda x: not x.account_plans.exists() or len(x.account_plans.fetch()["plans"]) < 1,
+                      8, jitter=None)
 def get_custom_client(url, access_token, ssl_verify):
     """
     Given the credentials, returns a client for the custom tenant.
