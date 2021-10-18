@@ -423,7 +423,13 @@ def rhsso_service_info(request, testconfig, tools):
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
 
-    client = realm.create_client(name=blame(request, "client"), serviceAccountsEnabled=True, standardFlowEnabled=False)
+    client = realm.create_client(
+        name=blame(request, "client"),
+        serviceAccountsEnabled=True,
+        directAccessGrantsEnabled=False,
+        publicClient=False,
+        protocol="openid-connect",
+        standardFlowEnabled=False)
 
     username = cnf["test_user"]["username"]
     password = cnf["test_user"]["password"]
