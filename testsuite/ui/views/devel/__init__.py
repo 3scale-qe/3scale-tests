@@ -79,3 +79,27 @@ class AccessView(View):
         return self.access_code_label.is_displayed and \
                self.access_code_label.text == 'Access code' and \
                self.access_code_field.is_displayed
+
+
+class SignUpView(BaseDevelView):
+    """View for Sign Up into devel portal"""
+    path_pattern = "/signup"
+    organization = TextInput(id="account_org_name")
+    username = TextInput(id="account_user_username")
+    email = TextInput(id="account_user_email")
+    signup_button = GenericLocatorWidget("//input[@type='submit']")
+
+    def signup(self, org: str, username: str = None, email: str = None):
+        """Signup into devel portal"""
+        self.organization.wait_displayed()
+        self.organization.fill(org)
+        if username:
+            self.username.fill(username)
+        if email:
+            self.email.fill(email)
+        self.signup_button.click()
+
+    @property
+    def is_displayed(self):
+        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
+               self.organization.is_displayed and self.username.is_displayed and self.email.is_displayed

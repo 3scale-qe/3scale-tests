@@ -4,7 +4,9 @@ Rewrite of spec/ui_specs/oauth/provider_rhsso_spec.rb
 import pytest
 
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.views.admin.settings.sso_integrations import SSOIntegrationDetailView, RhssoView
+from testsuite.ui.views.admin.settings.sso_integrations import SSOIntegrationDetailView
+
+from testsuite.ui.views.auth import RhssoView
 
 
 # pylint: disable=unused-argument, too-many-arguments, too-many-locals
