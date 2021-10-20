@@ -56,7 +56,7 @@ class _Endpoint(ParametrizedView):
         """
         self.fill(params)
         self.submit_button.click()
-        return self.status_code_field.read()
+        return self.status_code()
 
     @classmethod
     def all(cls, browser):
