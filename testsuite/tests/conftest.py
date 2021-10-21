@@ -727,6 +727,7 @@ def _backend_delete(backend):
 
 
 @pytest.fixture(scope="module")
+# pylint: disable=too-many-arguments
 def custom_backend(threescale, request, testconfig, private_base_url):
     """
     Parametrized custom Backend
@@ -735,11 +736,15 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         :param endpoint: endpoint of backend
     """
 
-    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None, threescale_client=threescale):
+    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None, threescale_client=threescale,
+                        blame_name=True):
         if endpoint is None:
             endpoint = private_base_url()
 
-        params = {"name": blame(request, name, 10), "private_endpoint": endpoint}
+        if blame_name:
+            name = blame(request, name, 10)
+
+        params = {"name": name, "private_endpoint": endpoint}
 
         for hook in _select_hooks("before_backend", hooks):
             hook(params)
