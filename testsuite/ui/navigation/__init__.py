@@ -15,7 +15,7 @@ Design of this navigation is based on: https://github.com/RedHatQE/navmazing
 """
 import inspect
 from collections import deque
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Optional
 
 from widgetastic.widget import View
 
@@ -82,13 +82,18 @@ class Navigator:
         filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
         return cls(self.browser, **filtered_kwargs)
 
-    def open(self, cls: Type[CustomView], **kwargs) -> CustomView:
+    # pylint: disable=inconsistent-return-statements
+    def open(self, cls: Type[CustomView] = None, url: str = None, **kwargs) -> Optional[CustomView]:
         """
-        Directly opens desired View, by inserting its `path` in to browser
+        Directly opens desired View, by inserting its `path` in to browser or url
         Args:
             :param cls: Class of desired View
+            :param url: Custom host URL
             :return: Instance of the opened View
         """
+        if url:
+            self.browser.url = url
+            return None
         page = self.new_page(cls, **kwargs)
         self.browser.set_path(page.path)
         page.post_navigate(**kwargs)

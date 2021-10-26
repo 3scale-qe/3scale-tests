@@ -6,7 +6,7 @@ from widgetastic_patternfly4 import PatternflyTable, Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import ThreescaleDropdown
+from testsuite.ui.widgets import ThreescaleDropdown, ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleEditButton, ThreescaleDeleteButton
 
 
@@ -77,6 +77,7 @@ class SSOIntegrationDetailView(BaseSettingsView):
     """View representation of detail SSO Integrations page"""
     path_pattern = "/p/admin/account/authentication_providers/{integration_id}"
     test_flow_link = Text(".//*[normalize-space(.)='Test authentication flow now']")
+    test_flow_checkbox = ThreescaleCheckBox(locator="//input[@id='check']")
     callback_url = Text("//dl[2]//*[2]")
     callback_url_for_flow_test = Text("//dl[2]//*[4]")
     edit_button = ThreescaleEditButton()
