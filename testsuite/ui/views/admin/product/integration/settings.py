@@ -12,7 +12,13 @@ class ProductSettingsView(BaseProductView):
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
     deployment = DeploymentRadio('//*[@id="service_deployment_option_input"]')
+    authentication = DeploymentRadio('//*[@id="service_proxy_authentication_method_input"]')
+    client_id = TextInput(id="service_proxy_attributes_jwt_claim_with_client_id")
     update_button = ThreescaleUpdateButton()
+
+    def update_client_id(self, string):
+        """Update client_id"""
+        self.client_id.fill(string)
 
     def update_gateway(self, staging="", production=""):
         """Update gateway"""
@@ -20,6 +26,11 @@ class ProductSettingsView(BaseProductView):
             self.staging_url.fill(staging)
         if production:
             self.production_url.fill(production)
+        self.update_button.click()
+
+    def change_authentication(self, option):
+        """Change authentication"""
+        self.authentication.select([option])
         self.update_button.click()
 
     def change_deployment(self, option):
