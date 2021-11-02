@@ -29,7 +29,7 @@ class ServiceMeshRequirements(GatewayRequirements, ABC):
 class ServiceMeshGateway(AbstractGateway):
     """Gateway for Service mesh configured with 3scale through 3scale-istio-adapter"""
 
-    CAPABILITIES = [Capability.SERVICE_MESH]
+    CAPABILITIES = {Capability.SERVICE_MESH}
 
     def __init__(self, configuration: ServiceMeshRequirements):
         self.configuration = configuration
