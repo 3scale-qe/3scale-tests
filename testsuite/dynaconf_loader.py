@@ -88,12 +88,18 @@ def _docker_image(ocp, name):
 def _rhsso_password(server_url, token):
     """Search for SSO admin password"""
     try:
-        # was it deployed as part of tools?
+        # is this RHOAM?
         tools = OpenShiftClient(
-            project_name="tools", server_url=server_url, token=token)
-        return tools.environ("sso")["SSO_ADMIN_PASSWORD"]
+            project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
+        return tools.secrets["credential-rhssouser"]["ADMIN_PASSWORD"].decode("utf-8")
     except (OpenShiftPythonException, KeyError):
-        return None
+        try:
+            # was it deployed as part of tools?
+            tools = OpenShiftClient(
+                project_name="tools", server_url=server_url, token=token)
+            return tools.environ("sso")["SSO_ADMIN_PASSWORD"]
+        except (OpenShiftPythonException, KeyError):
+            return None
 
 
 # pylint: disable=unused-argument,too-many-locals
