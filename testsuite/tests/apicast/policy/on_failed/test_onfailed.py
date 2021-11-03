@@ -53,7 +53,7 @@ def test_on_failed_policy(application, status_code):
     Sends request to apicast and check that the returned code
     is the expected one as per `status_code`
     """
-    api_client = application.api_client()
+    api_client = application.api_client(disable_retry_status_list=(503,))
 
     response = api_client.get("/")
     assert response.status_code == status_code

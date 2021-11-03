@@ -93,7 +93,7 @@ def test_on_failed(build_images, application, return_code):
     to on_failed policy configuration.
     build_images is requested but not used to trigger the build of the image with the custom policy
     """
-    api_client = application.api_client()
+    api_client = application.api_client(disable_retry_status_list=(503,))
 
     response = api_client.get("/")
     assert response.status_code == return_code
