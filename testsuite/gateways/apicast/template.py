@@ -4,7 +4,6 @@ import os
 
 import importlib_resources as resources
 
-from testsuite import utils
 from testsuite.openshift.objects import SecretTypes
 from testsuite.openshift.client import OpenShiftClient
 from .selfmanaged import SelfManagedApicast
@@ -16,9 +15,9 @@ class TemplateApicast(SelfManagedApicast):
     """Template-based APIcast Gateway."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging, openshift: OpenShiftClient, template, name, image,
-                 portal_endpoint, path_routing=False, randomize=False):
-        super().__init__(staging, openshift, f"{name}-stage" if staging else name, randomize, path_routing)
+    def __init__(self, staging: bool, openshift: OpenShiftClient, template, name, image,
+                 portal_endpoint, generate_name=False, path_routing=False):
+        super().__init__(staging, openshift, name, generate_name, path_routing)
         self._image = image
         self._portal_endpoint = portal_endpoint
 

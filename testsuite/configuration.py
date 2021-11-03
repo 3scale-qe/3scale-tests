@@ -70,6 +70,7 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, Certifica
                                server_url=server.get("server_url", None),
                                token=server.get("token", None))
 
+
 def call(method, **kwargs):
     """Calls method with only parameters it requires"""
     expected = inspect.signature(method).parameters.keys()

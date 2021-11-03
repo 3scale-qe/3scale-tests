@@ -44,7 +44,7 @@ gateway:
      token: "abcdef"                     # Optional: token for that Openshift server
      kind: "OpenShiftClient"
    name: "gateway-test"                  # Name for the APIcast resource
-   randomize: true                       # True, if the name should have random suffix
+   generate_name: true                   # True, if the name should have a random suffix
    kind: "OperatorApicast"
 ```
 ## Template APIcast
@@ -61,7 +61,7 @@ gateway:
      token: "abcdef"                     # Optional: token for that Openshift server
      kind: "OpenShiftClient"
    name: "gateway-test"                  # Name for the APIcast resources
-   randomize: true                       # True, if the name should have random suffix
+   generate_name: true                   # True, if the name should have a random suffix
    template: "<template_url_or_path>"    # Template for deployment
    image: "<image>                       # Optional: Image to be used
    path_routing: false                   # Optional: True, if the path_routing should be used
@@ -80,7 +80,7 @@ gateway:
      token: "abcdef"                     # Optional: token for that Openshift server
      kind: "OpenShiftClient"
    name: "gateway-test"                  # Name for the APIcast resources
-   randomize: true                       # True, if the name should have random suffix
+   generate_name: true                   # True, if the name should have a random suffix
    template: "<template_url_or_path>"    # Template for deployment
    image: "<image>                       # Optional: Image to be used
    path_routing: false                   # Optional: True, if the path_routing should be used
@@ -130,7 +130,7 @@ selfmanaged:
    gateway:
     default:
       name: "selfmanaged"
-      randomize: true
+      generate_name: true
       template: "<template_url_or_path>" 
       kind: "TemplateApicast"
 ```
@@ -143,7 +143,7 @@ selfmanaged:
    gateway:
     default:
       name: "selfmanaged"
-      randomize: true
+      generate_name: true
       template: "<template_url_or_path>"
       image: "<image>"
       kind: "TemplateApicast"
@@ -157,7 +157,7 @@ selfmanaged:
    gateway:
     default:
       name: "selfmanaged"
-      randomize: true
+      generate_name: true
       kind: "OperatorApicast"
 ```
 ### APIcast Operator deployed in different project
@@ -172,7 +172,7 @@ selfmanaged:
        project_name: "apicast-operator"
        kind: "OpenShiftClient"
       name: "selfmanaged"
-      randomize: true
+      generate_name: true
       kind: "OperatorApicast"   
 ```
 

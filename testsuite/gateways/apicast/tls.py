@@ -7,6 +7,7 @@ from threescale_api.resources import Application
 from testsuite.openshift.objects import Routes, SecretKinds
 from .template import TemplateApicast
 from ...certificates import Certificate
+from ...openshift.client import OpenShiftClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -15,9 +16,9 @@ class TLSApicast(TemplateApicast):
     """APIcast deployed with TLS certificates."""
 
     # pylint: disable=too-many-arguments,too-many-instance-attributes
-    def __init__(self, staging, openshift, template, name, image, portal_endpoint, superdomain,
-                 server_authority, manager, path_routing=False) -> None:
-        super().__init__(staging, openshift, template, name, image, portal_endpoint, path_routing)
+    def __init__(self, staging: bool, openshift: OpenShiftClient, template, name, image, portal_endpoint, superdomain,
+                 server_authority, manager, generate_name=False, path_routing=False) -> None:
+        super().__init__(staging, openshift, template, name, image, portal_endpoint, generate_name, path_routing)
         self.service_name = self.deployment
         self.superdomain = superdomain
         self.server_authority = server_authority

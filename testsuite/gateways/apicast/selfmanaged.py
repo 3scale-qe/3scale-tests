@@ -1,12 +1,13 @@
 """Self-managed APIcast already deployed somewhere in OpenShift """
 import logging
-from typing import Dict
+from typing import Dict, List
 
 from threescale_api.resources import Service
 
 from testsuite import utils
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
+from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.env import Environ
 from testsuite.openshift.objects import Routes
 
@@ -23,18 +24,23 @@ class SelfManagedApicast(AbstractApicast):
                     Capability.JAEGER}
     HAS_PRODUCTION = True
 
-    def __init__(self, staging, openshift, name, randomize=False, path_routing=False):
+    # pylint: disable=too-many-arguments
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name, generate_name=False, path_routing=False):
         self.staging = staging
         self.secure = True
         self.path_routing = path_routing
 
         self.openshift = openshift
-        self.name = name if not randomize else f"{name}-{utils.randomize(utils._whoami()[:8])}"
-        self._routes = []
+        self.name = name
+        if generate_name:
+            name = f"{name}-stage" if staging else name
+            self.name = f"{name}-{utils.randomize(utils._whoami()[:8])}"
+        self._routes: List[str] = []
         self._base_route = None
 
     @property
     def deployment(self):
+        """Returns name of the deployment, by default it is just a name"""
         return self.name
 
     def _routename(self, service):

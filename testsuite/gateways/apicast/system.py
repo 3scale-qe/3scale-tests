@@ -22,11 +22,10 @@ class SystemApicast(AbstractApicast):
                     Capability.JAEGER}
     HAS_PRODUCTION = True
 
-    def __init__(self, staging, openshift):
+    def __init__(self, staging: bool, openshift: "OpenShiftClient"):
         self.staging = staging
         self.deployment = "apicast-staging" if staging else "apicast-production"
         self.openshift: "OpenShiftClient" = openshift
-        self.name = self.deployment
 
     @property
     def environ(self) -> Environ:

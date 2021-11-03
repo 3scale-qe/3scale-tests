@@ -1,6 +1,5 @@
 """Apicast deployed with ApicastOperator"""
 import time
-from testsuite import utils
 
 from testsuite.capabilities import Capability
 from testsuite.openshift.client import OpenShiftClient
@@ -15,9 +14,9 @@ class OperatorApicast(SelfManagedApicast):
     CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY}
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, randomize=False) -> None:
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, generate_name=False) -> None:
         # APIcast operator prepends apicast in front the deployment name
-        super().__init__(staging, openshift, f"{name}-stage" if staging else name, randomize)
+        super().__init__(staging, openshift, name, generate_name)
         self.portal_endpoint = portal_endpoint
         self.apicast = None
 
