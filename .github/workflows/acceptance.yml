@@ -9,12 +9,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
+        id: setup-python
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
       - name: Install pipenv
         run: pip install pipenv
+      - name: Week number
+        id: weeknum
+        run: |
+          echo "::set-output name=weeknum::$(/bin/date -u "+%g.%V")"
+        shell: bash
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.local/share/virtualenvs
+            Pipfile.lock
+          key: ${{ runner.os }}-w${{ steps.weeknum.outputs.weeknum }}-python-${{ steps.setup-python.outputs.python-version }}-pipenv-${{ hashFiles('Pipfile') }}
       - name: Install dependencies
-        run: PIPENV_VERBOSITY=-1 make pipenv-dev
+        run: PIPENV_VERBOSITY=-1 make fake-sync pipenv-dev
       - name: Run acceptance check
         run: PIPENV_VERBOSITY=-1 make commit-acceptance
