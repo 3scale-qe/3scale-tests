@@ -12,6 +12,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 
 class AccountsView(BaseAudienceView):
     """View representation of Accounts Listing page"""
+    # TODO search will be separated into the AudienceTable Widget later.
     path_pattern = '/buyers/accounts'
     new_account = Text("//a[@href='/buyers/accounts/new']")
     table = AudienceTable("//*[@id='buyer_accounts']")
@@ -111,8 +112,9 @@ class AccountNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and self.email.is_displayed \
-               and self.organization.is_displayed and self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
+               and self.username.is_displayed and self.email.is_displayed \
+               and self.organization.is_displayed
 
 
 class AccountEditView(BaseAudienceView):

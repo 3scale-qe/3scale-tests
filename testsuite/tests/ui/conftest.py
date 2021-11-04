@@ -22,6 +22,9 @@ from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
 from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
+from testsuite.ui.views.master.audience.tenant import TenantNewView
+from testsuite.ui.views.master.foundation import BaseMasterView
+from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.utils import blame
 
@@ -87,6 +90,25 @@ def login(custom_admin_login):
     return custom_admin_login()
 
 
+@pytest.fixture
+def master_login(browser, navigator):
+    """
+    Login to the Master portal with default admin credentials
+    :param browser: Browser instance
+    :param navigator: Navigator Instance
+    :return: Login with default credentials
+    """
+    url = settings["threescale"]["master"]["url"]
+    name = settings["threescale"]["master"]["username"]
+    password = settings["threescale"]["master"]["password"]
+    browser.url = url
+
+    page = navigator.open(MasterLoginView)
+
+    if page.is_displayed:
+        page.do_login(name, password)
+
+
 @pytest.fixture(scope="module")
 def custom_devel_login(browser, sessions, navigator, provider_account, account_password):
     """
@@ -137,10 +159,45 @@ def navigator(browser):
         :return: Navigator instance
     """
     base_views = [
-        BaseAdminView
+        BaseAdminView,
+        BaseMasterView
     ]
     navigator = Navigator(browser, base_views)
     return navigator
+
+
+# pylint: disable=unused-argument, too-many-arguments
+@pytest.fixture(scope="module")
+def custom_ui_tenant(navigator, threescale, testconfig, request, master_threescale):
+    """Parametrized custom Tenant created via UI"""
+
+    def _custom_ui_tenant(username: str = "",
+                          email: str = "",
+                          password: str = "",
+                          organisation: str = "",
+                          autoclean=True):
+
+        tenant = navigator.navigate(TenantNewView)
+
+        tenant.create(username=username, email=email+"@anything.invalid", password=password, organization=organisation)
+
+        account = master_threescale.accounts.read_by_name(organisation)
+        tenant = master_threescale.tenants.read(account.entity_id)
+        tenant.wait_tenant_ready()
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(tenant.delete)
+
+        return tenant
+
+    return _custom_ui_tenant
+
+
+@pytest.fixture(scope="module")
+def ui_tenant(custom_ui_tenant, request):
+    """Preconfigured tenant existing over whole testing session"""
+    name = blame(request, "ui-tenant")
+    return custom_ui_tenant(username=name, email=name, password="12345678", organisation=name)
 
 
 # pylint: disable=unused-argument, too-many-arguments

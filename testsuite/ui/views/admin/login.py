@@ -1,10 +1,10 @@
 """ Representation of Login specific views"""
-from widgetastic.widget import TextInput, View, Text
+from widgetastic.widget import View, Text
 
 from testsuite.ui.navigation import Navigable
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.views.auth import Auth0View, RhssoView
-from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
+from testsuite.ui.views.common.login import LoginForm
 
 
 class LoginView(View, Navigable):
@@ -15,11 +15,7 @@ class LoginView(View, Navigable):
     ROOT = "/html//div[@id='pf-login-page-container']"
     header = Text("//main/header/h2")
     error_message = Text("//p[@class='pf-c-form__helper-text pf-m-error']")
-    username_field = TextInput(id='session_username')
-    username_label = Text('//input[@id="session_username"]/preceding-sibling::label')
-    password_field = TextInput(id='session_password')
-    password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
-    submit = ThreescaleSubmitButton()
+    login_widget = View.nested(LoginForm)
     password_reset_link = Text("//a[@href='/p/password/reset']")
     auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
     rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
@@ -31,9 +27,7 @@ class LoginView(View, Navigable):
         :param password: User password for login
         :return DashboardView page object
         """
-        self.username_field.fill(name)
-        self.password_field.fill(password)
-        self.submit.click()
+        self.login_widget.do_login(name, password)
         if '/p/admin/onboarding/wizard/intro' in self.browser.url:
             wizard = WizardIntroView(self.browser.root_browser)
             wizard.close_wizard()
@@ -66,7 +60,6 @@ class LoginView(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.username_field.is_displayed and self.password_field.is_displayed and \
-               self.password_reset_link.is_displayed and self.path in self.browser.url and \
+        return self.password_reset_link.is_displayed and self.path in self.browser.url and \
                self.browser.title == '3scale Login' and 'Log in to your account' in self.header.text and \
-               'Email or Username' in self.username_label.text and 'Password' in self.password_label.text
+               self.login_widget.is_displayed
