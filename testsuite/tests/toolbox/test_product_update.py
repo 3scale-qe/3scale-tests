@@ -243,7 +243,7 @@ def modify_apps_account(modify_product, request, custom_application,
     """ Modify/delete/add Application plans and Applications and Accounts"""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
-    iname = blame(request, "id")
+    iname = blame(request, "account")
     acc_raw = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
     acc_raw.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
     account_up = custom_account(acc_raw)

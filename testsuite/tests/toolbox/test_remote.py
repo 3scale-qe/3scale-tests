@@ -79,7 +79,7 @@ def test_list3(src1_str, regexp_dst1):
     ret = toolbox.run_cmd(create_cmd('list'))
     assert not ret['stderr']
     lines = ret['stdout'].splitlines()
-    assert re.compile(src1_str.replace('source', 'source_renamed')).match(lines[2]) is not None
+    assert re.compile(src1_str.replace('source', 'source_renamed', 1)).match(lines[2]) is not None
     assert regexp_dst1.match(lines[0]) is not None
 
 
