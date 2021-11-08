@@ -19,7 +19,7 @@ def my_services(custom_service, service, request):
 @pytest.fixture(scope="module")
 def my_accounts(custom_account, account, request):
     """Accounts fixture"""
-    iname = blame(request, "id")
+    iname = blame(request, "account")
     return (account, custom_account(dict(name=iname, username=iname, org_name=iname)))
 
 
@@ -124,7 +124,9 @@ def test_list2(empty_list, my_services, my_applications, create_cmd):
     # pylint: disable=unused-argument
     ret = toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))
     assert not ret['stderr']
-    assert empty_list in ret['stdout']
+    for line in empty_list.splitlines():
+        if line:
+            assert line in ret['stdout']
     to_cmp = f"{out_variables['app1']['id']}" + r'\tapp1\tlive\ttrue\t'
     to_cmp += f"{out_variables['app1']['account_id']}" + r'\t'
     to_cmp += f"{out_variables['app1']['service_id']}" + r'\t'

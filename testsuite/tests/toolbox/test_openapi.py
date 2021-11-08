@@ -99,7 +99,7 @@ def import_oas(threescale_dst1, dest_client, request, oas):
 def account(custom_account, request, testconfig, dest_client, import_oas):
     "Preconfigured account existing over whole testing session"
     # pylint: disable=unused-argument
-    iname = blame(request, "id")
+    iname = blame(request, "account")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
     account.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
     return custom_account(threescale_client=dest_client, params=account)
