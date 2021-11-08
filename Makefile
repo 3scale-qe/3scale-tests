@@ -9,7 +9,6 @@ LOGLEVEL ?= INFO
 resultsdir ?= .
 
 PIPENV_VERBOSITY ?= -1
-PIPENV_VENV_IN_PROJECT ?= 1
 PIPENV_IGNORE_VIRTUALENVS ?= 1
 
 ifdef junit
@@ -144,6 +143,12 @@ endif
 ensure-smoke:
 	$(if $(wildcard .$@),,$(error smoke failed))
 	@rm -f .$@
+
+fake-sync:
+	test -e Pipfile.lock \
+		&& touch Pipfile.lock \
+		&& touch .make-pipenv-sync .make-pipenv-sync-dev \
+		|| true
 
 # this ensures dependent target is run everytime
 FORCE:
