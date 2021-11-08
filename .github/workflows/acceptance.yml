@@ -29,4 +29,4 @@ jobs:
       - name: Install dependencies
         run: PIPENV_VERBOSITY=-1 make fake-sync pipenv-dev
       - name: Run acceptance check
-        run: PIPENV_VERBOSITY=-1 make commit-acceptance
+        run: PIPENV_VERBOSITY=-1 make -k commit-acceptance
