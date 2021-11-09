@@ -87,12 +87,35 @@ def test_get_registry_policies_list(token, api_client):
     assert response.status_code == 200
 
 
-def test_create_registry_policy(threescale, token, api_client, schema, permission):
+# pylint: disable=too-many-arguments
+def test_create_registry_policy(threescale, token, api_client, schema, permission, request):
     """
     Request to create policy registry should have status code 403 (201 for write permission)
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
+    if permission[0]:
+        request.addfinalizer(lambda: threescale.policy_registry.delete("policy_registry-0.1"))
     assert response.status_code == permission[1]
-    if response.status_code == 201:
-        threescale.policy_registry.delete("policy_registry-0.1")
+
+
+def test_create_provider_account(request, token, api_client):
+    """
+    Request to create provider account should have status code 403
+    """
+    username = blame(request, "username")
+    params = {"username": username, "email": f"{username}@example.com", "password": "account_password"}
+    response = api_client("POST", "/admin/api/users", token, params)
+    assert response.status_code == 403
+
+
+def test_create_app_key(token, api_client, account, application):
+    """
+    Request to create application key should have status code 403
+    """
+    account_id = account.entity_id
+    application_id = application.entity_id
+    params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
+    response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token,
+                          params)
+    assert response.status_code == 403
