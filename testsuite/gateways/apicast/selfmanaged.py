@@ -36,11 +36,11 @@ class SelfManagedApicastRequirements(GatewayRequirements, ABC):
 class SelfManagedApicast(AbstractApicast):
     """Gateway for use with already deployed self-managed Apicast in OpenShift"""
 
-    CAPABILITIES = [Capability.APICAST,
+    CAPABILITIES = {Capability.APICAST,
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.PRODUCTION_GATEWAY,
                     Capability.LOGS,
-                    Capability.JAEGER]
+                    Capability.JAEGER}
 
     def __init__(self, requirements: SelfManagedApicastRequirements) -> None:
         self.staging = requirements.staging

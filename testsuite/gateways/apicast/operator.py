@@ -22,7 +22,7 @@ class OperatorApicastRequirements(SelfManagedApicastRequirements, ABC):
 
 class OperatorApicast(SelfManagedApicast):
     """Gateway for use with Apicast deployed by operator"""
-    CAPABILITIES = [Capability.APICAST, Capability.PRODUCTION_GATEWAY]
+    CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY}
 
     def __init__(self, requirements: OperatorApicastRequirements) -> None:
         super().__init__(requirements)

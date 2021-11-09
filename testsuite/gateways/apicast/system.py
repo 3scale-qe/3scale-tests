@@ -27,13 +27,13 @@ class SystemApicastRequirements(GatewayRequirements, ABC):
 class SystemApicast(AbstractApicast):
     """Apicast that is deployed with 3scale"""
 
-    CAPABILITIES = [Capability.SAME_CLUSTER,
+    CAPABILITIES = {Capability.SAME_CLUSTER,
                     Capability.CUSTOM_ENVIRONMENT,
                     Capability.APICAST,
                     Capability.PRODUCTION_GATEWAY,
                     Capability.STANDARD_GATEWAY,
                     Capability.LOGS,
-                    Capability.JAEGER]
+                    Capability.JAEGER}
 
     def __init__(self, requirements: SystemApicastRequirements):
         if requirements.staging:

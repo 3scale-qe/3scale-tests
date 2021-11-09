@@ -1,7 +1,7 @@
 """Module containing all basic gateways"""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Set
 
 from testsuite.capabilities import Capability
 from testsuite.lifecycle_hook import LifecycleHook
@@ -29,7 +29,7 @@ class GatewayRequirements(OpenshiftRequirement, ABC):
 class AbstractGateway(LifecycleHook, ABC):
     """Basic gateway for use with Apicast"""
 
-    CAPABILITIES: List[Capability] = []
+    CAPABILITIES: Set[Capability] = set()
 
     @property
     def environ(self) -> Environ:
@@ -48,7 +48,7 @@ class AbstractGateway(LifecycleHook, ABC):
 class AbstractApicast(AbstractGateway, ABC):
     """Interface defining basic functionality of an Apicast gateway"""
 
-    CAPABILITIES = [Capability.APICAST]
+    CAPABILITIES = {Capability.APICAST}
 
     @abstractmethod
     def reload(self):

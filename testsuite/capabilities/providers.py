@@ -19,7 +19,7 @@ def gateway_capabilities():
     """Adds capabilities provided by gateways"""
     staging = configuration.staging.CAPABILITIES
     if configuration.production:
-        return staging + configuration.production.CAPABILITIES
+        staging.update(configuration.production.CAPABILITIES)
     return staging
 
 
