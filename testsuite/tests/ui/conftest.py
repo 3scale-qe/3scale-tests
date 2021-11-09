@@ -9,6 +9,7 @@ from threescale_api.resources import Account, ApplicationPlan, Service
 
 from testsuite import rawobj
 from testsuite.auth0 import auth0_token
+from testsuite.billing import Stripe, Braintree
 from testsuite.config import settings
 from testsuite.tests.ui import Sessions
 from testsuite.ui.browser import ThreeScaleBrowser
@@ -416,3 +417,19 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
 
         request.addfinalizer(_delete)
     return user
+
+
+@pytest.fixture(scope='session')
+def stripe():
+    """Stripe API"""
+    return Stripe(settings["stripe"]["api_key"])
+
+
+@pytest.fixture(scope='session')
+def braintree():
+    """Braintree API"""
+    braintree_credentials = settings["braintree"]
+    merchant_id = braintree_credentials['merchant_id']
+    public_key = braintree_credentials['public_key']
+    private_key = braintree_credentials['private_key']
+    return Braintree(merchant_id, public_key, private_key)

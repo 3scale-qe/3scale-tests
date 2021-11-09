@@ -6,6 +6,8 @@ from threescale_api.resources import InvoiceState
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
 
+pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762")
+
 
 @pytest.fixture(scope="module")
 def setup_card(account, custom_devel_login, billing_address, navigator):
@@ -32,23 +34,27 @@ def no_sca_cards(request, braintree_gateway_no_sca, setup_card):
     setup_card(cc_details)
 
 
+# pylint: disable=too-many-arguments
+@pytest.mark.xfail
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
-def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards):
+def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards, braintree):
     """Tests stripe billing"""
     old = threescale.invoices.list_by_account(account)
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
     assert acc_invoices[0]['state'] == InvoiceState.PAID.value
-    # TODO: Braintree asserts
+    assert braintree.invoice_assert(acc_invoices[0])
 
 
+# pylint: disable=too-many-arguments
+@pytest.mark.xfail
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
-def test_braintree_no_sca(request, account, threescale, invoice_provider, no_sca_cards):
+def test_braintree_no_sca(request, account, threescale, invoice_provider, no_sca_cards, braintree):
     """Tests stripe billing"""
     old = threescale.invoices.list_by_account(account)
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
     assert acc_invoices[0]['state'] == InvoiceState.PAID.value
-    # TODO: Braintree asserts
+    assert braintree.invoice_assert(acc_invoices[0])
