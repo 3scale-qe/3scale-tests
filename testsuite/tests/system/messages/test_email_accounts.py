@@ -47,22 +47,26 @@ def matching_emails(mailhog_client, mail_template):
         message_body = message["Content"]["Body"]\
             .replace("=\r\n", "").replace("\r\n", "")
         headers = message["Content"]["Headers"]
-
-        for address_type in ["To", "From", "Return-Path"]:
-            if headers[address_type][0] != mail_template["equal_templates"][address_type]:
-                break
-
         is_message_valid = False
-        for template in mail_template["subject_templates"].values():
-            match_body = re.fullmatch(template["Body"], message_body)
-            match_headers = re.fullmatch(template["Headers"], headers["X-SMTPAPI"][0])
-            if match_body and match_headers and template["Body"] not in checked_messages:
-                is_message_valid = True
-                checked_messages.append(template["Body"])
-                break
+        are_headers_valid = True
+        for address_type in ["To", "From", "Return-Path"]:
+            try:
+                if headers[address_type][0] != mail_template["equal_templates"][address_type]:
+                    are_headers_valid = False
+                    break
+            except KeyError:
+                are_headers_valid = False
+        if are_headers_valid:
+            for template in mail_template["subject_templates"].values():
+                match_body = re.fullmatch(template["Body"], message_body)
+                match_headers = re.fullmatch(template["Headers"], headers["X-SMTPAPI"][0])
+                if match_body and match_headers and template["Body"] not in checked_messages:
+                    is_message_valid = True
+                    checked_messages.append(template["Body"])
+                    break
 
-        if is_message_valid:
-            ids.append(message["ID"])
+            if is_message_valid:
+                ids.append(message["ID"])
     return ids
 
 
@@ -78,7 +82,7 @@ def clean_up(mailhog_client, mail_template):
 
 # pylint: disable=unused-argument
 @backoff.on_exception(backoff.fibo, AssertionError, 8, jitter=None)
-def test_emails_after_account_creation(mailhog_client, mail_template, clean_up):
+def test_emails_after_account_creation(mailhog_client, mail_template):
     """
     Checks that the total number of matching emails is three.
     """
