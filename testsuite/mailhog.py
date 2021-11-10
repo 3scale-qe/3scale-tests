@@ -43,18 +43,24 @@ class MailhogClient:
         full_url = self._url + "/" + endpoint
         response = requests.request(method=method, url=full_url,
                                     params=params, verify=False)
-        assert response.status_code == 200, 'The request to mailhog failed'
+        assert response.status_code == 200, f"The request to mailhog failed: {response.status_code} {response.text}"
         return response
 
     def messages(self, start: int = 0, limit: int = 25):
         """Gets sent emails to the mailhog"""
         params = {"start": start, "limit": limit}
-        response = self.request(params=params, endpoint="/api/v2/messages")
+        response = self.request(params=params, endpoint="api/v2/messages")
         # The quotes are in the returned json escaped by two backslashes and python
         # can not parse it, this replacements fixes it
         return json.loads(
             response.content.decode('utf8').replace('\\\\"', '\\"'))
 
-    def delete(self):
-        """Deletes all emails from the mailhog"""
-        self.request(method="DELETE", endpoint="/api/v1/messages")
+    def delete(self, mail_id=None):
+        """Deletes emails from the mailhog. If id is None all emails are deleted"""
+        if mail_id is None:
+            self.request(method="DELETE", endpoint="api/v1/messages")
+        elif isinstance(mail_id, str):
+            self.request(method="DELETE", endpoint=f"api/v1/messages/{mail_id}")
+        else:
+            for mail in mail_id:
+                self.request(method="DELETE", endpoint=f"api/v1/messages/{mail}")
