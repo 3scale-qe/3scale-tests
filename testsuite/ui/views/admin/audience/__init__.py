@@ -18,14 +18,14 @@ class BaseAudienceView(BaseAdminView):
         self.nav.select("Developer Portal", "Visit Portal")
 
     @step("@href")
-    def step(self, href, **kwargs):
+    def step(self, href):
         """
         Perform step to specific item in Navigation with use of href locator.
         This step function is used by Navigator. Every item in Navigation Menu contains link to the specific View.
         Navigator calls this function with href parameter (Views path), Step then locates correct
         item from Navigation Menu and clicks on it.
         """
-        self.nav.select_href(href, **kwargs)
+        self.nav.select_href(href)
 
     def prerequisite(self):
         return BaseAdminView

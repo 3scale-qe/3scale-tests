@@ -14,15 +14,19 @@ Navigation process consists of two parts:
 Design of this navigation is based on: https://github.com/RedHatQE/navmazing
 """
 import inspect
+import logging
 from collections import deque
 from typing import TypeVar, Type, Optional
 
 from widgetastic.widget import View
 
+from testsuite.ui.navigation.exception import NavigationStepNotFound
+from testsuite.ui.navigation.nav_rules import view_class, view_class_string, href, STEP_DEST
+
 CustomView = TypeVar("CustomView", bound=View)
 
 
-def step(cls, **kwargs):
+def step(cls, prerequisite=False):
     """
     Decorator for methods invoking new page or View.
     Within Navigator context, such method is referred as a step, that is performed
@@ -36,16 +40,64 @@ def step(cls, **kwargs):
                 user is responsible for correct implementation of such method.
     Args:
         :param cls: String name of View that is accessible with particular step
+        :param prerequisite:
         :param kwargs: required by Views as part of query string
     """
 
-    # pylint: disable=protected-access
-    def decorator(function):
-        function._class_name = cls
-        function._kwargs = kwargs
-        return function
+    class _NavStep:
+        def __init__(self, function):
+            self.function = function
+            setattr(function, STEP_DEST, cls)
 
-    return decorator
+        def __set_name__(self, owner, name):
+            if prerequisite:
+                def add_prerequisite():
+                    return owner
+
+                setattr(cls, 'prerequisite', add_prerequisite)
+
+        def __get__(self, obj, owner):
+            return self.function.__get__(obj, owner)
+
+        def __call__(self, method, *args, **kwargs):
+            return self.function(*args, **kwargs)
+
+    return _NavStep
+
+
+# pylint: disable=too-few-public-methods
+class ViewStepsProcessor:
+    """
+    Offers methods that interact with step methods from given View.
+    """
+
+    def __init__(self, current_view):
+        """
+        Extracts list of step methods from `current_view`
+        Args:
+            :param current_view: currently processed View
+        """
+        self.current_view = current_view
+        self.step_methods = [i[1] for i in inspect.getmembers(current_view, lambda o: hasattr(o, STEP_DEST))]
+
+    def invoke(self, destination, **kwargs):
+        """
+        This method invokes method that is decorated with `@step`. The correct step method is chosen
+        from the `step_methods` by filters in a form of navigation rules.
+        Args:
+            :param destination: View desired destination
+            :param kwargs: parameters that are passed to particular steps. E.g. account_id={id}
+        """
+        rules = [view_class, view_class_string, href]
+        logging.debug("Navigator: finding step from {self.current_view} to {destination}")
+        for rule in rules:
+            # The list of rules is ordered by priority. If the first rule returns any result,
+            # the method is invoked and other rules are skipped
+            if any(rule(step, destination, **kwargs) for step in self.step_methods):
+                logging.debug("Navigator: completed step from {self.current_view} to {destination}")
+                return
+
+        raise NavigationStepNotFound(self.current_view, destination, self.step_methods)
 
 
 class Navigator:
@@ -107,7 +159,7 @@ class Navigator:
         """
         page = self.new_page(cls, **kwargs)
         self.page_chain.append(page)
-        if cls in self.base_views or page.is_displayed:
+        if page.is_displayed:
             return
         self._backtrace(page.prerequisite(), **kwargs)
 
@@ -123,98 +175,13 @@ class Navigator:
         page = self.page_chain.pop()
         dest = self.page_chain[-1]
 
-        possible_steps = inspect.getmembers(page, lambda o: hasattr(o, '_class_name'))
-        if self._invoke_step(possible_steps, dest, **kwargs):
-            dest.post_navigate(**kwargs)
-            return self._perform_steps(**kwargs)
-        raise NavigationStepNotFound(page, dest, possible_steps)
-
-    def _invoke_step(self, possible_steps, destination, **kwargs):
-        """
-        Perform one step. This method invokes method that is decorated with @step.
-        See `step(cls, **kwargs)` correct usage.
-
-        :param possible_steps: list of tuples [(method name, method)]. Describes all View methods
-            decorated with @step
-        :param destination: View class
-        :param kwargs: parameters that are passed to particular steps. E.g. account_id={id}
-        :return: Bool value representing if step was preformed or not
-        """
-        alternative_steps = []
-        for _, method in possible_steps:
-            key_word = method._class_name
-            if key_word == destination.__class__.__name__:
-                signature = inspect.signature(method)
-                filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
-                bound = signature.bind(**filtered_kwargs)
-                bound.apply_defaults()
-                try:
-                    method(*bound.args, **bound.kwargs)
-                except Exception as exc:
-                    raise NavigationStepException(method.__dict__, destination, method) from exc
-                return True
-            if key_word.startswith('@'):
-                alternative_steps.append(method)
-
-        return self._invoke_alternative_step(alternative_steps, destination)
-
-    @staticmethod
-    def _invoke_alternative_step(alternative_steps, destination):
-        """
-        Alternative steps begins with "@".
-        See `step(cls, **kwargs)` for alternatives.
-
-        :param alternative_steps: list of tuples [(method name, method)]. Describes all View methods
-            decorated with @step
-        :param destination: View class
-        :return: Bool value representing if step was preformed or not
-        """
-        for method in alternative_steps:
-            if method._class_name.startswith('@href'):
-                try:
-                    method(destination.path)
-                except Exception as exc:
-                    raise NavigationStepException(method.__dict__, destination, method) from exc
-                return True
-        return False
-
-
-class NavigationStepNotFound(Exception):
-    """Exception when navigations can't be found"""
-
-    def __init__(self, current, dest, possibilities):
-        super().__init__(self)
-        self.current = current
-        self.dest = dest
-        self.possibilities = possibilities
-
-    def __str__(self):
-        return (
-            "Couldn't find step to destination View: [{}] from current View: [{}]."
-            " Following steps were available: [{}]"
-        ).format(self.dest, self.current, ", ".join(list(self.possibilities)))
-
-
-class NavigationStepException(Exception):
-    """Exception when navigation fails on `@step` method"""
-
-    def __init__(self, current, dest, step):
-        super().__init__(self)
-        self.current = current
-        self.dest = dest
-        self.step = step
-
-    def __str__(self):
-        return (
-            "Step from current [{}] View to destination [{}] View failed"
-            " during method invocation: [{}]"
-        ).format(self.dest, self.current, self.step)
+        ViewStepsProcessor(page).invoke(dest, **kwargs)
+        dest.post_navigate(**kwargs)
+        return self._perform_steps(**kwargs)
 
 
 class Navigable:
     """Adds simple methods that helps with navigation"""
-
-    # TODO: Navigation Exceptions
 
     def prerequisite(self):
         """
