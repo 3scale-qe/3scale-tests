@@ -10,50 +10,39 @@ from packaging.version import Version, InvalidVersion
 tags = run(["git", "tag"], check=False, encoding="utf-8", stdout=PIPE)
 tags = tags.stdout.split()
 
-version_str = open("VERSION").read().strip()
-version = Version(version_str)
+version = Version(open("VERSION").read().strip())
 
 versions = []
 for tag in tags:
     try:
-        versions.append(Version(tag))
+        versions.append(Version(tag[1:]))
     except InvalidVersion:
         pass
-latest = sorted(
-    versions,
-    key=lambda v: v.release + (v.post, v.pre[1] if v.pre else 20000000))[-1]
+latest = sorted(versions)[-1])
 
 just_one = "-1" in sys.argv
 
-
-def vstr(ver):
-    return f"{ver.base_version}-r{ver.post}"
-
-
 def docker_tags(version, latest, just_one):
+    version = str(version)  # X.Y.Z.R
     tags = [version]
     if just_one:
         return tags
-    tags.append(version.split("-")[0])
+    tags.append(version.rsplit(".", 1)[0])  # X.Y.Z
     if latest:
-        tags.append(version.rsplit(".", 1)[0])
+        tags.append(version.rsplit(".", 2)[0])  # X.Y
         tags.append(version.split(".")[0])
         tags.append("latest")
     return tags
 
 
-if version_str in tags:
-    print(" ".join(docker_tags(version_str, latest == version, just_one)))
-    sys.exit(0)
-
-if version_str == vstr(latest):
-    print(str(latest).replace(".post", "-r"))
+if f"v{version}" in tags:
+    print(" ".join(docker_tags(version, latest == version, just_one)))
     sys.exit(0)
 
 rc = 1
-current = f"{version.base_version}rc{rc}-r{version.post}"
+current = f"v{version}rc{rc}"
 
 while current in tags:
     rc += 1
-    current = f"{version.base_version}rc{rc}-r{version.post}"
+    current = f"{version}rc{rc}"
 print(current)

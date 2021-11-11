@@ -15,18 +15,18 @@ tags = run(["git", "tag"], check=False, encoding="utf-8", stdout=PIPE)
 tags = tags.stdout.split()
 
 revision=1
-nextver=f"{version}-r{revision}"
-while nextver in tags:
+nextver=f"{version}.{revision}"
+while f"v{nextver}" in tags:
     revision += 1
-    nextver=f"{version}-r{revision}"
+    nextver=f"{version}.{revision}"
 
 rc=1
-nextver=f"{version}rc{rc}-r{revision}"
-while nextver in tags:
+nextver=f"{version}.{revision}rc{rc}"
+while f"v{nextver}" in tags:
     rc += 1
-    nextver=f"{version}rc{rc}-r{revision}"
+    nextver=f"{version}.{revision}rc{rc}"
 
 with open("VERSION", "w") as s:
-    s.write(f"{version}-r{revision}\n")
+    s.write(f"{version}.{revision}\n")
 
-run(["git", "checkout", "-b", f"v{version}rc{rc}-r{revision}"], check=True)
+run(["git", "checkout", "-b", f"release-v{version}.{revision}rc{rc}"], check=True)
