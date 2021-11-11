@@ -2,6 +2,7 @@
 Create a service with a non existent policy in the chain
 and tests that on failed policy returns the correct error code.
 """
+import backoff
 import pytest
 
 from testsuite import rawobj
@@ -48,12 +49,21 @@ def status_code(chain_name, on_failed_configuration) -> int:
     return on_failed_configuration.get("error_status_code", 503)
 
 
+@backoff.on_predicate(backoff.fibo,
+                      lambda response: response.headers.get("server") != "openresty",
+                      max_tries=5)
+def make_request(api_client):
+    """Make request to the product and retry if the response isn't from APIcast """
+    return api_client.get("/")
+
+
 def test_on_failed_policy(application, status_code):
     """
     Sends request to apicast and check that the returned code
     is the expected one as per `status_code`
     """
-    api_client = application.api_client()
+    api_client = application.api_client(disable_retry_status_list=(503,))
 
-    response = api_client.get("/")
+    response = make_request(api_client)
     assert response.status_code == status_code
+    assert response.headers["server"] == "openresty"

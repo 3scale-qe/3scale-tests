@@ -2,7 +2,7 @@
 Build an apicast image containing a custom policies that fails during execution
 and tests that on failed policy returns the correct error code.
 """
-
+import backoff
 import pytest
 import importlib_resources as resources
 
@@ -86,6 +86,14 @@ def return_code(request) -> int:
     return on_failed_conf.get("error_status_code", 503)
 
 
+@backoff.on_predicate(backoff.fibo,
+                      lambda response: response.headers.get("server") != "openresty",
+                      max_tries=5)
+def make_request(api_client):
+    """Make request to the product and retry if the response isn't from APIcast """
+    return api_client.get("/")
+
+
 # pylint: disable=unused-argument
 def test_on_failed(build_images, application, return_code):
     """
@@ -93,7 +101,8 @@ def test_on_failed(build_images, application, return_code):
     to on_failed policy configuration.
     build_images is requested but not used to trigger the build of the image with the custom policy
     """
-    api_client = application.api_client()
+    api_client = application.api_client(disable_retry_status_list=(503,))
 
-    response = api_client.get("/")
+    response = make_request(api_client)
     assert response.status_code == return_code
+    assert response.headers["server"] == "openresty"
