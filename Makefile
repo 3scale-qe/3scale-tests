@@ -113,7 +113,7 @@ release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
 	git add -f Pipfile.lock
 	git add testsuite/resources/apicast.yml
 	git commit -m"`git rev-parse --abbrev-ref HEAD`"
-	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c2-`" -m"`git rev-parse --abbrev-ref HEAD`"
+	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c9-`" -m"`git rev-parse --abbrev-ref HEAD`"
 	git rm --cached Pipfile.lock
 	git commit -m"Unfreeze Pipfile.lock after release"
 
