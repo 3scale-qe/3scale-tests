@@ -71,7 +71,7 @@ class ContextMenu(ContextSelector):
     to fit 3scale needs.
     """
     DEFAULT_LOCATOR = './/div[contains(@class, "pf-c-context-selector")]'
-    BUTTON_LOCATOR = './/a[@href="#context-menu"]'
+    BUTTON_LOCATOR = './/a[@title="Context Selector"]'
 
 
 # pylint: disable=abstract-method
