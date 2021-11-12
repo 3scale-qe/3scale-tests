@@ -74,8 +74,9 @@ pipenv: .make-pipenv-sync
 pipenv-dev: .make-pipenv-sync-dev
 
 container-image: ## Build container image
+container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
-	docker build -t 3scale-py-testsuite .
+	$(RUNSCRIPT)docker-build $(IMAGENAME) latest
 
 clean: ## clean pip deps
 clean: mostlyclean
@@ -118,7 +119,7 @@ release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
 	git commit -m"Unfreeze Pipfile.lock after release"
 
 dist: ## Build (and push optionally) distribution-ready container image
-dist: IMAGENAME ?= 3scale-py-testsuite
+dist: IMAGENAME ?= 3scale-testsuite
 dist: pipenv fetch-tools
 	git checkout v`$(RUNSCRIPT)docker-tags -1`
 	test -e VERSION
