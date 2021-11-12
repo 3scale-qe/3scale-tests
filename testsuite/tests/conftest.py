@@ -8,8 +8,7 @@ import time
 import importlib_resources as resources
 import backoff
 import pytest
-import threescale_api.errors
-from threescale_api import client
+from threescale_api import client, errors
 from weakget import weakget
 
 # to actually initialize all the providers
@@ -283,6 +282,14 @@ def account_password():
     return '123456'
 
 
+@backoff.on_exception(backoff.fibo, errors.ApiClientError, 8, jitter=None)
+def call_account(custom_account, params):
+    """A wrap around custom_account function to backoff the request
+    on Exception 'threescale_api.errors.ApiClientError: Response(409 Conflict)'
+    """
+    return custom_account(params=params)
+
+
 @pytest.fixture(scope="session")
 def account(custom_account, request, testconfig, account_password):
     "Preconfigured account existing over whole testing session"
@@ -292,7 +299,7 @@ def account(custom_account, request, testconfig, account_password):
         name=iname, username=iname,
         email=f"{iname}@anything.invalid",
         password=account_password))
-    account = custom_account(params=account)
+    account = call_account(custom_account, account)
 
     return account
 
@@ -719,7 +726,7 @@ def custom_service(threescale, request, testconfig, logger):
     return _custom_service
 
 
-@backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, max_tries=8, jitter=None)
+@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
 def _backend_delete(backend):
     """reliable backend delete"""
 
@@ -797,7 +804,7 @@ def custom_tenant(testconfig, master_threescale, request):
 
             unprivileged_client = client.ThreeScaleClient(admin_base_url, access_token, ssl_verify=False)
 
-            @backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, max_tries=8, jitter=None)
+            @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
             def _wait_on_ready_tenant():
                 unprivileged_client.services.list()
 
