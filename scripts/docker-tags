@@ -18,7 +18,7 @@ for tag in tags:
         versions.append(Version(tag[1:]))
     except InvalidVersion:
         pass
-latest = sorted(versions)[-1])
+latest = sorted(versions)[-1]
 
 just_one = "-1" in sys.argv
 
