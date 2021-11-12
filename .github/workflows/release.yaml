@@ -1,0 +1,21 @@
+name: release
+on:
+  push:
+    tags:
+      - v*
+env:
+  fetch_tools: ${{ secrets.FETCH_TOOLS }}
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: quay.io login
+        uses: docker/login-action@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      - name: release
+        run: make dist IMAGENAME="quay.io/rh_integration/3scale-testsuite" PUSHIMAGE=y
+
