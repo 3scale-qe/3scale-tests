@@ -9,7 +9,10 @@ shift
 
 image=$imagename:$tag
 
-docker build -t $image .
+buildargs=
+test -n "$CACERT" && buildargs="--build-arg=cacert=$CACERT"
+
+docker build -t $image $buildargs .
 
 if [ -n "$PUSHIMAGE" ]; then
 	docker push $image

@@ -6,9 +6,11 @@ Bind kubeconfig to /opt/kubeconfig \
 Bind a dir to /test-run-results to get reports \
 Set NAMESPACE env variable"
 
+ARG cacert=https://password.corp.redhat.com/RH-IT-Root-CA.crt
+
 USER root
 
-ADD https://password.corp.redhat.com/RH-IT-Root-CA.crt /etc/pki/ca-trust/source/anchors
+ADD $cacert /etc/pki/ca-trust/source/anchors
 ADD https://gist.githubusercontent.com/mijaros/c9c9ed016ce9985d96c6c5c3b35b4050/raw/66587720883554b03a4c24875fa47442db231a51/ca.pem /etc/pki/ca-trust/source/anchors
 RUN update-ca-trust
 
