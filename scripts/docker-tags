@@ -47,9 +47,9 @@ if version.release == latest.release:
 
 # Hmm, who knows what now... :-) (wasn't documented, should have some purpose)
 rc = 1
-current = f"v{version}rc{rc}"
+current = f"{version}rc{rc}"
 
-while current in tags:
+while f"v{current}" in tags:
     rc += 1
     current = f"{version}rc{rc}"
 print(current)
