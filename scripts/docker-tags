@@ -35,10 +35,17 @@ def docker_tags(version, latest, just_one):
     return tags
 
 
+# Tag for VERSION already exists -> this is release
 if f"v{version}" in tags:
     print(" ".join(docker_tags(version, latest == version, just_one)))
     sys.exit(0)
 
+# Now this is true only for RC
+if version.release == latest.release:
+    print(str(latest))
+    sys.exit(0)
+
+# Hmm, who knows what now... :-) (wasn't documented, should have some purpose)
 rc = 1
 current = f"v{version}rc{rc}"
 
