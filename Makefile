@@ -120,7 +120,7 @@ release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
 dist: ## Build (and push optionally) distribution-ready container image
 dist: IMAGENAME ?= 3scale-py-testsuite
 dist: pipenv fetch-tools
-	git checkout `$(RUNSCRIPT)docker-tags -1`
+	git checkout v`$(RUNSCRIPT)docker-tags -1`
 	test -e VERSION
 	$(RUNSCRIPT)docker-build $(IMAGENAME) `$(RUNSCRIPT)docker-tags`
 	-[ -n "$$NOSWITCH" ] || git checkout -
