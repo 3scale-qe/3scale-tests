@@ -48,7 +48,6 @@ def rhsso_setup(custom_admin_login, navigator, rhsso_service_info, rhsso_integra
 
 @pytest.mark.disruptive  # Only one instance of RHSSO could be present at the time so this test is disruptive to all
 # other tests that want to setup RHSSO integration for devel portal
-@pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7633")
 def test_devel_login_rhsso(custom_devel_rhsso_login, navigator, testconfig):
     """
@@ -60,7 +59,5 @@ def test_devel_login_rhsso(custom_devel_rhsso_login, navigator, testconfig):
     custom_devel_rhsso_login(test_user["username"], test_user["password"])
     signup_view = SignUpView(navigator.browser)
     assert signup_view.wait_displayed
-
-    signup_view.signup("RedHat")
 
     assert BaseDevelView(navigator.browser).is_displayed
