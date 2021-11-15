@@ -109,7 +109,7 @@ def account(custom_account, request, testconfig, dest_client, import_oas):
 def app_plan(import_oas, account, custom_app_plan, request, oas):
     "app plan bound to the service"
     # pylint: disable=unused-argument
-    return custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), import_oas[3])
+    return custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service=import_oas[3], autoclean=False)
 
 
 @pytest.fixture(scope="module")
