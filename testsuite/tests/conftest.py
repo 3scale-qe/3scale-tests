@@ -8,8 +8,7 @@ import time
 import importlib_resources as resources
 import backoff
 import pytest
-import threescale_api.errors
-from threescale_api import client
+from threescale_api import client, errors
 from weakget import weakget
 
 # to actually initialize all the providers
@@ -304,7 +303,7 @@ def custom_account(threescale, request, testconfig):
     Args:
         :param params: dict for remote call, rawobj.Account should be used
     """
-    @backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, 8, jitter=None)
+    @backoff.on_exception(backoff.fibo, errors.ApiClientError, 8, jitter=None)
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = threescale_client.accounts.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
@@ -719,7 +718,7 @@ def custom_service(threescale, request, testconfig, logger):
     return _custom_service
 
 
-@backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, max_tries=8, jitter=None)
+@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
 def _backend_delete(backend):
     """reliable backend delete"""
 
@@ -797,7 +796,7 @@ def custom_tenant(testconfig, master_threescale, request):
 
             unprivileged_client = client.ThreeScaleClient(admin_base_url, access_token, ssl_verify=False)
 
-            @backoff.on_exception(backoff.fibo, threescale_api.errors.ApiClientError, max_tries=8, jitter=None)
+            @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
             def _wait_on_ready_tenant():
                 unprivileged_client.services.list()
 
