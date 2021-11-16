@@ -8,7 +8,7 @@ import time
 import importlib_resources as resources
 import backoff
 import pytest
-import threescale_api
+import threescale_api.errors
 from threescale_api import client
 from weakget import weakget
 
@@ -310,6 +310,7 @@ def custom_account(threescale, request, testconfig):
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(acc.delete)
         return acc
+
     return _custom_account
 
 
