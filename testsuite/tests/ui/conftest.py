@@ -2,6 +2,7 @@
 
 import os
 
+import backoff
 import pytest
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
@@ -387,8 +388,10 @@ def set_callback_urls(auth0_client):
     Set callback urls for Auth0 application
     """
 
+    @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
     def _set_callback_urls(client_id, urls: list):
         auth0_client.clients.update(client_id, body={"callbacks": urls})
+        return auth0_client.clients.get(client_id)
 
     return _set_callback_urls
 
