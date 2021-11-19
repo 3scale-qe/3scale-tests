@@ -82,7 +82,7 @@ def clean_up(mailhog_client, mail_template):
 
 # pylint: disable=unused-argument
 @backoff.on_exception(backoff.fibo, AssertionError, 8, jitter=None)
-def test_emails_after_account_creation(mailhog_client, mail_template):
+def test_emails_after_account_creation(mailhog_client, mail_template, clean_up):
     """
     Checks that the total number of matching emails is three.
     """
