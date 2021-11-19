@@ -326,7 +326,7 @@ def user(custom_user, account, request, testconfig, configuration):
     return usr
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def custom_user(request, testconfig):  # pylint: disable=unused-argument
     """Parametrized custom User
 
