@@ -6,7 +6,7 @@ from urllib.parse import urlparse, urlunparse
 from openshift import Selector
 
 from testsuite.openshift.client import OpenShiftClient
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 
 
 class ServiceMesh:
@@ -77,6 +77,6 @@ class ServiceMesh:
         return self._ingress_url
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         """Returns Environ object for manipulation of the adapter environment"""
         return self.openshift.deployment_environ("3scale-istio-adapter")

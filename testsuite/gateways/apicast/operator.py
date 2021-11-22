@@ -4,7 +4,7 @@ import time
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.crd.apicast import APIcast
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 
 from .selfmanaged import SelfManagedApicast
 
@@ -19,6 +19,7 @@ class OperatorApicast(SelfManagedApicast):
         super().__init__(staging, openshift, name, generate_name)
         self.portal_endpoint = portal_endpoint
         self.apicast = None
+        self._environ: OperatorEnviron = None  # type: ignore
 
     @staticmethod
     def fits():
@@ -29,7 +30,7 @@ class OperatorApicast(SelfManagedApicast):
         return f"apicast-{super().deployment}"
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         raise NotImplementedError("Operator doesn't support environment")
 
     def reload(self):

@@ -8,7 +8,7 @@ from testsuite import utils
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.client import OpenShiftClient
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 from testsuite.openshift.objects import Routes
 
 LOGGER = logging.getLogger(__name__)
@@ -139,7 +139,7 @@ class SelfManagedApicast(AbstractApicast):
             self._routes.remove(name)
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         return self.openshift.environ(self.deployment)
 
     def reload(self):

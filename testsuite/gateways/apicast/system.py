@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
@@ -28,7 +28,7 @@ class SystemApicast(AbstractApicast):
         self.openshift: "OpenShiftClient" = openshift
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         return self.openshift.environ(self.deployment)
 
     def reload(self):

@@ -4,7 +4,7 @@ from typing import Set
 
 from testsuite.capabilities import Capability
 from testsuite.lifecycle_hook import LifecycleHook
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 
 
 class AbstractGateway(LifecycleHook, ABC):
@@ -14,7 +14,7 @@ class AbstractGateway(LifecycleHook, ABC):
     HAS_PRODUCTION = False
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         """Returns environ object for given gateway"""
         raise NotImplementedError()
 
