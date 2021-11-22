@@ -62,3 +62,6 @@ class APIcast(APIObject):
 
     def __setitem__(self, key, value):
         self.model.spec[key] = value
+
+    def __delitem__(self, key):
+        del self.model.spec[key]
