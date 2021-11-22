@@ -4,7 +4,7 @@ import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import RHSSOIntegrationEditView, \
     RHSSOIntegrationDetailView
-from testsuite.ui.views.devel import SignUpView, BaseDevelView
+from testsuite.ui.views.devel import BaseDevelView
 
 
 @pytest.fixture(scope="module")
@@ -48,7 +48,6 @@ def rhsso_setup(custom_admin_login, navigator, rhsso_service_info, rhsso_integra
 
 @pytest.mark.disruptive  # Only one instance of RHSSO could be present at the time so this test is disruptive to all
 # other tests that want to setup RHSSO integration for devel portal
-@pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7633")
 def test_devel_login_rhsso(custom_devel_rhsso_login, navigator, testconfig):
     """
@@ -58,9 +57,7 @@ def test_devel_login_rhsso(custom_devel_rhsso_login, navigator, testconfig):
     """
     test_user = testconfig["rhsso"]["test_user"]
     custom_devel_rhsso_login(test_user["username"], test_user["password"])
-    signup_view = SignUpView(navigator.browser)
-    assert signup_view.wait_displayed
+    devel_view = BaseDevelView(navigator.browser)
 
-    signup_view.signup("RedHat")
-
-    assert BaseDevelView(navigator.browser).is_displayed
+    assert devel_view.is_displayed
+    assert devel_view.is_logged_in

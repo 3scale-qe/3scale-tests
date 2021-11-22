@@ -35,17 +35,28 @@ class BaseDevelView(View, Navigable):
     """
     path_pattern = ''
     navbar = View.nested(Navbar)
+    footer_logo = GenericLocatorWidget(locator='//*[@class="powered-by"]')
+    navbar_brand = GenericLocatorWidget(locator='//*[@class="navbar-brand"]')
 
     def __init__(self, parent, access_code=None, logger=None, **kwargs):
         super().__init__(parent, logger=logger, **kwargs)
         self.access_code = access_code
         self.path = self.path_pattern.format_map(kwargs)
 
+    @property
+    def is_logged_in(self):
+        """ Detect if user is logged in developer portal"""
+        return self.navbar.sign_out_btn.is_displayed
+
     # pylint: disable=using-constant-test
     def post_navigate(self, **kwargs):
         access_view = AccessView(self.browser.root_browser)
         if access_view.is_displayed:
             access_view.access_code(self.access_code)
+
+    @property
+    def is_displayed(self):
+        return self.footer_logo.is_displayed and self.navbar_brand.is_displayed
 
 
 class LandingView(BaseDevelView):
