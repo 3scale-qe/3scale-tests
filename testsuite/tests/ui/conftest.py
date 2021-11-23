@@ -63,8 +63,8 @@ def custom_admin_login(browser, sessions, navigator):
 
     def _login(name=None, password=None):
         url = settings["threescale"]["admin"]["url"]
-        name = name or settings["ui"]["username"]
-        password = password or settings["ui"]["password"]
+        name = name or settings["threescale"]["admin"]["username"]
+        password = password or settings["threescale"]["admin"]["password"]
         browser.url = url
 
         if not sessions.restore(name, password, url):
