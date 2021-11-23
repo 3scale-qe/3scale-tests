@@ -15,9 +15,9 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, gateway_environment, gateway_options):
+def staging_gateway(request, gateway_kind, gateway_environment, gateway_options):
     """Deploy self-managed template based apicast gateway."""
-    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"), **gateway_options)
+    gw = gateway(kind=gateway_kind, staging=True, name=blame(request, "gw"), **gateway_options)
     request.addfinalizer(gw.destroy)
     gw.create()
 
@@ -25,6 +25,12 @@ def staging_gateway(request, gateway_environment, gateway_options):
         gw.environ.set_many(gateway_environment)
 
     return gw
+
+
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Gateway class to use for tests"""
+    return TemplateApicast
 
 
 @pytest.fixture(scope="module")
