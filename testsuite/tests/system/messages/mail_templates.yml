@@ -20,12 +20,12 @@ subject_templates:
       this because you subscribed to this notification.<br />View notification preferences
       on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>
       </p></body></html>----==_mimepart_(?!-).*--'
-  API signup created on <service>:
+  <application> signup created on <service>:
       Headers: '{"unique_args":{"event_name":"Applications::ApplicationCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","applications/application_created_event"\]}'
       Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
       7bitDear <username>,A new application subscribed to the <aplan> plan on the
       <service> service of the <test_group> account.Application details:  Name:
-      API signup  Description: API signupTo view application, follow this link: https://3scale-admin.<threescale_superdomain>/p/admin/applications/[0-9]+You
+      <application>  Description: <app_description>To view application, follow this link: https://3scale-admin.<threescale_superdomain>/p/admin/applications/[0-9]+You
       are receiving this because you subscribed to this notification.View notification
       preferences on https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences----==_mimepart_.+Content-Type:
       text/html; charset=UTF-8Content-Transfer-Encoding: quoted-printable<!DOCTYPE
@@ -33,7 +33,7 @@ subject_templates:
       &#39;Lucida Grande&#39;, verdana, sans-serif;"><p>Dear <username>,</p><p>A new
       application subscribed to the <aplan> plan on the <service> service
       of the <test_group> account.</p><p><b>Application details:</b></p><ul><li><b>Name:</b>
-      API signup</li><li><b>Description:</b> API signup</li></ul><p><a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/applications/[0-9]+">View
+      <application></li><li><b>Description:</b> <app_description></li></ul><p><a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/applications/[0-9]+">View
       new application in your 3scale Admin Portal</a></p><p>=E2=80=94<br />You
       are receiving this because you subscribed to this notification.<br />View notification
       preferences on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>

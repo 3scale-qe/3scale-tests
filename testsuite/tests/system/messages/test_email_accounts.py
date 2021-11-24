@@ -13,7 +13,15 @@ import backoff
 
 
 @pytest.fixture
-def mail_template(account, testconfig) -> dict:
+def application(application):
+    """Change the application description to avoid errors in YAML parsing
+    """
+    application.update({'description': 'API signup'})
+    return application
+
+
+@pytest.fixture
+def mail_template(account, application, testconfig) -> dict:
     """loads the mail templates and substitutes the variables"""
     dirname = os.path.dirname(__file__)
     with open(f"{dirname}/mail_templates.yml", encoding="utf8") as stream:
@@ -24,8 +32,10 @@ def mail_template(account, testconfig) -> dict:
             .replace("<account_email_domain>", "anything.invalid") \
             .replace("<username>", "admin") \
             .replace("<tenant>", "3scale") \
-            .replace("<service>", "API") \
-            .replace("<aplan>", "Basic") \
+            .replace("<service>", application['service_name']) \
+            .replace("<aplan>", application['plan_name']) \
+            .replace("<application>", application['name']) \
+            .replace("<app_description>", application['description']) \
             .replace("\\[", "\\[") \
             .replace("\\]", "\\]")  # replaces '\\]' with '\]'
 
