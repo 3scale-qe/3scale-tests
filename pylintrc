@@ -252,6 +252,7 @@ good-names=i,
            Run,
            pytestmark,
            logger,
+           gw,
            _
 
 # Include a hint for the correct naming format with invalid-name.

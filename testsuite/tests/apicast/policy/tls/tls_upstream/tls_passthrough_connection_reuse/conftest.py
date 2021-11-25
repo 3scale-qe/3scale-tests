@@ -3,8 +3,7 @@ Conftest for connection reuse test
 """
 import pytest
 
-from testsuite import gateways
-from testsuite import rawobj
+from testsuite import rawobj, gateways
 from testsuite.openshift.objects import Routes
 from testsuite.tests.apicast.policy.tls import embedded
 
@@ -23,18 +22,14 @@ def policy_settings(certificate):
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request, testconfig, configuration):
+def staging_gateway(request):
     """
     Standard staging gateway.
     We are testing the communication between the APIcast and API backend,
     the TLS certificates are configured in the backends.
     """
-    options = gateways.configuration.options(staging=True,
-                                             settings_block=testconfig["threescale"]["gateway"]["configuration"],
-                                             configuration=configuration)
-    gateway = gateways.configuration.staging(options)
+    gateway = gateways.gateway(staging=True)
     request.addfinalizer(gateway.destroy)
-
     gateway.create()
 
     return gateway

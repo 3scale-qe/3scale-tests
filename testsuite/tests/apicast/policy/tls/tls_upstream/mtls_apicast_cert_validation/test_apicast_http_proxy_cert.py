@@ -6,8 +6,9 @@ only globally.
 import pytest
 
 from testsuite.certificates import Certificate
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
 from testsuite.capabilities import Capability
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
 pytestmark = [
@@ -27,16 +28,13 @@ def authority_and_code(request):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, settings_block):
-    """Deploy template apicast gateway."""
+def staging_gateway(request):
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-
-    request.addfinalizer(gateway.destroy)
-
-    gateway.create()
-    return gateway
+    return gw
 
 
 @pytest.fixture(scope="module")

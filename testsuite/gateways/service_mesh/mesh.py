@@ -1,6 +1,7 @@
 """Objects for managing ServiceMesh deployments"""
 from contextlib import ExitStack
 from typing import List
+from urllib.parse import urlparse, urlunparse
 
 from openshift import Selector
 
@@ -11,9 +12,12 @@ from testsuite.openshift.env import Environ
 class ServiceMesh:
     """Class for working with Service mesh"""
 
-    def __init__(self, openshift: OpenShiftClient, token: str, url: str, identifier: str) -> None:
-        self.token = token
-        self.url = url
+    def __init__(self, openshift: OpenShiftClient, portal_endpoint, identifier: str) -> None:
+        url = urlparse(portal_endpoint)
+        self.token = url.username
+        url = url._replace(netloc=url.hostname)
+        self.url = urlunparse(url)
+
         self.openshift = openshift
         self.identifier = identifier
         self._ingress_url = None
@@ -76,16 +80,3 @@ class ServiceMesh:
     def environ(self) -> Environ:
         """Returns Environ object for manipulation of the adapter environment"""
         return self.openshift.deployment_environ("3scale-istio-adapter")
-
-
-# pylint: disable=too-few-public-methods
-class ServiceMeshFactory:
-    """Factory for ServiceMesh instances"""
-    def __init__(self, openshift: OpenShiftClient, token: str, url: str) -> None:
-        self.openshift = openshift
-        self.token = token
-        self.url = url
-
-    def create(self, identifier) -> ServiceMesh:
-        """Returns new ServiceMesh instance"""
-        return ServiceMesh(self.openshift, self.token, self.url, identifier)

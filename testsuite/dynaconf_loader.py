@@ -131,6 +131,7 @@ def load(obj, env=None, silent=None, key=None):
         master_url = _route2url(ocp.routes.for_service("system-master")[0])
         master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
         devel_url = _route2url(ocp.routes.for_service("system-developer")[0])
+        superdomain = ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
         try:
             backend_route = ocp.routes.for_service("backend-listener")[0]
         except IndexError:
@@ -162,7 +163,7 @@ def load(obj, env=None, silent=None, key=None):
                         "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
             "threescale": {
                 "version": _guess_version(ocp),
-                "superdomain": ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"],
+                "superdomain": superdomain,
                 "catalogsource": catalogsource,
                 "admin": {
                     "url": admin_url,
@@ -177,7 +178,12 @@ def load(obj, env=None, silent=None, key=None):
                 "devel": {
                     "url": devel_url},
                 "gateway": {
-                    "image": _apicast_image(ocp)},
+                    "default": {
+                        "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
+                        "image": _apicast_image(ocp),
+                        "openshift": ocp
+                    }
+                },
                 "backend_internal_api": {
                     "route": backend_route,
                     "username": ocp.secrets["backend-internal-api"]["username"],

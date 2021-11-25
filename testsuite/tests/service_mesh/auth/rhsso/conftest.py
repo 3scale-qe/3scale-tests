@@ -2,7 +2,7 @@
 import pytest
 from threescale_api.resources import Service
 
-from testsuite.gateways import ServiceMeshGateway
+from testsuite.gateways.service_mesh import ServiceMeshGateway
 from testsuite.lifecycle_hook import LifecycleHook
 from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 

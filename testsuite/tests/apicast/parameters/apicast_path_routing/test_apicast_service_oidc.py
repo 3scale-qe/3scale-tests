@@ -4,46 +4,27 @@ Test for using OIDC with apicast env_variable 'APICAST_SERVICES_FILTER_BY_URL' a
 import pytest
 
 from testsuite import rawobj
-from testsuite.utils import blame
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import gateway
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
+from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY,
                                                 Capability.CUSTOM_ENVIRONMENT)]
 
 
 @pytest.fixture(scope="module")
-def production_route(request):
-    """Have different route name for production gateway"""
-    return blame(request, "path-routing")
-
-
-@pytest.fixture(scope="module")
-def production_gateway(request, configuration, settings_block, gateway_environment, production_route):
-    """Deploy template apicast production gateway."""
-    options = TemplateApicastOptions(staging=False, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
-    gateway.add_route(production_route)
+def production_gateway(request, gateway_environment):
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=False, name=blame(request, "gw"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
     if len(gateway_environment) > 0:
-        gateway.environ.set_many(gateway_environment)
+        gw.environ.set_many(gateway_environment)
 
-    return gateway
-
-
-@pytest.fixture(scope="module")
-def endpoint():
-    """Returns gateway endpoint."""
-    return ""
-
-
-@pytest.fixture(scope="module")
-def prod_endpoint(production_gateway, production_route):
-    """Returns gateway endpoint."""
-    return production_gateway.endpoint % production_route
+    return gw
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -16,7 +16,8 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
@@ -50,21 +51,15 @@ def setup(lifecycle_hooks):
 
 
 @pytest.fixture(scope="module")
-def production_gateway(request, configuration):
-    """Deploy template apicast gateway."""
-    settings_block = {
-        "deployments": {
-            "production": blame(request, "production")
-        }
-    }
-    options = TemplateApicastOptions(staging=False, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
+def production_gateway(request):
+    """Deploy template APIcast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=False, name=blame(request, "production"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
-    gateway.environ["APICAST_SERVICES_FILTER_BY_URL"] = ".*.doesnt.exist"
+    gw.environ["APICAST_SERVICES_FILTER_BY_URL"] = ".*.doesnt.exist"
 
-    return gateway
+    return gw
 
 
 # pylint: disable=unused-argument

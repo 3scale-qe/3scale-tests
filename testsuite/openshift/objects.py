@@ -93,9 +93,11 @@ class Routes(RemoteMapping):
         Args:
             :param route_type: the route type available in Route.Types
             :param kwargs: options for the command
+            :return Created route object
         """
         cmd_args = [f"--{k}={v}" for k, v in kwargs.items()]
-        self._client.do_action("create", ["route", route_type.value, name, cmd_args])
+        cmd_args.append("--output=json")
+        return self._client.do_action("create", ["route", route_type.value, name, cmd_args], parse_output=True)
 
     def for_service(self, service) -> list:
         """

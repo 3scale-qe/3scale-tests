@@ -1,150 +1,64 @@
 """Self managed apicast deployed from apicast template"""
 import logging
-from abc import ABC, abstractmethod
-from typing import Optional, List
-from urllib.parse import urlparse
+import os
 
-from threescale_api.resources import Service
+import importlib_resources as resources
 
-from testsuite.openshift.objects import Routes, SecretTypes
-from testsuite.requirements import ThreeScaleAuthDetails
-from .selfmanaged import SelfManagedApicast, SelfManagedApicastRequirements
-from ...openshift.env import Environ
+from testsuite.openshift.objects import SecretTypes
+from testsuite.openshift.client import OpenShiftClient
+from .selfmanaged import SelfManagedApicast
 
 LOGGER = logging.getLogger(__name__)
 
 
-class TemplateApicastRequirements(SelfManagedApicastRequirements,
-                                  ThreeScaleAuthDetails,
-                                  ABC):
-    """Requirements for TemplateApicast"""
-    @property
-    @abstractmethod
-    def template(self):
-        """Returns template file"""
-
-    @property
-    @abstractmethod
-    def image(self):
-        """Return image to use with in the template"""
-
-    @property
-    @abstractmethod
-    def configuration_url(self):
-        """Returns URL for configuring apicast"""
-
-    @property
-    @abstractmethod
-    def service_routes(self) -> bool:
-        """True, if apicast should creates route for every service"""
-
-
-# pylint: disable=too-many-instance-attributes
 class TemplateApicast(SelfManagedApicast):
-    """Template-based Apicast Gateway."""
+    """Template-based APIcast Gateway."""
 
-    def __init__(self, requirements: TemplateApicastRequirements) -> None:
-        super().__init__(requirements)
-        self.requirements = requirements
-        self.template = requirements.template
-        self.image = requirements.image
-        self.service_routes = requirements.service_routes
-        self.service_name = self.deployment
-        self.name = self.deployment
-        self.configuration_url_secret_name = f'{self.deployment}-config-url'
-        self.routes: List[str] = []
-        self.route_type = Routes.Types.EDGE
+    # pylint: disable=too-many-arguments
+    def __init__(self, staging: bool, openshift: OpenShiftClient, template, name, image,
+                 portal_endpoint, generate_name=False, path_routing=False):
+        super().__init__(staging, openshift, name, generate_name, path_routing)
+        self._image = image
+        self._portal_endpoint = portal_endpoint
 
-    def get_app_params(self, **kwargs):
-        """Template envs for oc new-app."""
-        params = {
+        if template.endswith(".yml") and template == os.path.basename(template):
+            template = resources.files("testsuite.resources").joinpath(template)
+
+        self._template = template
+        self.template_parameters = {
             "APICAST_NAME": self.deployment,
-            "AMP_APICAST_IMAGE": self.image,
-            "DEPLOYMENT_ENVIRONMENT": "production",
-            "CONFIGURATION_LOADER": "boot",
-            "CONFIGURATION_CACHE": 300,
-            "LOG_LEVEL": "info",
-            "CONFIGURATION_URL_SECRET": self.configuration_url_secret_name,
-        }
-
+            "AMP_APICAST_IMAGE": self._image,
+            "CONFIGURATION_URL_SECRET": f"{self.deployment}-secret"}
         if self.staging:
-            params.update({
+            self.template_parameters.update({
                 "CONFIGURATION_LOADER": "lazy",
                 "DEPLOYMENT_ENVIRONMENT": "staging",
-                "CONFIGURATION_CACHE": 0,
-            })
-
-        params.update(**kwargs)
-
-        return params
+                "CONFIGURATION_CACHE": 0})
 
     def _create_configuration_url_secret(self):
         self.openshift.secrets.create(
-            name=self.configuration_url_secret_name,
+            name=self.template_parameters["CONFIGURATION_URL_SECRET"],
             string_data={
-                "password": self.requirements.configuration_url
+                "password": self._portal_endpoint
             },
             secret_type=SecretTypes.BASIC_AUTH
         )
 
-    def _route_name(self, entity_id):
-        if self.staging:
-            return f"{entity_id}-staging"
-        return f"{entity_id}-production"
-
-    def on_service_create(self, service: Service):
-        super().on_service_create(service)
-        if self.service_routes:
-            entity_id = service.entity_id
-            self.add_route(entity_id, self._route_name(entity_id))
-
-    def on_service_delete(self, service: Service):
-        super().on_service_delete(service)
-        if self.service_routes:
-            self.delete_route(self._route_name(service.entity_id))
-
-    @property
-    def environ(self) -> Environ:
-        return self.openshift.environ(self.deployment)
-
-    def add_route(self, url_fragment, name: Optional[str] = None):
-        """Adds new route for this apicast"""
-        identifier = name or url_fragment
-        url = urlparse(self.endpoint % url_fragment)
-        if url.scheme == "https":
-            self.openshift.routes.create(identifier, self.route_type,
-                                         service=self.service_name, hostname=url.hostname)
-        elif url.scheme == "http":
-            self.openshift.routes.expose(name=identifier,
-                                         service=self.service_name, hostname=url.hostname)
-        else:
-            raise AttributeError(f"Unknown scheme {url.scheme} for apicast route")
-        self.routes.append(identifier)
-
-    def delete_route(self, identifier):
-        """Delete route"""
-        if identifier in self.routes and identifier in self.openshift.routes:
-            del self.openshift.routes[identifier]
-            self.routes.remove(identifier)
-
     def create(self):
         LOGGER.debug('Deploying new template-based apicast "%s". Template params: "%s"',
-                     self.deployment, self.get_app_params())
+                     self.deployment, self.template_parameters)
 
         self._create_configuration_url_secret()
 
-        self.openshift.new_app(self.template, self.get_app_params())
+        self.openshift.new_app(self._template, self.template_parameters)
 
         # pylint: disable=protected-access
         self.openshift._wait_for_deployment(self.deployment)
+        super().create()
 
     def destroy(self):
+        super().destroy()
         LOGGER.debug('Destroying template-based apicast "%s"...', self.deployment)
-
-        for route in self.routes:
-            if route in self.openshift.routes:
-                LOGGER.debug('Removing route "%s"...', route)
-                del self.openshift.routes[route]
 
         LOGGER.debug('Deleting service "%s"', self.deployment)
         self.openshift.delete("service", self.deployment)
@@ -152,5 +66,40 @@ class TemplateApicast(SelfManagedApicast):
         LOGGER.debug('Deleting deploymentconfig "%s"', self.deployment)
         self.openshift.delete("deploymentconfig", self.deployment)
 
-        LOGGER.debug('Deleting secret "%s"', self.configuration_url_secret_name)
-        self.openshift.delete("secret", self.configuration_url_secret_name)
+        LOGGER.debug('Deleting secret "%s"', self.template_parameters["CONFIGURATION_URL_SECRET"])
+        self.openshift.delete("secret", self.template_parameters["CONFIGURATION_URL_SECRET"])
+
+    def connect_jaeger(self, jaeger, jaeger_randomized_name):
+        """
+        Modifies the APIcast to send information to jaeger.
+        Creates configmap and a volume, mounts the configmap into the volume
+        Updates the required env vars
+        :param jaeger instance of the Jaeger class carrying the information about the apicast_configuration
+        :param jaeger_randomized_name: randomized name used for the name of the configmap and for
+               the identifying name of the service in jaeger
+        """
+        service_name = jaeger_randomized_name
+        config_map_name = f"{jaeger_randomized_name}.json"
+        self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, service_name))
+        self.openshift.add_volume(self.deployment, "jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
+        self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
+                               "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+
+    def update_image_stream(self, image_stream: str, amp_release: str = "latest"):
+        """
+        Updates the image stream the deployment is using
+        :param image_stream: name of the image stream
+        :param amp_release: tag of the image stream
+        """
+        self.openshift.patch("dc", self.deployment, {"spec": {
+            "triggers": [{
+                "imageChangeParams": {
+                    "automatic": True,
+                    "containerNames": [
+                        self.deployment],
+                    "from":{
+                        "name": f"{image_stream}:{amp_release}"}},
+                    "type": "ImageChange"},
+                {"type": "ConfigChange"}]}})
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(self.deployment)

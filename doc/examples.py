@@ -2,7 +2,8 @@
 This is complication of examples how to use testsuite and write tests. As such
 this is not supposed to be executed and it isn't goal to have this executable
 """
-from testsuite.gateways import SelfManagedApicastOptions, SelfManagedApicast, TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import SelfManagedApicastOptions, SelfManagedApicast, TemplateApicastOptions, TemplateApicast, \
+    gateway
 from testsuite.capabilities import Capability
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
@@ -13,6 +14,9 @@ import requests
 
 ################################################################################
 # run simple test
+from testsuite.utils import blame
+
+
 def test_basic_request(application):
     """test request has to pass and return HTTP 200"""
     assert application.test_request().status_code == 200
@@ -112,45 +116,14 @@ def service(service):
 
 ###############################################################################
 # To explicitly specify gateway for tests override staging_gateway or production_gateway
-@pytest.fixture(scope="session")
-def staging_gateway(request, configuration):
-    # Here you specify the same configuration in dict form as in the settings.yaml
-    setting_block = {
-        "deployments": {  # DeploymentConfigs
-            "staging": "selfmanaged-staging",
-            "production": "selfmanaged-production"
-        }
-    }
-    options = TemplateApicastOptions(staging=True, settings_block=setting_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
+@pytest.fixture(scope="module")
+def staging_gateway(request, testconfig, openshift):
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
-
-    return gateway
-
-
-###############################################################################
-# To explicitly specify the gateway endpoints for the staging and production gateway
-
-@pytest.fixture(scope="session")
-def staging_gateway(settings_block, request, configuration):
-    """Settings block with http(s) endpoints"""
-    endpoints = {
-        "endpoints": {
-            "staging": "https://staging.custom.endpoint",
-            "production": "https://production.custom.endpoint"
-        }}
-    settings_block.update(endpoints)
-
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-
-    request.addfinalizer(gateway.destroy)
-    gateway.create()
-
-    return settings_block
-
+    return gw
 
 ###############################################################################
 # To skip apicast retrying on 404 status code

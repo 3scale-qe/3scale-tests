@@ -2,7 +2,8 @@
 from weakget import weakget
 import pytest
 
-from testsuite.gateways import TemplateApicastOptions, TemplateApicast
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame, warn_and_skip
 
 
@@ -14,31 +15,22 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, configuration, settings_block, gateway_environment):
-    """Deploy template apicast gateway."""
-
-    options = TemplateApicastOptions(staging=True, settings_block=settings_block, configuration=configuration)
-    gateway = TemplateApicast(requirements=options)
-
-    request.addfinalizer(gateway.destroy)
-
-    gateway.create()
+def staging_gateway(request, gateway_environment, gateway_options):
+    """Deploy self-managed template based apicast gateway."""
+    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"), **gateway_options)
+    request.addfinalizer(gw.destroy)
+    gw.create()
 
     if len(gateway_environment) > 0:
-        gateway.environ.set_many(gateway_environment)
+        gw.environ.set_many(gateway_environment)
 
-    return gateway
+    return gw
 
 
 @pytest.fixture(scope="module")
-def settings_block(request):
-    """Settings block for staging gateway"""
-    return {
-        "deployments": {
-            "staging": blame(request, "staging"),
-            "production": blame(request, "production")
-        }
-    }
+def gateway_options():
+    """Additional options to pass to staging gateway constructor"""
+    return {}
 
 
 @pytest.fixture(scope="module")
