@@ -795,16 +795,7 @@ def custom_tenant(testconfig, master_threescale, request):
         master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
 
         if wait:
-            admin_base_url = tenant.entity["signup"]["account"]["admin_base_url"]
-            access_token = tenant.entity["signup"]["access_token"]["value"]
-
-            unprivileged_client = client.ThreeScaleClient(admin_base_url, access_token, ssl_verify=False)
-
-            @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
-            def _wait_on_ready_tenant():
-                unprivileged_client.services.list()
-
-            _wait_on_ready_tenant()
+            tenant.wait_tenant_ready()
 
         return tenant
 

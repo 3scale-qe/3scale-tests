@@ -18,10 +18,7 @@ def dest_client(request) -> client.ThreeScaleClient:
     else:
         tenant = request.getfixturevalue("custom_tenant")()
 
-        destination_endpoint = tenant.entity["signup"]["account"]["admin_base_url"]
-        destination_provider = tenant.entity["signup"]["access_token"]["value"]
-
-        unprivileged_client = client.ThreeScaleClient(destination_endpoint, destination_provider, ssl_verify=False)
+        unprivileged_client = tenant.admin_api(wait=True)
 
         token_name = blame(request, "at")
 
@@ -29,6 +26,7 @@ def dest_client(request) -> client.ThreeScaleClient:
             token_name, "rw", ["finance", "account_management",
                                "stats", "policy_registry"]))
 
+        destination_endpoint = tenant.admin_base_url
         destination_provider = access_token["value"]  # overriding with greater and better access key
 
     return client.ThreeScaleClient(destination_endpoint,
