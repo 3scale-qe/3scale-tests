@@ -3,6 +3,7 @@
 import inspect
 import logging
 import os
+import signal
 import time
 
 import importlib_resources as resources
@@ -27,6 +28,17 @@ from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 
 pytest_plugins = ("testsuite.gateway_logs",)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def term_handler():
+    """
+    This will handle ^C, cleanup won't be skipped
+    https://github.com/pytest-dev/pytest/issues/9142
+    """
+    orig = signal.signal(signal.SIGTERM, signal.getsignal(signal.SIGINT))
+    yield
+    signal.signal(signal.SIGTERM, orig)
 
 
 def pytest_addoption(parser):
