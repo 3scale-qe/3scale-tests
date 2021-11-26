@@ -26,20 +26,6 @@ METRICS = [
 STATUSES = [300, 418, 507]
 
 
-@pytest.fixture(scope="module")
-def api_client(api_client):
-    """Returns stage client instance."""
-    client = api_client()
-    return client
-
-
-@pytest.fixture(scope="module")
-def prod_client(prod_client):
-    """Returns prod client instance."""
-    client = prod_client()
-    return client
-
-
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module", params=["apicast-staging", "apicast-production"])
 def metrics(request, prometheus):
@@ -85,6 +71,7 @@ def test_apicast_status_metrics(request, client, container, prometheus):
     """
 
     client = request.getfixturevalue(client)
+    client = client()
 
     for status in STATUSES:
         assert client.get(f"/status/{status}").status_code == status
