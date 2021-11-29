@@ -36,22 +36,6 @@ def service(service):
     return service
 
 
-@pytest.fixture(scope="module")
-def prod_client(prod_client):
-    """Hit production apicast so that we can have metrics from it and that we can cache incoming requests"""
-    client = prod_client()
-    assert client.get("/anything").status_code == 200
-    return client
-
-
-@pytest.fixture(scope="module")
-def api_client(api_client):
-    """Apicast needs to load configuration in order to cache incoming requests"""
-    client = api_client()
-    assert client.get("/anything").status_code == 200
-    return client
-
-
 @pytest.mark.disruptive
 @pytest.mark.parametrize(("client", "apicast"), [("api_client", "apicast-staging"),
                                                  ("prod_client", "apicast-production")
@@ -62,6 +46,7 @@ def test_content_caching(request, prometheus, client, apicast):
     Test if cache works correctly and if prometheus contains content_caching metric.
     """
     client = request.getfixturevalue(client)
+    client = client()
     counts_before = extract_caching(prometheus, "content_caching", apicast)
 
     response = client.get("/anything/test", headers=dict(origin="localhost"))
