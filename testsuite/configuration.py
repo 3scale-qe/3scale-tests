@@ -73,7 +73,9 @@ class CommonConfiguration(ThreeScaleAuthDetails, OpenshiftRequirement, Certifica
 
 def call(method, **kwargs):
     """Calls method with only parameters it requires"""
-    expected = inspect.signature(method).parameters.keys()
+    # Due to SelfManaged overriding __new__, inspect cannot infer the expected variables from __new__
+    inspected_method = method.__init__ if inspect.isclass(method) else method
+    expected = inspect.signature(inspected_method).parameters.keys()
     return method(**{k: v for k, v in kwargs.items() if k in expected})
 
 

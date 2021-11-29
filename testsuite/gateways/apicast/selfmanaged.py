@@ -14,6 +14,10 @@ from testsuite.openshift.objects import Routes
 LOGGER = logging.getLogger(__name__)
 
 
+class NoSuitableApicastError(Exception):
+    """Raised if no deployment method is found"""
+
+
 class SelfManagedApicast(AbstractApicast):
     """Gateway for use with already deployed self-managed APIcast in OpenShift"""
 
@@ -23,6 +27,13 @@ class SelfManagedApicast(AbstractApicast):
                     Capability.LOGS,
                     Capability.JAEGER}
     HAS_PRODUCTION = True
+
+    # pylint: disable=unused-argument
+    def __new__(cls, *args, **kwargs):
+        if cls is SelfManagedApicast:
+            klass = cls.resolve_class()
+            super().__new__(klass)
+        return super().__new__(cls)
 
     # pylint: disable=too-many-arguments
     def __init__(self, staging: bool, openshift: OpenShiftClient, name, generate_name=False, path_routing=False):
@@ -37,6 +48,24 @@ class SelfManagedApicast(AbstractApicast):
             self.name = f"{name}-{utils.randomize(utils._whoami()[:8])}"
         self._routes: List[str] = []
         self._base_route = None
+
+    @classmethod
+    def resolve_class(cls):
+        """Returns actual class that will be instantiated"""
+        if cls is SelfManagedApicast:
+            for klass in cls.__subclasses__():
+                if klass.fits():
+                    return klass
+            raise NoSuitableApicastError()
+        return cls
+
+    @staticmethod
+    def fits():   # pylint: disable=unused-argument
+        """
+        True, if this instance fits the current environment
+        Every subclass should override it
+        """
+        return False
 
     @property
     def deployment(self):

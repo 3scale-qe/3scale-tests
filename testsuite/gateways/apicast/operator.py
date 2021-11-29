@@ -1,7 +1,7 @@
 """Apicast deployed with ApicastOperator"""
 import time
 
-from testsuite.capabilities import Capability
+from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.crd.apicast import APIcast
 from testsuite.openshift.env import Environ
@@ -19,6 +19,10 @@ class OperatorApicast(SelfManagedApicast):
         super().__init__(staging, openshift, name, generate_name)
         self.portal_endpoint = portal_endpoint
         self.apicast = None
+
+    @staticmethod
+    def fits():
+        return Capability.OCP4 in CapabilityRegistry()
 
     @property
     def deployment(self):

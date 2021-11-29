@@ -47,8 +47,10 @@ def gateway(kind: Union[Type[Gateway], str] = None, staging: bool = True, **kwar
     configuration = settings["threescale"]["gateway"]["default"].copy()
     kind = kind or configuration["kind"]
     clazz = globals()[kind] if not inspect.isclass(kind) else kind  # type: ignore
-    name = kind.__name__ if inspect.isclass(kind) else kind  # type: ignore
+    if hasattr(clazz, "resolve_class"):
+        clazz = clazz.resolve_class()
 
+    name = clazz.__name__
     named_settings = {}
     if name in settings["threescale"]["gateway"]:
         named_settings = settings["threescale"]["gateway"][name]

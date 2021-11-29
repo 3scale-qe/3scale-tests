@@ -7,6 +7,7 @@ import importlib_resources as resources
 from testsuite.openshift.objects import SecretTypes
 from testsuite.openshift.client import OpenShiftClient
 from .selfmanaged import SelfManagedApicast
+from ...capabilities import CapabilityRegistry, Capability
 
 LOGGER = logging.getLogger(__name__)
 
@@ -34,6 +35,10 @@ class TemplateApicast(SelfManagedApicast):
                 "CONFIGURATION_LOADER": "lazy",
                 "DEPLOYMENT_ENVIRONMENT": "staging",
                 "CONFIGURATION_CACHE": 0})
+
+    @staticmethod
+    def fits():
+        return Capability.OCP3 in CapabilityRegistry()
 
     def _create_configuration_url_secret(self):
         self.openshift.secrets.create(
