@@ -30,7 +30,7 @@ all-is-package:
 
 # pattern to run testfiles individually
 %.py: FORCE
-	$(PYTEST) --performance --ui --disruptive --toolbox $(flags) $@
+	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
 
 test: ## Run test
 test pytest tests: pipenv
