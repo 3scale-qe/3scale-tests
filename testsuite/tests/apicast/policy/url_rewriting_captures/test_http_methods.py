@@ -43,6 +43,13 @@ def service(service):
     return service
 
 
+@pytest.fixture(scope="module")
+def api_client(api_client):
+    """Ensure all is up & running by get request as the other requests in tests are not retried"""
+    api_client().get("/get")
+    return api_client
+
+
 def test_rewrite_url_captures(api_client):
     """it will rewrite /hello/get to /get?my_arg=hello"""
     response = api_client().get("/hello/get")
