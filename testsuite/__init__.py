@@ -30,7 +30,7 @@ from testsuite.configuration import CommonConfiguration  # noqa
 # To avoid indefinite waiting on socket issues default timeout is used.
 # Furthermore to avoid reset of timeout, monkey patching is used to alter
 # socket.settimeout behavior
-socket.setdefaulttimeout(60)
+socket.setdefaulttimeout(120)
 _socket_settimeout = socket.socket.settimeout
 
 
