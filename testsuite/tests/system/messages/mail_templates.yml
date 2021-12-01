@@ -20,7 +20,7 @@ subject_templates:
       this because you subscribed to this notification.<br />View notification preferences
       on <a href=3D"https://3scale-admin.<threescale_superdomain>/p/admin/user/notification_preferences">3scale.net</a>
       </p></body></html>----==_mimepart_(?!-).*--'
-  <application> signup created on <service>:
+  <application> created on <service>:
       Headers: '{"unique_args":{"event_name":"Applications::ApplicationCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","applications/application_created_event"\]}'
       Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
       7bitDear <username>,A new application subscribed to the <aplan> plan on the
