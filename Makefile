@@ -29,7 +29,7 @@ all-is-package:
 	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 # pattern to run testfiles individually
-%.py: FORCE
+%.py: FORCE pipenv
 	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
 
 test: ## Run test
