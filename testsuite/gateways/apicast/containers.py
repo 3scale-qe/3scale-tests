@@ -5,7 +5,7 @@ from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
-from testsuite.openshift.env import Environ
+from testsuite.openshift.env import Properties
 
 
 class ContainerizedApicast(AbstractApicast):
@@ -41,5 +41,5 @@ class ContainerizedApicast(AbstractApicast):
         raise NotImplementedError()
 
     @property
-    def environ(self) -> Environ:
+    def environ(self) -> Properties:
         raise NotImplementedError("ContainerizedAPIcast doesn't support environ yet")

@@ -1,4 +1,5 @@
 """Module containing classes that manipulate deployment configs environment"""
+import abc
 import re
 import logging
 from typing import TYPE_CHECKING, Callable, Match, Dict
@@ -77,6 +78,27 @@ class ConfigMapEnvironmentVariable(EnvironmentVariable):
 
 
 logger = logging.getLogger(__name__)
+
+
+class Properties(abc.ABC):
+    """Abstract class for manipulating objects properties, albeit operator properties or deployments environmental
+    variables"""
+
+    @abc.abstractmethod
+    def set_many(self, envs: Dict[str, str]):
+        """Allow setting many envs at a time."""
+
+    @abc.abstractmethod
+    def __getitem__(self, name):
+        """Returns item"""
+
+    @abc.abstractmethod
+    def __setitem__(self, name, value):
+        """Sets item"""
+
+    @abc.abstractmethod
+    def __delitem__(self, name):
+        """Deletes item"""
 
 
 class Environ:
