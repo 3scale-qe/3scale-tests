@@ -11,13 +11,19 @@ import pytest
 import yaml
 import backoff
 
+from testsuite import rawobj
+from testsuite.utils import blame
+
 
 @pytest.fixture
-def application(application):
-    """Change the application description to avoid errors in YAML parsing
-    """
-    application.update({'description': 'API signup'})
-    return application
+def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
+    "application bound to the account and service with specific description that don't break yaml parsing"
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    app = custom_application(
+        rawobj.Application(blame(request, "app"), plan, "Api signup"), hooks=lifecycle_hooks,
+        annotate=False)
+    service.proxy.deploy()
+    return app
 
 
 @pytest.fixture

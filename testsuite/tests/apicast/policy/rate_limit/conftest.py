@@ -65,8 +65,8 @@ def prod_client(production_gateway, application, request):
                 version = app.service.proxy.list().configs.latest()['version']
             try:
                 app.service.proxy.list().promote(version=version)
-            except threescale_api.errors.ApiClientError:
-                warnings.warn(str(threescale_api.errors.ApiClientError))
+            except threescale_api.errors.ApiClientError as err:
+                warnings.warn(str(err))
 
         if redeploy:
             production_gateway.reload()
