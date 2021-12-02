@@ -315,7 +315,6 @@ def custom_account(threescale, request, testconfig):
     Args:
         :param params: dict for remote call, rawobj.Account should be used
     """
-    @backoff.on_exception(backoff.fibo, errors.ApiClientError, 8, jitter=None)
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = threescale_client.accounts.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
