@@ -3,6 +3,7 @@ Tests the apicast integration with jaeger, information about the requests
 made through apicast is available in jaeger
 It is necessary to have the jaeger url config value set
 """
+import backoff
 import pytest
 
 from testsuite.utils import randomize
@@ -28,17 +29,21 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_randomized_name):
     response = api_client().get(endpoint)
     assert response.status_code == 200
 
+    @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
+    def request_traced():
+        """Let's retry as the tracing might be 'lazy'"""
+        traces = jaeger.traces(jaeger_randomized_name, "/")
+        for trace in traces['data']:
+            for span in trace['spans']:
+                if span['operationName'] == '/':
+                    for tag in span['tags']:
+                        if tag['key'] == "http.url" and endpoint in tag['value']:
+                            return True
+        return False
+
+    assert request_traced()
+
     traces = jaeger.traces(jaeger_randomized_name, "/")
-
-    request_traced = False
-    for trace in traces['data']:
-        for span in trace['spans']:
-            if span['operationName'] == '/':
-                for tag in span['tags']:
-                    if tag['key'] == "http.url" and endpoint in tag['value']:
-                        request_traced = True
-    assert request_traced
-
     url_and_uri = True
     for trace in traces['data']:
         for span in trace['spans']:
