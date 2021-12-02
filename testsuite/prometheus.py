@@ -20,7 +20,7 @@ class PrometheusClient:
     def __init__(self, endpoint: str):
         self.endpoint = endpoint
 
-    def get_metrics(self, target: str) -> dict:
+    def get_metrics(self, target: str) -> set:
         """Get metrics for a specific target.
 
         Args:
@@ -31,7 +31,8 @@ class PrometheusClient:
         }
         response = requests.get(f"{self.endpoint}/api/v1/targets/metadata", params=params)
         response.raise_for_status()
-        return response.json()
+        metrics = response.json()
+        return {m["metric"] for m in metrics["data"]}
 
     def get_metric(self, metric: str, timestamp: Optional[str] = None) -> dict:
         """Get a metric byt metric name.
@@ -69,6 +70,32 @@ class PrometheusClient:
                 # waits to refresh the prometheus metrics
                 time.sleep(PROMETHEUS_REFRESH)
                 _has_metric = self.get_metric(metric) != []
+
+        except requests.exceptions.HTTPError:
+            _has_metric = False
+
+        return _has_metric
+
+    def has_metrics(self, metric: str, target: str, trigger_request: Optional[Callable] = None) -> bool:
+        """
+        Returns true if the given metric is collected by the current settings
+        of prometheus, with the selector 'container=$target'.
+        Args:
+            :param metric: the name of the metric to test
+            :param target: the name of the container label
+            :param trigger_request: a function triggering the metric,
+            as it does not have to be always present in Prometheus.
+            (e. g. fresh install)
+            When empty, the trigger call is not invoked.
+        """
+        try:
+            _has_metric = metric in self.get_metrics(target)
+            if not _has_metric and trigger_request is not None:
+                # when testing on a new install, the metric does not have to be present
+                trigger_request()
+                # waits to refresh the prometheus metrics
+                time.sleep(PROMETHEUS_REFRESH)
+                _has_metric = metric in self.get_metrics(target)
 
         except requests.exceptions.HTTPError:
             _has_metric = False

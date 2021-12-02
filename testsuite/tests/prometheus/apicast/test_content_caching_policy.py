@@ -61,7 +61,6 @@ def test_content_caching(request, prometheus, client, apicast):
     time.sleep(PROMETHEUS_REFRESH)
 
     metrics = prometheus.get_metrics(apicast)
-    metrics = [m["metric"] for m in metrics["data"]]
     assert "content_caching" in metrics
 
     counts_after = extract_caching(prometheus, "content_caching", apicast)

@@ -31,12 +31,9 @@ STATUSES = [300, 418, 507]
 def metrics(request, prometheus):
     """Return all metrics from target defined of staging and also production apicast."""
     metrics = prometheus.get_metrics(request.param)
-    return {m["metric"] for m in metrics["data"]}
+    return metrics
 
 
-# flaky as the testsuite does not trigger the metrics that are expected, their presence
-# depends on prior usage of the gateway
-@pytest.mark.flaky
 @pytest.mark.parametrize("expected_metric", METRICS)
 def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metrics):
     """Metrics must contains expected apicast metrics defined in METRICS."""

@@ -45,7 +45,7 @@ pytestmark = [
 def metrics_master(prometheus):
     """Return all metrics from target defined of system-master."""
     metrics = prometheus.get_metrics("system-master")
-    return {m["metric"] for m in metrics["data"]}
+    return metrics
 
 
 # pylint: disable=unused-argument
@@ -53,7 +53,7 @@ def metrics_master(prometheus):
 def metrics_sidekiq(prometheus):
     """Return all metrics from target defined of system-master."""
     metrics = prometheus.get_metrics("system-sidekiq")
-    return {m["metric"] for m in metrics["data"]}
+    return metrics
 
 
 @pytest.mark.parametrize("metric", METRICS_MASTER)
