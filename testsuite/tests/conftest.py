@@ -607,7 +607,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
 
-    def _custom_application(params, autoclean=True, hooks=None, annotate=True):
+    def _custom_application(params, autoclean=True, hooks=None, annotate=True, account=account):
         params = params.copy()
         for hook in _select_hooks("before_application", hooks):
             params = hook(params)

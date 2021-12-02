@@ -99,17 +99,19 @@ def Application(name: str, application_plan: 'resources.ApplicationPlan',
 
 def ApplicationPlan(name: str,
                     approval_required: bool = False, state_event: str = "publish",
-                    service: 'resources.Service' = None) -> dict:
+                    service: 'resources.Service' = None, setup_fee=0) -> dict:
     """builder of params to create an application plan
     Args:
         :param name: name of the plan
         :param service: The Service associated with this plan
         :approval_required: Is explicit manual approval needed? Default: False
-        :state_event: initial state of the plan; default: 'publish'"""
+        :state_event: initial state of the plan; default: 'publish'
+        :param setup_fee: option for paid plan; default: 0"""
     obj = {
         "name": name,
         "approval_required": approval_required,
-        "state_event": state_event}
+        "state_event": state_event,
+        "setup_fee": setup_fee}
 
     if service is not None:
         obj["service_id"] = service["id"]
