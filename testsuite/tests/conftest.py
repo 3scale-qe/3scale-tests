@@ -275,7 +275,9 @@ def threescale(testconfig):
     return client.ThreeScaleClient(
         testconfig["threescale"]["admin"]["url"],
         testconfig["threescale"]["admin"]["token"],
-        ssl_verify=testconfig["ssl_verify"])
+        ssl_verify=testconfig["ssl_verify"],
+        wait=True
+    )
 
 
 @pytest.fixture(scope="session")
@@ -315,7 +317,6 @@ def custom_account(threescale, request, testconfig):
     Args:
         :param params: dict for remote call, rawobj.Account should be used
     """
-    @backoff.on_exception(backoff.fibo, errors.ApiClientError, 8, jitter=None)
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = threescale_client.accounts.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
@@ -785,7 +786,7 @@ def custom_tenant(testconfig, master_threescale, request):
     """
     Custom Tenant
     """
-    def _custom_tenant(name="t", autoclean=True, wait=True):
+    def _custom_tenant(name="t", autoclean=True):
         user_name = blame(request, name)
         tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
 
@@ -793,18 +794,6 @@ def custom_tenant(testconfig, master_threescale, request):
             request.addfinalizer(tenant.delete)
 
         master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
-
-        if wait:
-            admin_base_url = tenant.entity["signup"]["account"]["admin_base_url"]
-            access_token = tenant.entity["signup"]["access_token"]["value"]
-
-            unprivileged_client = client.ThreeScaleClient(admin_base_url, access_token, ssl_verify=False)
-
-            @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
-            def _wait_on_ready_tenant():
-                unprivileged_client.services.list()
-
-            _wait_on_ready_tenant()
 
         return tenant
 
