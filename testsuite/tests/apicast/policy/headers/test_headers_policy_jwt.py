@@ -61,7 +61,7 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
     # add 10 seconds to now because there can be different times
     # in Jenkins machine and machine with Apicast
     now = time.time() + 10
-    assert float(exp) > now
-    assert float(iat) <= now
     assert rhsso_service_info.issuer_url() == iss
     assert azp == application["application_id"]
+    assert float(exp) > now
+    assert float(iat) <= now
