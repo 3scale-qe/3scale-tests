@@ -1,0 +1,73 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+name: "apicast-example-policy-copy"
+message: "APIcast Example Policy Source"
+description: "Builds APIcast with custom policy (example) by just copying policy source code from already built image"
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+    labels:
+      app: apicast-custom-policy
+    name: '${BUILD_NAME}'
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: '${TARGET_IMAGE_STREAM}:${TARGET_TAG}'
+    postCommit:
+      args:
+        - '--test'
+        - '--lazy'
+      command:
+        - bin/apicast
+    resources: {}
+    runPolicy: Serial
+    source:
+      images:
+        - from:
+            kind: ImageStreamTag
+            name: '${EXAMPLE_POLICY_IMAGE_STREAM}:${EXAMPLE_POLICY_TAG}'
+          paths:
+            # copy policy source code into the new image
+            - destinationDir: policies
+              sourcePath: /opt/app-root/policies/example
+            # copy also installed dependencies to the policy folder, so they are vendored
+            # - destinationDir: policies/example/0.1/resty/
+            #   sourcePath: /opt/app-root/src/lua_modules/share/lua/5.1/resty/iputils.lua
+      type: Dockerfile
+      dockerfile: |
+        FROM scratch
+        COPY . src
+
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: 'amp-apicast:${AMP_RELEASE}'
+      type: Docker
+
+parameters:
+- name: AMP_RELEASE
+  required: true
+  description: AMP Version (eg. "2.10"), "master" for nightlies
+- name: BUILD_NAME
+  required: true
+  description: Name of the build config
+- name: EXAMPLE_POLICY_IMAGE_STREAM
+  required: true
+  description: Name of the image stream from where to copy the policy
+- name: EXAMPLE_POLICY_TAG
+  required: false
+  default: "github"
+  description: Tag of the image stream from where to copy the policy
+- name: TARGET_IMAGE_STREAM
+  required: true
+  description: Name of the imagestream where to output the final image
+- name: TARGET_TAG
+  required: false
+  default: "copy"
+  description: Tag of the image stream where to output the final image

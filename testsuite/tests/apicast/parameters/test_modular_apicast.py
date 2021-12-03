@@ -17,24 +17,15 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
 
 
 @pytest.fixture(scope="module")
-def image_template():
-    """
-    Returns the path of the apicast_example_policy_template
-    """
-    return resources.files('testsuite.resources.modular_apicast').joinpath("apicast_example_policy.yml")
-
-
-@pytest.fixture(scope="module")
-def image_stream_amp_apicast_custom_policy(request):
+def image_stream_name(request):
     """
     Returns the blamed name for the amp-apicast-custom-policy image stream
     """
-    return blame(request, "is-amp-apicast-custom-policy")
+    return blame(request, "examplepolicy")
 
 
 @pytest.fixture(scope="module")
-def build_images(openshift, request, image_template,
-                 image_stream_amp_apicast_custom_policy):
+def build_images(openshift, request, image_stream_name):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -45,34 +36,44 @@ def build_images(openshift, request, image_template,
     """
     openshift_client = openshift()
 
-    amp_release = openshift_client.image_stream_tag("amp-apicast")
-    build_name_example_policy = blame(request, "apicast-example-policy")
-    build_name_custom_policies = blame(request, "apicast-custom-policies")
-    image_stream_apicast_policy = blame(request, "is-apicast-policy")
+    github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
+    copy_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy_copy.yml")
 
-    template_params = {"AMP_RELEASE": amp_release,
-                       "BUILD_NAME_EXAMPLE_POLICY": build_name_example_policy,
-                       "BUILD_NAME_CUSTOM_POLICY": build_name_custom_policies,
-                       "IMAGE_STREAM_APICAST_POLICY": image_stream_apicast_policy,
-                       "IMAGE_STREAM_AMP_APICAST_CUSTOM_POLICY": image_stream_amp_apicast_custom_policy
-                       }
+    amp_release = openshift_client.image_stream_tag("amp-apicast")
+    build_name_github = blame(request, "apicast-example-policy-github")
+    build_name_copy = blame(request, "apicast-example-policy-copy")
+
+    github_params = {"AMP_RELEASE": amp_release,
+                     "BUILD_NAME": build_name_github,
+                     "IMAGE_STREAM_NAME": image_stream_name,
+                     "IMAGE_STREAM_TAG": "github"}
+
+    copy_params = {"AMP_RELEASE": amp_release,
+                   "BUILD_NAME": build_name_copy,
+                   "TARGET_IMAGE_STREAM": image_stream_name,
+                   "TARGET_TAG": "latest",
+                   "EXAMPLE_POLICY_IMAGE_STREAM": image_stream_name,
+                   "EXAMPLE_POLICY_TAG": "github"}
 
     def _delete_builds():
-        openshift_client.delete_template(image_template, template_params)
+        openshift_client.delete_template(github_template, github_params)
+        openshift_client.delete_template(copy_template, copy_params)
 
     request.addfinalizer(_delete_builds)
 
-    openshift_client.new_app(image_template, template_params)
-    openshift_client.start_build(build_name_example_policy)
+    openshift_client.new_app(github_template, github_params)
+    openshift_client.new_app(copy_template, copy_params)
+    openshift_client.start_build(build_name_github)
+    openshift_client.start_build(build_name_copy)
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(staging_gateway, image_stream_amp_apicast_custom_policy):
+def staging_gateway(staging_gateway, image_stream_name):
     """
     Deploys template apicast.
     Updates the gateway to use the new imagestream.
     """
-    staging_gateway.update_image_stream(image_stream_amp_apicast_custom_policy)
+    staging_gateway.update_image_stream(image_stream_name)
     return staging_gateway
 
 
@@ -96,7 +97,7 @@ def service(service, policy_settings):
 # for some reason first requests do not seem to be modified, policy is applied later
 @backoff.on_predicate(backoff.fibo, lambda x: "X-Example-Policy-Response" not in x.headers, 8, jitter=None)
 def get(api_client, url):
-    """Resilient get to ensure apicast has time to initalize policy chain"""
+    """Resilient get to ensure apicast has time to initialize policy chain"""
     return api_client.get(url)
 
 
