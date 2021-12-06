@@ -52,7 +52,7 @@ def test_devel_login_auth0(custom_devel_auth0_login, navigator, auth0_user, auth
     """
     custom_devel_auth0_login(auth0_user["email"], auth0_user_password)
     signup_view = SignUpView(navigator.browser)
-    assert signup_view.wait_displayed
+    assert signup_view.wait_displayed()
 
     signup_view.signup("RedHat")
 
