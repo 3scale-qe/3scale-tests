@@ -45,8 +45,10 @@ def test_content_caching(request, prometheus, client, apicast):
     """
     Test if cache works correctly and if prometheus contains content_caching metric.
     """
-    client = request.getfixturevalue(client)
-    client = client()
+    client = request.getfixturevalue(client)()
+    # """Hit apicast so that we can have metrics from it and that we can cache incoming requests"""
+    # """Apicast needs to load configuration in order to cache incoming requests"""
+    client.get("/get")
     counts_before = extract_caching(prometheus, "content_caching", apicast)
 
     response = client.get("/anything/test", headers=dict(origin="localhost"))
