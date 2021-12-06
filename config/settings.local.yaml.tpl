@@ -17,7 +17,8 @@ development:  # default dynaconf env
       password: ${MASTER_PASSWORD}
       token: ${MASTER_ACCESS_TOKEN}
     gateway:
-      image: ${APICAST_IMAGE}
+      TemplateApicast:
+        image: ${APICAST_IMAGE}
     service:
       backends:
         echo_api: https://${ECHO_API_HOSTNAME}:443
