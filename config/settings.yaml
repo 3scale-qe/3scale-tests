@@ -12,6 +12,10 @@ default:
     gateway:
       TemplateApicast:
         template: apicast.yml
+      OperatorApicast:
+        openshift:
+          project_name: "apicast-operator"
+          kind: "OpenShiftClient"
       default:
         kind: "SystemApicast"
   rhsso:
