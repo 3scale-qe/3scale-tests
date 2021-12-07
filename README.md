@@ -138,6 +138,9 @@ Alternatively it can be set in the configuration.
 `make test NAMESPACE=3scale`
  - general way to run the testsuite; troublesome tests excluded == no flaky or disruptive
 
+`make speedrun NAMESPACE=3scale`
+ - this is 'test' just even more reduced to provide better coverage than smoke but still fast enough
+
 `make flaky NAMESPACE=3scale`
  - unstable tests causing false alarms
 
@@ -155,11 +158,22 @@ Targets can be combined
 `make ./testsuite/tests/apicast/auth/test_basic_auth_user_key.py NAMESPACE=3scale`
  - to run particular test standalone
 
+### Test Selection, Marks and Custom Arguments
+
+Selection of tests in the targets described above is based on pytest marks and
+extra commandline options. Marks should be used wisely and reviewed carefully
+and extra care is required when combining marks on one test. For example
+`pytest.mark.disruptive` on some UI test causes that neither `make ui` nor
+`make disruptive` without extra option runs such test. This danger applies to
+selections based on the arguments, e.g. `pytest.mark.flaky` is safe to combine
+with anything, it just doesn't have to be reasonable for every case.
+
 ### pytest Arguments
 
 The arguments to pytest can be passed as `flags=` variable:
 
 `make smoke NAMESPACE=3scale flags=--junitxml=junit.xml`
+
 
 ## Run the tests in container
 

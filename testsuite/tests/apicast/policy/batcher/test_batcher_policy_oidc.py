@@ -24,7 +24,7 @@ def policy_settings():
     return rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS})
 
 
-@pytest.mark.slow
+@pytest.mark.sandbag  # slow due to long sleep
 def test_batcher_policy_oidc(api_client, application, rhsso_service_info):
     """Test if return correct number of usages of a service in batch"""
     app_key = application.keys.list()["keys"][0]["key"]["value"]

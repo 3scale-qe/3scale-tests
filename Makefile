@@ -36,6 +36,10 @@ test: ## Run test
 test pytest tests: pipenv
 	$(PYTEST) -n4 -m 'not flaky' $(flags) testsuite
 
+speedrun: ## Bigger than smoke faster than test
+speedrun: pipenv
+	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
+
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
 debug: test

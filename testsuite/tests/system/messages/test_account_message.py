@@ -4,6 +4,7 @@ When sending message to a developer account, the email is send
 """
 
 import backoff
+import pytest
 
 
 @backoff.on_exception(backoff.fibo, AssertionError, 8, jitter=None)
@@ -15,6 +16,8 @@ def assert_message_received(mailhog, text):
     return ids
 
 
+# requires mailhog *AND* special deployment with preconfigured smtp secret
+@pytest.mark.sandbag
 def test_account_will_receive_email(mailhog_client, threescale, account):
     """
     Sends a message to an account
