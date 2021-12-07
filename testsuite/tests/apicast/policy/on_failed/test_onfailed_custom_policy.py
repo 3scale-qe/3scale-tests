@@ -3,30 +3,20 @@ Build an apicast image containing a custom policies that fails during execution
 and tests that on failed policy returns the correct error code.
 """
 import backoff
-import pytest
 import importlib_resources as resources
-
+import pytest
 
 from testsuite.capabilities import Capability
 from testsuite.gateways import gateway
-from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
-
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6705")]
 
 
 @pytest.fixture(scope="module")
-def image_stream_name(request):
-    """
-    Returns the blamed name for the amp-apicast-custom-policy image stream
-    """
-    return blame(request, "examplepolicy")
-
-
-@pytest.fixture(scope="module")
-def build_images(openshift, request, image_stream_name):
+def set_gateway_image(openshift, staging_gateway, request):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -35,14 +25,17 @@ def build_images(openshift, request, image_stream_name):
 
     Adds finalizer to delete the created resources when the test ends.
     """
-    openshift_client = openshift()
+    openshift_client = staging_gateway.openshift
+    image_stream_name = blame(request, "examplepolicy")
 
     github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
 
-    amp_release = openshift_client.image_stream_tag_from_trigger("dc/apicast-production")
+    amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
+    project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
 
     github_params = {"AMP_RELEASE": amp_release,
+                     "NAMESPACE": project,
                      "BUILD_NAME": build_name_github,
                      "IMAGE_STREAM_NAME": image_stream_name,
                      "IMAGE_STREAM_TAG": "github"}
@@ -58,13 +51,11 @@ def build_images(openshift, request, image_stream_name):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def staging_gateway(request, build_images, image_stream_name) -> TemplateApicast:
+def staging_gateway(request) -> SelfManagedApicast:
     """Deploy self-managed template based apicast gateway."""
-    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    gw = gateway(kind=SelfManagedApicast, staging=True, name=blame(request, "gw"))
     request.addfinalizer(gw.destroy)
     gw.create()
-
-    gw.update_image_stream(image_stream_name)
     return gw
 
 
@@ -92,7 +83,7 @@ def make_request(api_client):
 
 
 # pylint: disable=unused-argument
-def test_on_failed(build_images, application, return_code):
+def test_on_failed(set_gateway_image, application, return_code):
     """
     Sends request to backend and check that the right error_status_code is returned according
     to on_failed policy configuration.

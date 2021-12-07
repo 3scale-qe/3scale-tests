@@ -2,30 +2,39 @@
 Tests that an apicast image containing custom policies can be build,
 substituted for the image of the deployed apicast and the custom policies
 are working as expected.
+
+When tested with APIcast deployed by template it successfully tests custom policies,
+ however for Operator it does test APIcast with custom image only as the supported way of doing custom policies
+ through operator is a different one.
 """
 
 import backoff
-
-import pytest
 import importlib_resources as resources
+import pytest
+
 from testsuite import rawobj
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast.operator import OperatorApicast
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553")]
 
 
-@pytest.fixture(scope="module")
-def image_stream_name(request):
-    """
-    Returns the blamed name for the amp-apicast-custom-policy image stream
-    """
-    return blame(request, "examplepolicy")
+@pytest.fixture(scope="module", params=[
+    pytest.param(TemplateApicast,
+                 id="Custom policy test (Template)", marks=[pytest.mark.required_capabilities(Capability.OCP3)]),
+    pytest.param(OperatorApicast,
+                 id="Custom image test (Operator)", marks=[pytest.mark.required_capabilities(Capability.OCP4)])
+])
+def gateway_kind(request):
+    """Gateway class to use for tests"""
+    return request.param
 
 
 @pytest.fixture(scope="module")
-def build_images(openshift, request, image_stream_name):
+def set_gateway_image(openshift, staging_gateway, request):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -34,21 +43,25 @@ def build_images(openshift, request, image_stream_name):
 
     Adds finalizer to delete the created resources when the test ends.
     """
-    openshift_client = openshift()
+    openshift_client = staging_gateway.openshift
+    image_stream_name = blame(request, "examplepolicy")
 
     github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
     copy_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy_copy.yml")
 
-    amp_release = openshift_client.image_stream_tag_from_trigger("dc/apicast-production")
+    amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
+    project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
     build_name_copy = blame(request, "apicast-example-policy-copy")
 
     github_params = {"AMP_RELEASE": amp_release,
+                     "NAMESPACE": project,
                      "BUILD_NAME": build_name_github,
                      "IMAGE_STREAM_NAME": image_stream_name,
                      "IMAGE_STREAM_TAG": "github"}
 
     copy_params = {"AMP_RELEASE": amp_release,
+                   "NAMESPACE": project,
                    "BUILD_NAME": build_name_copy,
                    "TARGET_IMAGE_STREAM": image_stream_name,
                    "TARGET_TAG": "latest",
@@ -66,15 +79,7 @@ def build_images(openshift, request, image_stream_name):
     openshift_client.start_build(build_name_github)
     openshift_client.start_build(build_name_copy)
 
-
-@pytest.fixture(scope="module")
-def staging_gateway(staging_gateway, image_stream_name):
-    """
-    Deploys template apicast.
-    Updates the gateway to use the new imagestream.
-    """
-    staging_gateway.update_image_stream(image_stream_name)
-    return staging_gateway
+    staging_gateway.set_image(f"{openshift_client.image_stream_repository(image_stream_name)}:latest")
 
 
 @pytest.fixture(scope="module")
@@ -102,7 +107,7 @@ def get(api_client, url):
 
 
 # pylint: disable=unused-argument
-def test_modular_apicast(build_images, api_client):
+def test_modular_apicast(set_gateway_image, api_client):
     """
     Sends a request.
     Asserts that the header added by the example policy is present.

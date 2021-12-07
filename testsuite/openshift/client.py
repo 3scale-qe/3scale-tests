@@ -460,3 +460,8 @@ class OpenShiftClient:
         Gets the tag of the given imagestream
         """
         return self.do_action("get", ["imagestream", image_stream]).actions()[0].out.split()[7]
+
+    def image_stream_repository(self, image_stream):
+        """Returns absolute repository url for an image stream"""
+        stream = self.do_action("get", ["imagestream", image_stream, "-o", "yaml"], parse_output=True)
+        return stream.model.status.dockerImageRepository
