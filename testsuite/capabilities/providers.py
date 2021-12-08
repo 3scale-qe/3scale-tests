@@ -1,11 +1,12 @@
 """This module is where most of the capability providers should be to not have them scattered around"""
-from testsuite import CONFIGURATION, gateways
+from testsuite import gateways
 from testsuite.capabilities import CapabilityRegistry, Capability
+from testsuite.configuration import openshift
 
 
 def _rhoam():
     """Returns True, if the current instance is RHOAM. Detects RHOAM by annotations on APIManager object"""
-    client = CONFIGURATION.openshift()
+    client = openshift()
     if client.is_operator_deployment:
         manager = client.api_manager
         if manager.get_annotation("integreatly-name") or manager.get_annotation("integreatly-namespace"):
@@ -30,7 +31,7 @@ def ocp_version():
     Adds capabilities for OCP versions,
     This doesnt check server version but only if the 3scale si deployed by APIManager, but for 99% cases it is enough
     """
-    if CONFIGURATION.openshift().is_operator_deployment:
+    if openshift().is_operator_deployment:
         return {Capability.OCP4}
     return {Capability.OCP3}
 

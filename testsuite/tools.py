@@ -10,9 +10,8 @@ from openshift namespace/project."""
 # to become independent. IDEA: maybe it's worth to consider separation of that
 # code that should be independent from testsuite
 
-from testsuite import CONFIGURATION
 from testsuite.config import settings
-
+from testsuite.configuration import openshift
 
 _tr = {
     "echo_api": "echo-api+ssl",
@@ -49,7 +48,7 @@ class OpenshiftProject:
         self._cache = {}
         self._namespace = namespace
         try:
-            self._oc = CONFIGURATION.openshift(project=namespace)
+            self._oc = openshift(project=namespace)
         except Exception:
             self._oc = None
 

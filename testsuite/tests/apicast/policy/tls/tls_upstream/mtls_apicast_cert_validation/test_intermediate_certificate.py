@@ -7,7 +7,6 @@ import pytest
 from testsuite import rawobj
 from testsuite.tests.apicast.policy.tls import embedded
 
-
 pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363")
 
 
@@ -20,14 +19,14 @@ def upstream_authority(valid_authority):
 
 
 @pytest.fixture(scope="module")
-def intermediate_authority(request, configuration, valid_authority):
+def intermediate_authority(request, manager, valid_authority):
     """
     Intermediate_authority
     valid_authority -> intermediate_authority
     """
-    authority = configuration.manager.get_or_create_ca("intermediate_authority",
-                                                       hosts=["*.com"],
-                                                       certificate_authority=valid_authority)
+    authority = manager.get_or_create_ca("intermediate_authority",
+                                         hosts=["*.com"],
+                                         certificate_authority=valid_authority)
     request.addfinalizer(authority.delete_files)
     return authority
 

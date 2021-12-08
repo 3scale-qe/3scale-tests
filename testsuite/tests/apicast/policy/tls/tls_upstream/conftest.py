@@ -20,33 +20,33 @@ def upstream_authority(valid_authority):
 
 
 @pytest.fixture(scope="module")
-def upstream_cert_hostname(configuration):
+def upstream_cert_hostname(superdomain):
     """
     Hostname of the upstream certificate sent to be validated by APIcast
     May be overwritten to configure different test cases
     """
-    return "*." + configuration.superdomain.split(".", 1)[1]
+    return "*." + superdomain.split(".", 1)[1]
 
 
 @pytest.fixture(scope="module")
-def upstream_certificate(request, configuration, valid_authority, upstream_cert_hostname) -> Certificate:
+def upstream_certificate(request, manager, valid_authority, upstream_cert_hostname) -> Certificate:
     """
     Certificate sent from upstream (httpbin) to be validated by APIcast
     """
     label = "httpbin_" + upstream_cert_hostname
-    cert = configuration.manager.get_or_create(label,
-                                               common_name=upstream_cert_hostname,
-                                               hosts=[upstream_cert_hostname],
-                                               certificate_authority=valid_authority)
+    cert = manager.get_or_create(label,
+                                 common_name=upstream_cert_hostname,
+                                 hosts=[upstream_cert_hostname],
+                                 certificate_authority=valid_authority)
 
     request.addfinalizer(cert.delete_files)
     return cert
 
 
 @pytest.fixture(scope="session")
-def invalid_host_authority(request, configuration) -> Certificate:
+def invalid_host_authority(request, manager) -> Certificate:
     """To be used in tests validating server certificates"""
-    certificate_authority = configuration.manager.get_or_create_ca("invalid_host_ca", hosts=["*.com"])
+    certificate_authority = manager.get_or_create_ca("invalid_host_ca", hosts=["*.com"])
     request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 

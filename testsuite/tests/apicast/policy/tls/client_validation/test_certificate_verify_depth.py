@@ -27,27 +27,27 @@ def valid_authority(staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def authority_a(request, configuration, valid_authority):
+def authority_a(request, manager, valid_authority):
     """
     Intermediate authority_a
     valid_authority -> authority_a
     """
-    authority = configuration.manager.get_or_create_ca("authority_a",
-                                                       hosts=["*.com"],
-                                                       certificate_authority=valid_authority)
+    authority = manager.get_or_create_ca("authority_a",
+                                         hosts=["*.com"],
+                                         certificate_authority=valid_authority)
     request.addfinalizer(authority.delete_files)
     return authority
 
 
 @pytest.fixture(scope="module")
-def authority_b(request, configuration, authority_a):
+def authority_b(request, manager, authority_a):
     """
     Intermediate authority_a
     valid_authority -> authority_a -> authority_b
     """
-    authority = configuration.manager.get_or_create_ca("authority_b",
-                                                       hosts=["*.com"],
-                                                       certificate_authority=authority_a)
+    authority = manager.get_or_create_ca("authority_b",
+                                         hosts=["*.com"],
+                                         certificate_authority=authority_a)
     request.addfinalizer(authority.delete_files)
     return authority
 
