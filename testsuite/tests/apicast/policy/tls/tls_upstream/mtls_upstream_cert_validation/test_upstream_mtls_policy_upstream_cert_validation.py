@@ -19,7 +19,7 @@ from testsuite import TESTED_VERSION, rawobj # noqa # pylint: disable=unused-imp
 from testsuite.utils import blame
 
 pytestmark = [
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7099")
 ]

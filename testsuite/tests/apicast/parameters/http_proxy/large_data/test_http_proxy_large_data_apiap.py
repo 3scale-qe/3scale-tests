@@ -13,7 +13,7 @@ from testsuite.tests.toolbox.test_backend import random_string
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3863"),
-              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
+              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
 
 
 @pytest.fixture(scope="module")

@@ -3,13 +3,10 @@
 import pytest
 from weakget import weakget
 
-from testsuite.capabilities import Capability
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 from testsuite.utils import warn_and_skip
-
-pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
 @pytest.fixture(scope="module", autouse=True)

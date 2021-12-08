@@ -15,7 +15,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame, randomize
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
+              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
 
 
 @pytest.fixture(scope="module")
