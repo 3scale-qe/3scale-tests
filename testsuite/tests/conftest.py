@@ -17,7 +17,7 @@ from weakget import weakget
 import testsuite.capabilities.providers
 import testsuite.tools
 
-from testsuite import rawobj, CONFIGURATION, HTTP2, gateways
+from testsuite import rawobj, HTTP2, gateways, configuration
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.prometheus import PrometheusClient
@@ -184,14 +184,14 @@ def logger(request):
 
 
 @pytest.fixture(scope="session")
-def openshift(configuration):
+def openshift(testconfig):
     "OpenShift client generator"
     return configuration.openshift
 
 
 # pylint: disable=too-few-public-methods,broad-except
 @pytest.fixture(scope="session")
-def tools(testconfig, configuration):
+def tools(testconfig):
     """dict-like object to provide testing environment tools"""
 
     options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
@@ -254,12 +254,6 @@ def prod_client(production_gateway, application, request):
         return client
 
     return _prod_client
-
-
-@pytest.fixture(scope="session")
-def configuration():
-    "CommonConfiguration instance"
-    return CONFIGURATION
 
 
 @pytest.fixture(scope="session")
@@ -399,7 +393,7 @@ def staging_gateway(request):
 
 
 @pytest.fixture(scope="session")
-def production_gateway(request, testconfig, configuration, openshift):
+def production_gateway(request, testconfig, openshift):
     """Production gateway"""
     if not gateways.default.HAS_PRODUCTION:
         return None

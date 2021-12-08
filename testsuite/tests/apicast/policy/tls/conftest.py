@@ -3,7 +3,9 @@
 from weakget import weakget
 import pytest
 
-from testsuite.certificates import Certificate
+from testsuite.certificates import Certificate, CertificateManager
+from testsuite.certificates.cfssl.cli import CFSSLProviderCLI
+from testsuite.certificates.stores import InMemoryCertificateStore
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.tls import TLSApicast
 from testsuite.openshift.objects import SecretKinds
@@ -18,23 +20,37 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="session")
-def server_authority(request, configuration):
+def manager(testconfig):
+    """Certificate Manager"""
+    provider = CFSSLProviderCLI(binary=testconfig["cfssl"]["binary"])
+    store = InMemoryCertificateStore()
+    return CertificateManager(provider, provider, store)
+
+
+@pytest.fixture(scope="session")
+def superdomain(testconfig):
+    """3scale superdomain"""
+    return testconfig["threescale"]["superdomain"]
+
+
+@pytest.fixture(scope="session")
+def server_authority(request, superdomain, manager):
     """CA Authority to be used in the gateway"""
-    wildcard_domain = "*." + configuration.superdomain
-    authority = configuration.manager.get_or_create_ca("server-ca",
-                                                       hosts=[wildcard_domain])
+    wildcard_domain = "*." + superdomain
+    authority = manager.get_or_create_ca("server-ca",
+                                         hosts=[wildcard_domain])
     request.addfinalizer(authority.delete_files)
     return authority
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, testconfig, server_authority, configuration):
+def staging_gateway(request, testconfig, server_authority, superdomain, manager):
     """Deploy tls apicast gateway. We need APIcast listening on https port"""
     kwargs = dict(
         name=blame(request, "tls-gw"),
-        manager=configuration.manager,
+        manager=manager,
         server_authority=server_authority,
-        superdomain=configuration.superdomain,
+        superdomain=superdomain,
         **testconfig["threescale"]["gateway"]["TemplateApicast"],
     )
     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
@@ -45,24 +61,26 @@ def staging_gateway(request, testconfig, server_authority, configuration):
 
 
 @pytest.fixture(scope="session")
-def create_cert(request, configuration):
+def create_cert(request, superdomain, manager):
     """Creates certificate that is valid for entire 3scale subdomain"""
-    host = "*." + configuration.superdomain
+    host = "*." + superdomain
 
     def _create(name: str, certificate_authority: Certificate) -> Certificate:
-        cert = configuration.manager.get_or_create(name,
-                                                   common_name=host,
-                                                   hosts=[host],
-                                                   certificate_authority=certificate_authority)
+        cert = manager.get_or_create(name,
+                                     common_name=host,
+                                     hosts=[host],
+                                     certificate_authority=certificate_authority)
 
         request.addfinalizer(cert.delete_files)
         return cert
+
     return _create
 
 
 @pytest.fixture(scope="session")
 def chainify(request):
     """Creates chain from certificate and his certificate authorities"""
+
     def _chain(certificate: Certificate, *authorities: Certificate) -> Certificate:
         entire_chain = [certificate]
         entire_chain.extend(authorities)
@@ -70,13 +88,14 @@ def chainify(request):
                             key=certificate.key)
         request.addfinalizer(chain.delete_files)
         return chain
+
     return _chain
 
 
 @pytest.fixture(scope="session")
-def valid_authority(request, configuration) -> Certificate:
+def valid_authority(request, manager) -> Certificate:
     """To be used in tests validating server certificates"""
-    certificate_authority = configuration.manager.get_or_create_ca("valid_ca", hosts=["*.com"])
+    certificate_authority = manager.get_or_create_ca("valid_ca", hosts=["*.com"])
     request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 
@@ -114,6 +133,7 @@ def mount_certificate_secret(request, staging_gateway):
         staging_gateway.openshift.secrets.create(secret_name, SecretKinds.TLS, certificate=certificate)
         staging_gateway.openshift.add_volume(staging_gateway.deployment, secret_name,
                                              mount_path, secret_name)
+
     return _mount
 
 

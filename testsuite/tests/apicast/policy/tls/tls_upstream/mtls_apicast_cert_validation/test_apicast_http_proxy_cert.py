@@ -61,9 +61,9 @@ def settings_block(request):
 
 
 @pytest.fixture(scope="session")
-def invalid_authority(request, configuration) -> Certificate:
+def invalid_authority(request, manager) -> Certificate:
     """To be used in tests validating server certificates"""
-    certificate_authority = configuration.manager.get_or_create_ca("invalid_ca", hosts=["*.com"])
+    certificate_authority = manager.get_or_create_ca("invalid_ca", hosts=["*.com"])
     request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 

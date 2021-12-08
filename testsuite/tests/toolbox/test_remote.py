@@ -6,7 +6,6 @@ import pytest
 
 from testsuite.config import settings
 
-import testsuite
 from testsuite.toolbox import toolbox
 
 
@@ -14,9 +13,9 @@ EMPTY_LIST = 'Empty remote list.\n'
 
 
 @pytest.fixture(scope="module")
-def src1_str():
+def src1_str(testconfig):
     """ Expected source remote config """
-    return f"^source {testsuite.CONFIGURATION.url} {testsuite.CONFIGURATION.token}$"
+    return f"^source {testconfig['threescale']['admin']['url']} {testconfig['threescale']['admin']['token']}$"
 
 
 @pytest.fixture(scope="module")

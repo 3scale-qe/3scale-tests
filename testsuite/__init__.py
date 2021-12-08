@@ -24,7 +24,6 @@ from pathlib import Path  # noqa
 from packaging.version import Version  # noqa
 
 from testsuite.config import settings  # noqa
-from testsuite.configuration import CommonConfiguration  # noqa
 
 
 # To avoid indefinite waiting on socket issues default timeout is used.
@@ -77,4 +76,3 @@ else:
 TESTED_VERSION = Version(str(settings["threescale"]["version"]))
 HTTP2 = settings.get("http2", False)
 ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent
-CONFIGURATION: CommonConfiguration = CommonConfiguration()
