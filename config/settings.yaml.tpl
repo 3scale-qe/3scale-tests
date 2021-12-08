@@ -18,6 +18,9 @@ default:
     gateway:  # More info at GATEWAYS.md
       default:
         kind: "SystemApicast"
+        openshift:  # Only needed if run without OpenShift
+            project_name: ""{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
+            kind: "OpenShiftClient"
   openshift:
     servers:
       default:

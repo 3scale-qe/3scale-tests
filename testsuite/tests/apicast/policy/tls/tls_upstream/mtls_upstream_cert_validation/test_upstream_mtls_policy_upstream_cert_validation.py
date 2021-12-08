@@ -34,11 +34,11 @@ def apicast_certificate(certificate):
 
 
 @pytest.fixture(scope="module")
-def valid_upstream_hostname(configuration):
+def valid_upstream_hostname(superdomain):
     """
     Upstream hostname matching the upstream domain name
     """
-    return "*." + configuration.superdomain.split(".", 1)[1]
+    return "*." + superdomain.split(".", 1)[1]
 
 
 @pytest.fixture(scope="module")
