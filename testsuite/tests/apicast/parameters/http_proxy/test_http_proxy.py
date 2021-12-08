@@ -9,7 +9,7 @@ from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)]
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
 
 
 @pytest.fixture(scope="module")

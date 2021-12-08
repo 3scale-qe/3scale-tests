@@ -3,6 +3,10 @@ This policy checks client certificates against whitelist of certificates or CAs
 This tests check how TLS validation policy acts when multiple certs are provided"""
 import pytest
 
+from testsuite.capabilities import Capability
+
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
+
 
 @pytest.fixture(scope="module", params=[
     pytest.param(("all_valid", 200), id="all_certs_valid"),

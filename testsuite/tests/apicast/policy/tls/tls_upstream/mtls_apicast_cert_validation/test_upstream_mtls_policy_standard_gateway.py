@@ -10,13 +10,8 @@ It tests only embedded type as path requires manipulation with the deployment
 import pytest
 
 from testsuite import rawobj, gateways
-from testsuite.capabilities import Capability
 from testsuite.certificates import Certificate
 from testsuite.tests.apicast.policy.tls import embedded
-
-pytestmark = [
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
-]
 
 
 @pytest.fixture(scope="session")

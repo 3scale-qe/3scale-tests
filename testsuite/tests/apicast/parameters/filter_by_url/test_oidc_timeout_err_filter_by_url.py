@@ -23,7 +23,7 @@ from testsuite.utils import blame
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6139")]
 

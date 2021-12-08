@@ -9,7 +9,7 @@ import pytest
 from testsuite.capabilities import Capability
 from testsuite import rawobj
 
-pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
+pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
 
 @pytest.fixture(scope="module")

@@ -5,10 +5,13 @@ all certificates in the chain are sent and the request is correctly validated.
 import pytest
 
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.tls import embedded
 
 
-pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363")
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363")]
 
 
 @pytest.fixture(scope="module")

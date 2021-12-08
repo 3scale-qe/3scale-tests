@@ -12,7 +12,7 @@ from testsuite.httpx import HttpxClient
 
 # CFSSL instance is necessary
 pytestmark = [
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4684")]
 
 

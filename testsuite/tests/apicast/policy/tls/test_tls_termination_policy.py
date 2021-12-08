@@ -10,7 +10,7 @@ from testsuite.tests.apicast.policy.tls import embedded
 from testsuite.utils import blame
 
 pytestmark = [
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2898")
 ]
 
