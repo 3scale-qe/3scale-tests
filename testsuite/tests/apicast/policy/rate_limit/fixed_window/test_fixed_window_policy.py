@@ -58,6 +58,28 @@ def application2(config, custom_app_plan, custom_application, request):
     return custom_application(rawobj.Application(blame(request, "app"), plan))
 
 
+@pytest_cases.fixture
+def client(application):
+    """
+    client for first application.
+    """
+
+    client = application.api_client()
+    yield client
+    client.close()
+
+
+@pytest_cases.fixture
+def client2(application2):
+    """
+    client for second application.
+    """
+
+    client = application2.api_client()
+    yield client
+    client.close()
+
+
 @backoff.on_predicate(backoff.constant, lambda x: x[0] != 429 or x[1] != 429, max_time=config_cases.TIME_WINDOW)
 def retry_requests(client, client2):
     """
