@@ -68,7 +68,6 @@ def test_utilization(url, prometheus, application, backend_listener_url, auth_he
     time.sleep(PROMETHEUS_REFRESH)
 
     metrics = prometheus.get_metrics("system-provider")
-    metrics = [m["metric"] for m in metrics["data"]]
     assert "rails_requests_total" in metrics
 
     counts_after = extract_call_metrics(prometheus, "rails_requests_total", "system-provider",
