@@ -47,6 +47,7 @@ objects:
       dockerStrategy:
         from:
           kind: ImageStreamTag
+          namespace: '${NAMESPACE}'
           name: 'amp-apicast:${AMP_RELEASE}'
       type: Docker
 
@@ -67,6 +68,9 @@ parameters:
 - name: TARGET_IMAGE_STREAM
   required: true
   description: Name of the imagestream where to output the final image
+- name: NAMESPACE
+  required: true
+  description: Namespace where amp-apicast resides
 - name: TARGET_TAG
   required: false
   default: "copy"
