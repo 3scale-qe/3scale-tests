@@ -6,7 +6,10 @@ import pytest
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
+# websockets may fail on some deployments probably because of TLS config mismatch
+pytestmark = [
+        pytest.mark.sandbag,
+        pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
 
 
 @pytest.fixture

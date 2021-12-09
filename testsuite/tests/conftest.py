@@ -53,8 +53,12 @@ def pytest_addoption(parser):
     parser.addoption(
         "--ui", action="store_true", default=False, help="Run also UI tests (default: False)"
     )
+    parser.addoption(
+        "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)")
 
 
+# there are many branches as there are many options to influence test selection
+# pylint: disable=too-many-branches
 def pytest_runtest_setup(item):
     """Exclude disruptive tests by default, require explicit option"""
 
@@ -67,6 +71,15 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding performance tests")
     if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
         pytest.skip("Excluding UI tests")
+    if item.config.getoption("--drop-sandbag"):
+        sandbag_caps = (Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER)
+        if "sandbag" in marks or "xfail" in marks:
+            pytest.skip("Dropping sandbag")
+        elif "required_capabilities" in marks:
+            required_capabilities = item.iter_markers(name="required_capabilities")
+            for cap in required_capabilities:
+                if cap in sandbag_caps:
+                    pytest.skip("Dropping sandbag")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:

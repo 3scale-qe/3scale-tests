@@ -21,7 +21,6 @@ def test_incorrect_name_policy_staging_call(api_client):
     assert response.status_code == 200
 
 
-@pytest.mark.slow
 @pytest.mark.disruptive
 @pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)
 def test_incorrect_name_policy_production_call(prod_client):
