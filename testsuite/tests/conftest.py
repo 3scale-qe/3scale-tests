@@ -334,10 +334,10 @@ def custom_account(threescale, request, testconfig):
 
 
 @pytest.fixture(scope="session")
-def user(custom_user, account, request, testconfig, configuration):
+def user(custom_user, account, request, testconfig):
     "Preconfigured user existing over whole testing session"
     username = blame(request, 'us')
-    domain = configuration.superdomain
+    domain = testconfig["threescale"]["superdomain"]
     usr = dict(username=username, email=f"{username}@{domain}",
                password=blame(request, ''), account_id=account['id'])
     usr = custom_user(account, params=usr)

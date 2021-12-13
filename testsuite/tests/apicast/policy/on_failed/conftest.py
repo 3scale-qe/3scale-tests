@@ -5,17 +5,6 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 
-@pytest.fixture(scope="module")
-def settings_block(request) -> dict:
-    """Settings block for staging gateway"""
-    return {
-        "deployments": {
-            "staging": blame(request, "staging"),
-            "production": blame(request, "production")
-        }
-    }
-
-
 @pytest.fixture(params=[{}, {"error_status_code": 500}])
 def on_failed_configuration(request) -> dict:
     """returns the configuration of the on_failed policy to use"""

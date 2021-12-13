@@ -24,10 +24,10 @@ def my_accounts(custom_account, account, request):
 
 
 @pytest.fixture(scope="module")
-def my_account_users(request, user, custom_user, my_accounts, configuration):
+def my_account_users(request, user, custom_user, my_accounts, testconfig):
     """Account users fixture"""
     username = blame(request, 'user')
-    domain = configuration.superdomain
+    domain = testconfig["threescale"]["superdomain"]
     user2 = custom_user(my_accounts[1],
                         dict(username=username, email=f"{username}@{domain}",
                              password=blame(request, ''), account_id=my_accounts[1]['id']))
