@@ -1,4 +1,5 @@
 """View representations of Billing pages"""
+
 from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput
 
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -103,8 +104,7 @@ class BillingSettingsView(BaseAudienceView):
         """Save changes for billing settings View"""
         self.browser.click(self.gateway_form.save_btn, ignore_ajax=True)
         if self.browser.alert_present:
-            self.browser.get_alert().accept()
-            self.browser.get_alert().accept()
+            self.browser.handle_double_alert()
 
     def prerequisite(self):
         return BaseAudienceView

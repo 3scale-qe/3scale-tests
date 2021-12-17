@@ -2,6 +2,9 @@
 from contextlib import contextmanager
 from time import sleep
 from urllib import parse
+import backoff
+
+from selenium.common.exceptions import NoSuchElementException
 
 from widgetastic.browser import Browser, DefaultPlugin
 
@@ -106,3 +109,24 @@ class ThreeScaleBrowser(Browser):
         else:
             self.browser.close_window(new_handle)
             self.browser.switch_to_window(current_handle)
+
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=8, jitter=None)
+    def switch_to_frame(self, *args, **kwargs) -> None:
+        """
+        Overrides `switch_to_frame` method defined in widgetastic/browser.
+        IFrames for billing (OTP forms) usually take a long time to load. Simple backoff should ensure
+        correct frame switching.
+        """
+        parent = kwargs.pop("parent", self.browser)
+        self.selenium.switch_to.frame(self.element(parent=parent, *args, **kwargs))
+
+    def handle_double_alert(self):
+        """
+        In some user interactions, 3scale displays two alerts to confirm one action. This method confirms both of them.
+        Firefox needs a split second between two alerts to load them correctly, so we had to use two similar,
+        but different methods defined by Widgetastic:
+            `get_alert().accept()` does not implement implicit waiting
+            `handle_alert()` waits for an alert to appear, but dismiss all subsequent alerts
+        """
+        self.get_alert().accept()
+        self.handle_alert()

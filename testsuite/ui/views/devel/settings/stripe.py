@@ -1,7 +1,6 @@
 """Settings Devel portal View containing credit card details for Stripe payment gateway"""
 import logging
 
-import backoff
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 
 from testsuite.ui.objects import CreditCard, BillingAddress
@@ -35,50 +34,56 @@ class BillingAddressForm(View):
         self.postal.fill(address.zip)
         self.submit.click()
 
+    @property
+    def is_displayed(self):
+        return self.name.is_displayed and self.submit.is_displayed
+
 
 class StripeCCForm(View):
     """Stripe Credit card form"""
-    submit_btn = GenericLocatorWidget("//button[@id='stripe-submit']")
+    submit_btn = GenericLocatorWidget(".//button[@id='stripe-submit']")
+
+    @View.nested
+    class cc_details(View):  # pylint: disable=invalid-name
+        """IFrame that contains credit card information"""
+        FRAME = ".//form[@id='stripe-form']//iframe"
+        cardnumber = TextInput(name="cardnumber")
+        expiration = TextInput(name="exp-date")
+        cvc = TextInput(name="cvc")
+        postal = TextInput(name="postal")
 
     def add(self, credit_card, postal):
         """Adds a new card to the Stripe form"""
-        stripe_frame = self.browser.selenium.find_elements_by_tag_name("iframe")[0]
-        self.browser.selenium.switch_to.frame(stripe_frame)
-        self._element('cardnumber').send_keys(credit_card.number)
-        self._element('exp-date').send_keys(f"{credit_card.exp_month}{credit_card.exp_year}")
-        self._element('cvc').send_keys(credit_card.cvc)
-        self._element('postal').send_keys(postal)
-        self.browser.selenium.switch_to.default_content()
+        self.cc_details.cardnumber.fill(credit_card.number)
+        self.cc_details.expiration.fill(f"{credit_card.exp_month}{credit_card.exp_year}")
+        self.cc_details.cvc.fill(credit_card.cvc)
+        self.cc_details.postal.fill(postal)
         self.submit_btn.click()
 
-    def _element(self, name):
-        return self.browser.selenium.find_element_by_name(name)
+    @property
+    def is_displayed(self):
+        return self.submit_btn.is_displayed and self.cc_details.cardnumber.is_displayed
 
 
 class OTPForm(View):
-    """3DS Stripe verification form"""
+    """3DS Stripe verification form. OTP test button is hidden in 3 IFrames"""
+    FRAME = "html/body/div/iframe[contains(@name, 'StripeFrame')]"
+
+    @View.nested
+    class challenge_frame(View):  # pylint: disable=invalid-name
+        """Nested IFrame"""
+        FRAME = ".//iframe[@id='challengeFrame']"
+
+        @View.nested
+        class acs_frame(View):  # pylint: disable=invalid-name
+            """Nested IFrame that contains OTP elements"""
+            FRAME = ".//iframe[@name='acsFrame']"
+            complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-3ds']")
+
     def complete_auth(self):
         """Completes the authentication"""
-        self._switch_to_otp_frame()
-        self.browser.wait_for_element("//*[@id='test-source-authorize-3ds']").click()
+        self.browser.element(self.challenge_frame.acs_frame.complete_auth).submit()
         self.browser.selenium.switch_to.default_content()
-
-    def _switch_frame(self, name):
-        self.browser.selenium.switch_to.frame(self.browser.selenium.find_element_by_xpath(name))
-
-    def _switch_to_otp_frame(self):
-        def _switch_default(details):
-            logger.debug("Switching focus into the 3DS form iFrame. "
-                         "Backing off {wait:0.1f} seconds afters {tries} tries.".format(**details))
-            self.browser.selenium.switch_to.default_content()
-
-        @backoff.on_exception(backoff.fibo, Exception, max_tries=8, jitter=None, on_backoff=_switch_default)
-        def _otp_frame_switch():
-            self._switch_frame("/html/body/div[1]/iframe")
-            self._switch_frame("//iframe[@id='challengeFrame']")
-            self._switch_frame("//iframe[@name='acsFrame']")
-
-        return _otp_frame_switch()
 
 
 class StripeCCView(BaseDevelView):
@@ -87,18 +92,20 @@ class StripeCCView(BaseDevelView):
     tabs = View.nested(SettingsTabs)
     add_billing_address_btn = Text("//a[@href='/admin/account/stripe/edit']")
     add_cc_details_btn = GenericLocatorWidget("//*[normalize-space(.)='Edit Credit Card Details']")
+
     address_form = View.nested(BillingAddressForm)
     cc_form = View.nested(StripeCCForm)
     otp_form = View.nested(OTPForm)
 
     def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details for the user"""
-        if self.add_billing_address_btn.is_displayed:
-            self.add_billing_address_btn.click()
+        self.add_billing_address_btn.wait_displayed()
+        self.add_billing_address_btn.click()
         self.address_form.add(address)
 
         if self.add_cc_details_btn.is_displayed:
             self.add_cc_details_btn.click()
+        self.cc_form.wait_displayed()
         self.cc_form.add(credit_card, address.zip)
 
         if credit_card.sca:

@@ -68,7 +68,8 @@ class OTPForm(View):
         """Complete authentication"""
         self.otp_input.wait_displayed()
         self.otp_input.fill("1234")
-        self.submit.click()
+        self.browser.element(self.submit).submit()
+        self.browser.selenium.switch_to.default_content()
 
 
 class BraintreeCCView(BaseDevelView):
@@ -79,10 +80,11 @@ class BraintreeCCView(BaseDevelView):
         "//*[normalize-space(.)='Add Credit Card Details and Billing Address']/a")
     edit_billing_address = Text(
         "//*[normalize-space(.)='Edit Credit Card Details and Billing Address']/a")
+    otp_tmp = GenericLocatorWidget("//div[@id='Cardinal-Modal']")
+
     customer_form = View.nested(CustomerForm)
     cc_form = View.nested(BraintreeCCForm)
     otp_form = View.nested(OTPForm)
-    otp_tmp = GenericLocatorWidget("//div[@id='Cardinal-Modal']")
 
     def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details for the user"""
@@ -90,12 +92,13 @@ class BraintreeCCView(BaseDevelView):
             self.add_billing_address.click()
         if self.edit_billing_address.is_displayed:
             self.edit_billing_address.click()
-        self.customer_form.wait_displayed()
+        self.customer_form.wait_displayed(timeout="20s")
         self.customer_form.add(address)
+
         self.cc_form.add(credit_card)
         self.customer_form.save.click()
+
         if credit_card.sca:
-            self.otp_tmp.wait_displayed()
             self.otp_form.complete_auth()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
