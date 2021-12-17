@@ -20,7 +20,8 @@ METRICS = [
     # "nginx_error_log",
     "nginx_http_connections", "nginx_metric_errors_total", "openresty_shdict_capacity",
     "openresty_shdict_free_space", "threescale_backend_calls", "total_response_time_seconds",
-    "upstream_response_time_seconds", "upstream_status",
+    "upstream_response_time_seconds", "upstream_status", "apicast_status", "worker_process",
+    "content_caching",
 ]
 
 STATUSES = [300, 418, 507]

@@ -1,7 +1,9 @@
 """Provide a small client for interacting with Prometheus REST API."""
 import time
+from datetime import datetime
 from typing import Optional, Callable
 
+import backoff
 import requests
 
 # Prometheus has configured the scrape interval to 30s,
@@ -51,6 +53,17 @@ class PrometheusClient:
         response.raise_for_status()
         return response.json()["data"]["result"]
 
+    def get_targets(self) -> dict:
+        """Get active targets information"""
+
+        params = {
+            "state": "active",
+        }
+
+        response = requests.get(f"{self.endpoint}/api/v1/targets", params=params)
+        response.raise_for_status()
+        return response.json()["data"]["activeTargets"]
+
     def has_metric(self, metric: str, trigger_request: Optional[Callable] = None) -> bool:
         """
         Returns true if the given metric is collected by the current settings
@@ -94,10 +107,36 @@ class PrometheusClient:
                 # when testing on a new install, the metric does not have to be present
                 trigger_request()
                 # waits to refresh the prometheus metrics
-                time.sleep(PROMETHEUS_REFRESH)
+                self.wait_on_next_scrape(target)
                 _has_metric = metric in self.get_metrics(target)
 
         except requests.exceptions.HTTPError:
             _has_metric = False
 
         return _has_metric
+
+    def wait_on_next_scrape(self, target_container: str):
+        """Block until next scrape for a container is finished"""
+        after = datetime.utcnow()
+
+        def _time_of_scrape(target_container: str):
+            for target in self.get_targets():
+                if "container" in target["labels"].keys() and target["labels"]["container"] == target_container:
+                    return datetime.fromisoformat(target["lastScrape"][:19])
+            return None
+
+        @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
+        def _wait_on_next_scrape():
+            last_scrape = _time_of_scrape(target_container)
+            if last_scrape is not None:
+                return after < last_scrape
+            return False
+
+        last_scrape = _time_of_scrape(target_container)
+        if after < last_scrape:
+            return
+
+        wait_time = PROMETHEUS_REFRESH - (after - last_scrape).seconds
+
+        time.sleep(wait_time)
+        _wait_on_next_scrape()

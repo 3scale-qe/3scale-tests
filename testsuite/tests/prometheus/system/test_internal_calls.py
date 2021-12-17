@@ -2,14 +2,12 @@
 Test Prometheus metric for content_caching.
 """
 import base64
-import time
 
 import pytest
 import requests
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
-from testsuite.prometheus import PROMETHEUS_REFRESH
 
 pytestmark = [
     pytest.mark.disruptive,
@@ -65,7 +63,7 @@ def test_utilization(url, prometheus, application, backend_listener_url, auth_he
                  verify=False, headers=auth_headers)
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
-    time.sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-worker")
 
     metrics = prometheus.get_metrics("system-provider")
     assert "rails_requests_total" in metrics
