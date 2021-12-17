@@ -1,7 +1,8 @@
 """Plug-in for Widgetastic browser with 3scale specific environment settings"""
 from contextlib import contextmanager
-from urllib import parse
 from time import sleep
+from urllib import parse
+
 from widgetastic.browser import Browser, DefaultPlugin
 
 
@@ -98,6 +99,7 @@ class ThreeScaleBrowser(Browser):
         returned_object = trigger()
         new_handle = [t for t in self.browser.window_handles if t not in old_handles][0]
         self.browser.switch_to_window(new_handle)
+        self.plugin.ensure_page_safe()
         yield returned_object
         if keep_tab:
             self.browser.close_window(current_handle)
