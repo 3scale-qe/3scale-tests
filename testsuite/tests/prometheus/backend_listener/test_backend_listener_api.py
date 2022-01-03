@@ -5,8 +5,6 @@ the increase of the metric, respective to the endpoint and returned
 status code, is expected in prometheus.
 """
 
-from time import sleep
-
 import pytest
 import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
@@ -14,7 +12,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame, randomize
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.prometheus import PROMETHEUS_REFRESH
 
 NUM_OF_REQUESTS = 10
 
@@ -163,7 +160,8 @@ def data(standard_auth, transaction_auth, oauth_params):
     }
 
 
-def test_authrep(data, prometheus_response_codes_for_metric, auth_request):
+# pylint: disable=too-many-locals
+def test_authrep(data, prometheus_response_codes_for_metric, auth_request, prometheus):
     """
     Sends NUM_OF_REQUESTS requests returning 2xx response and 403 response
     to each backend-listener authorization endpoint.
@@ -173,7 +171,7 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request):
     """
 
     # wait to update metrics triggered by previous tests
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-listener")
 
     count_before = {}
     for request_type in data:
@@ -186,7 +184,7 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request):
                 f"failed for {request_type}"
 
     # wait for prometheus to collect the metrics
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-listener")
 
     count_after = {}
     results = {}

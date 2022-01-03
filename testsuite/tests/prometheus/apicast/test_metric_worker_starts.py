@@ -2,13 +2,11 @@
 Test Prometheus metric when worker starts
 https://issues.redhat.com/browse/THREESCALE-5965
 """
-from time import sleep
 
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
-from testsuite.prometheus import PROMETHEUS_REFRESH
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
               pytest.mark.disruptive,
@@ -33,7 +31,7 @@ def test_metric_worker(prometheus, production_gateway):
     ocp.do_action("exec", ['-ti', pod.names()[0], "--", "/bin/sh", "-c", kill_worker])
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("apicast-production")
 
     metrics = prometheus.get_metric("worker_process")
 

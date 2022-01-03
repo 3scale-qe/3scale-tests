@@ -3,13 +3,10 @@ When report request is sent to backend, the report job starts and
 the report jobs metric in prometheus is increased.
 """
 
-from time import sleep
-
 import pytest
 import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite.prometheus import PROMETHEUS_REFRESH
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
@@ -49,7 +46,7 @@ def prometheus_worker_job_count(prometheus, testconfig):
     return _prometheus_worker_job_count
 
 
-def test_authrep(backend_listener_url, auth_data, prometheus_worker_job_count):
+def test_authrep(backend_listener_url, auth_data, prometheus_worker_job_count, prometheus):
     """
     Sends NUM_OF_REQUESTS report requests on backend listener.
 
@@ -57,7 +54,7 @@ def test_authrep(backend_listener_url, auth_data, prometheus_worker_job_count):
     by the number of requests sent.
     """
     # wait to update metrics triggered by previous tests
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-worker")
 
     report_jobs_count_before = prometheus_worker_job_count("ReportJob")
 
@@ -66,7 +63,7 @@ def test_authrep(backend_listener_url, auth_data, prometheus_worker_job_count):
         assert response.status_code == 202
 
     # wait for prometheus to collect the metrics
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-worker")
 
     report_jobs_count_after = prometheus_worker_job_count("ReportJob")
 

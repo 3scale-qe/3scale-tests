@@ -1,13 +1,12 @@
 """
 Test Prometheus metric for content_caching.
 """
-import time
 
+import backoff
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
-from testsuite.prometheus import PROMETHEUS_REFRESH
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
@@ -48,7 +47,17 @@ def test_content_caching(request, prometheus, client, apicast):
     client = request.getfixturevalue(client)()
     # """Hit apicast so that we can have metrics from it and that we can cache incoming requests"""
     # """Apicast needs to load configuration in order to cache incoming requests"""
-    client.get("/get")
+    client.get("/get", headers=dict(origin="localhost"))
+
+    @backoff.on_predicate(backoff.fibo, lambda x: not x, 10, jitter=None)
+    def wait():
+        """Wait until content_caching key is in prometheus"""
+        prometheus.wait_on_next_scrape(apicast)
+        metrics = prometheus.get_metrics(apicast)
+        return "content_caching" in metrics
+
+    wait()
+
     counts_before = extract_caching(prometheus, "content_caching", apicast)
 
     response = client.get("/anything/test", headers=dict(origin="localhost"))
@@ -60,7 +69,7 @@ def test_content_caching(request, prometheus, client, apicast):
     assert response.headers.get("X-Cache-Status") == "HIT"
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
-    time.sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape(apicast)
 
     metrics = prometheus.get_metrics(apicast)
     assert "content_caching" in metrics

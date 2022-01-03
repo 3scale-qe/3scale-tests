@@ -4,14 +4,12 @@ When an internal backend api endpoint is requested, the increase of the respecti
 metric is expected
 """
 import base64
-from time import sleep
 
 import pytest
 import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from threescale_api.resources import Service
-from testsuite.prometheus import PROMETHEUS_REFRESH
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
@@ -171,8 +169,9 @@ def data_xfail():
         }
 
 
+# pylint: disable=too-many-locals
 def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
-                                   auth_headers, backend_listener_internal_api_endpoint):
+                                   auth_headers, backend_listener_internal_api_endpoint, prometheus):
     """
     Sends a number of requests to each backend internal api endpoint.
     Asserts that the metric for the number of requests to the endpoint in prometheus is increased
@@ -181,7 +180,7 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
     prometheus integration, as responses with all response codes are reported in prometheus
     """
     # wait to update metrics triggered by previous tests
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-listener")
 
     count_before = {}
     for request_type in data:
@@ -198,7 +197,7 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
                     f"actual response_code: {response.status_code}"
 
     # wait to update metrics in prometheus
-    sleep(PROMETHEUS_REFRESH)
+    prometheus.wait_on_next_scrape("backend-listener")
 
     count_after = {}
     results = {}
