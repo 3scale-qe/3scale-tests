@@ -8,7 +8,7 @@ from testsuite.capabilities import Capability
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 
-def test_proxy_endpoints_set(service, configuration):
+def test_proxy_endpoints_set(service, testconfig):
     """
     Test checks if the endpoints match.
     """
@@ -16,7 +16,7 @@ def test_proxy_endpoints_set(service, configuration):
     tenant_name = "3scale"
     prefix = f"{service_name}-{tenant_name}"
     proxy = service.proxy.list()
-    superdomain = configuration.superdomain
+    superdomain = testconfig["threescale"]["superdomain"]
 
     assert proxy["endpoint"] == f"https://{prefix}-apicast-production.{superdomain}:443"
 

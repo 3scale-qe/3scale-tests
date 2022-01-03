@@ -49,17 +49,6 @@ def setup_gateway(request, mount_certificate_secret, staging_gateway, certificat
     })
 
 
-@pytest.fixture(scope="module")
-def settings_block(request):
-    """Settings block for staging gateway"""
-    return {
-        "deployments": {
-            "staging": blame(request, "staging"),
-            "production": blame(request, "production")
-        }
-    }
-
-
 @pytest.fixture(scope="session")
 def invalid_authority(request, manager) -> Certificate:
     """To be used in tests validating server certificates"""

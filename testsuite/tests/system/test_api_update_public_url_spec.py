@@ -10,13 +10,13 @@ pytestmark = pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-2939"
 
 
 @pytest.fixture(scope="module")
-def proxy_update(service, configuration, request):
+def proxy_update(service, testconfig, request):
     """
      Updates endpoint and sandbox endpoint.
     :returns updated params
     """
     prefix = blame(request, "svc")
-    superdomain = configuration.superdomain
+    superdomain = testconfig["threescale"]["superdomain"]
     params = {
         "endpoint": f"https://{prefix}-2-production.{superdomain}:443",
         "sandbox_endpoint": f"https://{prefix}-2-staging.{superdomain}:443"

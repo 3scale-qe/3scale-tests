@@ -24,18 +24,6 @@ def gateway_kind():
 
 
 @pytest.fixture(scope="module")
-def settings_block(settings_block, configuration, protocol):
-    """Settings block with http(s) endpoints"""
-    endpoints = {
-        "endpoints": {
-            "staging": f"{protocol}://%s-staging.{configuration.superdomain}",
-            "production": f"{protocol}://%s-production.{configuration.superdomain}"
-        }}
-    settings_block.update(endpoints)
-    return settings_block
-
-
-@pytest.fixture(scope="module")
 def gateway_environment(gateway_environment, testconfig, tools):
     """
     Adds HTTP proxy to the staging gateway

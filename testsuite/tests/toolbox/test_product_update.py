@@ -239,7 +239,7 @@ def modify_mapping_rules(modify_product, modify_metrics, service, modify_methods
 
 @pytest.fixture(scope="module")
 def modify_apps_account(modify_product, request, custom_application,
-                        custom_user, custom_account, configuration, my_applications_plans):
+                        custom_user, custom_account, testconfig, my_applications_plans):
     """ Modify/delete/add Application plans and Applications and Accounts"""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
@@ -249,7 +249,7 @@ def modify_apps_account(modify_product, request, custom_application,
     account_up = custom_account(acc_raw)
 
     username = blame(request, 'us')
-    domain = configuration.superdomain
+    domain = testconfig["threescale"]["superdomain"]
     usr = dict(username=username, email=f"{username}@{domain}",
                password=blame(request, ''), account_id=account_up['id'])
     custom_user(account_up, params=usr)
