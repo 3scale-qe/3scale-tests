@@ -1,10 +1,14 @@
 """Tests for Application Plans Toolbox feature"""
 
+import string
+import random
 import re
 import logging
+import yaml
 
 import pytest
 
+from testsuite.config import settings
 from testsuite.toolbox import constants
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
@@ -68,11 +72,39 @@ def test_list1(empty_list, service, my_app_plans, create_cmd):
         ret['stdout'])
 
 
+PLANS = {
+    'plan1': {
+        'name': 'plan1',
+        'state': 'published',
+        'setup_fee': '22.2',
+        'cost_per_month': '11.1',
+        'trial_period_days': '33',
+        'cancellation_period': '0',
+        'approval_required': 'true',
+        'system_name': 'plan1sysname'
+    },
+    'plan2': {
+        'name': 'plan2',
+        'state': 'hidden',
+        'setup_fee': '0.0',
+        'cost_per_month': '0.0',
+        'trial_period_days': '0',
+        'cancellation_period': '0',
+        'approval_required': 'false',
+        'system_name': 'plan2sysname'
+    }
+}
+
+
 def test_create1(service, create_cmd):
     """Run command 'create' to create first application plan"""
-    cmd = f"{service['id']} plan1 --approval-required=true --cost-per-month=11.1 "
-    cmd += '--default --disabled --publish --setup-fee=22.2 '
-    cmd += '--system-name=plan1sysname --trial-period-days=33'
+    plan = PLANS['plan1']
+    cmd = f"{service['id']} {plan['name']} --approval-required={plan['approval_required']} "
+    cmd += f"--cost-per-month={plan['cost_per_month']} --default --disabled "
+    if plan['state'] == 'published':
+        cmd += '--publish '
+    cmd += f"--setup-fee={plan['setup_fee']} --system-name={plan['system_name']} "
+    cmd += f"--trial-period-days={plan['trial_period_days']}"
 
     ret = toolbox.run_cmd(create_cmd('create', cmd))
     assert not ret['stderr']
@@ -83,13 +115,130 @@ def test_create1(service, create_cmd):
 
 def test_create2(service, create_cmd):
     """Run command 'create' to create second application plan"""
-    cmd = f"{service['id']} plan2 --approval-required=false --cost-per-month=0 "
-    cmd += '--setup-fee=0 --system-name=plan2sysname --trial-period-days=0'
+    plan = PLANS['plan2']
+    cmd = f"{service['id']} {plan['name']} --approval-required={plan['approval_required']} "
+    cmd += f"--cost-per-month={plan['cost_per_month']} --setup-fee={plan['setup_fee']} "
+    cmd += f"--system-name={plan['system_name']} --trial-period-days={plan['trial_period_days']}"
     ret = toolbox.run_cmd(create_cmd('create', cmd))
     assert not ret['stderr']
 
     out_variables['plan2'] = parse_create_command_out(ret['stdout'])
     out_variables['plan2_entity'] = service.app_plans[int(out_variables['plan2'][0])].entity
+
+
+def test_export(service, create_cmd):
+    """Run command 'export' for app. plans."""
+    for plan_name in ['plan1', 'plan2']:
+        cmd = f"{service['id']} {PLANS[plan_name]['system_name']}"
+        ret = toolbox.run_cmd(create_cmd('export', cmd))
+        assert not ret['stderr']
+        yaml_out = yaml.load(ret['stdout'], Loader=yaml.SafeLoader)
+        for attr, value in PLANS[plan_name].items():
+            assert str(yaml_out['plan'][attr]).casefold() == value
+        assert len(yaml_out['limits']) == 0 or yaml_out['limits'][0] == {
+            'metric_system_name': 'hits',
+            'period': 'eternity',
+            'value': 0,
+        }
+        assert len(yaml_out['metrics']) == 0 or yaml_out['metrics'][0] == {
+            'name': 'hits',
+            'system_name': 'hits',
+            'friendly_name': 'Hits',
+            'description': 'Number of API hits',
+            'unit': 'hit',
+        }
+        assert not yaml_out['pricingrules']
+        assert not yaml_out['plan_features']
+        assert not yaml_out['methods']
+
+
+# deprecated plan -> 'cancellation_period': '10',
+# methods -> 'parent_id': 'pears', this is ignored
+FOR_IMPORT = {
+    'limits': [{
+        'metric_system_name': 'pears',
+        'period': 'eternity',
+        'plan_id': 'plantest',
+        'value': 10,
+    }],
+    'pricingrules': [{
+        'cost_per_unit': 1.1,
+        'min': 1,
+        'max': 11,
+        'metric_system_name': 'pears_m',
+    }],
+    'plan_features': [],
+    'metrics': [{
+        'name': 'pears',
+        'system_name': 'pears',
+        'friendly_name': 'Pears',
+        'description': 'Number of API hits',
+        'unit': 'hit',
+    }],
+    'methods': [{
+        'name': 'pears_m',
+        'system_name': 'pears_m',
+        'friendly_name': 'Pears_m',
+        'description': 'Number of API hits',
+    }],
+    'plan': {
+        'name': 'plantest',
+        'state': 'published',
+        'setup_fee': '1.1',
+        'cost_per_month': '10.5',
+        'trial_period_days': '400',
+        'approval_required': 'true',
+        'system_name': 'plantest'
+    }
+}
+
+
+def test_import(service, create_cmd):
+    """Run command 'import' for app. plans.
+    This test just checks 'plan' attributes."""
+    fil_name = settings['toolbox']['podman_cert_dir'] + '/'
+    fil_name += ''.join(random.choice(string.ascii_letters) for _ in range(16))
+    str_import = yaml.dump(FOR_IMPORT, Dumper=yaml.SafeDumper)
+    toolbox.copy_string_to_remote_file(str_import, fil_name)
+    ret = toolbox.run_cmd(create_cmd('import', fr"{service['id']} --file={fil_name}"))
+    assert not ret['stderr']
+    plan_id = re.match(r'Application plan created: (\d+)', ret['stdout']).groups()[0]
+    new_plan = service.app_plans.read(int(plan_id))
+    for attr, value in FOR_IMPORT['plan'].items():
+        assert str(new_plan[attr]).casefold() == value
+
+    out_variables['new_plan'] = new_plan
+
+
+def test_imported(service):
+    """Check objects imported by command 'import'."""
+    # pylint: disable=too-many-branches
+    new_plan = out_variables['new_plan']
+    for metric in service.metrics.list():
+        if metric['system_name'] == FOR_IMPORT['metrics'][0]['system_name']:
+            for metric_attr, metric_val in FOR_IMPORT['metrics'][0].items():
+                assert str(metric[metric_attr]) == metric_val
+            limit = new_plan.limits(metric).list()[0]
+            for limit_attr, limit_val in FOR_IMPORT['limits'][0].items():
+                if limit_attr == 'plan_id':
+                    assert str(limit_val) == str(new_plan['system_name'])
+                elif limit_attr == 'metric_system_name':
+                    assert str(limit_val) == str(metric['system_name'])
+                else:
+                    assert str(limit[limit_attr]) == str(limit_val)
+        if metric['system_name'].startswith('hits'):
+            method = metric.methods.list()[0]
+            for method_attr, method_val in FOR_IMPORT['methods'][0].items():
+                if method_attr == 'parent_id':
+                    assert str(metric['system_name']) == str(method_val)
+                else:
+                    assert str(method[method_attr]) == method_val
+            pricing = new_plan.pricing_rules(method).list()[0]
+            for pricing_attr, pricing_val in FOR_IMPORT['pricingrules'][0].items():
+                if pricing_attr == 'metric_system_name':
+                    assert str(method['system_name']) == str(pricing_val)
+                else:
+                    assert str(pricing[pricing_attr]) == str(pricing_val)
 
 
 def test_list2(empty_list, service, my_app_plans, create_cmd):
@@ -115,9 +264,12 @@ def test_show1(service, create_cmd):
     to_cmp = r'ID\tNAME\tSYSTEM_NAME\tAPPROVAL_REQUIRED\t'
     to_cmp += r'COST_PER_MONTH\tSETUP_FEE\tTRIAL_PERIOD_DAYS'
     assert re.findall(to_cmp, ret['stdout'])
+    plan = PLANS['plan1']
 
     # https://issues.redhat.com/browse/THREESCALE-5542
-    to_cmp = fr"{out_variables['plan1'][0]}\tplan1\tplan1sysname\ttrue\t11.1\t22.2\t33"
+    to_cmp = fr"{out_variables['plan1'][0]}\t{plan['name']}\t{plan['system_name']}\t"
+    to_cmp += fr"{plan['approval_required']}\t{plan['cost_per_month']}\t{plan['setup_fee']}\t"
+    to_cmp += fr"{plan['trial_period_days']}"
     logging.error(to_cmp)
     assert re.findall(to_cmp, ret['stdout'])
 
