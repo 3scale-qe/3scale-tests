@@ -1,4 +1,6 @@
 """View representations of Developer Portal section pages"""
+from selenium.common.exceptions import NoSuchElementException
+from wait_for import TimedOutError, wait_for
 from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput, Image
 
 from testsuite.ui.navigation import step
@@ -34,6 +36,10 @@ class DeveloperPortalLogoView(BaseAudienceView):
         """Method choose logo and uploads it"""
         self.file_input.fill(file)
         self.upload_button.click()
+        try:
+            wait_for(lambda: self.logo.is_displayed and file.name in self.logo.src, timeout="10s", delay=0.2)
+        except TimedOutError as exc:
+            raise NoSuchElementException("The Logo is not displayed correctly") from exc
 
     def prerequisite(self):
         return BaseAudienceView
