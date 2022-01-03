@@ -30,7 +30,6 @@ import yaml
 from openshift import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
 
-
 identifier = "threescale"  # pylint: disable=invalid-name
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -53,17 +52,13 @@ def _guess_version(ocp):
     """Attempt to determine version from amp-system imagestream"""
 
     version = None
-    lookup = _docker_image(ocp, "amp-system")
-
     try:
-        version = lookup["name"]
+        config = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"], parse_output=True)
+        version = [trigger.imageChangeParams["from"]["name"].split(":", 1)[1]
+                   for trigger in config.model.spec.triggers if trigger.type == "ImageChange"][0]
         Version(version)
-    except (KeyError, InvalidVersion):
-        version = lookup["from"]["name"].split(":", 1)[1].replace("3scale", "")
-        try:
-            Version(version)
-        except InvalidVersion:
-            return _testsuite_version().split("-")[0]
+    except (IndexError, OpenShiftPythonException, InvalidVersion):
+        return _testsuite_version().split("-")[0]
 
     return str(version)
 
@@ -73,16 +68,6 @@ def _apicast_image(ocp):
     lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"])
     lookup = yaml.safe_load(lookup.out())
     return lookup["spec"]["template"]["spec"]["containers"][0]["image"]
-
-
-def _docker_image(ocp, name):
-    """shared helper to get image object of specific name"""
-
-    lookup = ocp.do_action("get", ["imagestream", name, "-o", "yaml"])
-    lookup = yaml.safe_load(lookup.out())
-    lookup = lookup["spec"]["tags"]
-
-    return [i for i in lookup if i.get("from", {}).get("kind") == "DockerImage"][-1]
 
 
 def _rhsso_password(server_url, token):
