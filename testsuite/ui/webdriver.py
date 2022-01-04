@@ -120,9 +120,11 @@ class SeleniumDriver:
                                               chrome_options=options)
         elif self.driver == 'firefox':
             browser_profile = webdriver.FirefoxProfile()
+            # default Firefox profile preference `open_newwindow` is set to 2. This causes the links open
+            # in the new window instead of a new tab.
+            browser_profile.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
             if not self.ssl_verify:
                 browser_profile.accept_untrusted_certs = True
-
             if self.source == 'binary':
                 executor = self.binary_path
             elif self.source == 'local':
