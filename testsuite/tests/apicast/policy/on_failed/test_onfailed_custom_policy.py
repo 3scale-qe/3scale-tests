@@ -18,15 +18,15 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
 
 
 @pytest.fixture(scope="module")
-def image_stream_amp_apicast_custom_policy(request):
+def image_stream_name(request):
     """
     Returns the blamed name for the amp-apicast-custom-policy image stream
     """
-    return blame(request, "is-amp-apicast-custom-policy")
+    return blame(request, "examplepolicy")
 
 
 @pytest.fixture(scope="module")
-def build_images(openshift, request, image_stream_amp_apicast_custom_policy):
+def build_images(openshift, request, image_stream_name):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -37,33 +37,34 @@ def build_images(openshift, request, image_stream_amp_apicast_custom_policy):
     """
     openshift_client = openshift()
 
+    github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
+
     amp_release = openshift_client.image_stream_tag("amp-apicast")
-    build_name_failing_policy = blame(request, "apicast-failing-policy")
-    build_name_custom_policies = blame(request, "apicast-custom-policies")
-    image_stream_apicast_policy = blame(request, "is-apicast-policy")
-    image_template = resources.files('testsuite.resources.on_failed_policy').joinpath("apicast_failing_policy.yml")
+    build_name_github = blame(request, "apicast-example-policy-github")
 
-    template_params = {"AMP_RELEASE": amp_release,
-                       "BUILD_NAME_FAILING_POLICY": build_name_failing_policy,
-                       "BUILD_NAME_CUSTOM_POLICY": build_name_custom_policies,
-                       "IMAGE_STREAM_APICAST_POLICY": image_stream_apicast_policy,
-                       "IMAGE_STREAM_AMP_APICAST_CUSTOM_POLICY": image_stream_amp_apicast_custom_policy
-                       }
+    github_params = {"AMP_RELEASE": amp_release,
+                     "BUILD_NAME": build_name_github,
+                     "IMAGE_STREAM_NAME": image_stream_name,
+                     "IMAGE_STREAM_TAG": "github"}
 
-    request.addfinalizer(lambda: openshift_client.delete_template(image_template, template_params))
+    def _delete_builds():
+        openshift_client.delete_template(github_template, github_params)
 
-    openshift_client.new_app(image_template, template_params)
-    openshift_client.start_build(build_name_failing_policy)
+    request.addfinalizer(_delete_builds)
+
+    openshift_client.new_app(github_template, github_params)
+    openshift_client.start_build(build_name_github)
 
 
+# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def staging_gateway(request, image_stream_amp_apicast_custom_policy) -> TemplateApicast:
+def staging_gateway(request, build_images, image_stream_name) -> TemplateApicast:
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
     request.addfinalizer(gw.destroy)
     gw.create()
 
-    gw.update_image_stream(image_stream_amp_apicast_custom_policy)
+    gw.update_image_stream(image_stream_name)
     return gw
 
 

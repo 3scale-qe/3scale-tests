@@ -1,0 +1,53 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+name: "apicast-example-policy"
+message: "APIcast Example Policy"
+description: "Builds APIcast with custom policy (example)"
+objects:
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    labels:
+      app: apicast-custom-policy
+    name: '${IMAGE_STREAM_NAME}'
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+    labels:
+      app: apicast-custom-policy
+    name: '${BUILD_NAME}'
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: '${IMAGE_STREAM_NAME}:${IMAGE_STREAM_TAG}'
+    source:
+      git:
+        uri: https://github.com/3scale-qe/apicast-example-policy
+        ref: 'master'
+      type: Git
+    strategy:
+      type: Source
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: 'amp-apicast:${AMP_RELEASE}'
+
+parameters:
+- name: AMP_RELEASE
+  required: true
+  description: AMP Version (eg. "2.10"), "master" for nightlies
+- name: BUILD_NAME
+  required: true
+  description: Name of the build config
+- name: IMAGE_STREAM_NAME
+  required: true
+  description: Name of the target image stream
+- name: IMAGE_STREAM_TAG
+  required: false
+  default: "github"
