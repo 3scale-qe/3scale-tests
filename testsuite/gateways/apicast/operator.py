@@ -58,6 +58,9 @@ class OperatorEnviron(Properties):
             raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def set_many(self, envs: Dict[str, str]):
+        # If the CR is updated and is out of sync with the one we have stored in memory, it might not apply the patch
+        # correctly, refreshing before applying our changes is not 100% solution but should make this more stable
+        self.apicast.refresh()
         for name, value in envs.items():
             self._set(name, value, commit=False)
         self.apicast.apply()
