@@ -44,26 +44,30 @@ class OperatorEnviron(Properties):
         # "APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION": ""  # TODO: Works differently
     }
 
-    def _set(self, name, value, commit=True):
+    def _set(self, apicast, name, value):
         if name in self.NAMES:
             key = self.NAMES[name]
             if callable(key):
-                key(self.apicast, value)
+                key(apicast, value)
             else:
-                self.apicast[key] = value
-            if commit:
-                self.apicast.apply()
-                self.wait_function()
+                apicast[key] = value
+        else:
+            raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
+
+    def _delete(self, apicast, name):
+        if name in self.NAMES:
+            key = self.NAMES[name]
+            if callable(key):
+                raise NotImplementedError(f"Callable env variable {name} cannot be deleted yet")
+            del apicast[key]
         else:
             raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def set_many(self, envs: Dict[str, str]):
-        # If the CR is updated and is out of sync with the one we have stored in memory, it might not apply the patch
-        # correctly, refreshing before applying our changes is not 100% solution but should make this more stable
-        self.apicast.refresh()
-        for name, value in envs.items():
-            self._set(name, value, commit=False)
-        self.apicast.apply()
+        def _update(apicast):
+            for name, value in envs.items():
+                self._set(apicast, name, value)
+        self.apicast.modify_and_apply(_update)
         self.wait_function()
 
     def __getitem__(self, name):
@@ -75,18 +79,12 @@ class OperatorEnviron(Properties):
         raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def __setitem__(self, name, value):
-        self._set(name, value)
+        self.apicast.modify_and_apply(lambda apicast: self._set(apicast, name, value))
+        self.wait_function()
 
     def __delitem__(self, name):
-        if name in self.NAMES:
-            key = self.NAMES[name]
-            if callable(key):
-                raise NotImplementedError(f"Callable env variable {name} cannot be deleted yet")
-            del self.apicast[key]
-            self.apicast.apply()
-            self.wait_function()
-        else:
-            raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
+        self.apicast.modify_and_apply(lambda apicast: self._delete(apicast, name))
+        self.wait_function()
 
 
 class OperatorApicast(SelfManagedApicast):
