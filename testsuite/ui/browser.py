@@ -6,7 +6,6 @@ from urllib import parse
 from widgetastic.browser import Browser, DefaultPlugin
 
 
-# pylint: disable=abstract-method
 class ThreescaleBrowserPlugin(DefaultPlugin):
     """
     Plug-in for :class:`ThreeScaleBrowser` which make sure page is loaded completely and is safe for UI interacting.
@@ -38,27 +37,36 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
         """
         Invoked before clicking on an element. Ensure page is fully loaded
         before clicking.
+        This method implements simple even listener, that listens for unload event that indicates
+        navigation to a new page.
         """
-        self.ensure_page_safe()
+        if self.browser.browser_type == 'firefox':
+            listener = '''
+            window.addEventListener("beforeunload", function() {
+                console.log("Navigating to a new page. Unloading the window.");
+                localStorage.setItem("pageUnloading", true);
+            });
+            '''
+            self.browser.execute_script(listener)
 
-    # pylint: disable=unnecessary-pass
     def after_click(self, element, locator=None):
         """
         Invoked after clicking on an element. Ensure page is fully loaded
         before proceeding further.
+        When navigation to a new page Firefox does not change state of `document.readyState` immediately.
+        This method uses simple sleep when navigating to a new page with Firefox browser.
         """
-        # plugin.ensure_page_safe() is invoked from browser click.
-        # we should not invoke it a second time, this can conflict with
-        # ignore_ajax=True usage from browser click
-        # we need to add sleep in case of using firefox after click action
-        # because gecodriver(firefox driver) execute actions in strange way
-        # TODO: explore possibilities to check JS running or stalness of
-        #  clickable element in click / after_click action
         if self.browser.browser_type == 'firefox':
-            sleep(1)
-        pass
+            if not self.browser.alert_present:
+                unloading = self.browser.execute_script('return localStorage.getItem("pageUnloading") == "true";')
+                if unloading:
+
+                    sleep(2)
+                    self.browser.execute_script('localStorage.setItem("pageUnloading", false);')
+                    self.ensure_page_safe()
 
 
+# pylint: disable=abstract-method
 class ThreeScaleBrowser(Browser):
     """Wrapper around :class:`widgetastic.browser.Browser`"""
 
