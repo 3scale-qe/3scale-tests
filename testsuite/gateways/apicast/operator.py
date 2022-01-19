@@ -1,7 +1,7 @@
 """Apicast deployed with ApicastOperator"""
 import re
 import time
-from typing import Dict
+from typing import Dict, Callable, Pattern, Any, Match, Union
 
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.openshift.client import OpenShiftClient
@@ -9,6 +9,9 @@ from testsuite.openshift.crd.apicast import APIcast
 from testsuite.openshift.env import Properties
 
 from .selfmanaged import SelfManagedApicast
+
+StrMatcher = Dict[str, Union[str, Callable[[APIcast, Any], Any]]]
+RegexMatcher = Dict[Pattern, Callable[[APIcast, Match, Any], Any]]
 
 
 def apicast_service_list(apicast: APIcast, services: str):
@@ -33,7 +36,7 @@ class OperatorEnviron(Properties):
         self.apicast = apicast
         self.wait_function = wait_function
 
-    NAMES = {
+    NAMES: StrMatcher = {
         "APICAST_SERVICES_FILTER_BY_URL": "servicesFilterByURL",
         "APICAST_SERVICES_LIST": apicast_service_list,
         "APICAST_UPSTREAM_RETRY_CASES": "upstreamRetryCases",
@@ -51,7 +54,7 @@ class OperatorEnviron(Properties):
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
     }
 
-    REGEX_NAMES = {
+    REGEX_NAMES: RegexMatcher = {
         re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version
     }
 
