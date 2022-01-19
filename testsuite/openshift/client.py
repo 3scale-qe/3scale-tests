@@ -429,6 +429,16 @@ class OpenShiftClient:
             :param target_port: Port to which the service forwards connections.
         """
         self.do_action("create", ["service", service_type.value, name, f"--tcp={port}:{target_port}"])
+    def add_labels(self, name: str, object_type: str, labels: list):
+        """Add labels to the object.
+        Args:
+            :param name: Object name
+            :param object_type: Type of the object
+            :param labels: Labels to be added
+        """
+        params = [object_type, name]
+        params.extend(labels)
+        self.do_action("label", params)
 
     def start_build(self, build_name):
         """
