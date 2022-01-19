@@ -1,4 +1,5 @@
 """Apicast deployed with ApicastOperator"""
+import re
 import time
 from typing import Dict
 
@@ -14,6 +15,13 @@ def apicast_service_list(apicast: APIcast, services: str):
     """Sets APICAST_SERVICE_LIST in the APIcast CR """
     service_list = str(services).split(",")
     apicast["enabledServices"] = service_list
+
+
+def set_configuration_version(apicast: APIcast, match: Match, version):
+    """Sets the configuration version the APIcast should use for this service"""
+    service_id = match.group(1)
+    overrides = apicast.model.spec.setdefault("serviceConfigurationVersionOverride", {})
+    overrides[service_id] = str(version)
 
 
 class OperatorEnviron(Properties):
@@ -41,7 +49,10 @@ class OperatorEnviron(Properties):
         "APICAST_LOAD_SERVICES_WHEN_NEEDED": "loadServicesWhenNeeded",
         "APICAST_CACHE_STATUS_CODES": "cacheStatusCodes",
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
-        # "APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION": ""  # TODO: Works differently
+    }
+
+    REGEX_NAMES = {
+        re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version
     }
 
     def _set(self, apicast, name, value):
@@ -51,8 +62,13 @@ class OperatorEnviron(Properties):
                 key(apicast, value)
             else:
                 apicast[key] = value
-        else:
-            raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
+            return
+        for regex, func in self.REGEX_NAMES.items():
+            match = regex.match(name)
+            if match:
+                func(self.apicast, match, value)
+                return
+        raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def _delete(self, apicast, name):
         if name in self.NAMES:
