@@ -235,11 +235,10 @@ class InvoiceDetailView(BaseAudienceView):
 
     def charge(self):
         """Charges the invoices (PENDING -> PAID)"""
-        # Charge button has two alerts which completely messed up with widgetastic
+        # Charge button has two alerts which completely messed up with widgetastic.
         # https://issues.redhat.com/browse/THREESCALE-7276
         self.browser.click(self.charge_button, ignore_ajax=True)
-        self.browser.get_alert().accept()
-        self.browser.get_alert().accept()
+        self.browser.handle_double_alert()
 
         # Wait until charge is done
         self.browser.wait_for_element(self.paid_field, timeout=5)
