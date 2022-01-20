@@ -2,6 +2,9 @@
 flake8 = "*"
 mypy = "*"
 pylint = "*"
+# This is ipdb dependency and Pypi was not able to pick one version.
+# This should be revisited in furute
+black = "==21.12b0"
 ipdb = "*"
 web-pdb = "*"
 types-requests = "*"
