@@ -5,7 +5,7 @@ import json
 from contextlib import ExitStack
 import os
 from datetime import timezone
-from typing import List, Dict, Union, Any, Optional, Callable
+from typing import List, Dict, Union, Any, Optional, Callable, Sequence
 
 import openshift as oc
 
@@ -45,7 +45,7 @@ class OpenShiftClient:
             stack.enter_context(oc.token(self.token))
         stack.enter_context(oc.project(self.project_name))
 
-    def do_action(self, verb: str, cmd_args: List[Union[str, List[str]]] = None,
+    def do_action(self, verb: str, cmd_args: Sequence[Union[str, Sequence[str]]] = None,
                   auto_raise: bool = True, parse_output: bool = False):
         """Run an oc command."""
         cmd_args = cmd_args or []
@@ -429,7 +429,8 @@ class OpenShiftClient:
             :param target_port: Port to which the service forwards connections.
         """
         self.do_action("create", ["service", service_type.value, name, f"--tcp={port}:{target_port}"])
-    def add_labels(self, name: str, object_type: str, labels: list):
+
+    def add_labels(self, name: str, object_type: str, labels: List[str]):
         """Add labels to the object.
         Args:
             :param name: Object name
