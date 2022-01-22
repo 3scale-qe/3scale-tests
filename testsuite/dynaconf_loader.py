@@ -53,12 +53,10 @@ def _guess_version(ocp):
 
     version = None
     try:
-        config = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"], parse_output=True)
-        version = [trigger.imageChangeParams["from"]["name"].split(":", 1)[1]
-                   for trigger in config.model.spec.triggers if trigger.type == "ImageChange"][0]
+        version = ocp.image_stream_tag_from_trigger("dc/apicast-production")
         Version(version)
-    except (IndexError, OpenShiftPythonException, InvalidVersion):
-        return _testsuite_version().split("-")[0]
+    except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
+        return ".".join(_testsuite_version().split(".")[:2])
 
     return str(version)
 

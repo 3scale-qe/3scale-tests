@@ -25,7 +25,7 @@ def image_stream_name(request):
 
 
 @pytest.fixture(scope="module")
-def build_images(openshift, testconfig, request, image_stream_name):
+def build_images(openshift, request, image_stream_name):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -39,7 +39,7 @@ def build_images(openshift, testconfig, request, image_stream_name):
     github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
     copy_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy_copy.yml")
 
-    amp_release = testconfig["threescale"]["version"]
+    amp_release = openshift_client.image_stream_tag_from_trigger("dc/apicast-production")
     build_name_github = blame(request, "apicast-example-policy-github")
     build_name_copy = blame(request, "apicast-example-policy-copy")
 
