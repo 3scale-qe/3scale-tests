@@ -37,7 +37,6 @@ def test_headers_policy_doesnt_exist(api_client):
     assert "X-Request-Custom-Add" not in echoed_request.headers
 
 
-@pytest.mark.smoke
 def test_headers_policy_another_value_to_request(api_client):
     """ must add another value to the existing header of the request """
     response = api_client().get("/get", headers={'X-REQUEST-CUSTOM-ADD': 'Original header'})

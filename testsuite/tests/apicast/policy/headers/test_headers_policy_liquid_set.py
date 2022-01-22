@@ -24,6 +24,7 @@ def policy_settings():
                      }]})
 
 
+@pytest.mark.smoke
 def test_header_policy_add_to_response_with_liquid_service_id_api_client(api_client, service):
     """must add header to response using the liquid - service id should be expanded"""
     liquid_value = f"Service_id {service.entity_id}"
