@@ -29,7 +29,7 @@ class EchoedRequest:
                 if isinstance(self.params[key], list) and len(self.params[key]) == 1:
                     self.params[key] = self.params[key][0]
 
-        self.body = self.json.get("body")
+        self.body = self.json.get("body", self.json.get("data"))
         self.path = self.json.get("path")
 
     @staticmethod
@@ -40,6 +40,12 @@ class EchoedRequest:
 
         if "HTTP_HOST" in data["headers"]:
             return _EchoApiRequest(response)
+
+        if "keepAlive" in data and "secure" in data:
+            return _MockServerRequest(response)
+
+        if "queryStringParameters" in data:
+            return _MockServerRequest(response)
 
         if list in [type(i) for i in data["headers"].values()]:
             return _HttpbinGoRequest(response)
@@ -66,24 +72,26 @@ class _EchoApiRequest(EchoedRequest):
         return CaseInsensitiveDict(headers)
 
 
+def _flatten(dict_):
+    """Convert list values in dict to string values"""
+    for k, val in dict_.items():
+        if isinstance(val, list):
+            dict_[k] = ",".join(val)
+    return CaseInsensitiveDict(data=dict_)
+
+
 class _HttpbinGoRequest(EchoedRequest):
     """Wrapper over Httpbin go backend"""
 
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
-        self.headers = self.__process_headers()
-        self.params = self.__process_params()
+        self.headers = _flatten(self.headers)
+        self.params = _flatten(self.params)
 
-    def __process_params(self) -> CaseInsensitiveDict:
-        params = self.params
-        for key in params:
-            if isinstance(params[key], list) and len(params[key]) == 1:
-                params[key] = params[key][0]
-        return CaseInsensitiveDict(data=params)
 
-    def __process_headers(self) -> CaseInsensitiveDict:
-        headers = self.headers
-        for key in headers:
-            if isinstance(headers[key], list):
-                headers[key] = ",".join(headers[key])
-        return CaseInsensitiveDict(data=headers)
+class _MockServerRequest(EchoedRequest):
+    """Wrapper over MockServer backend"""
+    def __init__(self, response: requests.Response) -> None:
+        super().__init__(response)
+        self.headers = _flatten(self.headers)
+        self.params = _flatten(self.json.get("queryStringParameters", {}))
