@@ -21,8 +21,8 @@ from testsuite import rawobj, HTTP2, gateways, configuration
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.prometheus import PrometheusClient
-from testsuite.requestbin import RequestBinClient
 from testsuite.httpx import HttpxHook
+from testsuite.mockserver import Mockserver
 from testsuite.rhsso.objects import Realm
 from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
@@ -785,7 +785,7 @@ def requestbin(testconfig, tools):
     """
     Returns an instance of RequestBin.
     """
-    return RequestBinClient(weakget(testconfig)["requestbin"]["url"] % tools["request-bin"])
+    return Mockserver(tools["mockserver"])
 
 
 @pytest.fixture(scope="session")
