@@ -5,7 +5,6 @@ default:
   threescale:
     service:
       backends:
-        primary: https://echo-api.3scale.net:443
         httpbin: https://httpbin.org:443
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
