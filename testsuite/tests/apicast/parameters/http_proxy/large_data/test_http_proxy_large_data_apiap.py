@@ -8,6 +8,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.tests.toolbox.test_backend import random_string
 
@@ -23,7 +24,7 @@ def backends_mapping(custom_backend, private_base_url, protocol, lifecycle_hooks
         - path to Backend 1: "/bin"
         - path to Backend 2: "/bin2"
     """
-    bin_url = urlparse(private_base_url("httpbin"))
+    bin_url = urlparse(private_base_url("httpbin_go"))
     url = f"{protocol}://{bin_url.hostname}"
     return {"/bin": custom_backend("backend_one", endpoint=url, hooks=lifecycle_hooks),
             "/bin2": custom_backend("backend_two", endpoint=url, hooks=lifecycle_hooks)}
@@ -43,8 +44,12 @@ def test_large_data(api_client, num_bytes):
 
     response = client.post('/bin/post', data=data)
     assert response.status_code == 200
-    assert response.json().get('data') == data
+    echo = EchoedRequest.create(response)
+    assert echo.headers.get("X-Forwarded-By", "MISSING").startswith("MockServer")
+    assert echo.body == data
 
     response = client.post('/bin2/post', data=data)
     assert response.status_code == 200
-    assert response.json().get('data') == data
+    echo = EchoedRequest.create(response)
+    assert echo.headers.get("X-Forwarded-By", "MISSING").startswith("MockServer")
+    assert echo.body == data
