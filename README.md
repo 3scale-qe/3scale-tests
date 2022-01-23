@@ -37,6 +37,12 @@ configuration points to some publicly available services. However it is
 **highly desirable** to deploy own instance(s) of suitable service and change
 configuration to use this (through `config/settings.local.yaml`
 
+Backend APIs are referenced by service name in the settings, e.g. 'httpbin',
+'httpbin_nossl'. These names are used (and kept unchanged) for historical
+reason to avoid breaking of defined usage. In fact they don't represent
+specific service, but rather an 'interface' of such service implemting its
+calls.
+
 ### make tools
 
 Container image can be built with script that provisions necessary
@@ -113,13 +119,11 @@ set in configuration.
 
 Here is the list of services:
 
- * docker.io/eloycoto/apicast:tinyproxy
  * docker.io/jaegertracing/all-in-one:latest
  * docker.io/jsmadis/go-httpbin:latest
- * docker.io/jsmadis/httpbin:latest
  * docker.io/mailhog/mailhog:latest
  * docker.io/prom/prometheus
- * docker.io/sxmichael/requestbin:latest
+ * quay.io/mganisin/mockserver:latest
  * quay.io/rh_integration/3scale-fuse-camel-proxy:latest
  * quay.io/3scale/echoapi:stable
  * registry.redhat.io/rhscl/redis-32-rhel7:3.2
