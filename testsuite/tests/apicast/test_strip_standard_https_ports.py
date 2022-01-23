@@ -57,7 +57,7 @@ def test_strip_ports(api_client, private_base_url_and_expected_port):
     client = api_client()
     response = client.get("/get")
 
-    echoed_request = EchoedRequest(response)
+    echoed_request = EchoedRequest.create(response)
 
     url_split = echoed_request.headers['host'].split(":")
 
