@@ -1,4 +1,5 @@
 """Conftest for websocket policy tests"""
+import contextlib
 import ssl
 from urllib.parse import urljoin
 
@@ -39,7 +40,15 @@ def websocket_options(testconfig):
     return options
 
 
-@backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
+@contextlib.contextmanager
+def wsconnect(uri, options):
+    """context manager for websocket"""
+    websocket = create_connection(uri, **options)
+    yield websocket
+    websocket.close()
+
+
+@backoff.on_exception(backoff.fibo, WebSocketBadStatusException, 8, jitter=None)
 def retry_sucessful(websocket_uri, message, websocket_options):
     """
     Retry for websocket when we expect successful message delivery.
@@ -48,17 +57,9 @@ def retry_sucessful(websocket_uri, message, websocket_options):
     :param websocket_options: websocket options
     :return: received message
     """
-    websocket = None
-    try:
-        websocket = create_connection(websocket_uri, **websocket_options)
+    with wsconnect(websocket_uri, websocket_options) as websocket:
         websocket.send(message)
-        response = websocket.recv()
-        return response
-    except WebSocketBadStatusException:
-        return None
-    finally:
-        if websocket:
-            websocket.close()
+        return websocket.recv()
 
 
 @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
@@ -70,12 +71,8 @@ def retry_failing(websocket_uri, expected_message, websocket_options):
     :param websocket_options: websocket options
     :return: caught exception message
     """
-    websocket = None
     try:
-        websocket = create_connection(websocket_uri, **websocket_options)
-        return "Connection successful"
+        with wsconnect(websocket_uri, websocket_options):
+            return "Connection successful"
     except WebSocketBadStatusException as exception:
         return exception.args[0] if expected_message in exception.args[0] else ""
-    finally:
-        if websocket:
-            websocket.close()
