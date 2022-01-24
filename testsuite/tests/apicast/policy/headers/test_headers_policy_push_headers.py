@@ -30,7 +30,6 @@ def policy_settings():
                      "value": "Additional request header"}]})
 
 
-@pytest.mark.smoke
 def test_headers_policy_function(api_client):
     """testing custom header policy"""
     response = api_client().get('/get')
