@@ -436,6 +436,14 @@ class OpenShiftClient:
         """
         self.do_action("start-build", [build_name, "--wait=true"])
 
+    def image_stream_tag_from_trigger(self, name):
+        """Gather tag from trigger of given obj name e.g. dc/something"""
+        obj = self.do_action("get", [name, "-o", "yaml"], parse_output=True)
+        for trigger in obj.model.spec.triggers:
+            if trigger.type == "ImageChange":
+                return trigger.imageChangeParams["from"]["name"].split(":", 1)[1]
+        raise ValueError(f"{obj} without ImageChange trigger")
+
     def image_stream_tag(self, image_stream):
         """
         Gets the tag of the given imagestream
