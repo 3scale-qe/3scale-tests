@@ -16,6 +16,7 @@ types-paramiko = "*"
 [packages]
 typing_extensions = "*"
 importlib_resources = "*"
+zipp = "*"
 pytest-xdist = "*"
 pytest = "*"
 pytest-cases = "*"
