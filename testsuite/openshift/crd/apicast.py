@@ -53,7 +53,7 @@ class APIcast(APIObject):
         Creates object on the server and returns created entity.
         It will be the same class but attributes might differ, due to server adding/rejecting some of them.
         """
-        self.create()
+        self.create(["--save-config=true"])
         return self.refresh()
 
     # Direct access to spec attributes, since all of the attributes are located directly there
