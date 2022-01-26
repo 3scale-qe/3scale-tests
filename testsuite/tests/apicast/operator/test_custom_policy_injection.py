@@ -5,7 +5,7 @@ import pytest
 
 # pylint: disable=unused-argument
 @pytest.mark.disruptive
-def test_on_failed_policy(patch_apimanager, application):
+def test_apimanager_custom_policy(patch_apimanager, application):
     """
     Sends request to apicast and check that the custom policy header is there
     """
