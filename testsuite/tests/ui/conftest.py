@@ -254,6 +254,21 @@ def ui_application(service, custom_app_plan, custom_ui_application, account, req
     return custom_ui_application(name, "description", plan, account, service)
 
 
+@pytest.fixture(scope="module")
+def custom_ui_app_plan(custom_admin_login, navigator):
+    """Create custom application plan via UI"""
+
+    def _custom_ui_app_plan(name: str, service: Service):
+        custom_admin_login()
+        plan = navigator.navigate(ApplicationPlanNewView, product=service)
+        plan.create(name, name)
+        app_plan = service.app_plans.read_by_name(name)
+
+        return app_plan
+
+    return _custom_ui_app_plan
+
+
 def pytest_exception_interact(node, call, report):
     """
         Method that is being invoked, when a test fails (hook)
@@ -359,20 +374,6 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig):
             request.addfinalizer(_delete)
 
     return _login
-
-
-@pytest.fixture(scope="module")
-def custom_ui_app_plan(custom_admin_login, navigator):
-    """Create custom application plan via UI"""
-
-    def _custom_ui_app_plan(name: str, service: Service):
-        plan = navigator.navigate(ApplicationPlanNewView, product=service)
-        plan.create(name, name)
-        app_plan = service.app_plans.read_by_name(name)
-
-        return app_plan
-
-    return _custom_ui_app_plan
 
 
 @pytest.fixture(scope="module")
