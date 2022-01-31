@@ -138,3 +138,83 @@ def warn_and_skip(message):
     """
     warnings.warn(message)
     pytest.skip(message)
+
+
+def custom_policy() -> dict:
+    """Returns a dict containing a custom policy based on https://github.com/3scale-qe/apicast-example-policy
+    """
+    initlua = "return require('example')"
+    apicastpolicyjson = """
+    {
+        "$schema": "http://apicast.io/policy-v1/schema#manifest#",
+        "name": "APIcast Example Policy",
+        "summary": "This is just an example.",
+        "description": "This policy is just an example how to write your custom policy.",
+        "version": "0.1",
+        "configuration": {
+            "type": "object",
+            "properties": { }
+        }
+    }
+    """
+    examplelua = """
+    local setmetatable = setmetatable
+
+    local _M = require('apicast.policy').new('Example', '0.1')
+    local mt = { __index = _M }
+
+    function _M.new()
+    return setmetatable({}, mt)
+    end
+
+    function _M:init()
+    ngx.log(ngx.DEBUG, "example policy initialized")
+    -- do work when nginx master process starts
+    end
+
+    function _M:init_worker()
+    -- do work when nginx worker process is forked from master
+    end
+
+    function _M:rewrite()
+    -- change the request before it reaches upstream
+    ngx.req.set_header('X-Example-Policy-Request', 'HERE')
+    end
+
+    function _M:access()
+    -- ability to deny the request before it is sent upstream
+    end
+
+    function _M:content()
+    -- can create content instead of connecting to upstream
+    end
+
+    function _M:post_action()
+    -- do something after the response was sent to the client
+    end
+
+    function _M:header_filter()
+    -- can change response headers
+    ngx.header['X-Example-Policy-Response'] = 'TEST'
+    end
+
+    function _M:body_filter()
+    -- can read and change response body
+    -- https://github.com/openresty/lua-nginx-module/blob/master/README.markdown#body_filter_by_lua
+    end
+
+    function _M:log()
+    -- can do extra logging
+    end
+
+    function _M:balancer()
+    -- use for example require('resty.balancer.round_robin').call to do load balancing
+    end
+
+    return _M
+    """
+    return {
+        "init.lua": initlua,
+        "example.lua": examplelua,
+        "apicast-policy.json": apicastpolicyjson
+    }
