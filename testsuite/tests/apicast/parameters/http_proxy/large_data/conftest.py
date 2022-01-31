@@ -41,7 +41,7 @@ def gateway_environment(gateway_environment, testconfig, tools):
                                 "HTTPS_PROXY": proxy_endpoint['https'],
                                 "NO_PROXY":
                                     f"backend-listener,system-master,system-provider,{rhsso_url},{superdomain}",
-                                "APICAST_LOAD_SERVICES_WHEN_NEEDED": 1})
+                                "APICAST_LOAD_SERVICES_WHEN_NEEDED": True})
     return gateway_environment
 
 
