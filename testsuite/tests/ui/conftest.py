@@ -270,6 +270,8 @@ def pytest_exception_interact(node, call, report):
     """
     if report.failed:
         browser = node.funcargs.get("browser")
+        if not browser:
+            return
         screenshot = os.path.join(get_resultsdir_path(node), "failed-test-screenshot.png")
         browser.selenium.save_screenshot(screenshot)
 
