@@ -36,6 +36,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
+          namespace: '${NAMESPACE}'
           name: 'amp-apicast:${AMP_RELEASE}'
 
 parameters:
@@ -48,6 +49,9 @@ parameters:
 - name: IMAGE_STREAM_NAME
   required: true
   description: Name of the target image stream
+- name: NAMESPACE
+  required: true
+  description: Namespace where amp-apicast resides
 - name: IMAGE_STREAM_TAG
   required: false
   default: "github"

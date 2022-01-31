@@ -149,3 +149,9 @@ class OperatorApicast(SelfManagedApicast):
 
     def get_logs(self, since_time=None):
         raise NotImplementedError()
+
+    def set_image(self, image):
+        def _update(apicast):
+            apicast["image"] = image
+        self.apicast.modify_and_apply(_update)
+        self.reload()

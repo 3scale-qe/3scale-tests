@@ -147,3 +147,15 @@ class SelfManagedApicast(AbstractApicast):
 
     def get_logs(self, since_time=None):
         return self.openshift.get_logs(self.deployment, since_time=since_time)
+
+    def set_image(self, image):
+        """Sets specific image to the deployment config and redeploys it"""
+        self.openshift.patch("dc", self.deployment, [
+                {
+                    "op": "replace",
+                    "path": "/spec/template/spec/containers/0/image",
+                    "value": image
+                }
+            ], patch_type="json")
+        # pylint: disable=protected-access
+        self.openshift._wait_for_deployment(self.deployment)
