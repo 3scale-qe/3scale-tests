@@ -96,7 +96,8 @@ def test_update_staging(service):
 
 def test_deploy(service, create_cmd):
     """Test 'deploy' command. """
-    ret = toolbox.run_cmd(create_cmd(service, 'deploy'))
+    cmd = create_cmd(service, 'deploy')
+    ret = toolbox.run_cmd(cmd.replace('-config', ''))
     proxy = service.proxy.list()
     assert not ret['stderr']
     assert proxy.entity == json.loads(ret['stdout'])

@@ -93,14 +93,13 @@ def test_show2(threescale, create_cmd):
     ret = toolbox.run_cmd(create_cmd('show', out_variables['ser2_entity']['id']))
     assert not ret['stderr']
 
-    to_cmp = "ID\tNAME\tSTATE\tSYSTEM_NAME\tEND_USER_REGISTRATION_REQUIRED\tBACKEND_VERSION\t"
+    to_cmp = "ID\tNAME\tSTATE\tSYSTEM_NAME\tBACKEND_VERSION\t"
     to_cmp += "DEPLOYMENT_OPTION\tSUPPORT_EMAIL\tDESCRIPTION\tCREATED_AT\tUPDATED_AT"
     assert re.findall(to_cmp, ret['stdout'])
 
     service2 = out_variables['ser2_entity']
     to_cmp = fr"{service2['id']}\t{service2['name']}\t{service2['state']}\t{service2['system_name']}\t"
-    # END_USER_REGISTRATION_REQUIRED will be removed because of https://issues.redhat.com/browse/THREESCALE-7916
-    to_cmp += fr"\(empty\)\t{service2['backend_version']}\t{service2['deployment_option']}\t"
+    to_cmp += fr"{service2['backend_version']}\t{service2['deployment_option']}\t"
     to_cmp += fr"{service2['support_email']}\t{service2['description']}\t"
     to_cmp += fr"{service2['created_at']}\t{service2['updated_at']}"
     assert re.findall(to_cmp, ret['stdout'])

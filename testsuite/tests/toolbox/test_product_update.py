@@ -12,7 +12,7 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
 
 
-@pytest.fixture(scope="module", params=['copy_service', 'product_copy', 'service_copy'])
+@pytest.fixture(scope="module", params=['product_copy', 'service_copy'])
 def product_service(request):
     """Test copying of service or product"""
     return request.param
@@ -288,7 +288,7 @@ def toolbox_update(service, modify_product, product_service, dst_product, modify
                    modify_activedocs, threescale_src1, threescale_dst1):
     """Toolbox updates product from one 3scale instance to another one"""
     # 3scale service copy [opts] -s <src> -d <dst> <source-service>
-    # 3scale update service [opts] -s <src> -d <dst> <src_service_id> <dst_service_id>
+    # [REMOVED] 3scale update service [opts] -s <src> -d <dst> <src_service_id> <dst_service_id>
     # 3scale product copy [opts] -s <source-remote> -d <target-remote> <source-product>
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
@@ -298,11 +298,7 @@ def toolbox_update(service, modify_product, product_service, dst_product, modify
         update_cmd = 'product copy'
     elif product_service == 'service_copy':
         update_cmd = 'service copy '
-    else:
-        update_cmd = 'update service '
     update_cmd += f" -s {threescale_src1} -d {threescale_dst1} {service['id']}"
-    if product_service == 'copy_service':
-        update_cmd += f" {dst_product['id']}"
     ret = toolbox.run_cmd(update_cmd)
     return (ret['stdout'], ret['stderr'])
 
@@ -315,16 +311,13 @@ def test_update(toolbox_update, modify_product, dst_product, product_service, se
     # pylint: disable=unused-argument
     (stdout, stderr) = toolbox_update
 
-    if product_service == 'copy_service':
-        assert 'This command has been deprecated. Use \'3scale service copy\' instead' in stderr
-    else:
-        assert not stderr
+    assert not stderr
     assert re.findall(r'copy proxy policies', stdout)
     assert re.findall(r'copying all service ActiveDocs', stdout)
 
     service.read()
     dst_product.read()
-    if product_service in ['copy_service', 'service_copy']:
+    if product_service == 'service_copy':
         toolbox.cmp_services(service, dst_product, 'service', False)
     else:
         toolbox.cmp_services(service, dst_product, 'product', False)
@@ -334,7 +327,7 @@ def test_backends(toolbox_update, modify_product, service, dest_client, dst_prod
     """Test backends of the product."""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
-    if product_service in ['copy_service', 'service_copy']:
+    if product_service == 'service_copy':
         pytest.skip("If copying/updating 'service' one backend is copied/updated in background.")
     stdout = toolbox_update[0]
 
@@ -359,12 +352,12 @@ def test_backends(toolbox_update, modify_product, service, dest_client, dst_prod
 
 
 def test_metrics_methods_maps_in_backends(
-        toolbox_update, modify_product, service, dest_client, dst_product):
+        toolbox_update, modify_product, service, dest_client, dst_product, product_service):
     """Test metrics, methods and mapping rules for backedn of product"""
     # pylint: disable=unused-argument
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
-    if product_service in ['copy_service', 'service_copy']:
+    if product_service == 'service_copy':
         pytest.skip("If copying/updating 'service' one backend is copied/updated in background.")
     stdout = toolbox_update[0]
 
