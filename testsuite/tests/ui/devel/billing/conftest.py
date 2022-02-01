@@ -44,7 +44,7 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
 @pytest.fixture(scope="module")
 def billing_address():
     """Billing Address for Credit Card details"""
-    return BillingAddress("aaa", "bbb", "Brno", "Czech Republic", "", "123456789", "12345")
+    return BillingAddress("Red Hat", "Street 5", "Bratislava", "Slovakia", "", "123456789", "12345")
 
 
 @pytest.fixture(scope="module")
