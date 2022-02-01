@@ -11,10 +11,12 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
 
+# removed 'update' as unsupported command
+
 TOOLBOX_COMMANDS = [
     'account', 'activedocs', 'application', 'application-plan', 'backend',
     'copy', 'help', 'import', 'method', 'metric', 'policies', 'policy-registry',
-    'product', 'proxy-config', 'remote', 'service', 'update'
+    'product', 'proxy', 'proxy-config', 'remote', 'service'
     ]
 
 TOOLBOX_SUBCOMMANDS = {
@@ -30,10 +32,10 @@ TOOLBOX_SUBCOMMANDS = {
     'policies': ['export', 'import'],
     'policy-registry': ['copy'],
     'product': ['copy', 'export', 'import'],
+    'proxy': ['deploy', 'show', 'update'],
     'proxy-config': ['deploy', 'export', 'list', 'promote', 'show'],
     'remote': ['add', 'list', 'remove', 'rename'],
     'service': ['apply', 'copy', 'create', 'delete', 'list', 'show'],
-    'update': ['service']
     }
 
 RE_EXPR = re.compile(r'^\s+([^\s]+)\s+.*$')
