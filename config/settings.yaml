@@ -14,7 +14,7 @@ default:
         template: apicast.yml
       OperatorApicast:
         openshift:
-          project_name: "apicast-operator"
+          project_name: "apicast-ga"
           kind: "OpenShiftClient"
       default:
         kind: "SystemApicast"
