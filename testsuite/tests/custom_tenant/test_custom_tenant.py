@@ -12,7 +12,7 @@ def threescale(custom_tenant, testconfig):
     the new tenant
     """
     tenant = custom_tenant()
-    return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=True)
+    return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=32)
 
 
 # FIXME: threescale_api.errors.ApiClientError: Response(422): b'{"errors":{"system_name":["must be shorter."]}}
