@@ -251,9 +251,9 @@ class OpenShiftClient:
             opt_args.extend([f"--param={n}={v}" for n, v in params.items()])
 
         if os.path.isfile(source):
-            source = f"--file={source}"
-
-        self.do_action("new-app", [source, opt_args])
+            source = f"--filename={source}"
+        objects = self.do_action("process", [source, opt_args]).out()
+        self.create(objects)
 
     # pylint: disable=too-many-arguments
     def add_volume(self, deployment_name: str, volume_name: str, mount_path: str,
