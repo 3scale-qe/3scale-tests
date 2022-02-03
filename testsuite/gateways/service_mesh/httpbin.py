@@ -15,7 +15,7 @@ class Httpbin:
         self.name = f"httpbin-{identifier}"
 
         path = resources.files('testsuite.resources.service_mesh').joinpath('httpbin.yaml')
-        self.openshift.new_app(path, {"NAME": self.name})
+        self.openshift.new_app(path, {"NAME": self.name, "LABEL": identifier})
         self.openshift._wait_for_deployment(self.name)
 
     def destroy(self):
