@@ -31,7 +31,7 @@ def service(service):
     return service
 
 
-def test_successful_requests(api_client, prod_client, application):
+def test_successful_requests(api_client, prod_client, application, logger):
     """
     Test that apicast routes with http will be created by zync
     """
@@ -39,6 +39,8 @@ def test_successful_requests(api_client, prod_client, application):
     response = api_client().get('/get')
     assert response.status_code == 200
 
+    logger.info("response.url: %s", response.url)
+    logger.info("response.request.url: %s", response.request.url)
     request_url = urlparse(str(response.url))
     assert request_url.scheme == 'http'
     assert request_url.port == 80
