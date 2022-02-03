@@ -382,7 +382,8 @@ class OpenShiftClient:
         :return: the operator pod
         """
         def select_operator(apiobject):
-            return apiobject.get_label("com.redhat.component-name") == "3scale-operator"
+            return apiobject.get_label("com.redhat.component-name") == "3scale-operator" \
+                or apiobject.get_label("rht.subcomp") == "3scale_operator"
 
         return self.select_resource("pods", narrow_function=select_operator)
 
