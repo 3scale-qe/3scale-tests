@@ -13,7 +13,7 @@ def gateway_environment(gateway_environment):
     return gateway_environment
 
 
-@pytest.mark.required_capabilities(Capability.SERVICE_MESH)
+@pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER)
 @pytest.mark.disruptive
 def test_caching_policy_strict(api_client, openshift):
     """

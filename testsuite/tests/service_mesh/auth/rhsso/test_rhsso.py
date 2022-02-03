@@ -6,7 +6,7 @@ from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
+pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER)
 
 
 def test_rhsso_auth(api_client, service):

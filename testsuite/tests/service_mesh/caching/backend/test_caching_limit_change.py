@@ -6,7 +6,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 
-pytestmark = [pytest.mark.required_capabilities(Capability.SERVICE_MESH), pytest.mark.disruptive]
+pytestmark = [pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER), pytest.mark.disruptive]
 
 
 @pytest.fixture(scope="module")
