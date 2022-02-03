@@ -45,6 +45,13 @@ class OpenShiftClient:
             stack.enter_context(oc.token(self.token))
         stack.enter_context(oc.project(self.project_name))
 
+    @property
+    def api_url(self):
+        """Returns real API url"""
+        with ExitStack() as stack:
+            self.prepare_context(stack)
+            return oc.whoami("--show-server=true")
+
     def do_action(self, verb: str, cmd_args: Sequence[Union[str, Sequence[str]]] = None,
                   auto_raise: bool = True, parse_output: bool = False):
         """Run an oc command."""

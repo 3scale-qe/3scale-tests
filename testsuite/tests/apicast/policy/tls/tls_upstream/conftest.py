@@ -1,6 +1,8 @@
 """
 Configuration for tests making use of an upstream supporting TLS
 """
+from urllib.parse import urlparse
+
 import pytest
 
 import importlib_resources as resources
@@ -20,12 +22,13 @@ def upstream_authority(valid_authority):
 
 
 @pytest.fixture(scope="module")
-def upstream_cert_hostname(superdomain):
+def upstream_cert_hostname(staging_gateway):
     """
     Hostname of the upstream certificate sent to be validated by APIcast
     May be overwritten to configure different test cases
     """
-    return "*." + superdomain.split(".", 1)[1]
+    hostname = urlparse(staging_gateway.openshift.api_url).hostname
+    return "*.apps" + hostname.split(".", 1)[1]
 
 
 @pytest.fixture(scope="module")

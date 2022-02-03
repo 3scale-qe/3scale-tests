@@ -7,6 +7,7 @@ Second the ca_certificates contains mismatched certificates, which should fail w
 refusing to accept the other certificate.
 Third the no certificates are specified in ca_certificates, in which case APIcast returns 200
 """
+from urllib.parse import urlparse
 
 import pytest
 
@@ -34,11 +35,13 @@ def apicast_certificate(certificate):
 
 
 @pytest.fixture(scope="module")
-def valid_upstream_hostname(superdomain):
+def valid_upstream_hostname(staging_gateway):
     """
-    Upstream hostname matching the upstream domain name
+    Upstream hostname matching the upstream domain name based on API server url
+    Note: This will work only on OpenShift with default settings for API and apps URL
     """
-    return "*." + superdomain.split(".", 1)[1]
+    hostname = urlparse(staging_gateway.openshift.api_url).hostname
+    return "*.apps." + hostname.split(".", 1)[1]
 
 
 @pytest.fixture(scope="module")
