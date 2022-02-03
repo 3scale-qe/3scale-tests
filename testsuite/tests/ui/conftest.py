@@ -98,6 +98,7 @@ def custom_devel_login(browser, sessions, navigator, provider_account, account_p
     :param account_password: fixture that returns default account password
     :return: Login to Developer portal with custom credentials (account or name-password pair)
     """
+
     def _login(account=None, name=None, password=None):
         url = settings["threescale"]["devel"]["url"]
         name = name or account['org_name']
@@ -351,7 +352,7 @@ def custom_auth0_login(browser, navigator, threescale, request, testconfig):
 
 
 @pytest.fixture(scope="module")
-def custom_rhsso_login(browser, navigator, threescale, request, testconfig):
+def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhsso_service_info):
     """
     Login fixture for admin portal via RHSSO.
     :param browser: Browser instance
@@ -364,6 +365,8 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig):
     def _login(username, password, rhsso_username=None):
         browser.selenium.delete_all_cookies()
         browser.refresh()
+        user_id = rhsso_service_info.realm.admin.get_user_id(username)
+        rhsso_service_info.realm.admin.logout(user_id)
         browser.url = settings["threescale"]["admin"]["url"]
         page = navigator.open(LoginView)
         page.do_rhsso_login(username, password)
@@ -391,13 +394,20 @@ def set_callback_urls(auth0_client):
     """
     Set callback urls for Auth0 application
     """
+    cleanup = []
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
-    def _set_callback_urls(client_id, urls: list):
-        auth0_client.clients.update(client_id, body={"callbacks": urls})
+    @backoff.on_predicate(backoff.fibo, lambda x: not x['callbacks'], 8, jitter=None)
+    def _get_auth_client(client_id):
         return auth0_client.clients.get(client_id)
 
-    return _set_callback_urls
+    def _set_callback_urls(client_id, urls: list):
+        auth0_client.clients.update(client_id, body={"callbacks": urls})
+        cleanup.append(client_id)
+        return _get_auth_client(client_id)
+
+    yield _set_callback_urls
+    for client in cleanup:
+        auth0_client.clients.update(client, body={"callbacks": []})
 
 
 @pytest.fixture(scope="module")

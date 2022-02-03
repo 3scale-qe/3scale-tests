@@ -1,7 +1,7 @@
 """View representations of 3rd party auth pages"""
 
 from weakget import weakget
-from widgetastic.widget import View, TextInput, GenericLocatorWidget
+from widgetastic.widget import View, TextInput, GenericLocatorWidget, Text
 
 from testsuite import settings
 from testsuite.ui.navigation import Navigable
@@ -15,17 +15,21 @@ class Auth0View(View, Navigable):
     password = TextInput(name="password")
     login_button = GenericLocatorWidget(locator="//button[@aria-label='Log In']")
     last_login_button = GenericLocatorWidget(locator="//*[contains(@class,'auth0-lock-social-button')]")
+    last_login_button_text = Text(locator="//*[contains(@class,'auth0-lock-social-button-text')]")
     not_my_account = GenericLocatorWidget(locator="//*[@class='auth0-lock-alternative-link']")
 
     def login(self, email, password):
         """Login to 3scale via Auth0"""
         self.last_login_button.wait_displayed()
-        if self.email.is_displayed:
-            self.email.fill(email)
-            self.password.fill(password)
-            self.login_button.click()
-        else:
-            self.last_login_button.click()
+        if not self.email.is_displayed:
+            if self.last_login_button_text.text == email:
+                self.last_login_button.click()
+                return
+            self.not_my_account.click()
+        self.email.wait_displayed()
+        self.email.fill(email)
+        self.password.fill(password)
+        self.login_button.click()
 
     @property
     def is_displayed(self):

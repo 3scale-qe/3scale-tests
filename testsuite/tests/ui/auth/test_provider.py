@@ -19,4 +19,4 @@ def test_provider(navigator, login, request):
     """
     request.getfixturevalue(login)
     admin_view = navigator.navigate(BaseAdminView)
-    assert admin_view.is_displayed
+    assert admin_view.wait_displayed()

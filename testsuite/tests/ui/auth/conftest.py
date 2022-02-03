@@ -34,7 +34,8 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
 
 
 @pytest.fixture(scope="module")
-def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, set_callback_urls, auth0_user):
+def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, set_callback_urls, auth0_user,
+                threescale):
     """
     Preparation for Auth0 tests:
         - Crate Auth0 SSO integration
@@ -54,7 +55,12 @@ def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, s
     assert sso.test_flow_checkbox.is_checked
     sso.publish()
 
-    return urls
+    yield urls
+
+    if not testconfig["skip_cleanup"]:
+        name = auth0_user["email"].split("@")[0]
+        user = threescale.provider_account_users.read_by_name(name)
+        user.delete()
 
 
 @pytest.fixture
@@ -109,7 +115,7 @@ def rhsso_setup(request, custom_admin_login, rhsso_service_info, ui_sso_integrat
 
 
 @pytest.fixture
-def rhsso_login(rhsso_setup, testconfig, custom_rhsso_login):
+def rhsso_login(rhsso_setup, testconfig, custom_rhsso_login, rhsso_service_info):
     """Login into 3scale via RHSSO"""
     test_user = testconfig["rhsso"]["test_user"]
     custom_rhsso_login(test_user["username"], test_user["password"])
@@ -119,6 +125,9 @@ def rhsso_login(rhsso_setup, testconfig, custom_rhsso_login):
 def rhsso_bounce_login(rhsso_setup, navigator, testconfig, browser, rhsso_service_info, threescale):
     """Login into 3scale via RHSSO using /bounce URL"""
     bounce_url = rhsso_setup[0].replace("/callback", "/bounce")
+    username = testconfig["rhsso"]["test_user"]["username"]
+    user_id = rhsso_service_info.realm.admin.get_user_id(username)
+    rhsso_service_info.realm.admin.logout(user_id)
     navigator.open(url=bounce_url)
     provider = RhssoView(browser.root_browser)
     test_user = testconfig["rhsso"]["test_user"]
