@@ -23,6 +23,8 @@ def ui_application(service, custom_app_plan, custom_ui_application, request):
 
 
 # pylint: disable=unused-argument
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6205")
+@pytest.mark.xfail
 def test_search_account(login, navigator, custom_ui_account, ui_application, request):
     """
     Preparation:
