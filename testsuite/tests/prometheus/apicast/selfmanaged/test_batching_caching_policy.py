@@ -10,7 +10,7 @@ from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.required_capabilities(Capability.OCP4),
+    pytest.mark.required_capabilities(Capability.OCP4, Capability.APICAST),
     ]
 
 BATCH_REPORT_SECONDS = 50
