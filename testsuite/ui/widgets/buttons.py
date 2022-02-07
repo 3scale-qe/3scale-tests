@@ -44,7 +44,7 @@ class ThreescaleSubmitButton(Button):
 
 
 class ThreescaleSearchButton(Button):
-    """Specific Create button of 3scale pages"""
+    """Specific Search button of 3scale pages"""
 
     def __init__(self, parent=None, locator="//button[contains(text(), 'Search')]", logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
