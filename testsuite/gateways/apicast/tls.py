@@ -19,12 +19,12 @@ class TLSApicast(TemplateApicast):
     def __init__(self, staging: bool, openshift: OpenShiftClient, template, name, image, portal_endpoint, superdomain,
                  server_authority, manager, generate_name=False, path_routing=False) -> None:
         super().__init__(staging, openshift, template, name, image, portal_endpoint, generate_name, path_routing)
-        self.service_name = self.deployment
+        self.service_name = self.deployment.name
         self.superdomain = superdomain
         self.server_authority = server_authority
         self.manager = manager
-        self.secret_name = f"{self.deployment}-server-authority"
-        self.volume_name = f"{self.deployment}-volume"
+        self.secret_name = f"{self.deployment.name}-server-authority"
+        self.volume_name = f"{self.deployment.name}-volume"
         self.mount_path = "/var/apicast/secrets"
         self.https_port = 8443
 
@@ -43,7 +43,8 @@ class TLSApicast(TemplateApicast):
     def add_route(self, name, kind=Routes.Types.PASSTHROUGH):
         """Adds new route for this APIcast"""
         hostname = f"{name}.{self.superdomain}"
-        result = self.openshift.routes.create(name, kind, hostname=hostname, service=self.deployment, port="https")
+        result = self.openshift.routes.create(name, kind, hostname=hostname,
+                                              service=self.deployment.name, port="https")
         self._routes.append(name)
         return result
 
@@ -73,7 +74,7 @@ class TLSApicast(TemplateApicast):
             "APICAST_HTTPS_CERTIFICATE_KEY": f"{self.mount_path}/tls.key",
         }
         LOGGER.debug(envs)
-        self.openshift.environ(self.deployment).set_many(envs)
+        self.environ.set_many(envs)
 
     def _create_secret(self):
         LOGGER.debug('Creating tls secret "%s"...', self.secret_name)
@@ -89,8 +90,7 @@ class TLSApicast(TemplateApicast):
 
         LOGGER.debug('Adding volume "%s" bound to secret "%s" to deployment "%s"...',
                      self.volume_name, self.secret_name, self.deployment)
-        self.openshift.add_volume(self.deployment, self.volume_name,
-                                  self.mount_path, self.secret_name)
+        self.deployment.add_volume(self.volume_name, self.mount_path, self.secret_name)
 
         self._add_envs()
 
@@ -107,6 +107,6 @@ class TLSApicast(TemplateApicast):
         LOGGER.debug('Deleting secret "%s"', self.secret_name)
         self.openshift.delete("secret", self.secret_name)
 
-        LOGGER.debug('TLS apicast "%s" has been destroyed!', self.deployment)
+        LOGGER.debug('TLS apicast "%s" has been destroyed!', self.deployment.name)
 
         self.server_certificate.delete_files()

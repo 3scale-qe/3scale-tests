@@ -89,10 +89,9 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
 
         request.addfinalizer(
             lambda: staging_gateway.openshift.delete_template(path, parameters))
-
         staging_gateway.openshift.new_app(path, parameters)
         # pylint: disable=protected-access
-        staging_gateway.openshift._wait_for_deployment(name)
+        staging_gateway.openshift.deployment(f"dc/{name}").wait_for()
 
         if tls_route_type is not None:
             request.addfinalizer(lambda: openshift.delete("route", name))

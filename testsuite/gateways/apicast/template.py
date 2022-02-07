@@ -27,9 +27,9 @@ class TemplateApicast(SelfManagedApicast):
 
         self._template = template
         self.template_parameters = {
-            "APICAST_NAME": self.deployment,
+            "APICAST_NAME": self.deployment.name,
             "AMP_APICAST_IMAGE": self._image,
-            "CONFIGURATION_URL_SECRET": f"{self.deployment}-secret"}
+            "CONFIGURATION_URL_SECRET": f"{self.deployment.name}-secret"}
         if self.staging:
             self.template_parameters.update({
                 "CONFIGURATION_LOADER": "lazy",
@@ -58,7 +58,7 @@ class TemplateApicast(SelfManagedApicast):
         self.openshift.new_app(self._template, self.template_parameters)
 
         # pylint: disable=protected-access
-        self.openshift._wait_for_deployment(self.deployment)
+        self.deployment.wait_for()
         super().create()
 
     def destroy(self):
@@ -66,10 +66,10 @@ class TemplateApicast(SelfManagedApicast):
         LOGGER.debug('Destroying template-based apicast "%s"...', self.deployment)
 
         LOGGER.debug('Deleting service "%s"', self.deployment)
-        self.openshift.delete("service", self.deployment)
+        self.openshift.delete("service", self.deployment.name)
 
         LOGGER.debug('Deleting deploymentconfig "%s"', self.deployment)
-        self.openshift.delete("deploymentconfig", self.deployment)
+        self.deployment.delete()
 
         LOGGER.debug('Deleting secret "%s"', self.template_parameters["CONFIGURATION_URL_SECRET"])
         self.openshift.delete("secret", self.template_parameters["CONFIGURATION_URL_SECRET"])
@@ -86,6 +86,7 @@ class TemplateApicast(SelfManagedApicast):
         service_name = jaeger_randomized_name
         config_map_name = f"{jaeger_randomized_name}.json"
         self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, service_name))
-        self.openshift.add_volume(self.deployment, "jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
+        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/",
+                                   configmap_name=config_map_name)
         self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
                                "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})

@@ -131,8 +131,7 @@ def mount_certificate_secret(request, staging_gateway):
         request.addfinalizer(turn_down)
 
         staging_gateway.openshift.secrets.create(secret_name, SecretKinds.TLS, certificate=certificate)
-        staging_gateway.openshift.add_volume(staging_gateway.deployment, secret_name,
-                                             mount_path, secret_name)
+        staging_gateway.deployment.add_volume(secret_name, mount_path, secret_name)
 
     return _mount
 

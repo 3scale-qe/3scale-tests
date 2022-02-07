@@ -27,7 +27,7 @@ def test_metric_worker(prometheus, production_gateway):
                    'if [[ $? == 0 ]]; then echo ${k##*/}; fi;'
                    'done | xargs kill -9')
     ocp = production_gateway.openshift
-    pod = ocp.get_pod(production_gateway.deployment)
+    pod = production_gateway.deployment.get_pods()
     ocp.do_action("exec", ['-ti', pod.names()[0], "--", "/bin/sh", "-c", kill_worker])
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch

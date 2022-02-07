@@ -2,17 +2,15 @@
 
 import enum
 import json
-from contextlib import ExitStack
 import os
-from datetime import timezone
+from contextlib import ExitStack
 from typing import List, Dict, Union, Any, Optional, Callable, Sequence
 
 import openshift as oc
 
 from testsuite.openshift.crd.apimanager import APIManager
-from testsuite.openshift.env import Environ
+from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
-
 # There is indeed cyclic import but it should be negated by TYPE_CHECKING check
 # pylint: disable=cyclic-import
 from testsuite.openshift.scaler import Scaler
@@ -108,25 +106,23 @@ class OpenShiftClient:
 
         return Scaler(self)
 
-    def environ(self, name: str,
-                resource_type: Optional[str] = None,
-                wait_for_resource: Optional[Callable[[str], None]] = None):
+    def deployment(self, resource: str) -> Deployment:
+        """Interface for deployment config manipulation"""
+        if "/" not in resource:
+            raise ValueError(f"Resource {resource} is not in <resource_type>/<name> format")
+        resource_type = resource.split("/")[0]
+        if resource_type in ("dc", "deploymentconfig"):
+            return DeploymentConfig(self, resource)
+        if resource_type == "deployment":
+            return KubernetesDeployment(self, resource)
+        raise ValueError(f"Resource type {resource_type} is unknown")
+
+    def environ(self, name: str):
         """Dict-like access to environment variables
         Args:
             :param name: Name of the resource
-            :param resource_type: The resource type. Ex.: deploymentconfig, deployment. Defaults to dc
-            :param wait_for_resource: Callable that should be called to wait until the resource is ready
         """
-        resource_type = resource_type or "dc"
-        wait_for_resource = wait_for_resource or self._wait_for_deployment
-        return Environ(openshift=self, name=name, resource_type=resource_type, wait_for_resource=wait_for_resource)
-
-    def deployment_environ(self, name: str):
-        """Dict-like access to environment variables of a deployment
-        Args:
-            :param name: Name of the resource
-        """
-        return self.environ(name, "deployment", self.wait_for_ready)
+        return self.deployment(name).environ()
 
     def patch(self, resource_type: str, resource_name: str, patch, patch_type: str = None):
         """Patch the specified resource
@@ -189,56 +185,6 @@ class OpenShiftClient:
         for resource in processed_tmpl["items"]:
             self.delete(resource['kind'], resource['metadata']['name'])
 
-    def scale(self, deployment_name: str, replicas: int):
-        """
-        Scale an existing version of Deployment.
-        Args:
-            :param deployment_name: DeploymentConfig name
-            :param replicas: scale up/down to this number
-        """
-        self.do_action("scale", ["--replicas=" + str(replicas), "dc", deployment_name])
-        if replicas > 0:
-            self._wait_for_deployment(deployment_name)
-
-    def rsync(self, deployment_name: str, source: str, dest: str):
-        """Copy files from remote pod container to local.
-
-        First container in the pod from the specified deployment will be used.
-
-        Note: For the time being, rsync is only available from remote to local.
-
-        Args:
-            :param deployment_name: DeploymentConfig name
-            :param source: Remote file-path.
-            :param dest: Local dir where the file will be copied to.
-        """
-        if not os.path.isdir(dest):
-            raise ValueError("You must provide a valid local directory to 'dest'.")
-
-        pod = self.get_pod(deployment_name).object().name()
-        self.do_action("rsync", [f"{pod}:{source}", dest])
-
-    def get_replicas(self, deployment_name: str):
-        """
-        Return number of replicas of Deployment
-        Args:
-            :param deployment_name: DeploymentConfig name
-        """
-        with ExitStack() as stack:
-            self.prepare_context(stack)
-            selector = oc.selector("dc/" + deployment_name)
-            deployment = selector.objects()[0]
-            return deployment.model.spec.replicas
-
-    def rollout(self, deployment_name: str):
-        """Rollout a new version of a Deployment.
-
-        Args:
-            :param deployment_name: DeploymentConfig name
-        """
-        self.do_action("rollout", ["latest", deployment_name])
-        self.do_action("rollout", ["status", deployment_name])
-
     def new_app(self, source: str, params: Dict[str, str] = None):
         """Create application based on source code.
 
@@ -254,133 +200,6 @@ class OpenShiftClient:
             source = f"--filename={source}"
         objects = self.do_action("process", [source, opt_args]).out()
         self.create(objects)
-
-    # pylint: disable=too-many-arguments
-    def add_volume(self, deployment_name: str, volume_name: str, mount_path: str,
-                   secret_name: str = None, configmap_name: str = None):
-        """Add volume to a given deployment.
-
-        Args:
-            :param deployment_name: The deployment name
-            :param volume_name: The volume name
-            :param mount_path: The path to be mounted
-            :param secret_name: The name of an existing Secret
-            :param configmap_name: The name of an existing ConfigMap
-        """
-        self._manage_volume("add", deployment_name, volume_name, mount_path, secret_name, configmap_name)
-
-    def remove_volume(self, deployment_name: str, volume_name: str):
-        """Remove volume from a given deployment.
-
-        Args:
-            :param deployment_name: The deployment name
-            :param volume_name: The volume name
-        """
-        self._manage_volume("remove", deployment_name, volume_name)
-
-    # pylint: disable=too-many-arguments
-    def _manage_volume(self, action: str, deployment_name: str, volume_name: str,
-                       mount_path: str = None, secret_name: str = None,
-                       configmap_name: str = None):
-        """Manage volumes for a given deployment.
-
-        You can add or remove a volume by passing `add` or `remove` to :param action.
-
-        Args:
-            :param action: Either "add" or "remove" option
-            :param deployment_name: The deployment name
-            :param volume_name: The volume name
-            :param mount_path: The path to be mounted
-            :param secret_name: The name of an existing Secret
-            :param configmap_name: The name of an existing ConfigMap
-        """
-        if secret_name and configmap_name:
-            raise ValueError("You must use either Secret or ConfigMap, not both.")
-
-        opt_args = ["--name", volume_name]
-        if mount_path:
-            opt_args.extend(["--mount-path", mount_path])
-
-        if secret_name:
-            opt_args.extend(["--secret-name", secret_name])
-
-        if configmap_name:
-            opt_args.extend(["--configmap-name", configmap_name])
-
-        self.do_action("set", ["volume", f"dc/{deployment_name}", f"--{action}", opt_args])
-        self._wait_for_deployment(deployment_name)
-
-    def _wait_for_deployment(self, deployment_name: str):
-        """Wait for a given deployment to be running.
-
-        Args:
-            :param deployment_name: The deployment name.
-        """
-        with ExitStack() as stack:
-            self.prepare_context(stack)
-            stack.enter_context(oc.timeout(90))
-
-            dc_data = oc.selector(f"dc/{deployment_name}").object()
-            dc_version = dc_data.model.status.latestVersion
-            oc.selector(
-                "pods",
-                labels={
-                    "deployment": f"{deployment_name}-{dc_version}"
-                }
-            ).until_all(
-                success_func=lambda pod: (
-                    pod.model.status.phase == "Running" and pod.model.status.containerStatuses[0].ready
-                )
-            )
-
-    def wait_for_ready(self, deployment_name: str):
-        """
-        Wait for a given deployment to be scaled.
-        Args:
-            :param deployment_name: The deployment name
-        """
-        with ExitStack() as stack:
-            self.prepare_context(stack)
-            # pylint: disable=no-member
-            # https://github.com/PyCQA/pylint/issues/3137
-            stack.enter_context(oc.timeout(90))
-            oc.selector(f"deployment/{deployment_name}").until_all(
-                success_func=lambda deployment: "readyReplicas" in deployment.model.status
-            )
-
-    def get_logs(self, deployment_name: str, since_time=None, tail: int = -1) -> str:
-        """
-        Get merged logs for the pods of the most recent deployment
-
-        Works only for DeploymentConfig, not for Deployment
-        :param since_time starting time from logs
-        :param deployment_name name of the pod to get the logs of
-        :param tail: how many logs to get, defaults to all
-        :return: logs of the pod
-        """
-        cmd_args = []
-        if since_time is not None:
-            d_with_timezone = since_time.replace(tzinfo=timezone.utc)
-            time = d_with_timezone.isoformat()
-            cmd_args.append(f"--since-time={time}")
-        pod_selector = self.get_pod(deployment_name)
-        logs = pod_selector.logs(tail, cmd_args=cmd_args)
-        return "".join(logs.values())
-
-    def get_pod(self, deployment_name: str):
-        """
-        Gets the selector for the pods of the most recent deployment
-
-        Works only for DeploymentConfig, not for Deployment
-        :param deployment_name name of the pod to get
-        :return: the pod of the most recent deployment
-        """
-        def select_pod(apiobject):
-            annotation = "openshift.io/deployment-config.latest-version"
-            latest_version = apiobject.get_annotation(annotation)
-            return apiobject.get_label("deployment") == f"{deployment_name}-{latest_version}"
-
-        return self.select_resource("pods", narrow_function=select_pod)
 
     def get_operator(self):
         """

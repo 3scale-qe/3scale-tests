@@ -18,10 +18,10 @@ ANNOTATIONS = [
 ]
 
 
-@pytest.fixture(params=['zync', 'zync-que'])
+@pytest.fixture(params=['dc/zync', 'dc/zync-que'])
 def poda(request):
     """Return zync pod object."""
-    pod = openshift().get_pod(request.param).object()
+    pod = openshift().deployment(request.param).get_pods().object()
     return pod
 
 

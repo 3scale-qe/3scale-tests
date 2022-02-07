@@ -2,6 +2,8 @@
 import typing
 from contextlib import contextmanager
 
+from testsuite.openshift.deployments import DeploymentConfig
+
 if typing.TYPE_CHECKING:
     from testsuite.openshift.client import OpenShiftClient
     from testsuite.openshift.crd.apimanager import APIManager
@@ -33,8 +35,9 @@ class Scaler:
         if self.operator_deploy:
             apimanager_func = getattr(self.apimanager, self.DEPLOYMENT_MAPPINGS[deployment_name])
             return apimanager_func(replicas, wait_for_replicas=wait_for_replicas)
-        previous_replicas = self.client.get_replicas(deployment_name)
-        self.client.scale(deployment_name, replicas)
+        deployment = DeploymentConfig(self.client, f"dc/{deployment_name}")
+        previous_replicas = deployment.get_replicas()
+        deployment.scale(replicas)
         return previous_replicas
 
     @contextmanager

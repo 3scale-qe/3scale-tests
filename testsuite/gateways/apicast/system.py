@@ -24,18 +24,18 @@ class SystemApicast(AbstractApicast):
 
     def __init__(self, staging: bool, openshift: "OpenShiftClient"):
         self.staging = staging
-        self.deployment = "apicast-staging" if staging else "apicast-production"
+        self.deployment = openshift.deployment("dc/apicast-staging" if staging else "dc/apicast-production")
         self.openshift: "OpenShiftClient" = openshift
 
     @property
     def environ(self) -> Properties:
-        return self.openshift.environ(self.deployment)
+        return self.deployment.environ()
 
     def reload(self):
-        self.openshift.rollout(f"dc/{self.deployment}")
+        self.deployment.rollout()
 
     def get_logs(self, since_time=None):
-        return self.openshift.get_logs(self.deployment, since_time=since_time)
+        return self.deployment.get_logs(since_time=since_time)
 
     def connect_jaeger(self, jaeger, jaeger_randomized_name):
         """
@@ -49,7 +49,7 @@ class SystemApicast(AbstractApicast):
         config_map_name = f"{jaeger_randomized_name}.json"
         service_name = jaeger_randomized_name
         self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, service_name))
-        self.openshift.add_volume(self.deployment, "jaeger-config-vol",
-                                  "/tmp/jaeger/", configmap_name=config_map_name)
+        self.deployment.add_volume("jaeger-config-vol",
+                                   "/tmp/jaeger/", configmap_name=config_map_name)
         self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
                                "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
