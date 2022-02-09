@@ -67,6 +67,20 @@ gateway:
    path_routing: false                   # Optional: True, if the path_routing should be used
    kind: "TemplateApicast"
 ```
+## SelfManaged APIcast
+*Description*: Dynamically select appropriate APIcast deployment method.
+Used basically to get available and best fit deployment. Chosen deployment type
+is one of its subclasses (at the time of writing this text it was
+TemplateApicast or OperatorApicast). The exact deployment can be forced in
+configuration. The arguments for final instance are read from particular
+subsection in config (default or ClassName).
+```
+gateway:
+  default:
+    kind: SelfManagedApicast
+  SelfManagedApicast:
+    force: OperatorApicast
+```
 ## TLS APIcast
 *Description*: Extension to Template APIcast, which sets up APIcast for TLS communication
 

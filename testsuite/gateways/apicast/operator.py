@@ -8,7 +8,7 @@ from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.crd.apicast import APIcast
 from testsuite.openshift.env import Properties
 
-from .selfmanaged import SelfManagedApicast
+from . import OpenshiftApicast
 
 StrMatcher = Dict[str, Union[str, Callable[[APIcast, Any], Any]]]
 RegexMatcher = Dict[Pattern, Callable[[APIcast, Match, Any], Any]]
@@ -106,12 +106,13 @@ class OperatorEnviron(Properties):
         self.wait_function()
 
 
-class OperatorApicast(SelfManagedApicast):
+class OperatorApicast(OpenshiftApicast):
     """Gateway for use with APIcast deployed by operator"""
     CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY, Capability.CUSTOM_ENVIRONMENT}
+    PRIORITY = 1000
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, generate_name=False) -> None:
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, generate_name=False):
         # APIcast operator prepends apicast in front the deployment name
         super().__init__(staging, openshift, name, generate_name)
         self.portal_endpoint = portal_endpoint
@@ -119,8 +120,8 @@ class OperatorApicast(SelfManagedApicast):
         self._environ: OperatorEnviron = None  # type: ignore
 
     @staticmethod
-    def fits():
-        return Capability.OCP4 in CapabilityRegistry()
+    def fits(openshift: OpenShiftClient):
+        return Capability.OCP4 in CapabilityRegistry() and openshift.project_exists
 
     @property
     def deployment(self):
