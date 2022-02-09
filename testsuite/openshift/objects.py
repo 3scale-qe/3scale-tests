@@ -130,6 +130,9 @@ class Secrets(RemoteMapping):
             def __getitem__(self, name):
                 return base64.b64decode(self._data[name])
 
+            def __contains__(self, name):
+                return name in self._data
+
         return _DecodedSecrets(super().__getitem__(name)["data"])
 
     # pylint: disable=too-many-arguments
