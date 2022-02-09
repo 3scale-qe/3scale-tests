@@ -56,6 +56,15 @@ class APIcast(APIObject):
         self.create(["--save-config=true"])
         return self.refresh()
 
+    # pylint: disable=arguments-differ
+    # I am only adding optional argument, so it shouldn't be a big problem
+    def modify_and_apply(self, modifier_func, retries=2, cmd_args=None, ignore_errors=False):
+        """Modified version which asserts that it succeeds"""
+        result, success = super().modify_and_apply(modifier_func, retries, cmd_args)
+        if not ignore_errors:
+            assert success, result.err()
+        return result, success
+
     # Direct access to spec attributes, since all of the attributes are located directly there
     def __getitem__(self, item):
         return self.model.spec.get(item, default=None)

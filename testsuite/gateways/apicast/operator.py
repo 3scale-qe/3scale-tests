@@ -67,8 +67,7 @@ class OperatorEnviron(Properties):
         def _update(apicast):
             for name, value in envs.items():
                 self._set(apicast, name, value)
-        result, _ = self.apicast.modify_and_apply(_update)
-        assert not result.err(), result.err()
+        self.apicast.modify_and_apply(_update)
         self.wait_function()
 
     def __getitem__(self, name):
@@ -80,8 +79,7 @@ class OperatorEnviron(Properties):
         raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def __setitem__(self, name, value):
-        result, _ = self.apicast.modify_and_apply(lambda apicast: self._set(apicast, name, value))
-        assert not result.err(), result.err()
+        self.apicast.modify_and_apply(lambda apicast: self._set(apicast, name, value))
         self.wait_function()
 
     def __delitem__(self, name):
