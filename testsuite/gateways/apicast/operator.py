@@ -1,6 +1,7 @@
 """Apicast deployed with ApicastOperator"""
+import re
 import time
-from typing import Dict
+from typing import Dict, Callable, Pattern, Any, Match, Union
 
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.openshift.client import OpenShiftClient
@@ -9,11 +10,21 @@ from testsuite.openshift.env import Properties
 
 from .selfmanaged import SelfManagedApicast
 
+StrMatcher = Dict[str, Union[str, Callable[[APIcast, Any], Any]]]
+RegexMatcher = Dict[Pattern, Callable[[APIcast, Match, Any], Any]]
+
 
 def apicast_service_list(apicast: APIcast, services: str):
     """Sets APICAST_SERVICE_LIST in the APIcast CR """
     service_list = str(services).split(",")
     apicast["enabledServices"] = service_list
+
+
+def set_configuration_version(apicast: APIcast, match: Match, version):
+    """Sets the configuration version the APIcast should use for this service"""
+    service_id = match.group(1)
+    overrides = apicast.model.spec.setdefault("serviceConfigurationVersionOverride", {})
+    overrides[service_id] = str(version)
 
 
 class OperatorEnviron(Properties):
@@ -25,7 +36,7 @@ class OperatorEnviron(Properties):
         self.apicast = apicast
         self.wait_function = wait_function
 
-    NAMES = {
+    NAMES: StrMatcher = {
         "APICAST_SERVICES_FILTER_BY_URL": "servicesFilterByURL",
         "APICAST_SERVICES_LIST": apicast_service_list,
         "APICAST_UPSTREAM_RETRY_CASES": "upstreamRetryCases",
@@ -41,7 +52,10 @@ class OperatorEnviron(Properties):
         "APICAST_LOAD_SERVICES_WHEN_NEEDED": "loadServicesWhenNeeded",
         "APICAST_CACHE_STATUS_CODES": "cacheStatusCodes",
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
-        # "APICAST_SERVICE_{service.entity_id}_CONFIGURATION_VERSION": ""  # TODO: Works differently
+    }
+
+    REGEX_NAMES: RegexMatcher = {
+        re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version
     }
 
     def _set(self, apicast, name, value):
@@ -51,8 +65,13 @@ class OperatorEnviron(Properties):
                 key(apicast, value)
             else:
                 apicast[key] = value
-        else:
-            raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
+            return
+        for regex, func in self.REGEX_NAMES.items():
+            match = regex.match(name)
+            if match:
+                func(self.apicast, match, value)
+                return
+        raise NotImplementedError(f"Env variable {name} doesn't exists or is not yet implemented in operator")
 
     def _delete(self, apicast, name):
         if name in self.NAMES:
