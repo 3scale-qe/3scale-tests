@@ -20,6 +20,7 @@ import testsuite.tools
 from testsuite import rawobj, HTTP2, gateways, configuration
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
+from testsuite.openshift.client import OpenShiftClient
 from testsuite.prometheus import PrometheusClient
 from testsuite.requestbin import RequestBinClient
 from testsuite.httpx import HttpxHook
@@ -200,6 +201,21 @@ def logger(request):
 def openshift(testconfig):
     "OpenShift client generator"
     return configuration.openshift
+
+
+@pytest.fixture(scope="session")
+def operator_apicast_openshift():
+    """Creates OpenShiftClient for operator apicast project"""
+    project_name = settings["threescale"]["gateway"]["OperatorApicast"]['openshift']['project_name']
+
+    try:
+        server = settings["openshift"]["servers"]['default']
+    except KeyError:
+        server = {}
+
+    return OpenShiftClient(project_name=project_name,
+                           server_url=server.get("server_url", None),
+                           token=server.get("token", None))
 
 
 # pylint: disable=too-few-public-methods,broad-except
