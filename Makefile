@@ -6,7 +6,12 @@
 
 TB ?= short
 LOGLEVEL ?= INFO
+
+ifdef WORKSPACE  # Yes, this is for jenkins
+resultsdir ?= $(WORKSPACE)
+else
 resultsdir ?= .
+endif
 
 PIPENV_VERBOSITY ?= -1
 PIPENV_IGNORE_VIRTUALENVS ?= 1
