@@ -18,7 +18,9 @@ class Capability(enum.Enum):
     APICAST = "apicast"                         # Is APIcast, this is mutually exclusive with Service Mesh
     CUSTOM_ENVIRONMENT = "env"                  # Allows environment manipulation through environ() method
     SAME_CLUSTER = "internal-cluster"           # Is always located on the same cluster as 3scale
-    SERVICE_MESH = "service-mesh"               # Is Service Mesh, this is mutually exclusive with Apicast
+    SERVICE_MESH = "service-mesh"               # It is running through Service Mesh
+    SERVICE_MESH_WASM = "wasm"                  # It is running through WASM extension with ServiceMesh 2.1
+    SERVICE_MESH_ADAPTER = "adapter"            # It is running through Istio adapter with Service Mesh 2.0
     STANDARD_GATEWAY = "standard"               # Tests which deploy their own gateway will run
     LOGS = "logs"                               # Allows getting APIcast logs through get_logs() method
     JAEGER = "jaeger"                           # Allows configuring the APIcast to send data to Jaeger

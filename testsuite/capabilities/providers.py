@@ -23,7 +23,8 @@ def gateway_capabilities():
 CapabilityRegistry().register_provider(gateway_capabilities,
                                        {Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY, Capability.APICAST,
                                         Capability.CUSTOM_ENVIRONMENT, Capability.JAEGER, Capability.SAME_CLUSTER,
-                                        Capability.SERVICE_MESH, Capability.LOGS})
+                                        Capability.SERVICE_MESH, Capability.SERVICE_MESH_ADAPTER,
+                                        Capability.SERVICE_MESH_WASM, Capability.LOGS})
 
 
 def ocp_version():

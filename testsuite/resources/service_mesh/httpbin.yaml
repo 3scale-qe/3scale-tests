@@ -8,17 +8,17 @@ objects:
   metadata:
     name: ${NAME}
     labels:
-      app: ${NAME}
+      app: ${LABEL}
   spec:
     replicas: 1
     selector:
-      app: ${NAME}
+      app: ${LABEL}
     template:
       metadata:
         annotations:
           sidecar.istio.io/inject: "true"
         labels:
-          app: ${NAME}
+          app: ${LABEL}
       spec:
         containers:
           - image: quay.io/jsmadis/httpbin:latest
@@ -34,20 +34,20 @@ objects:
     name: ${NAME}
     labels:
       deployment: ${NAME}
-      app: ${NAME}
+      app: ${LABEL}
   spec:
     ports:
       - name: http
         port: 8080
         targetPort: 8080
     selector:
-     app: ${NAME}
-- apiVersion: networking.istio.io/v1alpha3
+     app: ${LABEL}
+- apiVersion: networking.istio.io/v1beta1
   kind: VirtualService
   metadata:
     name: ${NAME}
     labels:
-      app: ${NAME}
+      app: ${LABEL}
   spec:
     hosts:
       - "*"
@@ -64,12 +64,12 @@ objects:
               host: ${NAME}
               port:
                 number: 8080
-- apiVersion: networking.istio.io/v1alpha3
+- apiVersion: networking.istio.io/v1beta1
   kind: Gateway
   metadata:
     name: ${NAME}
     labels:
-      app: ${NAME}
+      app: ${LABEL}
   spec:
     selector:
       istio: ingressgateway
@@ -83,4 +83,7 @@ objects:
 parameters:
 - name: NAME
   description: "Name for the resources created"
+  required: true
+- name: LABEL
+  description: "App label for all resources"
   required: true

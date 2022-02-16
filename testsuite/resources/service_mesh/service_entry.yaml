@@ -1,0 +1,30 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: service-entry
+objects:
+- apiVersion: networking.istio.io/v1beta1
+  kind: ServiceEntry
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${LABEL}
+  spec:
+    hosts:
+    - ${HOST}
+    ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+    location: MESH_EXTERNAL
+    resolution: DNS
+parameters:
+- name: NAME
+  description: "Name of the service entry"
+  required: true
+- name: HOST
+  description: "Host"
+  required: true
+- name: LABEL
+  description: "App label for all resources"
+  required: true

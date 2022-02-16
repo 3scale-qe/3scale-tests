@@ -165,6 +165,9 @@ def load(obj, env=None, silent=None, key=None):
                         "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
                         "image": _apicast_image(ocp),
                         "openshift": ocp
+                    },
+                    "WASMGateway": {
+                        "backend_host": backend_route["spec"]["host"]
                     }
                 },
                 "backend_internal_api": {

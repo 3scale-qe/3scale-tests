@@ -52,11 +52,11 @@ def test_request_with_wrong_auth(api_client, invalid_auth, credentials_location)
     assert response.status_code == 403
 
 
-def test_request_without_auth(api_client):
+def test_request_without_auth(api_client, no_auth_status_code):
     """Forbid access if no credentials are provided, should fail with 401"""
     # pylint: disable=protected-access
     client = api_client()
     client.auth = None
     response = client.get("/get")
 
-    assert response.status_code == 401
+    assert response.status_code == no_auth_status_code

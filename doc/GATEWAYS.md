@@ -88,9 +88,9 @@ gateway:
 ```
 
 ## Service Mesh gateway
-*Description*: Gateway for 3scale-istio-adapter with service mesh (Istio)
+*Description*: Gateway for 3scale-istio-adapter with service mesh <2.1 (Istio)
 
-*Capabilities*: "ISTIO"
+*Capabilities*: "SERVICE_MESH, SERVICE_MESH_ADAPTER"
 ```
 gateway:
   default:
@@ -101,6 +101,23 @@ gateway:
     mesh:                                # OpenShiftClient where Service Mesh is installed, both httpbin and Service Mesh must be on the same server
       project_name: "service-mesh"       
       kind: "OpenShiftClient"
+```
+
+## WASM gateway
+*Description*: Gateway for 3scale-wasm-extension with service mesh 2.1+ (Istio)
+
+*Capabilities*: "SERVICE_MESH, SERVICE_MESH_WASM"
+```
+gateway:
+  default:
+    kind: "WASMGateway"
+    httpbin:                             # OpenShiftClient used for all httpbins
+      project_name: "httpbin"
+      kind: "OpenShiftClient"
+    mesh:                                # OpenShiftClient where Service Mesh is installed, both httpbin and Service Mesh must be on the same server
+      project_name: "service-mesh"       
+      kind: "OpenShiftClient"
+    image: <extension_image>             # Optional: Image of 3scale WASM Extension
 ```
 
 # Gateways for custom gateway tests
