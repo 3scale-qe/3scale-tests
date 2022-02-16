@@ -37,6 +37,7 @@ def ssh_client():
     @return ssh client
     """
     client = paramiko.client.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
     client.load_system_host_keys()
     client.connect(settings['toolbox']['machine_ip'],
                    username=settings['toolbox']['ssh_user'],
