@@ -96,7 +96,7 @@ class ApplicationNewView(BaseAudienceView):
     app_plan = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
     product = ThreescaleSelect(locator="//label[@for='product']/../div[1]")
     service_plan = ThreescaleSelect(locator="//label[@for='cinstance_service_plan_id']/../div[1]")
-    create_button = ThreescaleCreateButton()
+    create_button = ThreescaleCreateButton(locator="//button[contains(text(), 'Create')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
