@@ -39,7 +39,7 @@ all-is-package:
 
 test: ## Run test
 test pytest tests: pipenv
-	$(PYTEST) -n4 -m 'not flaky' $(flags) testsuite
+	$(PYTEST) -n4 -m 'not flaky' --dist loadfile $(flags) testsuite
 
 speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv
