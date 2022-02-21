@@ -336,6 +336,54 @@ class ActiveDocV2Section(Widget):
         return self.browser.text(self.RESPONSE_CODE_LOCATOR, parent=self)
 
 
+# pylint: disable=abstract-method
+# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
+# an abstract method
+class ActiveDocV3Section(Widget):
+    """Active Doc V3 preview section"""
+    ROOT = ParametrizedLocator('//*[@class="operation-tag-content"]')
+    ENDPOINTS_LIST = './span/div'
+    ITEMS_LOCATOR = './span/div/div/button/span[2]/a/span'
+    ITEMS_EXPAND_LOCATOR = './span/div/div/button/span[text()="{}"]/../span[2]/a/span[contains(text(),"{}")]'
+    RESPONSE_CODE_LOCATOR = './/*[text()="Server response"]/../table/tbody/tr/td[1]'
+    TRY_OUT_BUTTON_LOCATOR = './/*[@class="btn try-out__btn"]'
+    SELECT_OPTION_LOCATOR = './/select/option[text()="{}"]'
+    EXECUTE_BUTTON_LOCATOR = './/*[@class="btn execute opblock-control__btn"]'
+
+    @property
+    def endpoints(self):
+        """Returns a list of all endpoints registry items as strings."""
+        return [self.browser.text(el) for el in self.browser.elements(self.ITEMS_LOCATOR, parent=self)]
+
+    # pylint: disable=raise-missing-from
+    def item_element(self, method, path):
+        """Returns a WebElement for given item name.
+        :return WebElement
+        """
+        path = path.replace("/", "\u200b/")
+        try:
+            return self.browser.element(self.ITEMS_EXPAND_LOCATOR.format(method, path), parent=self)
+        except NoSuchElementException:
+            raise NoSuchElementException('Method {} with path {} not found.'.format(method, path))
+
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
+    def try_it_out(self, method, path, key):
+        """Make test request
+        :param path string eg. /post, /get
+        :param method string eg. GET, POST
+        :param key string name of application
+        """
+        self.browser.click(self.item_element(method, path))
+        self.browser.click(self.browser.element(self.TRY_OUT_BUTTON_LOCATOR))
+        self.browser.selenium.find_element_by_xpath(self.SELECT_OPTION_LOCATOR.format(key)).click()
+        self.browser.click(self.browser.element(self.EXECUTE_BUTTON_LOCATOR))
+
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
+    def get_response_code(self):
+        """Return response code called by method try_it_out"""
+        return self.browser.text(self.RESPONSE_CODE_LOCATOR, parent=self)
+
+
 class ThreescaleAnalyticsDropdown(GenericLocatorWidget):
     """Specific Dropdown menu of 3scale analytics pages"""
 

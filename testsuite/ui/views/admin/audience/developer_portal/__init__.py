@@ -6,7 +6,7 @@ from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput,
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleSubmitButton, ThreescaleDeleteButton
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton, ThreescaleDeleteButton
 
 
 class DeveloperPortalContentView(BaseAudienceView):
@@ -72,7 +72,7 @@ class ActiveDocsView(BaseAudienceView):
 class ActiveDocsNewView(BaseAudienceView):
     """View representation of New Active Docs page"""
     path_pattern = '/admin/api_docs/services/new'
-    create_spec_btn = ThreescaleCreateButton()
+    create_spec_btn = GenericLocatorWidget("//button[contains(text(), 'Create')]")
     skip_swagger_validation_checkbox = GenericLocatorWidget("#api_docs_service_skip_swagger_validations")
     name_field = TextInput(id="api_docs_service_name")
     sys_name_field = TextInput(id="api_docs_service_system_name")
