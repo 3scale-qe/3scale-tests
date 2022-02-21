@@ -117,7 +117,7 @@ testsuite/resources/apicast.yml: FORCE VERSION-required
 	sed -i "s/imagePullPolicy:.*/imagePullPolicy: Always/g" $@
 
 release: ## Create branch of new VERSION (and tag VERSION)
-release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml
+release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
 	$(RUNSCRIPT)make-next-release $(VERSION)
 	git add testsuite/VERSION
 	git add -f Pipfile.lock
