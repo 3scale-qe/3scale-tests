@@ -55,8 +55,9 @@ def test_labels_operator_old(label, expected_value, operator):
 
 @pytest.mark.skipif("TESTED_VERSION < Version('2.12')")
 @pytest.mark.parametrize("label,expected_value", LABELS_POST_2_12)
-def test_labels_operator_new(label, expected_value, operator):
+def test_labels_operator_new(label, expected_value, operator, logger):
     """ Test labels of apicast operator pod. """
+    logger.info("%(name)s labels from %(namespace)s: %(labels)s", operator.as_dict()["metadata"])
     value = operator.get_label(label)
     assert value is not None
     if expected_value:
