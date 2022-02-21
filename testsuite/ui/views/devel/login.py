@@ -1,6 +1,7 @@
 """Representation of login specific Views"""
-from widgetastic.widget import TextInput, GenericLocatorWidget, Text
+from widgetastic.widget import TextInput, Text
 
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
 from testsuite.ui.views.devel import BaseDevelView
 
@@ -10,7 +11,7 @@ class LoginDevelView(BaseDevelView):
     path_pattern = '/login'
     username_field = TextInput(id='session_username')
     password_field = TextInput(id='session_password')
-    sign_in_btn = GenericLocatorWidget(".//input[@type='submit']")
+    sign_in_btn = ThreescaleSubmitButton()
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
 
