@@ -12,7 +12,10 @@ def threescale(custom_tenant, testconfig):
     the new tenant
     """
     tenant = custom_tenant()
-    return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=32)
+    # This has to wait, backoff is not an option as this can create an object
+    # despite to returned error (would keep trash there), the wait time has to
+    # be really long.
+    return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=3*60)
 
 
 # FIXME: threescale_api.errors.ApiClientError: Response(422): b'{"errors":{"system_name":["must be shorter."]}}
