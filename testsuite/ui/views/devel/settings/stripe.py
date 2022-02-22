@@ -6,6 +6,7 @@ from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Te
 from testsuite.ui.objects import CreditCard, BillingAddress
 from testsuite.ui.views.devel import BaseDevelView
 from testsuite.ui.views.devel.settings import SettingsTabs
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class BillingAddressForm(View):
     state = TextInput(id="account_billing_address_state")
     phone = TextInput(id="account_billing_address_phone")
     postal = TextInput(id="account_billing_address_zip")
-    submit = GenericLocatorWidget(".//input[@type='submit']")
+    submit = ThreescaleSubmitButton()
 
     def add(self, address):
         """Adds billing address"""

@@ -7,14 +7,22 @@ from widgetastic_patternfly4 import Button
 class ThreescaleCreateButton(Button):
     """Specific Create button of 3scale pages"""
 
-    def __init__(self, parent=None, locator="//*[contains(text(), 'Create')]", logger=None):
+    def __init__(self, parent=None,
+                 locator=".//*[(self::a or self::button or (self::input and "
+                         "(@type='button' or @type='submit'))) and "
+                         "(contains(@class, 'create') or contains(text(), 'Create'))]",
+                 logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
 
 
 class ThreescaleDeleteButton(Button):
     """Specific Delete button of 3scale pages"""
 
-    def __init__(self, parent=None, locator="//*[contains(@class, 'delete')]", logger=None):
+    def __init__(self, parent=None,
+                 locator=".//*[(self::a or self::button or (self::input and "
+                         "(@type='button' or @type='submit'))) and "
+                         "(contains(@class, 'delete') or contains(text(), 'Delete'))]",
+                 logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
 
     def click(self, handle_alert=True):
@@ -25,14 +33,22 @@ class ThreescaleDeleteButton(Button):
 class ThreescaleUpdateButton(Button):
     """Specific Update button of 3scale pages"""
 
-    def __init__(self, parent=None, locator="//*[contains(text(), 'Update')]", logger=None):
+    def __init__(self, parent=None,
+                 locator=".//*[(self::a or self::button or (self::input and "
+                         "(@type='button' or @type='submit'))) and "
+                         "(contains(@class, 'update') or contains(text(), 'Update'))]",
+                 logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
 
 
 class ThreescaleEditButton(Button):
     """Specific Edit button of 3scale pages"""
 
-    def __init__(self, parent=None, locator="//*[contains(@class, 'edit')]", logger=None):
+    def __init__(self, parent=None,
+                 locator=".//*[(self::a or self::button or (self::input and "
+                         "(@type='button' or @type='submit'))) and "
+                         "(contains(@class, 'edit') or contains(text(), 'Edit'))]",
+                 logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
 
 
