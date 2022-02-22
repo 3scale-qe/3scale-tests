@@ -8,7 +8,7 @@ TB ?= short
 LOGLEVEL ?= INFO
 
 ifdef WORKSPACE  # Yes, this is for jenkins
-resultsdir ?= $(WORKSPACE)
+resultsdir = $(WORKSPACE)
 else
 resultsdir ?= .
 endif
@@ -111,14 +111,18 @@ reportportal:
 		--token-variable RP_TOKEN \
 		$(resultsdir)/junit-*.xml
 
-testsuite/resources/apicast.yml: FORCE VERSION-required
+testsuite/resources/apicast.yml: export VERSION ?= $(shell cut -d. -f1-3 VERSION)
+testsuite/resources/apicast.yml: FORCE
+	$(RUNSCRIPT)env-version-check
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/$(VERSION).GA/apicast-gateway/apicast.yml > $@ || \
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/apicast-gateway/apicast.yml > $@
 	sed -i "s/imagePullPolicy:.*/imagePullPolicy: Always/g" $@
 
 release: ## Create branch of new VERSION (optionally tag VERSION)
 release: tag_release ?= no
-release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
+release: export VERSION ?= $(shell cut -d. -f1-3 VERSION)
+release: Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
+	$(RUNSCRIPT)env-version-check
 	$(RUNSCRIPT)make-next-release $(VERSION)
 	git add testsuite/VERSION
 	git add -f Pipfile.lock
