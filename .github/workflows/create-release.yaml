@@ -15,13 +15,17 @@ jobs:
           fetch-depth: 0
       - name: Install pipenv
         run: pip install pipenv
-      - name: Create release  
+      - name: setup git user
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          make clean release
+      - name: make release
+        run: make clean release
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+      - name: create PR
+        run: |
           git push -u origin HEAD
           gh pr create --fill --reviewer mganisin,pehala
         env:
-          VERSION: ${{ github.event.inputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
