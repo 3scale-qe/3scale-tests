@@ -8,7 +8,7 @@ TB ?= short
 LOGLEVEL ?= INFO
 
 ifdef WORKSPACE  # Yes, this is for jenkins
-resultsdir ?= $(WORKSPACE)
+resultsdir = $(WORKSPACE)
 else
 resultsdir ?= .
 endif
