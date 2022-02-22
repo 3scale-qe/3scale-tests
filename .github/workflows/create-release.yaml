@@ -4,13 +4,15 @@ on:
     inputs:
       version:
         required: true
-        description: "Version needs to be in x.y.z format e.g. 2.12.0"
+        description: "Use x.y.z format e.g. 2.12.0"
         type: string
 jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Install pipenv
         run: pip install pipenv
       - name: Create release  
