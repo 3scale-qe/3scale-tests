@@ -116,14 +116,15 @@ testsuite/resources/apicast.yml: FORCE VERSION-required
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/apicast-gateway/apicast.yml > $@
 	sed -i "s/imagePullPolicy:.*/imagePullPolicy: Always/g" $@
 
-release: ## Create branch of new VERSION (and tag VERSION)
+release: ## Create branch of new VERSION (optionally tag VERSION)
+release: tag_release ?= no
 release: VERSION-required Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
 	$(RUNSCRIPT)make-next-release $(VERSION)
 	git add testsuite/VERSION
 	git add -f Pipfile.lock
 	git add testsuite/resources/apicast.yml
 	git commit -m"`git rev-parse --abbrev-ref HEAD`"
-	git tag -a "`git rev-parse --abbrev-ref HEAD|cut -c9-`" -m"`git rev-parse --abbrev-ref HEAD`"
+	echo "$$tag_release" | egrep -iq '^(false|no|f|n|0)$$' || git tag -a "`git rev-parse --abbrev-ref HEAD|sed 's/^3scale-tests-//'`" -m"`git rev-parse --abbrev-ref HEAD`"
 	git rm --cached Pipfile.lock
 	git commit -m"Unfreeze Pipfile.lock after release"
 

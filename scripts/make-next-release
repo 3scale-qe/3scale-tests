@@ -29,4 +29,4 @@ while f"v{nextver}" in tags:
 with open("VERSION", "w") as s:
     s.write(f"{version}.{revision}\n")
 
-run(["git", "checkout", "-b", f"release-v{version}.{revision}rc{rc}"], check=True)
+run(["git", "checkout", "-b", f"3scale-tests-v{version}.{revision}rc{rc}"], check=True)
