@@ -13,6 +13,8 @@ jobs:
       - name: Install pipenv
         run: pip install pipenv
       - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           make clean release
           git push -u origin HEAD
           gh pr create --fill --reviewer mganisin,pehala
