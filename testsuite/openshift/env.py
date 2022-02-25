@@ -2,11 +2,12 @@
 import abc
 import re
 import logging
-from typing import TYPE_CHECKING, Callable, Match, Dict
+from typing import TYPE_CHECKING, Match, Dict
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
+    from testsuite.openshift.deployments import Deployment
 
 
 class EnvironmentVariable:
@@ -14,12 +15,11 @@ class EnvironmentVariable:
     pattern = r"(?P<name>.*)=(?P<value>.*)"
 
     def __init__(self, openshift: 'OpenShiftClient',
-                 deployment: str,
                  match: Match,
                  environ: "Environ") -> None:
         self.name = match.group("name")
         self.match = match
-        self.deployment = deployment
+        self.deployment = environ.deployment
         self.openshift = openshift
         self.environ = environ
 
@@ -29,22 +29,22 @@ class EnvironmentVariable:
 
     def set(self, value: str):
         """Sets value for the environment variable"""
-        self.openshift.do_action("set", ["env", self.environ.resource_type, self.deployment, f"{self.name}={value}"])
+        self.openshift.do_action("set", ["env", self.deployment.resource, f"{self.name}={value}"])
         # pylint: disable=protected-access
-        self.environ.wait_for_resource(self.deployment)
+        self.deployment.wait_for()
 
     def delete(self):
         """Removes environment variable"""
-        self.openshift.do_action("set", ["env", self.environ.resource_type, self.deployment, f"{self.name}-"])
-        self.environ.wait_for_resource(self.deployment)
+        self.openshift.do_action("set", ["env", self.deployment.resource, f"{self.name}-"])
+        self.deployment.wait_for()
 
 
 class SecretEnvironmentVariable(EnvironmentVariable):
     """Class for working with environmental variable that is set from secret"""
     pattern = r"#\ (?P<name>.*)\ from\ secret\ (?P<secret>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: Match, environ: "Environ") -> None:
-        super().__init__(openshift, deployment, match, environ)
+    def __init__(self, openshift: 'OpenShiftClient', match: Match, environ: "Environ") -> None:
+        super().__init__(openshift, match, environ)
         self.secret = match.group("secret")
         self.key = match.group("key")
 
@@ -62,8 +62,8 @@ class ConfigMapEnvironmentVariable(EnvironmentVariable):
     """Class for working with environment variable that is set from configmap"""
     pattern = r"#\ (?P<name>.*)\ from\ configmap\ (?P<config>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', deployment: str, match: Match, environ: "Environ") -> None:
-        super().__init__(openshift, deployment, match, environ)
+    def __init__(self, openshift: 'OpenShiftClient', match: Match, environ: "Environ") -> None:
+        super().__init__(openshift, match, environ)
         self.config = match.group("config")
         self.key = match.group("key")
 
@@ -101,18 +101,13 @@ class Properties(abc.ABC):
         """Deletes item"""
 
 
-class Environ:
+class Environ(Properties):
     """Contains all env variables for a specific deployment config"""
     types = [EnvironmentVariable, SecretEnvironmentVariable, ConfigMapEnvironmentVariable]
 
-    def __init__(self, openshift: 'OpenShiftClient',
-                 name: str,
-                 wait_for_resource: Callable[[str], None],
-                 resource_type: str) -> None:
-        self.openshift = openshift
-        self.deployment_name = name
-        self.resource_type = resource_type
-        self.wait_for_resource = wait_for_resource
+    def __init__(self, deployment: "Deployment") -> None:
+        self.openshift = deployment.openshift
+        self.deployment: "Deployment" = deployment
         self.__envs = None
 
     @property
@@ -124,13 +119,12 @@ class Environ:
     def refresh(self):
         """Refreshes all the environment variables"""
         self.__envs = {}
-        cmd_result = self.openshift.do_action("set", ["env", self.resource_type, self.deployment_name, "--list"])
+        cmd_result = self.openshift.do_action("set", ["env", self.deployment.resource, "--list"])
         for line in cmd_result.out().split("\n"):
             for env_type in self.types:
                 match_obj = re.match(env_type.pattern, line)
                 if match_obj:
                     env = env_type(openshift=self.openshift,
-                                   deployment=self.deployment_name,
                                    match=match_obj,
                                    environ=self)
                     self.__envs[env.name] = env
@@ -141,10 +135,10 @@ class Environ:
         env_args = []
         for name, value in envs.items():
             env_args.append(f"{name}={value}")
-            logger.info("Setting env %s=%s in %s", name, value, self.deployment_name)
+            logger.info("Setting env %s=%s in %s", name, value, self.deployment.resource)
 
-        self.openshift.do_action("set", ["env", self.resource_type, self.deployment_name, env_args])
-        self.wait_for_resource(self.deployment_name)
+        self.openshift.do_action("set", ["env", self.deployment.resource, env_args])
+        self.deployment.wait_for()
 
         # refresh envs on the next access to self._envs
         self.__envs = None
@@ -158,10 +152,10 @@ class Environ:
         if name in self._envs:
             self._envs[name].set(value)
         else:
-            self.openshift.do_action("set", ["env", self.resource_type, self.deployment_name, f"{name}={value}"])
-            self.wait_for_resource(self.deployment_name)
+            self.openshift.do_action("set", ["env", self.deployment.resource, f"{name}={value}"])
+            self.deployment.wait_for()
 
-        logger.info("Setting env %s=%s in %s", name, value, self.deployment_name)
+        logger.info("Setting env %s=%s in %s", name, value, self.deployment.resource)
 
         self.__envs = None
 

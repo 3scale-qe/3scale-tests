@@ -13,10 +13,11 @@ class Httpbin:
         self.openshift = openshift
         self.credentials = credentials
         self.name = f"httpbin-{identifier}"
+        self.deployment = self.openshift.deployment(f"deployment/{self.name}")
 
         path = resources.files('testsuite.resources.service_mesh').joinpath('httpbin.yaml')
-        self.openshift.new_app(path, {"NAME": self.name, "LABEL": identifier})
-        self.openshift._wait_for_deployment(self.name)
+        self.openshift.new_app(path, {"NAME": self.name})
+        self.deployment.wait_for()
 
     def destroy(self):
         """Deletes all the resources created by this instance"""
@@ -24,9 +25,7 @@ class Httpbin:
 
     def patch_service(self, service_id):
         """Patches currently tested service into httpbin deployment"""
-        self.openshift.patch("dc",
-                             self.name,
-                             [
+        self.deployment.patch([
                                  {"op": "replace",
                                   "path": "/spec/template/metadata/labels/service-mesh.3scale.net~1service-id",
                                   "value": str(service_id)
@@ -37,7 +36,7 @@ class Httpbin:
                                   },
                              ], patch_type="json")
         # pylint: disable=protected-access
-        self.openshift._wait_for_deployment(self.name)
+        self.deployment.wait_for()
 
     def create_policy(self, name: str, info: RHSSOServiceConfiguration):
         """Creates new Policy, used for OIDC authorization, for specific realm setup"""

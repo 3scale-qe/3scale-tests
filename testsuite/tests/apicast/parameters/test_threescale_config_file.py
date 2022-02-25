@@ -44,8 +44,7 @@ def get_apicast_config(service):
 def setup_apicast_configuration(service, staging_gateway, configmap_name):
     """Configure apicast for reading configuration from ConfigMap."""
     staging_gateway.openshift.config_maps.add(configmap_name, get_apicast_config(service))
-    staging_gateway.openshift.add_volume(staging_gateway.deployment, "apicast-config-vol",
-                                         "/opt/config", configmap_name=configmap_name)
+    staging_gateway.deployment.add_volume("apicast-config-vol", "/opt/config", configmap_name=configmap_name)
 
 
 @pytest.fixture(scope="module")

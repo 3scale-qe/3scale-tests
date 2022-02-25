@@ -54,7 +54,7 @@ def read_log(staging_gateway, tmpdir):
         dest = f"{tmpdir}/{filename}"
 
         # copy log file from apicast to local
-        staging_gateway.openshift.rsync(staging_gateway.deployment, source, tmpdir)
+        staging_gateway.deployment.rsync(source, tmpdir)
 
         with open(dest, encoding="utf8") as file:
             content = file.read()

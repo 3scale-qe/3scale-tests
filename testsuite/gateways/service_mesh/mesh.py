@@ -79,4 +79,4 @@ class ServiceMesh:
     @property
     def environ(self) -> Properties:
         """Returns Environ object for manipulation of the adapter environment"""
-        return self.openshift.deployment_environ("3scale-istio-adapter")
+        return self.openshift.environ("deployment/3scale-istio-adapter")

@@ -124,7 +124,7 @@ class OperatorApicast(SelfManagedApicast):
 
     @property
     def deployment(self):
-        return f"apicast-{super().deployment}"
+        return self.openshift.deployment(f"deployment/apicast-{self.name}")
 
     @property
     def environ(self) -> Properties:
@@ -133,10 +133,7 @@ class OperatorApicast(SelfManagedApicast):
         return self._environ
 
     def reload(self):
-        self.openshift.do_action("delete", ["pod", "--force",
-                                            "--grace-period=0", "-l", f"deployment={self.deployment}"])
-        # pylint: disable=protected-access
-        self.openshift.wait_for_ready(self.deployment)
+        self.deployment.rollout()
 
     def create(self):
         apicast = APIcast.create_instance(
@@ -158,7 +155,7 @@ class OperatorApicast(SelfManagedApicast):
         # is created
         time.sleep(2)
         # pylint: disable=protected-access
-        self.openshift.wait_for_ready(self.deployment)
+        self.deployment.wait_for()
 
     def destroy(self):
         if self.apicast:

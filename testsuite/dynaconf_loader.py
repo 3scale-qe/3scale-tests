@@ -80,7 +80,7 @@ def _rhsso_password(server_url, token):
             # was it deployed as part of tools?
             tools = OpenShiftClient(
                 project_name="tools", server_url=server_url, token=token)
-            return tools.environ("sso")["SSO_ADMIN_PASSWORD"]
+            return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
         except (OpenShiftPythonException, KeyError):
             return None
 

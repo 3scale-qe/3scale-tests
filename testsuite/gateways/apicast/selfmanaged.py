@@ -8,6 +8,7 @@ from testsuite import utils
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.client import OpenShiftClient
+from testsuite.openshift.deployments import Deployment
 from testsuite.openshift.env import Properties
 from testsuite.openshift.objects import Routes
 
@@ -68,9 +69,9 @@ class SelfManagedApicast(AbstractApicast):
         return False
 
     @property
-    def deployment(self):
-        """Returns name of the deployment, by default it is just a name"""
-        return self.name
+    def deployment(self) -> Deployment:
+        """Gateway deployment"""
+        return self.openshift.deployment(f"dc/{self.name}")
 
     def _routename(self, service):
         """name of route for given service"""
@@ -83,7 +84,7 @@ class SelfManagedApicast(AbstractApicast):
     def base_route(self):
         """Route that points at the APIcast itself"""
         if self._base_route is None:
-            hostname = self.get_route(f"base-{self.deployment}")
+            hostname = self.get_route(f"base-{self.deployment.name}")
             self._base_route = hostname
         return self._base_route
 
@@ -99,7 +100,7 @@ class SelfManagedApicast(AbstractApicast):
         super().create()
 
         if self.path_routing:
-            self.add_route(f"base-{self.deployment}")
+            self.add_route(f"base-{self.deployment.name}")
 
     def before_service(self, service_params: Dict) -> Dict:
         service_params.update({"deployment_option": "self_managed"})
@@ -124,7 +125,7 @@ class SelfManagedApicast(AbstractApicast):
 
     def add_route(self, name, kind=Routes.Types.EDGE):
         """Adds new route for this APIcast"""
-        result = self.openshift.routes.create(name, kind, service=self.deployment, **{"insecure-policy": "Allow"})
+        result = self.openshift.routes.create(name, kind, service=self.deployment.name, **{"insecure-policy": "Allow"})
         self._routes.append(name)
         return result
 
@@ -140,22 +141,20 @@ class SelfManagedApicast(AbstractApicast):
 
     @property
     def environ(self) -> Properties:
-        return self.openshift.environ(self.deployment)
+        return self.deployment.environ()
 
     def reload(self):
-        self.openshift.rollout(f"dc/{self.deployment}")
+        self.deployment.rollout()
 
     def get_logs(self, since_time=None):
-        return self.openshift.get_logs(self.deployment, since_time=since_time)
+        return self.deployment.get_logs(since_time=since_time)
 
     def set_image(self, image):
         """Sets specific image to the deployment config and redeploys it"""
-        self.openshift.patch("dc", self.deployment, [
+        self.deployment.patch([
                 {
                     "op": "replace",
                     "path": "/spec/template/spec/containers/0/image",
                     "value": image
                 }
             ], patch_type="json")
-        # pylint: disable=protected-access
-        self.openshift._wait_for_deployment(self.deployment)
