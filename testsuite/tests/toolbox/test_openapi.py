@@ -92,7 +92,33 @@ def import_oas(threescale_dst1, dest_client, request, oas):
     yield (ret, service_id, service_name, service)
     if not settings["skip_cleanup"]:
         service.delete()
-        toolbox.run_cmd('rm -f ' + oas['file_name'], False)
+        toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
+
+
+@pytest.fixture(scope="module")
+def import_oas_backend(threescale_dst1, dest_client, oas, import_oas):
+    """Import backend OAS by Toolbox
+       It is imported only one backend based on servers[0].url.
+       For multiple servers, see https://issues.redhat.com/browse/THREESCALE-6197
+    """
+    if oas['type'] == 'oas2':
+        pytest.skip("This testcase is oas3 only.")
+    service = import_oas[3]
+    import_cmd = f"import openapi -d {threescale_dst1} "
+    import_cmd += oas['file_name']
+    import_cmd += f" --target_system_name={service['system_name']} "
+    import_cmd += ' --backend'
+    ret = toolbox.run_cmd(import_cmd)
+
+    output = json.loads(ret['stdout'])
+    backend = dest_client.backends[int(output['id'])]
+
+    yield (ret, output, backend)
+    if not settings["skip_cleanup"]:
+        for bus in service.backend_usages.list():
+            bus.delete()
+        backend.delete()
+        toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
 
 
 @pytest.fixture(scope="module")
@@ -122,7 +148,7 @@ def application(import_oas, account, custom_app_plan, custom_application, reques
 
 def test_import(import_oas, oas):
     """Checks import results"""
-    (ret, service_id, service_name, service) = import_oas
+    ret, service_id, service_name, service = import_oas
     assert not ret['stderr']
     assert int(service_id) == int(service['id'])
     assert oas['file']['info']['title'] == service_name
@@ -139,6 +165,23 @@ def test_import(import_oas, oas):
                 re.MULTILINE)
     if oas['type'] == 'oas3':
         assert re.findall(r'^Service policies updated$', ret['stdout'], re.MULTILINE)
+
+
+def test_import_backend(oas, import_oas_backend):
+    """Checks import backend result."""
+    if oas['type'] == 'oas2':
+        pytest.skip("This testcase is oas3 only.")
+    ret, output, backend = import_oas_backend
+    assert not ret['stderr']
+    assert output['system_name'] == backend['system_name']
+    assert output['private_endpoint'] == backend['private_endpoint']
+    for key, value in output['mapping_rules'].items():
+        metric = backend.metrics.read(int(value['metric_id']))
+        assert metric['friendly_name'] == key
+        back_map = backend.mapping_rules.select_by(metric_id=int(value['metric_id']))[0]
+        assert back_map['pattern'] == value['pattern']
+        assert back_map['http_method'] == value['http_method']
+        assert back_map['delta'] == value['delta']
 
 
 def test_service(import_oas, oas):
