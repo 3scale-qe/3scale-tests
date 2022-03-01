@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import APICAST_OPERATOR_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.5.2')"),
     pytest.mark.required_capabilities(Capability.OCP4, Capability.APICAST),
     ]
 
@@ -70,7 +70,7 @@ def test_batcher_policy(prometheus, pod_monitor, api_client, staging_gateway, ap
     """Test if return correct number of usages of a service in batch"""
     client = api_client()
 
-    apicast_deployment = staging_gateway.deployment
+    apicast_deployment = staging_gateway.deployment.name
 
     metrics_keys = prometheus.get_metrics(apicast_deployment)
 

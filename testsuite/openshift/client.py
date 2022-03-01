@@ -222,6 +222,19 @@ class OpenShiftClient:
 
         return self.select_resource("pods", narrow_function=select_operator)
 
+    @property
+    def apicast_operator_subscription(self):
+        """
+        Gets the selector for the apicast-operator subscription
+
+        :return: the subscription
+        """
+
+        def select_operator(subscription):
+            return subscription.model.spec.name == "apicast-operator"
+
+        return self.select_resource("subscriptions", narrow_function=select_operator)
+
     def select_resource(self,
                         resource: str,
                         labels: Optional[Dict[str, str]] = None,
