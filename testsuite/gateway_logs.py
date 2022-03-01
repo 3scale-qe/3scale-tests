@@ -58,7 +58,7 @@ def _print_logs(item, start_time, phase, suffix):
     # https://github.com/pytest-dev/pytest/issues/7724
     try:
         for gateway_name, gateway in item.gateways.items():
-            name = f"{gateway_name} - {suffix}"
+            name = f" {gateway_name} ({suffix}) "
             if Capability.LOGS in gateway.CAPABILITIES:
                 item.add_report_section(phase,
                                         "stdout",
