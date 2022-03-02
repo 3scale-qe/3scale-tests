@@ -67,14 +67,15 @@ class WASMGateway(AbstractGateway):
     def destroy(self):
         self.mesh.delete_app(self.label, resources="serviceentry")
 
-    def add_mapping_rules(self, service, metric, rules):
+    def add_mapping_rules(self, service, rules):
         """Adds mapping rules into the extension, as they do have to be configured separately"""
         ext = self.extensions[service["id"]]
-        ext.add_mapping_rule(metric, rules)
+        ext.add_mapping_rules(rules)
 
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
+        ext.synchronise_mapping_rules()
         return ServiceMeshHttpClient(app=application,
                                      cert=cert,
                                      disable_retry_status_list=disable_retry_status_list,
