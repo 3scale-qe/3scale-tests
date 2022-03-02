@@ -30,7 +30,7 @@ def pod_monitor(prometheus, openshift, staging_gateway):
     """ define pod monitor for prometheus """
 
     apicast_openshift_client = staging_gateway.openshift
-    apicast_deployment = staging_gateway.deployment
+    apicast_deployment = staging_gateway.deployment.name
     apicast_operator_namespace = apicast_openshift_client.project_name
 
     openshift_client = openshift()

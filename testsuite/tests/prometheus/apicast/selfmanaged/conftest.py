@@ -15,6 +15,14 @@ def require_openshift(testconfig):
         warn_and_skip("All monitoring for selfmanaged apicast skipped due to missing openshift")
 
 
+@pytest.fixture(scope="module", autouse=True)
+def require_prometheus_operator(openshift):
+    """require configured operator for prometheus"""
+    routes = openshift().routes.for_service('prometheus-operated')
+    if len(routes) == 0:
+        warn_and_skip("This test needs prometheus deployed by operator")
+
+
 @pytest.fixture(scope="module")
 def staging_gateway(request):
     """Deploy self-managed template based apicast gateway."""
