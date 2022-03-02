@@ -159,6 +159,7 @@ def pytest_report_header(config):
     threescale = settings["threescale"]["admin"]["url"]
     version = settings["threescale"]["version"]
     catalogsource = weakget(settings)["threescale"]["catalogsource"] % "UNKNOWN"
+    toolboximage = weakget(settings)["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
@@ -187,6 +188,7 @@ def pytest_report_header(config):
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
         f"testsuite: catalogsource = {catalogsource}",
+        f"testsuite: toolboximage = {toolboximage}",
         ""]
 
 
