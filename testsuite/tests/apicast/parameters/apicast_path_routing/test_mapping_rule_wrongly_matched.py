@@ -17,7 +17,7 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment):
     """Enables path routing on gateway"""
-    gateway_environment.update({"APICAST_PATH_ROUTING": 1})
+    gateway_environment.update({"APICAST_PATH_ROUTING": True})
     return gateway_environment
 
 

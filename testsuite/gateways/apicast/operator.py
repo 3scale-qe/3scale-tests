@@ -112,9 +112,10 @@ class OperatorApicast(OpenshiftApicast):
     PRIORITY = 1000
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient, name, portal_endpoint, generate_name=False):
+    def __init__(self, staging: bool, openshift: OpenShiftClient,
+                 name, portal_endpoint, generate_name=False, path_routing=False):
         # APIcast operator prepends apicast in front the deployment name
-        super().__init__(staging, openshift, name, generate_name)
+        super().__init__(staging, openshift, name, generate_name, path_routing)
         self.portal_endpoint = portal_endpoint
         self.apicast = None
         self._environ: OperatorEnviron = None  # type: ignore
@@ -158,9 +159,13 @@ class OperatorApicast(OpenshiftApicast):
         # pylint: disable=protected-access
         self.deployment.wait_for()
 
+        super().create()
+
     def destroy(self):
         if self.apicast:
             self.apicast.delete(ignore_not_found=True)
+
+        super().destroy()
 
     def get_logs(self, since_time=None):
         raise NotImplementedError()

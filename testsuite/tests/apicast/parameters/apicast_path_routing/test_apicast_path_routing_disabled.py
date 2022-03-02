@@ -15,7 +15,7 @@ pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capa
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment):
     """Disabled path routing on gateway"""
-    gateway_environment.update({"APICAST_PATH_ROUTING": 0})
+    gateway_environment.update({"APICAST_PATH_ROUTING": False})
     return gateway_environment
 
 

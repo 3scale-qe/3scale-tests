@@ -2,6 +2,7 @@
 import pytest
 
 from testsuite import rawobj
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 
@@ -10,6 +11,12 @@ def delete_all_mapping_rules(proxy):
     mapping_rules = proxy.mapping_rules.list()
     for mapping_rule in mapping_rules:
         proxy.mapping_rules.delete(mapping_rule["id"])
+
+
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Gateway class to use for tests"""
+    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")
