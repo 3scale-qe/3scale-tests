@@ -25,9 +25,10 @@ def openshift(server="default", project="threescale") -> OpenShiftClient:
 
 def call(method, **kwargs):
     """Calls method with only parameters it requires"""
-    # Due to SelfManaged overriding __new__, inspect cannot infer the expected variables from __new__
-    inspected_method = method.__init__ if inspect.isclass(method) else method
-    expected = inspect.signature(inspected_method).parameters.keys()
+    if hasattr(method, "expected_init_args"):
+        expected = method.expected_init_args()
+    else:
+        expected = inspect.signature(method.__init__).parameters.keys()
     return method(**{k: v for k, v in kwargs.items() if k in expected})
 
 

@@ -62,6 +62,15 @@ class OpenShiftClient:
             return result
 
     @property
+    def project_exists(self):
+        """Returns True if the project exists"""
+        try:
+            self.do_action("get", f"project/{self.project_name}")
+            return True
+        except oc.OpenShiftPythonException:
+            return False
+
+    @property
     def is_operator_deployment(self):
         """
         True, if the said namespace contains at least one APIManager resource
