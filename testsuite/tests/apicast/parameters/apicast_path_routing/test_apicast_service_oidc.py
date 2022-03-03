@@ -15,6 +15,12 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Cap
 
 
 @pytest.fixture(scope="module")
+def gateway_kind():
+    """Gateway class to use for tests"""
+    return TemplateApicast
+
+
+@pytest.fixture(scope="module")
 def production_gateway(request, gateway_environment):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=False, name=blame(request, "gw"))
