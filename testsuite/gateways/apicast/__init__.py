@@ -1,7 +1,7 @@
 """Module containing all APIcast gateways"""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 import logging
 
 from threescale_api.resources import Service
@@ -37,6 +37,7 @@ class AbstractApicast(AbstractGateway, ABC):
         pass
 
 
+# pylint: disable=too-many-instance-attributes
 class OpenshiftApicast(AbstractApicast, ABC):
     """Super-class for selfmanaged apicast deployed to openshift"""
 
@@ -62,6 +63,7 @@ class OpenshiftApicast(AbstractApicast, ABC):
             self.name = f"{name}-{utils.randomize(utils._whoami()[:8])}"
         self._routes: List[str] = []
         self._base_route = None
+        self._to_delete: List[Tuple[str, str]] = []
 
     @staticmethod
     def fits(openshift: OpenShiftClient):  # pylint: disable=unused-argument
@@ -98,6 +100,9 @@ class OpenshiftApicast(AbstractApicast, ABC):
             if route in self.openshift.routes:
                 LOGGER.debug('Removing route "%s"...', route)
                 del self.openshift.routes[route]
+
+        for kind, name in self._to_delete:
+            self.openshift.delete(kind, name)
 
     def create(self):
         super().create()
