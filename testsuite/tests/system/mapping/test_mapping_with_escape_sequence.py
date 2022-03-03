@@ -7,6 +7,8 @@ and relevant mapping/metric is applied
 import pytest
 from testsuite import rawobj
 
+pytestmark = pytest.mark.required_capabilities()
+
 
 @pytest.fixture(scope="module")
 def service(service):
