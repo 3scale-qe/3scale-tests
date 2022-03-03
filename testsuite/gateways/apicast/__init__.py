@@ -73,6 +73,10 @@ class OpenshiftApicast(AbstractApicast, ABC):
         """
         return False
 
+    @abstractmethod
+    def setup_tls(self, secret_name, https_port):
+        """Sets up TLS with the current gateway"""
+
     @property
     def deployment(self) -> Deployment:
         """Gateway deployment"""
@@ -166,3 +170,5 @@ class OpenshiftApicast(AbstractApicast, ABC):
                     "value": image
                 }
             ], patch_type="json")
+        # pylint: disable=protected-access
+        self.deployment.wait_for()

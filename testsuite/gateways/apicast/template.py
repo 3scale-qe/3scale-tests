@@ -73,6 +73,30 @@ class TemplateApicast(OpenshiftApicast):
         LOGGER.debug('Deleting secret "%s"', self.template_parameters["CONFIGURATION_URL_SECRET"])
         self.openshift.delete("secret", self.template_parameters["CONFIGURATION_URL_SECRET"])
 
+    def setup_tls(self, secret_name, https_port):
+        mount_path = "/var/apicast/secrets"
+        LOGGER.debug('Adding tls volume bound to secret "%s" to deployment "%s"...', secret_name, self.deployment)
+        self.deployment.add_volume("tls-secret", mount_path, secret_name)
+
+        LOGGER.debug('Patching https port into service "%s"...', self.deployment)
+        self.openshift.patch("service", self.deployment.name,
+                             [{
+                                 "op": "add",
+                                 "path": "/spec/ports/-",
+                                 "value": {
+                                     "name": "httpsproxy",
+                                     "port": https_port,
+                                     "protocol": "TCP"
+                                 }
+                             }], patch_type="json")
+
+        LOGGER.debug('Adding envs to deployment "%s"...', self.deployment)
+        self.environ.set_many({
+            "APICAST_HTTPS_PORT": https_port,
+            "APICAST_HTTPS_CERTIFICATE": f"{mount_path}/tls.crt",
+            "APICAST_HTTPS_CERTIFICATE_KEY": f"{mount_path}/tls.key",
+        })
+
     def connect_jaeger(self, jaeger):
         """
         Modifies the APIcast to send information to jaeger.

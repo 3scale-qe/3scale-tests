@@ -168,6 +168,13 @@ class OperatorApicast(OpenshiftApicast):
 
         super().destroy()
 
+    def setup_tls(self, secret_name, https_port):
+        def _add_tls(apicast):
+            apicast["httpsPort"] = https_port
+            apicast["httpsCertificateSecretRef"] = {"name": secret_name}
+        self.apicast.modify_and_apply(_add_tls)
+        self.reload()
+
     def get_logs(self, since_time=None):
         return self.deployment.get_logs(since_time=since_time)
 
