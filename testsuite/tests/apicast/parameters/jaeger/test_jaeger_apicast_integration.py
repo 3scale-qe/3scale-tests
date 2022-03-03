@@ -6,14 +6,19 @@ It is necessary to have the jaeger url config value set
 import backoff
 import pytest
 
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import randomize
 from testsuite.capabilities import Capability
 
 CAPABILITIES = [Capability.JAEGER]
 
 
-# seems to fail everytime actually
-@pytest.mark.flaky
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Gateway class to use for tests"""
+    return SelfManagedApicast
+
+
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5669")
 def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
     """

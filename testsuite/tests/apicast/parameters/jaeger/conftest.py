@@ -5,7 +5,6 @@ Conftest for the jaeger tests
 from weakget import weakget
 import pytest
 
-from testsuite.utils import blame
 from testsuite.jaeger import Jaeger
 
 
