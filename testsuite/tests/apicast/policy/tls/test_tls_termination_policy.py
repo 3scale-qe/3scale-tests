@@ -37,7 +37,7 @@ def path_policy_settings(request, certificate, mount_certificate_secret):
 
 @pytest.fixture(scope="module", params=(
         pytest.param("embedded_policy_settings", id="Embedded"),
-        pytest.param("path_policy_settings", id="Path")
+        pytest.param("path_policy_settings", id="Path", marks=pytest.mark.required_capabilities(Capability.OCP3))
 ))
 def policy_settings(request):
     """TLS termination policy settings"""
