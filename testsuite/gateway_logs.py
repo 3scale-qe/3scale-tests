@@ -2,6 +2,7 @@
 from datetime import datetime
 
 import pytest
+from _pytest.outcomes import Skipped
 from weakget import weakget
 
 from testsuite.config import settings
@@ -17,10 +18,14 @@ def pytest_runtest_setup(item):
         return
 
     start_time = datetime.utcnow()
-    yield
+    result = yield
+
+    item.gateways = {}
+    # If the test is skipped (by our other hook), rest of the hooks is still executed and fails
+    if result.excinfo is not None and Skipped in result.excinfo:
+        return
     # pylint: disable=protected-access
     request = item._request
-    item.gateways = {}
     if "api_client" in request.fixturenames:
         item.gateways["staging_gateway"] = request.getfixturevalue("staging_gateway")
     if "prod_client" in request.fixturenames:
