@@ -288,8 +288,7 @@ def pytest_exception_interact(node, call, report):
         browser = node.funcargs.get("browser")
         if not browser:
             return
-        screenshot = os.path.join(get_resultsdir_path(node), "failed-test-screenshot.png")
-        browser.selenium.save_screenshot(screenshot)
+        fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
 
 
 def get_resultsdir_path(node):
@@ -320,6 +319,29 @@ def get_resultsdir_path(node):
         os.makedirs(path)
 
     return path
+
+
+def fullpage_screenshot(driver, file_path):
+    """
+        A full-page screenshot function. It scroll the website and screenshots it.
+        - Creates multiple files
+        - Screenshots are made only vertically (on Y axis)
+    """
+    # Removal of the height: 100% style, that disables scroll.
+    driver.execute_script("document.body.style.height = 'unset'")
+    driver.execute_script("document.body.parentNode.style.height = 'unset'")
+
+    total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+    viewport_height = driver.execute_script("return window.innerHeight")
+    tolerance = 50     # Google chrome on 'window.innerHeight' returns the size of the whole window, not the viewport
+    scroll_height = viewport_height - tolerance
+    part = 0
+
+    for scroll in range(0, total_height, scroll_height):
+        driver.execute_script("window.scrollTo({0}, {1})".format(0, scroll))
+        file_name = file_path + "part_{0}.png".format(part)
+        driver.get_screenshot_as_file(file_name)
+        part += 1
 
 
 @pytest.fixture(scope="module")
