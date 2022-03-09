@@ -108,7 +108,7 @@ class OperatorEnviron(Properties):
 
 class OperatorApicast(OpenshiftApicast):
     """Gateway for use with APIcast deployed by operator"""
-    CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY, Capability.CUSTOM_ENVIRONMENT}
+    CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY, Capability.CUSTOM_ENVIRONMENT, Capability.LOGS}
     PRIORITY = 1000
 
     # pylint: disable=too-many-arguments
@@ -168,7 +168,7 @@ class OperatorApicast(OpenshiftApicast):
         super().destroy()
 
     def get_logs(self, since_time=None):
-        raise NotImplementedError()
+        return self.deployment.get_logs(since_time=since_time)
 
     def set_image(self, image):
         def _update(apicast):
