@@ -1,11 +1,16 @@
 "UI conftest"
 
+import io
+import math
 import os
+import traceback
+from datetime import datetime
 
 import backoff
 import pytest
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
+from PIL import Image
 
 from testsuite import rawobj
 from testsuite.auth0 import auth0_token
@@ -345,8 +350,12 @@ def pytest_exception_interact(node, call, report):
         browser = node.funcargs.get("browser")
         if not browser:
             return
-        screenshot = os.path.join(get_resultsdir_path(node), "failed-test-screenshot.png")
-        browser.selenium.save_screenshot(screenshot)
+
+        try:
+            fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+        # pylint: disable=broad-except
+        except Exception:
+            traceback.print_exc()
 
 
 def get_resultsdir_path(node):
@@ -377,6 +386,46 @@ def get_resultsdir_path(node):
         os.makedirs(path)
 
     return path
+
+
+def fullpage_screenshot(driver, file_path):
+    """
+        A full-page screenshot function. It scroll the website and screenshots it.
+        - Creates multiple files
+        - Screenshots are made only vertically (on Y axis)
+    """
+    # Removal of the height: 100% style, that disables scroll.
+    driver.execute_script("document.body.style.height = 'unset'")
+    driver.execute_script("document.body.parentNode.style.height = 'unset'")
+
+    total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+    viewport_height = driver.execute_script("return window.innerHeight")
+
+    screenshot_bytes = driver.get_screenshot_as_png()
+    screenshot = Image.open(io.BytesIO(screenshot_bytes))
+    width, height = screenshot.size
+    del screenshot
+
+    scaling_constant = (float(height) / float(viewport_height))
+    stitched_image = Image.new('RGB', (width, int(total_height * scaling_constant)))
+    part = 0
+
+    for scroll in range(0, total_height, viewport_height):
+        driver.execute_script("window.scrollTo({0}, {1})".format(0, scroll))
+        screenshot_bytes = driver.get_screenshot_as_png()
+        screenshot = Image.open(io.BytesIO(screenshot_bytes))
+
+        if scroll + viewport_height > total_height:
+            offset = (0, int(math.ceil((total_height - viewport_height) * scaling_constant)))
+        else:
+            offset = (0, int(math.ceil(scroll * scaling_constant)))
+
+        stitched_image.paste(screenshot, offset)
+        del screenshot
+        part += 1
+
+    date = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    stitched_image.save(file_path + f"/{date}.png")
 
 
 @pytest.fixture(scope="module")

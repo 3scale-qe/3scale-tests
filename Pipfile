@@ -52,6 +52,7 @@ lxml = "*"
 auth0-python= "*"
 stripe= "*"
 braintree = "*"
+pillow = "*"
 
 [requires]
 python_version = "3"
