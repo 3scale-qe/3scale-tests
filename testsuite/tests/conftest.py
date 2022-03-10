@@ -78,9 +78,10 @@ def pytest_runtest_setup(item):
             pytest.skip("Dropping sandbag")
         elif "required_capabilities" in marks:
             required_capabilities = item.iter_markers(name="required_capabilities")
-            for cap in required_capabilities:
-                if cap in sandbag_caps:
-                    pytest.skip("Dropping sandbag")
+            for mark in required_capabilities:
+                for cap in mark.args:
+                    if cap in sandbag_caps:
+                        pytest.skip("Dropping sandbag")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:
