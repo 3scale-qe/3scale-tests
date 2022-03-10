@@ -104,6 +104,35 @@ class RHSSOServiceConfiguration:
         app_key = app.keys.list()["keys"][0]["key"]["value"]
         return self.password_authorize(app["client_id"], app_key)["access_token"]
 
+    def __getstate__(self):
+        """
+        Custom serializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__getstate__
+        """
+        return {"client": self.client.client_id,
+                "realm": self.realm.name,
+                "rhsso": {"url": self.rhsso.server_url,
+                          "username": self.rhsso.master.username,
+                          "password": self.rhsso.master.password},
+                "user": self.user,
+                "username": self.username,
+                "password": self.password}
+
+    def __setstate__(self, state):
+        """
+        Custom deserializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
+        """
+        self.rhsso = RHSSO(server_url=state["rhsso"]["url"],
+                           username=state["rhsso"]["username"],
+                           password=state["rhsso"]["password"])
+        self.realm = Realm(self.rhsso.master, state["realm"])
+        self.user = state["user"]
+        self.client = Client(self.realm, state["client"])
+        self.username = state["username"]
+        self.password = state["password"]
+        self._oidc_client = self.client.oidc_client
+
 
 class OIDCClientAuth(BaseClientAuth):
     """Authentication class for  OIDC based authorization"""
