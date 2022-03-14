@@ -93,6 +93,7 @@ clean: mostlyclean
 
 mostlyclean:
 	rm -f .make-*
+	rm -rf .mypy_cache
 	-pipenv --rm
 
 all: ## Run all the tests and submit results to reportportal (may require -k)
