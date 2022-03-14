@@ -5,8 +5,10 @@ import pytest
 
 from testsuite import rawobj, resilient
 
-
-pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
+pytestmark = [
+    pytest.mark.nopersistence,
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
+]
 
 
 @pytest.fixture(scope="module")

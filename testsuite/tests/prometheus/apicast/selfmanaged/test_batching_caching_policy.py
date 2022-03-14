@@ -9,6 +9,7 @@ from testsuite import APICAST_OPERATOR_VERSION, rawobj  # noqa # pylint: disable
 from testsuite.capabilities import Capability
 
 pytestmark = [
+    pytest.mark.nopersistence,
     pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.5.2')"),
     pytest.mark.required_capabilities(Capability.OCP4, Capability.APICAST),
     ]

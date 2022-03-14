@@ -20,6 +20,8 @@ import pytest
 from testsuite import rawobj
 from testsuite.utils import blame, wait_interval, wait_until_next_minute
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def application_silver(application, custom_app_plan, custom_application, request):

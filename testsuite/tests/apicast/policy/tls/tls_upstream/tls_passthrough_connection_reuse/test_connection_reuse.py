@@ -12,8 +12,10 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
+    pytest.mark.nopersistence,
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6849")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6849")
+]
 
 
 @pytest.fixture(scope="module")

@@ -54,6 +54,7 @@ auth0-python= "*"
 stripe= "*"
 braintree = "*"
 pillow = "*"
+pytest-persistence = "*"
 
 [requires]
 python_version = "3"

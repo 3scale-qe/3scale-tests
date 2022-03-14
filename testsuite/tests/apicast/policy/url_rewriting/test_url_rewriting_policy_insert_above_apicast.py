@@ -36,13 +36,16 @@ def service(service):
 
 def test_url_rewriting_hello(application, api_client):
     "/hello should be rewritten to /get, metrics should be counted"
+    analytics = application.threescale_client.analytics
+    hits_before = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
+
     echoed_request = EchoedRequest.create(api_client().get("/hello"))
     assert echoed_request.path == "/get"
 
     analytics = application.threescale_client.analytics
-    hits = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
+    hits_after = analytics.list_by_service(application["service_id"], metric_name="get_metric")["total"]
 
-    assert hits == 5
+    assert hits_after == hits_before + 5
 
 
 def test_url_rewriting_hello_world(api_client):

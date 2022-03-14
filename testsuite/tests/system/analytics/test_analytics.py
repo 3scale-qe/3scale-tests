@@ -32,6 +32,10 @@ def test_hits_service(application, api_client, app2):
     - The number of hits to each app is equal to the number of requests made
       through that app
     """
+    analytics = app2.threescale_client.analytics
+    prev_service_hits = analytics.list_by_service(app2["service_id"], metric_name="hits")["total"]
+    prev_app_hits = analytics.list_by_application(application, metric_name="hits")["total"]
+    prev_app2_hits = analytics.list_by_application(app2, metric_name="hits")["total"]
     requests_app = 6
     requests_app2 = 4
 
@@ -44,14 +48,12 @@ def test_hits_service(application, api_client, app2):
     for _ in range(requests_app2):
         assert client2.get("/get").status_code == 200
 
-    analytics = app2.threescale_client.analytics
-
     metrics_service = resilient.stats_service_usage(
         app2.threescale_client, app2["service_id"], "hits", "total", requests_app+requests_app2)
-    assert metrics_service == requests_app + requests_app2
+    assert metrics_service == prev_service_hits + requests_app + requests_app2
 
     metrics_app = analytics.list_by_application(application, metric_name="hits")["total"]
-    assert metrics_app == requests_app
+    assert metrics_app == prev_app_hits + requests_app
 
     metrics_app2 = analytics.list_by_application(app2, metric_name="hits")["total"]
-    assert metrics_app2 == requests_app2
+    assert metrics_app2 == prev_app2_hits + requests_app2

@@ -10,6 +10,8 @@ from testsuite import rawobj
 from testsuite.rhsso import OIDCClientAuthHook
 from testsuite.utils import randomize
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):

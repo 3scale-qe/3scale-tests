@@ -1,6 +1,9 @@
 """
 Rewrite: 3scale-amp-tests/spec/functional_specs/update_staging_spec.rb
 """
+import pytest
+
+pytestmark = [pytest.mark.nopersistence]
 
 
 def test_updated_auth_param(api_client, service):

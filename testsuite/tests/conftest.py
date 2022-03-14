@@ -56,6 +56,9 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)")
+    parser.addoption(
+        "--drop-nopersistence", action="store_true", default=False, help="Skip tests incompatible with persistence "
+                                                                         "plugin (default: False)")
 
 
 # there are many branches as there are many options to influence test selection
@@ -82,6 +85,9 @@ def pytest_runtest_setup(item):
                 for cap in mark.args:
                     if cap in sandbag_caps:
                         pytest.skip("Dropping sandbag")
+    if item.config.getoption("--drop-nopersistence"):
+        if "nopersistence" in marks:
+            pytest.skip("Dropping nopersistence")
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:

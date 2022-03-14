@@ -18,7 +18,7 @@ from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553"),
               pytest.mark.sandbag]  # explicit requirement of operator apicast - doesn't have to be available
 

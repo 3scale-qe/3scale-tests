@@ -8,6 +8,7 @@ from testsuite import rawobj
 from testsuite.gateways.wasm import WASMGateway
 
 pytestmark = [
+    pytest.mark.nopersistence,
     pytest.mark.required_capabilities(),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2752")]
 
