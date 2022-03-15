@@ -3,6 +3,8 @@ This module contains wrapper for the Mailhog API
 """
 
 import json
+
+import pytest
 import requests
 from openshift import OpenShiftPythonException
 from testsuite.utils import warn_and_skip
@@ -22,7 +24,8 @@ class MailhogClient:
         # first choice
         try:
             mailhog_routes = openshift.routes.for_service(mailhog_service_name)
-            assert len(mailhog_routes) > 0, "Mailhog is misconfigured or missing"
+            if len(mailhog_routes) == 0:
+                pytest.skip("Mailhog is misconfigured or missing")
             self._url = \
                 "http://" + mailhog_routes[0]["spec"]["host"]
         except OpenShiftPythonException:
