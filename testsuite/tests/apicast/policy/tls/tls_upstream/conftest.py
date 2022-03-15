@@ -68,14 +68,16 @@ def httpbin(custom_httpbin, request):
     return custom_httpbin(blame(request, "httpbin-mtls"))
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_authority, openshift):
+def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_authority, openshift, testconfig):
     """
     Deploys httpbin with a custom name with mTLS enabled.
     If tls_route_type is set, creates routes for the backend with given TLS type
     and returns the public route of the backend.
     """
     openshift = openshift()
+    httpbin_image = testconfig["fixtures"]["custom_httpbin"]["image"]
 
     def _httpbin(name, tls_route_type=None):
         path = resources.files('testsuite.resources.tls').joinpath('httpbin_go.yaml')
@@ -85,6 +87,7 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
             "CERTIFICATE": upstream_certificate.certificate,
             "CERTIFICATE_KEY": upstream_certificate.key,
             "CA_CERTIFICATE": upstream_authority.certificate,
+            "IMAGE": httpbin_image
         }
 
         request.addfinalizer(
