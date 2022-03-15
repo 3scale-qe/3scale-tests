@@ -1,10 +1,11 @@
 """
-Test that limit exceeded metric returns status 429
+Test that limit exceeded metric returns status 429 or 403 if using WASMGateway
 """
 
 
 import pytest
 from testsuite import rawobj
+from testsuite.gateways.wasm import WASMGateway
 
 pytestmark = [
     pytest.mark.required_capabilities(),
@@ -29,14 +30,23 @@ def application(application):
     return application
 
 
-def test_limit_exceeded(api_client):
+@pytest.fixture(scope="session")
+def error_status_code_too_many(staging_gateway):
+    """'Too many requests' status codes
+        are different when using WASMGateway"""
+    if isinstance(staging_gateway, WASMGateway):
+        return 403
+    return 429
+
+
+def test_limit_exceeded(api_client, error_status_code_too_many):
     """Call to /anything/exceeded should returns 429 Too Many Requests."""
     client = api_client()
 
     assert client.get("/anything/exceeded").status_code == 200
     # Apicast allows more request to pass than is the actual limit, other gateway do not
     client.get("/anything/exceeded")
-    assert client.get("/anything/exceeded").status_code == 429
+    assert client.get("/anything/exceeded").status_code == error_status_code_too_many
 
 
 def test_anything_else_is_ok(api_client):
