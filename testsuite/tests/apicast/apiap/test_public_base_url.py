@@ -17,10 +17,6 @@ def test_public_base_url(service):
         - try to update staging and production Public Base URLs to localhost
         - assert that it's not possible
     """
-    thrown = False
-    try:
+    with pytest.raises(ApiClientError) as exc_info:
         service.proxy.update(params={'endpoint': 'https://localhost:80'})
-    except ApiClientError as error:
-        thrown = True
-        assert 'can\'t be localhost' in str(error)
-    assert thrown, "Public Base URL for 3scale-managed gateway can't be set to localhost"
+    assert r"can\'t be localhost" in str(exc_info.value)
