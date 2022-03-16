@@ -40,6 +40,8 @@ default:
   fixtures:
     tools:
       namespace: tools
+    custom_httpbin:
+      image: quay.io/jsmadis/go-httpbin:latest
     lifecycle_hooks:
       defaults: [staging_gateway, production_gateway]
     jaeger:

@@ -50,7 +50,7 @@ objects:
                 value: '8443'
               - name: MTLS_ENABLED
                 value: '1'
-              image: ${IMG_HTTPBIN_GOHTTPBIN}
+              image: ${IMAGE}
               imagePullPolicy: IfNotPresent
               name: go-httpbin
               ports:
@@ -100,7 +100,6 @@ parameters:
 - name: CA_CERTIFICATE
   description: "Certificate Authority"
   required: true
-- name: IMG_HTTPBIN_GOHTTPBIN
+- name: IMAGE
   description: Go httpbin image to use
   required: true
-  value: quay.io/jsmadis/go-httpbin:latest
