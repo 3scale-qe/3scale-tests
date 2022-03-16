@@ -43,6 +43,8 @@ class WASMExtension:
             "SELECTOR": self.label
         })
 
+        self.httpbin.deployment(f"dc/{self.httpbin_name}").wait_for()
+
     @property
     def ingress_url(self):
         """Return URL of the ingress gateway"""
