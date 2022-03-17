@@ -38,8 +38,8 @@ def test_log_with_empty_password(refreshed_browser):
     Test Login button is disabled if only name is filled
     """
     login_view = LoginView(refreshed_browser)
-    login_view.username_field.fill("username")
-    assert not login_view.submit.is_enabled
+    login_view.login_widget.username_field.fill("username")
+    assert not login_view.login_widget.submit.is_enabled
 
 
 @pytest.mark.smoke
@@ -48,8 +48,8 @@ def test_log_with_empty_username(refreshed_browser):
     Test Login button is disabled if only password is filled
     """
     login_view = LoginView(refreshed_browser)
-    login_view.password_field.fill("password")
-    assert not login_view.submit.is_enabled
+    login_view.login_widget.password_field.fill("password")
+    assert not login_view.login_widget.submit.is_enabled
 
 
 @pytest.mark.smoke
@@ -58,8 +58,8 @@ def test_log_with_random_username_password(refreshed_browser):
     Test Login button is enabled after filling form and expect incorrect credentials
     """
     login_view = LoginView(refreshed_browser)
-    login_view.username_field.fill("username")
-    login_view.password_field.fill("password")
-    assert login_view.submit.is_enabled
-    login_view.submit.click()
+    login_view.login_widget.username_field.fill("username")
+    login_view.login_widget.password_field.fill("password")
+    assert login_view.login_widget.submit.is_enabled
+    login_view.login_widget.submit.click()
     assert "Incorrect email or password. Please try again" in login_view.error_message.text

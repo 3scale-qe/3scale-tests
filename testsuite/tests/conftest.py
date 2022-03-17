@@ -820,6 +820,7 @@ def custom_tenant(testconfig, master_threescale, request):
     def _custom_tenant(name="t", autoclean=True):
         user_name = blame(request, name)
         tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
+        tenant.wait_tenant_ready()
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
