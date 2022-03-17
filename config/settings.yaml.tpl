@@ -9,6 +9,7 @@ default:
   tester: whatever # used to create unique names for 3scale artifacts it defaults to whoami or uid
   threescale:  # now configure threescale details
     version: "{DEFAULT_THREESCALE_VERSION}"  # tested version used for example is some tests needs to be skipped
+    apicast_operator_version: "{DEFAULT_APICAST_OPERATOR_VERSION}"  # version of apicast operator used for example is some tests needs to be skipped
     superdomain: "{DEFAULT_THREESCALE_SUPERDOMAIN}"  # Threescale superdomain/wildcard_domain
     service:
       backends:  # list of backend services for testing

@@ -160,6 +160,9 @@ def pytest_report_header(config):
     threescale = settings["threescale"]["admin"]["url"]
     version = settings["threescale"]["version"]
     catalogsource = weakget(settings)["threescale"]["catalogsource"] % "UNKNOWN"
+    apicast_project = \
+        weakget(settings)["threescale"]["gateway"]["OperatorApicast"]["openshift"]["project_name"] % "None"
+    apicast_version = settings["threescale"]["apicast_operator_version"]
     toolboximage = weakget(settings)["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
@@ -188,6 +191,8 @@ def pytest_report_header(config):
         f"testsuite: project = {project}",
         f"testsuite: threescale = {threescale}",
         f"testsuite: for 3scale version = {version}",
+        f"testsuite: Apicast operator project = {apicast_project}",
+        f"testsuite: for Apicast operator version = {apicast_version}",
         f"testsuite: catalogsource = {catalogsource}",
         f"testsuite: toolboximage = {toolboximage}",
         ""]

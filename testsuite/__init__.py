@@ -74,5 +74,6 @@ else:
     os.environ["OPENSHIFT_CLIENT_PYTHON_DEFAULT_SKIP_TLS_VERIFY"] = "true"
 
 TESTED_VERSION = Version(str(settings["threescale"]["version"]))
+APICAST_OPERATOR_VERSION = Version(str(settings["threescale"]["apicast_operator_version"]))
 HTTP2 = settings.get("http2", False)
 ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent

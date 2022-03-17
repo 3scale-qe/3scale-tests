@@ -24,6 +24,7 @@ import os
 import os.path
 
 from packaging.version import Version, InvalidVersion
+from weakget import weakget
 
 import yaml
 
@@ -57,6 +58,20 @@ def _guess_version(ocp):
         Version(version)
     except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
         return ".".join(_testsuite_version().split(".")[:2])
+
+    return str(version)
+
+
+def _guess_apicast_operator_version(ocp):
+    """Attempt to determine version of apicast operator from subscription"""
+
+    version = None
+    try:
+        version = ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
+        Version(version)
+    except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
+        return "2022"  # returning value that is greater than any apicast version
+        # in result all tests for latest apicast operator will run
 
     return str(version)
 
@@ -109,6 +124,16 @@ def load(obj, env=None, silent=None, key=None):
             server_url=ocp_setup.get("server_url"),
             token=ocp_setup.get("token"))
 
+        apicast_ocp = ocp
+
+        apicast_section = weakget(obj)["threescale"]["gateway"]["OperatorApicast"]["openshift"] % None
+
+        if apicast_section:
+            apicast_ocp = OpenShiftClient(
+                project_name=apicast_section.get("project_name"),
+                server_url=apicast_section.get("server_url"),
+                token=apicast_section.get("token"))
+
         admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
         admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
         master_url = _route2url(ocp.routes.for_service("system-master")[0])
@@ -146,6 +171,7 @@ def load(obj, env=None, silent=None, key=None):
                         "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
             "threescale": {
                 "version": _guess_version(ocp),
+                "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp),
                 "superdomain": superdomain,
                 "catalogsource": catalogsource,
                 "admin": {

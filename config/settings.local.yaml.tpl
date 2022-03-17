@@ -5,6 +5,7 @@
 development:  # default dynaconf env
   threescale:
     version: "${THREESCALE_VERSION}"
+    apicast_opearator_version: "${APICAST_OPERATOR_VERSION}"
     superdomain: ${THREESCALE_SUPERDOMAIN}
     admin:
       url: ${ADMIN_URL}
