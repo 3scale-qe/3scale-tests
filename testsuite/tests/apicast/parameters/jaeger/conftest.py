@@ -5,7 +5,6 @@ Conftest for the jaeger tests
 from weakget import weakget
 import pytest
 
-from testsuite.utils import blame
 from testsuite.jaeger import Jaeger
 
 
@@ -23,18 +22,8 @@ def jaeger(testconfig, tools):
 
 
 @pytest.fixture(scope="module")
-def jaeger_randomized_name(request):
-    """
-    Randomized name for the jaeger configmap and for the jaeger service_name used
-    when querying the services
-    """
-    return f"{blame(request, 'jaeger')}"
-
-
-@pytest.fixture(scope="module")
-def staging_gateway(staging_gateway, jaeger, jaeger_randomized_name):
+def jaeger_service_name(staging_gateway, jaeger):
     """
     Deploys template apicast gateway configured with jaeger.
     """
-    staging_gateway.connect_jaeger(jaeger, jaeger_randomized_name)
-    return staging_gateway
+    return staging_gateway.connect_jaeger(jaeger)

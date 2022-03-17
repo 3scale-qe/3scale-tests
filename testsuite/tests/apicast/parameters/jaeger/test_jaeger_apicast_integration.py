@@ -6,19 +6,23 @@ It is necessary to have the jaeger url config value set
 import backoff
 import pytest
 
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import randomize
 from testsuite.capabilities import Capability
 
 CAPABILITIES = [Capability.JAEGER]
 
 
-# seems to fail everytime actually
-@pytest.mark.flaky
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Gateway class to use for tests"""
+    return SelfManagedApicast
+
+
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5669")
-def test_jaeger_apicast_integration(api_client, jaeger, jaeger_randomized_name):
+def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
     """
     Makes a request to a random endpoint
-    :param jaeger_randomized_name the identifying name of the service in jaeger
     Tests that:
      1) data from the jaeger contain a trace where with the http.url tag in the span
         with the '/' operationName has the value containing the randomized endpoint
@@ -32,7 +36,7 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_randomized_name):
     @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
     def request_traced():
         """Let's retry as the tracing might be 'lazy'"""
-        traces = jaeger.traces(jaeger_randomized_name, "/")
+        traces = jaeger.traces(jaeger_service_name, "/")
         for trace in traces['data']:
             for span in trace['spans']:
                 if span['operationName'] == '/':
@@ -43,7 +47,7 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_randomized_name):
 
     assert request_traced()
 
-    traces = jaeger.traces(jaeger_randomized_name, "/")
+    traces = jaeger.traces(jaeger_service_name, "/")
     url_and_uri = True
     for trace in traces['data']:
         for span in trace['spans']:
