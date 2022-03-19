@@ -70,13 +70,12 @@ def httpbin(custom_httpbin, request):
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_authority, openshift, testconfig):
+def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_authority, testconfig):
     """
     Deploys httpbin with a custom name with mTLS enabled.
     If tls_route_type is set, creates routes for the backend with given TLS type
     and returns the public route of the backend.
     """
-    openshift = openshift()
     httpbin_image = testconfig["fixtures"]["custom_httpbin"]["image"]
 
     def _httpbin(name, tls_route_type=None):
@@ -97,9 +96,9 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
         staging_gateway.openshift.deployment(f"dc/{name}").wait_for()
 
         if tls_route_type is not None:
-            request.addfinalizer(lambda: openshift.delete("route", name))
-            openshift.routes.create(name, tls_route_type, service=name)
-            routes = openshift.routes[name]
+            request.addfinalizer(lambda: staging_gateway.openshift.delete("route", name))
+            staging_gateway.openshift.routes.create(name, tls_route_type, service=name)
+            routes = staging_gateway.openshift.routes[name]
             return f"https://{routes['spec']['host']}:443"
 
         return f"https://{name}:8443"

@@ -44,14 +44,13 @@ def server_authority(request, superdomain, manager):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, testconfig, server_authority, superdomain, manager):
+def staging_gateway(request, server_authority, superdomain, manager):
     """Deploy tls apicast gateway. We need APIcast listening on https port"""
     kwargs = dict(
         name=blame(request, "tls-gw"),
         manager=manager,
         server_authority=server_authority,
-        superdomain=superdomain,
-        **testconfig["threescale"]["gateway"]["TemplateApicast"],
+        superdomain=superdomain
     )
     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
 
