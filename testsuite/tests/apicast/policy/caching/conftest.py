@@ -2,7 +2,7 @@
 import pytest
 
 from testsuite.gateways import gateway
-from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.gateways.gateways import Capability
 from testsuite.utils import blame
 
@@ -13,7 +13,7 @@ from testsuite.utils import blame
         pytest.mark.required_capabilities(Capability.OCP3),
         pytest.mark.disruptive
     ], id="Default gateway"),
-    pytest.param(TemplateApicast, marks=[
+    pytest.param(SelfManagedApicast, marks=[
         pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
         pytest.mark.disruptive
     ], id="Self-managed gateway")

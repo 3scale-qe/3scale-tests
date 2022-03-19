@@ -7,7 +7,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 from testsuite.gateways import gateway
-from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
@@ -18,7 +18,7 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
 @pytest.fixture(scope="module")
 def staging_gateway(request):
     """Deploy self-managed template based apicast gateway."""
-    gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
+    gw = gateway(kind=SelfManagedApicast, staging=True, name=blame(request, "gw"))
     request.addfinalizer(gw.destroy)
     gw.create()
 
