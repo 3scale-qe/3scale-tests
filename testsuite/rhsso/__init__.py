@@ -68,11 +68,16 @@ class RHSSOServiceConfiguration:
         password = password or self.password
         return Token(self.realm.oidc_client(client_id, secret).token(username, password))
 
-    # Not sure if backoff is needed, disabling for now
-    @backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
-    def get_application_client(self, application):
+    def get_application_client(self, application, allow_null=False):
         """Returns ID of a client (not clientId) for an application"""
-        return self.realm.admin.get_client_id(application["client_id"])
+
+        @backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
+        def _app_client():
+            return self.realm.admin.get_client_id(application["client_id"])
+        client = _app_client()
+        if not allow_null:
+            assert client is not None, "Zync didnt create RHSSO client in time, try restarting it"
+        return client
 
     def token_url(self) -> str:
         """
