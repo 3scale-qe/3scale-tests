@@ -17,43 +17,27 @@ from testsuite.ui.exception import ItemNotPresentException
 # pylint: disable=abstract-method
 class RadioGroup(GenericLocatorWidget):
     """
-    Radio group of 3scale pages. It contains both radio and check box elements, therefore it is not
-    typical radio element. No control of option switching is implemented.
-
-    In case of check box (like one on the bottom of the User Edit page), user needs to remember that
-    possibility of multiple selected options is allowed (not an typical radio behaviour)
+    Radio group of 3scale pages.
     """
-    OPTIONS_SECTION = './fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION_CLASS = './fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION = './fieldset/ol'
 
-    OPTIONS = './li'
-    OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
+    OPTIONS = './li/label/input'
+    OPTIONS_BY_ID = OPTIONS + '[@id="{}"]'
 
     def __init__(self, parent=None, locator=None, fieldset_id="", logger=None):
         super().__init__(parent, locator, logger)
         if fieldset_id:
-            self.options_section = self.browser.element(self.OPTIONS_SECTION.format(fieldset_id))
+            self.options_section = self.browser.element(self.OPTIONS_SECTION_CLASS.format(fieldset_id))
         else:
-            self.options_section = self.browser.element(locator)
+            self.options_section = self.browser.element(self.OPTIONS_SECTION)
 
-    def select(self, options):
+    def select(self, option: str):
         """
         Select radio (check box) element from the list.
-        :param options: String id-s of options
+        :param option: String id-s of options
         """
-        for option in options:
-            element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
-            self._select_option(element)
-
-    def clear_all(self):
-        """
-        Unset all option in radiogroup.
-        """
-        for element in self.browser.elements(self.OPTIONS, parent=self.options_section):
-            self._select_option(element)
-
-    @staticmethod
-    def _select_option(element):
-        # if 'is-unchecked' in element.get_attribute("class").split():
+        element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
         element.click()
 
 
@@ -62,7 +46,41 @@ class RadioGroup(GenericLocatorWidget):
 # an abstract method
 class CheckBoxGroup(RadioGroup):
     """CheckBox group of 3scale pages"""
-    OPTIONS_BY_ID = './ol/li/label/input[@id="{}"]'
+
+    def __init__(self, parent=None, locator=None, fieldset_id="", logger=None):
+        super().__init__(parent, locator, fieldset_id, logger)
+
+    def is_checked(self, option: str):
+        element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
+        return element.is_selected()
+
+    def check(self, options: list):
+        """
+        Select check box element from the list.
+        :param options: List of string id-s of options
+        """
+        for option in options:
+            element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
+            if not element.is_selected():
+                element.click()
+
+    def uncheck(self, options: list):
+        """
+        Unselect check box element from the list.
+        :param options: List of string id-s of options
+        """
+        for option in options:
+            element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
+            if element.is_selected():
+                element.click()
+
+    def clear_all(self):
+        """
+        Unset all option in checkbox group.
+        """
+        for element in self.browser.elements(self.OPTIONS, parent=self.options_section):
+            if element.is_selected():
+                element.click()
 
 
 class ContextMenu(ContextSelector):
