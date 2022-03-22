@@ -54,12 +54,12 @@ class UserDetailView(BaseSettingsView):
     password = TextInput(id='#user_password')
     organization = TextInput(id='#user_password_confirmation')
     update_btn = ThreescaleUpdateButton()
-    role = RadioGroup('//*[@id="user_role_input"]')
+    role = RadioGroup(locator='//*[@id="user_role_input"]')
 
     permissions = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
                                 fieldset_id='FeatureAccessList')
-    # access_list = RadioGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
-    #                          fieldset_id='ServiceAccessList')
+    access_list = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
+                                fieldset_id='ServiceAccessList')
 
     def __init__(self, parent, user):
         super().__init__(parent, user_id=user.entity_id)
@@ -74,22 +74,47 @@ class UserDetailView(BaseSettingsView):
 
     def check_all_products(self):
         """Allow permissions for all products"""
-        self.permissions.select(['user_member_permission_ids_services'])
+        self.permissions.check(['user_member_permission_ids_services'])
 
-    def add_permissions(self, permissions):
+    def uncheck_all_products(self):
+        """Allow permissions for all products"""
+        self.permissions.uncheck(['user_member_permission_ids_services'])
+
+    def add_permissions(self, scope: list):
         """
         Select chosen permissions for the User
-        :param permissions: String id-s of permission check-boxes
+        :param scope: List of permissions scopes from class Scopes
         """
-        self.permissions.select(permissions)
-    #
-    # def clear_permissions(self):
-    #     """Remove all permissions for user"""
-    #     self.permissions.clear_all()
-    #
-    # def clear_access_list(self):
-    #     """Clear permissions for all services"""
-    #     self.access_list.clear_all()
+        self.permissions.check(scope)
+
+    def remove_permissions(self, scope: list):
+        """
+        Unselect chosen permissions for the User
+        :param scope: List of permissions scopes from class Scopes
+        """
+        self.permissions.uncheck(scope)
+
+    def clear_permissions(self):
+        """Remove all permissions for user"""
+        self.permissions.clear_all()
+
+    def clear_access_list(self):
+        """Clear permissions for all services"""
+        self.access_list.clear_all()
+
+    def add_products_access(self, product_ids: list):
+        """Add access to products by its ids
+        :param: product_ids: ID of services to add access to.
+        """
+        for prod_id in product_ids:
+            self.access_list.check([f"user_member_permission_service_ids_{prod_id}"])
+
+    def remove_products_access(self, product_ids: list):
+        """remove access to products by its ids
+        :param: product_ids: ID of services to remove access to.
+        """
+        for prod_id in product_ids:
+            self.access_list.uncheck([f"user_member_permission_service_ids_{prod_id}"])
 
     def prerequisite(self):
         return UsersView
