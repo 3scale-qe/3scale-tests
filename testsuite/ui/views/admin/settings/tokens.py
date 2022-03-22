@@ -7,7 +7,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import RadioGroup, ThreescaleDropdown
+from testsuite.ui.widgets import CheckBoxGroup, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -43,7 +43,7 @@ class TokenNewView(BaseSettingsView):
     """View representation of New Token page"""
     path_pattern = '/p/admin/user/access_tokens/new'
     name = TextInput(id='access_token_name')
-    scopes = RadioGroup("//*[@id='access_token_scopes_input']/fieldset/ol")
+    scopes = CheckBoxGroup("//*[@id='access_token_scopes_input']")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
     create_button = ThreescaleSubmitButton()
     token_value = Text(".//code[contains(@class,'AccessTokenBox-token')]")
@@ -51,7 +51,7 @@ class TokenNewView(BaseSettingsView):
     def create(self, name: str, scopes: List[Scopes], write: bool):
         """Create Token"""
         self.name.fill(name)
-        self.scopes.select(scopes)
+        self.scopes.check(scopes)
         if write:
             self.permissions.select_by_value("rw")
         self.create_button.click()
