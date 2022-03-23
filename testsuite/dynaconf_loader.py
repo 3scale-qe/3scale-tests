@@ -68,6 +68,7 @@ def _guess_apicast_operator_version(ocp):
     version = None
     try:
         version = ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
+        version = version.split("-")[0]
         Version(version)
     except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
         return "2022"  # returning value that is greater than any apicast version
