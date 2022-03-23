@@ -84,7 +84,7 @@ def blame_desc(request: 'FixtureRequest', text: str = None):
 def random_string(num_bytes):
     """Generates random string for given number of bytes"""
     random_bytes = urandom(num_bytes)
-    return b64encode(random_bytes).decode('utf-8')
+    return b64encode(random_bytes).decode('utf-8')[:num_bytes]
 
 
 def _to_bytes(value, encoding='utf-8'):
