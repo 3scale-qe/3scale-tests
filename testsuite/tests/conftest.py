@@ -150,7 +150,6 @@ def _global_property(config, name, value):
         xml.add_global_property(name, value)
 
 
-# pylint: disable=unused-argument
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
     testsuite_version = resources.read_text("testsuite", "VERSION").strip()
