@@ -19,7 +19,6 @@ Rewrite:
         true_condition/rate_limit_multiple_prepend_bucket_global_true_spec.rb
 """
 import asyncio
-from concurrent.futures.thread import ThreadPoolExecutor
 
 import backoff
 import pytest
@@ -28,6 +27,7 @@ from pytest_cases import parametrize_with_cases
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
+from testsuite.httpx import AsyncClientHook
 from testsuite.tests.apicast.policy.rate_limit.leaky_bucket import config_cases
 from testsuite.utils import blame
 
@@ -37,13 +37,19 @@ TOTAL_REQUESTS = 6
 pytestmark = pytest.mark.flaky
 
 
+@pytest.fixture(scope="module", autouse=True)
+def setup_async_client(lifecycle_hooks):
+    """Use async api client"""
+    lifecycle_hooks.append(AsyncClientHook(False))
+
+
 @pytest_cases.fixture
 def service(service_proxy_settings, custom_service, request):
     """Service configured with config"""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
 
 
-@pytest_cases.fixture
+@pytest.fixture
 def service2(service_proxy_settings, custom_service, request):
     """Service configured with parametrized config"""
     return custom_service({"name": blame(request, "svc")}, service_proxy_settings)
@@ -63,39 +69,30 @@ def config(case_data, service, service2):
     return apply_rate_limit, service2
 
 
-@pytest_cases.fixture
-def application(service, custom_app_plan, custom_application, request):
-    """First application bound to the account and service_plus"""
-    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
-
-
-@pytest_cases.fixture
-def application2(config, custom_app_plan, custom_application, request):
+@pytest.fixture
+def application2(config, custom_app_plan, custom_application, lifecycle_hooks, request):
     """Second application bound to the account and service_plus"""
     svc = config[1]
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), svc)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
-@pytest_cases.fixture
-def client(application):
+@pytest.fixture
+async def client(application):
     """api client for application"""
-    client = application.api_client()
-    yield client
-    client.close()
+    async with application.api_client() as client:
+        yield client
 
 
-@pytest_cases.fixture
-def client2(application2):
+@pytest.fixture
+async def client2(application2):
     """api client for application2"""
-    client = application2.api_client()
-    yield client
-    client.close()
+    async with application2.api_client() as client:
+        yield client
 
 
 @backoff.on_predicate(backoff.fibo, lambda x: x[0], 8, jitter=None)
-def retry_requests(client, client2, rate_limit_applied):
+async def retry_requests(client, client2, rate_limit_applied):
     """
     Retries requests to both clients
     If rate limit policy configuration was applied it will retry requests until at least one request was rejected
@@ -106,14 +103,11 @@ def retry_requests(client, client2, rate_limit_applied):
     :return: tuple: 1st: boolean if this function should be repeated, false otherwise
                     2nd: list of status codes
     """
-    loop = asyncio.get_event_loop()
-    responses = []
-    with ThreadPoolExecutor(max_workers=TOTAL_REQUESTS + 1) as pool:
-        futures = []
-        for _ in range(TOTAL_REQUESTS // 2):
-            futures.append(loop.run_in_executor(pool, client.get, "/get"))
-            futures.append(loop.run_in_executor(pool, client2.get, "/get"))
-        responses = loop.run_until_complete(asyncio.gather(*futures))
+    futures = []
+    for _ in range(TOTAL_REQUESTS // 2):
+        futures.append(client.get("/get"))
+        futures.append(client2.get("/get"))
+    responses = await asyncio.gather(*futures)
 
     status_codes = [response.status_code for response in responses]
     if rate_limit_applied:
@@ -122,7 +116,8 @@ def retry_requests(client, client2, rate_limit_applied):
 
 
 @pytest.mark.required_capabilities(Capability.SAME_CLUSTER)
-def test_leaky_bucket(client, client2, config):
+@pytest.mark.asyncio
+async def test_leaky_bucket(client, client2, config):
     """
     Test rate limit policy with leaky bucket limiters configurations.
     This test is the same for the different configuration which are specified in the config_cases.py file.
@@ -133,7 +128,8 @@ def test_leaky_bucket(client, client2, config):
     :param client2: api_client for the second application
     :param config: configuration of the actual test
     """
-    status_codes = retry_requests(client, client2, config[0])[1]
+    result = await retry_requests(client, client2, config[0])
+    _, status_codes = result
 
     successful = status_codes.count(200)
     if config[0]:  # is the condition of the leaky bucket limiter true?

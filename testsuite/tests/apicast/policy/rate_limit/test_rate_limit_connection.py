@@ -24,21 +24,20 @@ Actually this is 'scratched'. Does 'plain-to-plain' comparison make sense?
     spec/functional_specs/policies/rate_limit/connection/plain_text/true_condition/rate_limit_connection_service_true_spec.rb
 """
 
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from pprint import pformat
 import asyncio
 import random
-import time
 
+import httpx
 import pytest
 
 from testsuite import rawobj
+from testsuite.httpx import AsyncClientHook
 from testsuite.utils import randomize, blame
 
 
 pytestmark = pytest.mark.disruptive
-
 
 TOTAL_REQUESTS = 20
 CONNECTIONS = 10
@@ -48,10 +47,11 @@ DATEFMT = '%a, %d %b %Y %H:%M:%S GMT'
 WAIT = 15
 
 
-def test_rate_limit_connection_no_limit(logger, client, client2):
+@pytest.mark.asyncio
+async def test_rate_limit_connection_no_limit(logger, client, client2):
     """The call not matching the condition won't be limited"""
 
-    responses = concurrent_requests(logger, client, client2, limit_me="no")
+    responses = await concurrent_requests(logger, client, client2, limit_me="no")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -60,20 +60,15 @@ def test_rate_limit_connection_no_limit(logger, client, client2):
     assert all(i.status_code == 200 for i in responses)
 
 
-def test_rate_limit_connection(logger, client, client2):
+@pytest.mark.asyncio
+async def test_rate_limit_connection_u(logger, client, client2):
     """
     The call matching the condition will be limited to CONNECTIONS simultaneous
     connections and additional burst of BURST will be DELAY delayed, rest will
     receive 429.
     """
 
-    # does this help apicast to "cache" some data and process further requests
-    # faster?
-    client.get("/get")
-    if client2 is not None:
-        client2.get("/get")
-
-    responses = concurrent_requests(logger, client, client2, limit_me="yes")
+    responses = await concurrent_requests(logger, client, client2, limit_me="yes")
 
     # total responses
     assert len(responses) == TOTAL_REQUESTS
@@ -92,7 +87,7 @@ def test_rate_limit_connection(logger, client, client2):
     assert len([i for i in times if i - first >= delay]) == BURST
 
 
-def concurrent_requests(logger, client1, client2, limit_me):
+async def concurrent_requests(logger, client1, client2, limit_me):
     """Make simultaneous requests
 
     Args:
@@ -104,24 +99,15 @@ def concurrent_requests(logger, client1, client2, limit_me):
 
     :returns: collection of responses from concurrent requests"""
 
-    loop = asyncio.get_event_loop()
-    responses = []
-
     range1 = TOTAL_REQUESTS
     range2 = 0
     if client2 is not None:
         range1 = TOTAL_REQUESTS // 2
         range2 = TOTAL_REQUESTS - range1
 
-    with ThreadPoolExecutor(max_workers=TOTAL_REQUESTS+1) as pool:
-        futures = [
-            loop.run_in_executor(pool, get, client1, limit_me, f"/delay/{WAIT}")
-            for _ in range(range1)]
-        futures += [
-            loop.run_in_executor(pool, get, client2, limit_me, f"/delay/{WAIT}")
-            for _ in range(range2)]
-
-        responses = loop.run_until_complete(asyncio.gather(*futures))
+    futures = [get(client1, limit_me, f"/delay/{WAIT}") for _ in range(range1)]
+    futures += [get(client2, limit_me, f"/delay/{WAIT}") for _ in range(range2)]
+    responses = await asyncio.gather(*futures)
 
     strptime = datetime.strptime
     # a tuple (status_code, request Date header, response Date header) for
@@ -138,15 +124,12 @@ def concurrent_requests(logger, client1, client2, limit_me):
     return responses
 
 
-def get(client, limit_me, relpath):
+async def get(client, limit_me, relpath):
     """Helper to make async request with correct Date header"""
+    # let's spread requests over short period; avoid all at one moment
+    await asyncio.sleep(random.uniform(0, WAIT-DELAY-2))
 
-    # does this help apicast to handle all the concurrent requests?
-    # with no doubt it requires longer WAIT to make sure all the requests
-    # will be really concurrent
-    time.sleep(random.random()*(WAIT/4))
-
-    return client.get(
+    return await client.get(
         relpath, headers={
             "X-Limit-Me": limit_me,
             "Date": datetime.utcnow().strftime(DATEFMT)})
@@ -240,14 +223,28 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 
 
 @pytest.fixture
-def client2(key_scope, request, prod_client):
+async def client(application):
+    """client needs to wait more than WAIT time"""
+    async with application.api_client() as client:
+        client.timeout = httpx.Timeout(WAIT+DELAY+5.0)
+        yield client
+
+
+@pytest.fixture
+async def client2(key_scope, request):
     """A client of app2 to verify 'global' key_scope functionality"""
 
     if key_scope == "global":
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
-        client = prod_client(app2)
-        request.addfinalizer(client.close)
-        return client
+        async with app2.api_client() as client:
+            client.timeout = httpx.Timeout(WAIT+DELAY+5.0)
+            yield client
+    else:
+        yield
 
-    return None
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_async_client(lifecycle_hooks):
+    """Use async api client"""
+    lifecycle_hooks.append(AsyncClientHook(False))

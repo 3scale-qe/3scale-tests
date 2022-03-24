@@ -3,10 +3,11 @@ import functools
 import logging
 from typing import Iterable, Generator
 
-from httpx import Client, Request, Response, URL, Auth, create_ssl_context
+from httpx import Client, Request, Response, URL, Auth, create_ssl_context, USE_CLIENT_DEFAULT
 from threescale_api.resources import Application, Service
 from threescale_api.utils import response2str, request2curl
 import backoff
+import httpx
 
 from testsuite.lifecycle_hook import LifecycleHook
 
@@ -155,6 +156,105 @@ class HttpxClient:
     def delete(self, *args, **kwargs):
         """mimics requests interface"""
         return self.request('DELETE', *args, **kwargs)
+
+
+async def _async_log_request(request):
+    _log_request(request)
+
+
+async def _async_log_response(response):
+    """log response details"""
+    await response.aread()
+
+    class Response:
+        """attr reason is needed"""
+        def __init__(self, response):
+            self.__response = response
+            self.reason = response.reason_phrase
+
+        def __getattr__(self, name):
+            return getattr(self.__response, name)
+
+    log.info("\n".join(["[CLIENT]:", response2str(Response(response))]))
+
+
+class AsyncClient(httpx.AsyncClient):
+    """Asynchronous Api client class that is using HTTPX library instead of requests"""
+    @classmethod
+    def partial(cls, http2, **kwargs):
+        """Returns partially initialized HttpxClient suitable for client in the application"""
+        return functools.partial(cls, http2, **kwargs)
+
+    def __init__(
+            self,
+            http2: bool,
+            app: Application,
+            endpoint: str = "sandbox_endpoint",
+            verify: bool = True,
+            cert=None,
+            disable_retry_status_list: Iterable = ()):
+        base_url = app.service.proxy.fetch()[endpoint]
+        ssl_context = create_ssl_context(cert=cert, verify=verify, http2=http2, trust_env=True)
+        super().__init__(base_url=base_url, verify=ssl_context, http2=http2)
+
+        self._app = app
+        self._status_forcelist = {503, 404} - set(disable_retry_status_list)
+        self.auth = app.authobj()
+        self.event_hooks["request"] = [_async_log_request]
+        self.event_hooks["response"] = [_async_log_response]
+
+    @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8, jitter=None)
+    async def request(
+            self,
+            method: str,
+            url,
+            *,
+            content=None,
+            data=None,
+            files=None,
+            json=None,
+            params=None,
+            headers=None,
+            cookies=None,
+            auth=USE_CLIENT_DEFAULT,
+            follow_redirects: bool = True,
+            timeout=USE_CLIENT_DEFAULT,
+            extensions=None) -> Response:
+        """request with retry on unexpected status code"""
+        response = await super().request(
+                method,
+                url,
+                content=content,
+                data=data,
+                files=files,
+                json=json,
+                params=params,
+                headers=headers,
+                cookies=cookies,
+                auth=auth,
+                follow_redirects=follow_redirects,
+                timeout=timeout,
+                extensions=extensions)
+        if response.status_code in self._status_forcelist:
+            raise UnexpectedResponse(f"Didn't expect '{response.status_code}' status code", response)
+
+        return response
+
+    def extend_connection_pool(self, maxsize: int):
+        """Dummy - only requests need it, for compatibility here"""
+
+
+class AsyncClientHook(LifecycleHook):
+    """Lifecycle hook for Httpx client"""
+
+    def __init__(self, http2: bool = False) -> None:
+        self.http2 = http2
+
+    def on_application_create(self, application: Application):
+        # pylint: disable=protected-access
+        application._client_factory = AsyncClient.partial(self.http2)
+        application.register_auth(Service.AUTH_USER_KEY, HttpxUserKeyAuth)
+        application.register_auth(Service.AUTH_APP_ID_KEY, HttpxAppIdKeyAuth)
 
 
 # pylint: disable=too-few-public-methods
