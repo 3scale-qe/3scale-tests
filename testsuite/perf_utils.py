@@ -48,11 +48,11 @@ class HyperfoilUtils:
         """Adds specific url host to the benchmark"""
         self.benchmark.add_host(url, shared_connections, **kwargs)
 
+    # pylint: disable=consider-using-with
     def add_file(self, path):
         """Adds file to the benchmark"""
         filename = os.path.basename(path)
-        with open(path, 'r', encoding="utf8") as file:
-            self.factory.file(filename, file)
+        self.factory.file(filename, open(path, 'r', encoding="utf8"))
 
     def generate_random_file(self, filename: str, size: int):
         """Generates and adds file with such filename and size to the benchmark"""

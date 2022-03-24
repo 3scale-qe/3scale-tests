@@ -109,7 +109,7 @@ def test_smoke_user_key(applications, prod_client,  setup_benchmark):
         Asserts it was successful.
     """
     for app in applications:
-        client = prod_client(app, promote=False, redeploy=False)
+        client = prod_client(app)
         assert client.get("/0/anything/0").status_code == 200
         assert client.post("/0/anything/0").status_code == 200
 

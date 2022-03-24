@@ -115,3 +115,15 @@ def promoted_services(services, production_gateway):
         svc.proxy.list().promote(version=version)
     production_gateway.reload()
     return services
+
+
+@pytest.fixture(scope="module")
+def prod_client(request):
+    """Production client for performance tests omitting unecessary arguments.
+    Client don't handle with default product which causes errors in performance tests.
+    """
+    def _client(app):
+        client = app.api_client(endpoint="endpoint")
+        request.addfinalizer(client.close)
+        return client
+    return _client
