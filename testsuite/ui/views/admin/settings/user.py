@@ -1,5 +1,7 @@
 """View representations of User Account pages"""
 import enum
+from typing import List
+
 from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
@@ -54,12 +56,12 @@ class UserDetailView(BaseSettingsView):
     password = TextInput(id='#user_password')
     organization = TextInput(id='#user_password_confirmation')
     update_btn = ThreescaleUpdateButton()
-    role = RadioGroup(locator='//*[@id="user_role_input"]')
+    role = RadioGroup('//*[@id="user_role_input"]')
 
     permissions = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
-                                fieldset_id='FeatureAccessList')
+                                ol_identifier='FeatureAccessList')
     access_list = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
-                                fieldset_id='ServiceAccessList')
+                                ol_identifier='ServiceAccessList')
 
     def __init__(self, parent, user):
         super().__init__(parent, user_id=user.entity_id)
@@ -80,14 +82,14 @@ class UserDetailView(BaseSettingsView):
         """Allow permissions for all products"""
         self.permissions.uncheck(['user_member_permission_ids_services'])
 
-    def add_permissions(self, scope: list):
+    def add_permissions(self, scope: List[Scopes]):
         """
         Select chosen permissions for the User
         :param scope: List of permissions scopes from class Scopes
         """
         self.permissions.check(scope)
 
-    def remove_permissions(self, scope: list):
+    def remove_permissions(self, scope: List[Scopes]):
         """
         Unselect chosen permissions for the User
         :param scope: List of permissions scopes from class Scopes
@@ -102,14 +104,14 @@ class UserDetailView(BaseSettingsView):
         """Clear permissions for all services"""
         self.access_list.clear_all()
 
-    def add_products_access(self, product_ids: list):
+    def add_products_access(self, product_ids: List[int]):
         """Add access to products by its ids
         :param: product_ids: ID of services to add access to.
         """
         for prod_id in product_ids:
             self.access_list.check([f"user_member_permission_service_ids_{prod_id}"])
 
-    def remove_products_access(self, product_ids: list):
+    def remove_products_access(self, product_ids: List[int]):
         """remove access to products by its ids
         :param: product_ids: ID of services to remove access to.
         """
