@@ -7,6 +7,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.utils import random_string
 
@@ -18,7 +19,7 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url, protocol):
     """Url for service that is configured with http version of echo api"""
-    url = urlparse(private_base_url("httpbin"))
+    url = urlparse(private_base_url("httpbin_go"))
     return rawobj.Proxy(f"{protocol}://{url.hostname}")
 
 
@@ -33,4 +34,6 @@ def test_large_data(api_client, num_bytes):
 
     response = client.post('/post', data=data)
     assert response.status_code == 200
-    assert response.json().get('data') == data
+    echo = EchoedRequest.create(response)
+    assert echo.headers.get("X-Forwarded-By", "MISSING").startswith("MockServer")
+    assert echo.body == data

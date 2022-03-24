@@ -7,6 +7,7 @@ Proxy service is simple camel route, that adds "Fuse-Camel-Proxy" header to the 
 import pytest
 
 from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
@@ -38,6 +39,6 @@ def test_http_proxy_policy(api_client, private_base_url):
     """
     response = api_client().get("/headers")
     assert response.status_code == 200
-    headers = response.json()["headers"]
+    headers = EchoedRequest.create(response).headers
     assert "Fuse-Camel-Proxy" in headers
     assert headers["Source-Header"] in private_base_url("httpbin_service")

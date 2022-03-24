@@ -1,9 +1,24 @@
 # pylint: disable=too-few-public-methods,broad-except
 
-"""This provides interface to get test environment tools
+"""
+This provides interface to get test environment tools
 
 Different sources can be used, e.g. if deployed in openshift tools can be gathered
-from openshift namespace/project."""
+from openshift namespace/project.
+
+Historically "symbolic" names used as config keys in settings use name of
+particular service e.g. 'httpbin'. This was never 100% accurate as the service
+shouldn't represent a specific implementation but rather available upstream
+API. It's better to think about these names as desired interface of the
+upstream API. Even that is simplified, because all the services used as
+upstream API have standardized interface thanks to EchoedRequest.
+
+So 'httpbin' key doesn't represent the httpbin instance, but rather a upstream
+API implementing calls of httpbin.
+
+Note: It may be good idea to consider change of all these keys to something
+abstract, however that would cause huge disruption in usage of the testsuite.
+"""
 
 # This uses direct access to testsuite settings and configuration objects. The
 # difference is that this is integral part of the testsuite and has zero chance
@@ -15,10 +30,10 @@ from testsuite.configuration import openshift
 
 _tr = {
     "echo_api": "echo-api+ssl",
-    "httpbin": "httpbin+ssl",
-    "httpbin_nossl": "httpbin",
+    "httpbin": "mockserver+ssl",
+    "httpbin_nossl": "mockserver",
     "httpbin_go": "go-httpbin+ssl",
-    "httpbin_service": "httpbin+svc",
+    "httpbin_service": "echo-api+svc:9292",
     "httpbin_go_service": "go-httpbin+svc",
     "jaeger": "jaeger-query"}
 

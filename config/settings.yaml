@@ -5,7 +5,6 @@ default:
   threescale:
     service:
       backends:
-        primary: https://echo-api.3scale.net:443
         httpbin: https://httpbin.org:443
         echo_api: https://echo-api.3scale.net:443
         httpbin_nossl: http://httpbin.org:80
@@ -28,8 +27,8 @@ default:
   redis:
     url: redis://apicast-testing-redis:6379/1
   proxy:
-    http: "@format http://tinyproxy-service.{this.FIXTURES.tools.namespace}.svc:8888"
-    https: "@format http://tinyproxy-service.{this.FIXTURES.tools.namespace}.svc:8888"
+    http: "@format http://mockserver.{this.FIXTURES.tools.namespace}.svc:1080"
+    https: "@format http://mockserver.{this.FIXTURES.tools.namespace}.svc:1080"
   toolbox:
     cmd: "podman"
     podman_cert_dir: "/var/data"

@@ -11,15 +11,22 @@ The request will fail when:
 import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability
+from testsuite.mockserver import Mockserver
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def service_proxy_settings(base_url):
     """Have httpbin backend due to /fail-request implementation"""
 
-    return rawobj.Proxy(private_base_url("httpbin"))
+    return rawobj.Proxy(base_url)
+
+
+@pytest.fixture(scope="module")
+def base_url(private_base_url):
+    """Backend API URL"""
+    return private_base_url("mockserver+ssl")
 
 
 @pytest.fixture(scope="module")
@@ -50,10 +57,10 @@ def client(application, api_client):
     return api_client(disable_retry_status_list={404})
 
 
-def reset_httpbin_endpoint(client):
-    """Reset httpbin endpoint before each call by making request to
-       /fail-request/0/200 endpoint"""
-    client.get("/fail-request/0/200")
+@pytest.fixture(scope="module")
+def mockserver(base_url):
+    """Have mockerver to setup failing requests for certain occurrences"""
+    return Mockserver(base_url)
 
 
 @pytest.mark.parametrize("num_of_requests, awaited_response", [
@@ -61,7 +68,7 @@ def reset_httpbin_endpoint(client):
     pytest.param(5, 200, id="5 request should succeed"),
     pytest.param(6, 500, id="6 request, should fail")
 ])
-def test_retry_policy(client, num_of_requests, awaited_response):
+def test_retry_policy(client, mockserver, num_of_requests, awaited_response):
     """
     To test retry policy:
     - append the retry policy, conifgured to retry max n times
@@ -75,7 +82,7 @@ def test_retry_policy(client, num_of_requests, awaited_response):
     - make request n+1 times (/fail-request/n+1/500)
     - test if response is 500
     """
-    reset_httpbin_endpoint(client)
+    mockserver.temporary_fail_request(num_of_requests)
     response = client.get(
         "/fail-request/" + str(num_of_requests) + "/500")
     assert response.status_code == awaited_response

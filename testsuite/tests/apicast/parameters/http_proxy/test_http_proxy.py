@@ -6,6 +6,7 @@ Apicast should use all traffic through the defined proxy via HTTP_PROXY env var.
 import pytest
 
 from testsuite import rawobj
+from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 
@@ -39,7 +40,7 @@ def test_proxied_request(api_client, private_base_url):
     response = api_client().get("/headers")
     assert response.status_code == 200
 
-    headers = response.json()["headers"]
+    headers = EchoedRequest.create(response).headers
 
     assert "Fuse-Camel-Proxy" in headers
     assert headers["Source-Header"] in private_base_url("httpbin_service")
