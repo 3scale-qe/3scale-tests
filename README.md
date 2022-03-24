@@ -76,8 +76,8 @@ building the image!
 Actually this should be pretty first step:
 
 ```bash
-$ git clone git@gitlab.cee.redhat.com:3scale-qe/3scale-py-testsuite.git
-$ cd 3scale-py-testsuite
+$ git clone https://github.com/3scale-qe/3scale-tests.git
+$ cd 3scale-tests
 ```
 
 ## Customize the Configuration
