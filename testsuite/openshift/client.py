@@ -194,7 +194,7 @@ class OpenShiftClient:
         for resource in processed_tmpl["items"]:
             self.delete(resource['kind'], resource['metadata']['name'])
 
-    def new_app(self, source: str, params: Dict[str, str] = None):
+    def new_app(self, source, params: Dict[str, str] = None):
         """Create application based on source code.
 
         Args:
