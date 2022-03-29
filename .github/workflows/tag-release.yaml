@@ -1,0 +1,19 @@
+name: tag release
+on:
+  pull_request:
+    types: [closed]
+    paths: [testsuite/VERSION]
+
+jobs:
+  tag_release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: tag release
+        shell: bash
+        run: git log --no-merges --pretty=oneline|grep 'v[0-9.]*rc[0-9]*'|head -1|(read COMMIT MSG; gh release create "v${MSG##*-v}" -p --generate-notes --target $COMMIT)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
