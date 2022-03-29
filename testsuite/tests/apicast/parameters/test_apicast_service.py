@@ -64,7 +64,7 @@ def test_filter_by_url(api_client_pass, api_client_fail, staging_gateway, servic
     Request to 'service_pass' should return 200
     Request to 'service_fail' should return 404
     """
-    public_url = f".*{service_pass.entity_id}-stage.*"
+    public_url = f".*{service_pass.entity_id}-{staging_gateway.name}.*"
     staging_gateway.environ["APICAST_SERVICES_FILTER_BY_URL"] = public_url
 
     request = api_client_pass.get("/get")
