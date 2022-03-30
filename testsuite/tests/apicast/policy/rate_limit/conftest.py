@@ -34,11 +34,11 @@ def service_plus(custom_service, service_proxy_settings, request, policy_setting
 
 
 @pytest_cases.fixture
-def application(service_plus, custom_app_plan, custom_application, request):
+def application(service_plus, custom_app_plan, custom_application, lifecycle_hooks, request):
     """function-scoped application"""
 
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_plus)
-    return custom_application(rawobj.Application(blame(request, "app"), plan))
+    return custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)
 
 
 @pytest.fixture
@@ -72,7 +72,8 @@ def prod_client(production_gateway, application, request):
             production_gateway.reload()
 
         client = app.api_client(endpoint="endpoint")
-        request.addfinalizer(client.close)
+        if hasattr(client, "close"):
+            request.addfinalizer(client.close)
         return client
 
     return _prod_client
