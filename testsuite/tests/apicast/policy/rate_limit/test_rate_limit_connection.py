@@ -226,7 +226,7 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 async def client(application):
     """client needs to wait more than WAIT time"""
     async with application.api_client() as client:
-        client.timeout = httpx.Timeout(WAIT+DELAY+5.0)
+        client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
         yield client
 
 
@@ -238,7 +238,7 @@ async def client2(key_scope, request):
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
         async with app2.api_client() as client:
-            client.timeout = httpx.Timeout(WAIT+DELAY+5.0)
+            client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
             yield client
     else:
         yield

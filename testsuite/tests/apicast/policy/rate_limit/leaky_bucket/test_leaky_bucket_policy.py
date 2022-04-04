@@ -21,6 +21,7 @@ Rewrite:
 import asyncio
 
 import backoff
+import httpx
 import pytest
 import pytest_cases
 from pytest_cases import parametrize_with_cases
@@ -81,6 +82,7 @@ def application2(config, custom_app_plan, custom_application, lifecycle_hooks, r
 async def client(application):
     """api client for application"""
     async with application.api_client() as client:
+        client.timeout = httpx.Timeout(TOTAL_REQUESTS*2)
         yield client
 
 
@@ -88,6 +90,7 @@ async def client(application):
 async def client2(application2):
     """api client for application2"""
     async with application2.api_client() as client:
+        client.timeout = httpx.Timeout(TOTAL_REQUESTS*2)
         yield client
 
 
