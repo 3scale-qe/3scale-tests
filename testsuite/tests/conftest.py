@@ -172,7 +172,7 @@ def pytest_report_header(config):
     _global_property(config, "polarion-project-id", projectid)
     _global_property(config, "polarion-response-myteamsname", team)
     _global_property(config, "polarion-testrun-title", title)
-    _global_property(config, "polarion-testrun-id", title.replace(".", "_"))
+    _global_property(config, "polarion-testrun-id", title.replace(".", "_").replace(" ", "_"))
     _global_property(config, "polarion-testrun-status-id", "inprogress")
     _global_property(config, "polarion-lookup-method", "name")
 
