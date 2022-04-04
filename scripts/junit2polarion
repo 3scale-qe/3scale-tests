@@ -31,9 +31,10 @@ Requirements = etree.XSLT(etree.parse("./xslt/requirements.xsl"))
 Testcases = etree.XSLT(etree.parse("./xslt/testcases.xsl"))
 polish = etree.XSLT(etree.parse("./xslt/polish-junit.xsl"))
 
-xargs = {}
+TRUE = "'true()'"
+xargs = {"polarionProperties": TRUE}
 if args.skip_fails:
-    xargs = {"rmfails": "'true()'"}
+    xargs["rmfails"] = TRUE
 
 
 def files(xml):
