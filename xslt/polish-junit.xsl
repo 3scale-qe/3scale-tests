@@ -7,6 +7,7 @@
     <!-- https://mojo.redhat.com/docs/DOC-1073077 -->
 
     <xsl:param name="rmfails"/>
+    <xsl:param name="polarionProperties"/>
 
     <xsl:template match="node()|@*">
         <!-- this copies all objects that do not match other template -->
@@ -17,11 +18,12 @@
 
     <xsl:template match="/testsuites">
         <xsl:copy>
-            <xsl:copy-of select="./testsuite/properties"/>
+            <xsl:if test="$polarionProperties">
+                <xsl:copy-of select="./testsuite/properties"/>
+            </xsl:if>
             <xsl:apply-templates select="node()|@*"/>
         </xsl:copy>
     </xsl:template>
-    <xsl:template match="//testsuite/properties"/>
 
     <xsl:template match="testcase[skipped]"/>
     <xsl:template match="testsuite/@skipped">
