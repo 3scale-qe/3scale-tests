@@ -96,9 +96,14 @@ def _rhsso_password(server_url, token):
             # was it deployed as part of tools?
             tools = OpenShiftClient(
                 project_name="tools", server_url=server_url, token=token)
-            return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
+            # first RHSSO 7.5 way
+            return tools.secrets["credential-sso"]["ADMIN_PASSWORD"].decode("utf-8")
         except (OpenShiftPythonException, KeyError):
-            return None
+            try:
+                # try 7.4 known deployment if previous fails
+                return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
+            except (OpenShiftPythonException, KeyError):
+                return None
 
 
 # pylint: disable=unused-argument,too-many-locals
