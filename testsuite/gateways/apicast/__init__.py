@@ -84,9 +84,7 @@ class OpenshiftApicast(AbstractApicast, ABC):
 
     def _routename(self, service):
         """name of route for given service"""
-        route = f"{service.entity_id}"
-        if self.staging:
-            route = f"{route}-stage"
+        route = f"{service.entity_id}-{self.name}"
         return route
 
     @property
