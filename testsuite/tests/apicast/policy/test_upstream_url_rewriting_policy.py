@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import pytest
 
 from testsuite import rawobj
+from testsuite import resilient
 from testsuite.echoed_request import EchoedRequest
 
 
@@ -55,5 +56,6 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     request = EchoedRequest.create(response)
     assert request.headers["Host"] == parsed_url.hostname
 
-    hits = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    hits = resilient.stats_service_usage(
+        application.threescale_client, application["service_id"], "hits", "total", old_usage+1)
     assert hits == old_usage + 1

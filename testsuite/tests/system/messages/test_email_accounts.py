@@ -72,7 +72,7 @@ def message_match(tpl, key, text):
 
 # requires mailhog *AND* special deployment with preconfigured smtp secret
 # pylint: disable=unused-argument
-@backoff.on_exception(backoff.fibo, AssertionError, 8, jitter=None)
+@backoff.on_exception(backoff.fibo, AssertionError, 10, jitter=None)
 @pytest.mark.sandbag
 def test_emails_after_account_creation(mailhog_client, mail_template):
     """
