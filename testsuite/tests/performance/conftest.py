@@ -62,30 +62,34 @@ def shared_template(testconfig):
     return shared_template.to_dict()
 
 
+@pytest.fixture(scope="module")
+def event_loop():
+    """Event loop for use in performance tests"""
+    with ThreadPoolExecutor() as pool:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.set_default_executor(pool)
+        yield loop
+        loop.close()
+
+
 @pytest.fixture(scope='module')
-def applications(services, custom_application, lifecycle_hooks, number_of_apps):
+async def applications(services, custom_application, lifecycle_hooks, number_of_apps, event_loop):
     """Create multiple application for each service"""
 
     def _create_apps(svc):
         plan = svc.app_plans.list()[0]
         return custom_application(rawobj.Application(randomize("App"), plan), hooks=lifecycle_hooks)
 
-    loop = asyncio.get_event_loop()
-    apps = []
-    futures = []
-    with ThreadPoolExecutor() as pool:
-        for svc in services:
-            futures += [
-                loop.run_in_executor(pool, _create_apps, svc)
-                for _ in range(number_of_apps)]
-        apps = loop.run_until_complete(asyncio.gather(*futures))
-    return apps
+    return await asyncio.gather(
+         *(event_loop.run_in_executor(None, _create_apps, svc) for _ in range(number_of_apps) for svc in services)
+    )
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope='module')
-def services(request, custom_backend, custom_service, custom_app_plan, number_of_products,
-             number_of_backends, service_proxy_settings, service_settings, private_base_url, lifecycle_hooks):
+async def services(request, custom_backend, custom_service, custom_app_plan, number_of_products, event_loop,
+                   number_of_backends, service_proxy_settings, service_settings, private_base_url, lifecycle_hooks):
     """Create multiple services with multiple backends"""
 
     def _create_services():
@@ -97,14 +101,9 @@ def services(request, custom_backend, custom_service, custom_app_plan, number_of
         custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), svc)
         return svc
 
-    loop = asyncio.get_event_loop()
-    services = []
-    with ThreadPoolExecutor() as pool:
-        futures = [
-            loop.run_in_executor(pool, _create_services)
-            for _ in range(number_of_products)]
-        services = loop.run_until_complete(asyncio.gather(*futures))
-    return services
+    return await asyncio.gather(
+        *(event_loop.run_in_executor(None, _create_services) for _ in range(number_of_products))
+    )
 
 
 @pytest.fixture(scope='module')
