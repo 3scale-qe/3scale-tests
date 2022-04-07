@@ -17,52 +17,93 @@ from testsuite.ui.exception import ItemNotPresentException
 # pylint: disable=abstract-method
 class RadioGroup(GenericLocatorWidget):
     """
-    Radio group of 3scale pages. It contains both radio and check box elements, therefore it is not
-    typical radio element. No control of option switching is implemented.
-
-    In case of check box (like one on the bottom of the User Edit page), user needs to remember that
-    possibility of multiple selected options is allowed (not an typical radio behaviour)
+    Radio group of 3scale pages.
     """
-    OPTIONS_SECTION = './fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION_CLASS = '//fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION = '/fieldset/ol'
 
     OPTIONS = './li'
-    OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
+    OPTIONS_INPUT = OPTIONS + '/label/input'
+    OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
 
-    def __init__(self, parent=None, locator=None, fieldset_id="", logger=None):
+    def __init__(self, parent=None, locator=None, field_set_identifier="", logger=None):
         super().__init__(parent, locator, logger)
-        if fieldset_id:
-            self.options_section = self.browser.element(self.OPTIONS_SECTION.format(fieldset_id))
+        if field_set_identifier:
+            self.locator = locator + self.OPTIONS_SECTION_CLASS.format(field_set_identifier)
         else:
-            self.options_section = self.browser.element(locator)
+            self.locator = locator + self.OPTIONS_SECTION
 
-    def select(self, options):
+    def select(self, option: str):
         """
         Select radio (check box) element from the list.
-        :param options: String id-s of options
+        :param option: String id-s of options
         """
-        for option in options:
-            element = self.browser.element(self.OPTIONS_BY_ID.format(option), parent=self.options_section)
-            self._select_option(element)
-
-    def clear_all(self):
-        """
-        Unset all option in radiogroup.
-        """
-        for element in self.browser.elements(self.OPTIONS, parent=self.options_section):
-            self._select_option(element)
-
-    @staticmethod
-    def _select_option(element):
-        # if 'is-unchecked' in element.get_attribute("class").split():
+        element = self.browser.element(self.OPTIONS_BY_ID.format(option))
         element.click()
 
 
 # pylint: disable=abstract-method
 # Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
 # an abstract method
-class CheckBoxGroup(RadioGroup):
-    """CheckBox group of 3scale pages"""
-    OPTIONS_BY_ID = './ol/li/label/input[@id="{}"]'
+class CheckBoxGroup(GenericLocatorWidget):
+    """
+    CheckBox group of 3scale pages
+    :param ol_identifier: Set if Checkbox group is identified by attribute in ol tag.
+                     e.g. fieldset/ol[class=ServiceList]
+    :param field_set_identifier: Set if Checkbox group identifier is in fieldset level of group.
+    """
+    OPTIONS_SECTION = '/fieldset/ol'
+    OPTIONS_SECTION_OL_CLASS = '//fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION_FIELDSET_NAME = '//fieldset[contains(@name, "{}")]/ol'
+
+    OPTIONS = './li'
+    OPTIONS_INPUT = OPTIONS + '/label/input'
+    OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
+
+    # pylint: disable=too-many-arguments
+    def __init__(self, parent=None, locator=None, ol_identifier=None, field_set_identifier=None, logger=None):
+        super().__init__(parent, locator, logger)
+        if ol_identifier:
+            self.locator = locator + self.OPTIONS_SECTION_OL_CLASS.format(ol_identifier)
+        elif field_set_identifier:
+            self.locator = locator + self.OPTIONS_SECTION_FIELDSET_NAME.format(field_set_identifier)
+        else:
+            self.locator = locator + self.OPTIONS_SECTION
+
+    def is_checked(self, option: str):
+        """Detect if checkbox is already checked"""
+        element = self.browser.element(self.OPTIONS_BY_ID.format(option))
+        return element.is_selected()
+
+    def check(self, options: list):
+        """
+        Uncheck all checkboxes of the group
+        Selects check box element from the list.
+        :param options: List of string id-s of options
+        """
+        self.clear_all()
+        for option in options:
+            element = self.browser.element(self.OPTIONS_BY_ID.format(option))
+            if not element.is_selected():
+                element.click()
+
+    def uncheck(self, options: list):
+        """
+        Unselect check box element from the list.
+        :param options: List of string id-s of options
+        """
+        for option in options:
+            element = self.browser.element(self.OPTIONS_BY_ID.format(option))
+            if element.is_selected():
+                element.click()
+
+    def clear_all(self):
+        """
+        Unset all option in checkbox group.
+        """
+        for element in self.browser.elements(self.OPTIONS):
+            if element.is_selected():
+                element.click()
 
 
 class ContextMenu(ContextSelector):
