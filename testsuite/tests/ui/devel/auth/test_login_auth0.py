@@ -41,8 +41,6 @@ def auth0_setup(custom_admin_login, navigator, testconfig, set_callback_urls, au
     sso.publish()
 
 
-@pytest.mark.disruptive  # Only one instance of Auth0 could be present at the time so this test is disruptive to all
-# other tests that want to setup Auth0 integration for devel portal
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7633")
 def test_devel_login_auth0(custom_devel_auth0_login, navigator, auth0_user, auth0_user_password):
     """

@@ -18,7 +18,6 @@ def fields_definitions(login, navigator, threescale):
 
 
 @pytest.mark.xfail
-@pytest.mark.disruptive
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7955")
 def test_field_definitions(fields_definitions, account, navigator, browser):
     """

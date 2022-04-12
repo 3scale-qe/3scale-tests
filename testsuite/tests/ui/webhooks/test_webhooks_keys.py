@@ -9,9 +9,6 @@ from threescale_api.resources import Service
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 
-# webhook tests seem disruptive to requestbin as they reset it with no mercy
-pytestmark = [pytest.mark.disruptive]
-
 
 # pylint: disable=too-many-arguments, disable=unused-argument
 @pytest.fixture(scope="module", autouse=True)

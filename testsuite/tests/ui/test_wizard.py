@@ -26,7 +26,6 @@ def navigator(browser):
 
 
 # pylint:disable=unused-argument
-@pytest.mark.disruptive
 def test_wizard_correct_request(navigator, login, request, private_base_url):
     """
         Test:
@@ -59,7 +58,6 @@ def test_wizard_correct_request(navigator, login, request, private_base_url):
 
 
 # pylint:disable=unused-argument
-@pytest.mark.disruptive
 def test_wizard_bad_request(navigator, login, request, private_base_url):
     """
         Test:
@@ -100,7 +98,6 @@ def test_wizard_set_default_backend_url(navigator, login, browser):
 
 
 # pylint:disable=unused-argument
-@pytest.mark.disruptive
 def test_wizard_link_to_product(navigator, login, request, browser, private_base_url):
     """
         Test:
