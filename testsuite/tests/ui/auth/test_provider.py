@@ -7,7 +7,6 @@ import pytest
 from testsuite.ui.views.admin.foundation import BaseAdminView
 
 
-@pytest.mark.disruptive
 @pytest.mark.parametrize("login", ["auth0_login", "auth0_bounce_login", "rhsso_login",
                                    pytest.param("rhsso_bounce_login", marks=[
                                        pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1292")])])

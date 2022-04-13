@@ -11,9 +11,6 @@ from testsuite.ui.views.admin.audience.account_plan import NewAccountPlanView, A
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 
-# webhook tests seem disruptive to requestbin as they reset it with no mercy
-pytestmark = [pytest.mark.disruptive]
-
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module", autouse=True)

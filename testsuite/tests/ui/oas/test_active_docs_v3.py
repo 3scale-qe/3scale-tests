@@ -84,7 +84,6 @@ def ui_active_doc(custom_admin_login, request, navigator, service, oas3_spec):
 
 
 # pylint: disable=unused-argument, too-many-arguments
-@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1460")
 def test_active_docs_v3_generate_endpoints(login, navigator, ui_active_doc, service, prod_client, application):
     """
