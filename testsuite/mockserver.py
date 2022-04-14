@@ -53,7 +53,7 @@ class Mockserver:
             response = self._retrieve(matcher)
         except requests.exceptions.HTTPError:
             return None
-        return weakget(response.json())[0]["httpRequest"]["body"]["xml"] % None
+        return weakget(response.json())[-1]["httpRequest"]["body"]["xml"] % None
 
     def _retrieve(self, matcher):
         """Do mockserver/retrieve"""
