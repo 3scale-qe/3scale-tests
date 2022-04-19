@@ -223,7 +223,7 @@ class ThreescaleCheckBox(GenericLocatorWidget):
 # an abstract method
 class DeploymentRadio(RadioGroup):
     """Variation of 3scale radio group"""
-    OPTIONS_SECTION = './/li[@id="{}"]/fieldset/ol'
+    OPTIONS_SECTION = '/fieldset/ol'
 
     OPTIONS = './/li'
     OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'

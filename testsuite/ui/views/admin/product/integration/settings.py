@@ -30,12 +30,12 @@ class ProductSettingsView(BaseProductView):
 
     def change_authentication(self, option):
         """Change authentication"""
-        self.authentication.select([option])
+        self.authentication.select(option)
         self.update_button.click()
 
     def change_deployment(self, option):
         """Change deployment"""
-        self.deployment.select([option])
+        self.deployment.select(option)
         self.update_button.click()
 
     def prerequisite(self):
