@@ -76,6 +76,10 @@ class WASMGateway(AbstractGateway):
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
         ext.synchronise_mapping_rules()
+        ext.synchronise_credentials()
+
+        # wait needed for WASM to load new configuration, fixme: should be replaced with wait for wasm sync
+        ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
         return ServiceMeshHttpClient(app=application,
                                      cert=cert,
                                      disable_retry_status_list=disable_retry_status_list,

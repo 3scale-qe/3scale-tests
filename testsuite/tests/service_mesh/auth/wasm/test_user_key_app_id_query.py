@@ -1,13 +1,14 @@
 """
-Auth tests for user_key and app_id/app_key authentication modes for Service Mesh
-Service Mesh by allows both query and headers location to be used
+Modified copy of ../test_user_key_app_id
+Auth tests for user_key and app_id/app_key authentication modes
+with QUERY credential location for Service Mesh
 """
 import pytest
 from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER)
+pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 
 
 @pytest.fixture(scope="module", params=[
@@ -15,9 +16,16 @@ pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER)
     pytest.param(Service.AUTH_APP_ID_KEY, id="app-id")
 ])
 def service_settings(request, service_settings):
-    "Set auth mode to user key"
+    """Set auth mode to user key and app-id"""
     service_settings.update(backend_version=request.param)
     return service_settings
+
+
+@pytest.fixture(scope="module")
+def service_proxy_settings(service_proxy_settings):
+    """Set credential location to query"""
+    service_proxy_settings.update(credentials_location="query")
+    return service_proxy_settings
 
 
 @pytest.fixture
@@ -29,14 +37,17 @@ def invalid_auth(service_settings):
 
 
 @pytest.mark.parametrize("credentials_location", ["query", "headers"])
-def test_request_with_auth(api_client, credentials_location):
+def test_request_with_auth(api_client, credentials_location, service_proxy_settings):
     """Check valid credentials passed in query and headers, should return 200"""
     # pylint: disable=protected-access
     client = api_client()
     client.auth.location = credentials_location
     response = client.get("/get")
 
-    assert response.status_code == 200
+    if service_proxy_settings["credentials_location"] == credentials_location:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
 
 
 @pytest.mark.parametrize("credentials_location", ["params", "headers"])
