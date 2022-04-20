@@ -450,7 +450,7 @@ def production_gateway(request, testconfig, openshift):
     return gateway
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def rhsso_service_info(request, testconfig, tools):
     """
     Set up client for zync
