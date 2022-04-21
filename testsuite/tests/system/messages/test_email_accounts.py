@@ -15,6 +15,11 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 
+# Asynchronous 3scale e-mail notifications can be significantly delayed in case
+# of many requests, therefore not parallel run for this.
+pytestmark = [pytest.mark.disruptive]
+
+
 @pytest.fixture(scope="module")
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
     "application bound to the account and service with specific description that don't break yaml parsing"
