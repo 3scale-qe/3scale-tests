@@ -27,13 +27,15 @@ class TLSApicast(AbstractApicast):
                     Capability.JAEGER}
 
     # pylint: disable=too-many-arguments
-    def __init__(self, name, staging, superdomain, server_authority, manager, generate_name=False) -> None:
+    def __init__(self, name, staging, superdomain, server_authority,
+                 manager, generate_name=False, path_routing=False) -> None:
         super().__init__()
         # We expect that the SelfManagedApicast returns subclass of OpenshiftApicast,
         # which is for now true, but it is not ensured
         self.gateway: OpenshiftApicast = new_gateway({}, kind=SelfManagedApicast, staging=staging,  # type: ignore
                                                      settings_=settings["threescale"]["gateway"],
-                                                     name=name, randomize_name=generate_name)
+                                                     name=name, randomize_name=generate_name,
+                                                     path_routing=path_routing)
         # Ugly monkey-patching of a method
         self.gateway.add_route = self.add_route  # type: ignore
         self.secret_name = self.gateway.deployment.name

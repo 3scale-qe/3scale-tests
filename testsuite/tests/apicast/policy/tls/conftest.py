@@ -43,8 +43,9 @@ def server_authority(request, superdomain, manager):
     return authority
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def staging_gateway(request, server_authority, superdomain, manager):
+def staging_gateway(request, server_authority, superdomain, manager, gateway_options, gateway_environment):
     """Deploy tls apicast gateway. We need APIcast listening on https port"""
     kwargs = dict(
         name=blame(request, "tls-gw"),
@@ -52,10 +53,15 @@ def staging_gateway(request, server_authority, superdomain, manager):
         server_authority=server_authority,
         superdomain=superdomain
     )
+    kwargs.update(gateway_options)
     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
 
     request.addfinalizer(gw.destroy)
     gw.create()
+
+    if len(gateway_environment) > 0:
+        gw.environ.set_many(gateway_environment)
+
     return gw
 
 
@@ -145,3 +151,15 @@ def service(request, backends_mapping, custom_service,
     if policy_settings:
         service.proxy.list().policies.append(policy_settings)
     return service
+
+
+@pytest.fixture(scope="module")
+def gateway_options():
+    """Additional options to pass to staging gateway constructor"""
+    return {}
+
+
+@pytest.fixture(scope="module")
+def gateway_environment():
+    """Allows setting environment for tls tests"""
+    return {}
