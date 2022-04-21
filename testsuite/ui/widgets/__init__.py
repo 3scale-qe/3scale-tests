@@ -35,7 +35,7 @@ class RadioGroup(GenericLocatorWidget):
 
     def select(self, option: str):
         """
-        Select radio (check box) element from the list.
+        Select radio element from the list.
         :param option: String id-s of options
         """
         element = self.browser.element(self.OPTIONS_BY_ID.format(option))
@@ -216,17 +216,6 @@ class ThreescaleCheckBox(GenericLocatorWidget):
         :return if checkbox is checked
         """
         return self.__element__().get_attribute("checked") == "true"
-
-
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
-class DeploymentRadio(RadioGroup):
-    """Variation of 3scale radio group"""
-    OPTIONS_SECTION = './/li[@id="{}"]/fieldset/ol'
-
-    OPTIONS = './/li'
-    OPTIONS_BY_ID = OPTIONS + '/label/input[@id="{}"]'
 
 
 # pylint: disable=abstract-method
