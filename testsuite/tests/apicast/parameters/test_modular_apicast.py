@@ -19,7 +19,8 @@ from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553")]
+              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553"),
+              pytest.mark.sandbag]  # explicit requirement of operator apicast - doesn't have to be available
 
 
 @pytest.fixture(scope="module", params=[

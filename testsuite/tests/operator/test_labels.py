@@ -11,6 +11,7 @@ from testsuite.capabilities import Capability
 from testsuite.configuration import openshift
 
 pytestmark = [
+    pytest.mark.sandbag,  # requires operator in same namespace
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7750"),
     pytest.mark.required_capabilities(Capability.OCP4),
 ]
