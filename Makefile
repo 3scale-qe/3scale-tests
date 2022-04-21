@@ -146,7 +146,7 @@ fetch-tools:
 	-curl $(fetch_tools) | tar -xz
 
 tools:
-	./testsuite-tools/run.sh
+	SHARED_NAMESPACE=tools ./testsuite-tools/run.sh
 
 VERSION-required:
 ifndef VERSION
