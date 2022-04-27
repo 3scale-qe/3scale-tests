@@ -502,7 +502,7 @@ def set_callback_urls(auth0_client):
     """
     cleanup = []
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x['callbacks'], 8, jitter=None)
+    @backoff.on_predicate(backoff.fibo, lambda x: not x['callbacks'], max_tries=8, jitter=None)
     def _get_auth_client(client_id):
         return auth0_client.clients.get(client_id)
 

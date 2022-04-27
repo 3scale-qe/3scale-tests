@@ -13,7 +13,7 @@ class Jaeger:
         self.verify = verify
         self.custom_config = custom_config
 
-    @backoff.on_predicate(backoff.constant, lambda x: x['data'] == [], 10)
+    @backoff.on_predicate(backoff.constant, lambda x: x['data'] == [], max_tries=10)
     def traces(self, service: str, operation: str):
         """
         Gets traces for given service and operation

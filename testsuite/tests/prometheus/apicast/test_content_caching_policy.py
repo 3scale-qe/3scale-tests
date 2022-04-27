@@ -49,7 +49,7 @@ def test_content_caching(request, prometheus, client, apicast):
     # """Apicast needs to load configuration in order to cache incoming requests"""
     client.get("/get", headers=dict(origin="localhost"))
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x, 10, jitter=None)
+    @backoff.on_predicate(backoff.fibo, lambda x: not x, max_tries=10, jitter=None)
     def wait():
         """Wait until content_caching key is in prometheus"""
         prometheus.wait_on_next_scrape(apicast)

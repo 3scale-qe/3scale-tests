@@ -51,7 +51,7 @@ def status_code(chain_name, on_failed_configuration) -> int:
 
 @backoff.on_predicate(backoff.fibo,
                       lambda response: response.headers.get("server") != "openresty",
-                      8, jitter=None)
+                      max_tries=8, jitter=None)
 def make_request(api_client):
     """Make request to the product and retry if the response isn't from APIcast """
     return api_client.get("/")

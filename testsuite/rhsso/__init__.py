@@ -61,7 +61,7 @@ class RHSSOServiceConfiguration:
         secret = self.oidc_client.client_secret_key
         return url.replace("://", f"://{client_id}:{secret}@", 1)
 
-    @backoff.on_exception(backoff.fibo, KeycloakGetError, 8, jitter=None)
+    @backoff.on_exception(backoff.fibo, KeycloakGetError, max_tries=8, jitter=None)
     def password_authorize(self, client_id, secret, username=None, password=None):
         """Returns token retrieved by password authentication"""
         username = username or self.username
@@ -71,7 +71,7 @@ class RHSSOServiceConfiguration:
     def get_application_client(self, application, allow_null=False):
         """Returns ID of a client (not clientId) for an application"""
 
-        @backoff.on_predicate(backoff.fibo, lambda x: x is None, 8, jitter=None)
+        @backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8, jitter=None)
         def _app_client():
             return self.realm.admin.get_client_id(application["client_id"])
         client = _app_client()

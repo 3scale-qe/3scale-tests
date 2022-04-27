@@ -78,7 +78,7 @@ def change_flows(application, flow_to_update, request):
 
 
 # Zync is sometimes too slow to update the RHSSO client.
-@backoff.on_exception(backoff.fibo, Exception, 8, jitter=None)
+@backoff.on_exception(backoff.fibo, Exception, max_tries=8, jitter=None)
 def get_flows(realm, client_id, expected_flow, expected_value):
     """
     Retries until the changed flows appear on the RHSSO side.
