@@ -10,6 +10,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
 from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, TlsTerminationPolicyView
 from testsuite.utils import blame
@@ -72,7 +73,7 @@ def embedded_certs(certificate):
 
 # pylint: disable=too-many-arguments, disable=unused-argument
 @pytest.mark.parametrize("cert_type_setup", [
-    pytest.param("local_certs", id="Local certificates"),
+    pytest.param("local_certs", id="Local certificates", marks=pytest.mark.required_capabilities(Capability.OCP3)),
     pytest.param("embedded_certs", id="Embedded certificates"),
 ])
 def test_tls_terminology_policy_via_ui(request, policy_service, policy_application, browser, login, navigator,
