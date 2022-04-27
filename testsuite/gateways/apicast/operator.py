@@ -113,12 +113,13 @@ class OperatorApicast(OpenshiftApicast):
     PRIORITY = 1000
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient,
-                 name, portal_endpoint, generate_name=False, path_routing=False):
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name,
+                 portal_endpoint, image=None, generate_name=False, path_routing=False):
         # APIcast operator prepends apicast in front the deployment name
         super().__init__(staging, openshift, name, generate_name, path_routing)
         self.portal_endpoint = portal_endpoint
         self.apicast = None
+        self.image = image
         self._environ: OperatorEnviron = None  # type: ignore
 
     @staticmethod
@@ -152,7 +153,8 @@ class OperatorApicast(OpenshiftApicast):
         else:
             apicast["deploymentEnvironment"] = "production"
             apicast["cacheConfigurationSeconds"] = 300
-
+        if self.image:
+            apicast["image"] = self.image
         self.apicast = apicast.commit()
         # Since apicast operator doesnt have any indication of status of the apicast, we need wait until deployment
         # is created
