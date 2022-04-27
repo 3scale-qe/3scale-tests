@@ -217,7 +217,7 @@ class AsyncClient(httpx.AsyncClient):
             headers=None,
             cookies=None,
             auth=USE_CLIENT_DEFAULT,
-            follow_redirects: bool = True,
+            follow_redirects=True,
             timeout=USE_CLIENT_DEFAULT,
             extensions=None) -> Response:
         """request with retry on unexpected status code"""
