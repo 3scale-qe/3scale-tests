@@ -1,6 +1,7 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
 import pytest
 
+from testsuite import resilient
 from testsuite.utils import blame
 from testsuite.ui.views.admin.backend.backend import BackendEditView
 
@@ -37,7 +38,7 @@ def test_edit_backend(login, navigator, custom_backend, threescale):
     edit = navigator.navigate(BackendEditView, backend=backend)
 
     edit.update("updated_name", "updated_description", "https://updated_endpoint")
-    backend = threescale.backends.read_by_name(backend.entity_name)
+    backend = resilient.resource_read_by_name(threescale.backends, backend.entity_name)
 
     assert backend["name"] == "updated_name"
     assert backend["description"] == "updated_description"

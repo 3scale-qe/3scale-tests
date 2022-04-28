@@ -3,6 +3,7 @@
 """
 import pytest
 
+from testsuite import resilient
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
@@ -85,7 +86,7 @@ def test_delete_tenant(master_login, navigator, master_threescale, custom_tenant
 
     detail_view = navigator.navigate(TenantDetailView, account=tenant)
 
-    account_deleted = master_threescale.accounts.read_by_name(account.entity_name)
+    account_deleted = resilient.resource_read_by_name(master_threescale.accounts, account.entity_name)
     assert account_deleted.entity['state'] == 'scheduled_for_deletion'
 
     assert_displayed_in_new_tab(browser, detail_view.open_public_domain, NotFoundView)
@@ -112,7 +113,7 @@ def test_resume_tenant(master_login, navigator, master_threescale, custom_tenant
     # resume tenant from deletion
     detail_view.resume()
 
-    account_deleted = master_threescale.accounts.read_by_name(account.entity_name)
+    account_deleted = resilient.resource_read_by_name(master_threescale.accounts, account.entity_name)
     assert account_deleted.entity['state'] != 'scheduled_for_deletion'
 
     assert_displayed_in_new_tab(browser, detail_view.open_public_domain, LandingView)
