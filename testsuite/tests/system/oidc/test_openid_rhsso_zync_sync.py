@@ -16,7 +16,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
 
 
 # Zync is sometimes too slow to create the RHSSO client.
-@backoff.on_exception(backoff.fibo, KeycloakGetError, 8, jitter=None)
+@backoff.on_exception(backoff.fibo, KeycloakGetError, max_tries=8, jitter=None)
 def get_rhsso_client(application, rhsso_service_info):
     """
     Retries until the RHSSO client is created

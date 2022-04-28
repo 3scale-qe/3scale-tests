@@ -28,7 +28,7 @@ def client(api_client):
 
 
 @backoff.on_predicate(
-    backoff.fibo, lambda x: x.headers.get("server", "") not in ("openresty", "envoy"), 8, jitter=None)
+    backoff.fibo, lambda x: x.headers.get("server", "") not in ("openresty", "envoy"), max_tries=8, jitter=None)
 def make_requests(client):
     """Make sure that we get 503 apicast (backend is not available)"""
     return client.get("/anything")

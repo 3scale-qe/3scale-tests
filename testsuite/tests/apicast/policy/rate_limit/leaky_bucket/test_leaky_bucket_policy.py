@@ -94,7 +94,7 @@ async def client2(application2):
         yield client
 
 
-@backoff.on_predicate(backoff.fibo, lambda x: x[0], 8, jitter=None)
+@backoff.on_predicate(backoff.fibo, lambda x: x[0], max_tries=8, jitter=None)
 async def retry_requests(client, client2, rate_limit_applied):
     """
     Retries requests to both clients

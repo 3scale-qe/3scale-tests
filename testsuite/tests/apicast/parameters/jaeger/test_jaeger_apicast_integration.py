@@ -33,7 +33,7 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
     response = api_client().get(endpoint)
     assert response.status_code == 200
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
+    @backoff.on_predicate(backoff.fibo, lambda x: not x, max_tries=8, jitter=None)
     def request_traced():
         """Let's retry as the tracing might be 'lazy'"""
         traces = jaeger.traces(jaeger_service_name, "/")

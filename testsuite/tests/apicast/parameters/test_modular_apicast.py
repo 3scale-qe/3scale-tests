@@ -101,7 +101,7 @@ def service(service, policy_settings):
 
 
 # for some reason first requests do not seem to be modified, policy is applied later
-@backoff.on_predicate(backoff.fibo, lambda x: "X-Example-Policy-Response" not in x.headers, 8, jitter=None)
+@backoff.on_predicate(backoff.fibo, lambda x: "X-Example-Policy-Response" not in x.headers, max_tries=8, jitter=None)
 def get(api_client, url):
     """Resilient get to ensure apicast has time to initialize policy chain"""
     return api_client.get(url)

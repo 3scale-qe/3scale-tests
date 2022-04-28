@@ -48,7 +48,7 @@ def wsconnect(uri, options):
     websocket.close()
 
 
-@backoff.on_exception(backoff.fibo, WebSocketBadStatusException, 8, jitter=None)
+@backoff.on_exception(backoff.fibo, WebSocketBadStatusException, max_tries=8, jitter=None)
 def retry_sucessful(websocket_uri, message, websocket_options):
     """
     Retry for websocket when we expect successful message delivery.
@@ -62,7 +62,7 @@ def retry_sucessful(websocket_uri, message, websocket_options):
         return websocket.recv()
 
 
-@backoff.on_predicate(backoff.fibo, lambda x: not x, 8, jitter=None)
+@backoff.on_predicate(backoff.fibo, lambda x: not x, max_tries=8, jitter=None)
 def retry_failing(websocket_uri, expected_message, websocket_options):
     """
     Retry for websockets when we expect specific exception message.

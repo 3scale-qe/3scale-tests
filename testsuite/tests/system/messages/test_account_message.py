@@ -7,7 +7,7 @@ import backoff
 import pytest
 
 
-@backoff.on_exception(backoff.fibo, AssertionError, 8, jitter=None)
+@backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
 def assert_message_received(mailhog, text):
     """Resilient test on presence of expected message with retry"""
     messages = mailhog.messages()

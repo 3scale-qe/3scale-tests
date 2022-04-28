@@ -8,7 +8,7 @@ pytestmark = [pytest.mark.required_capabilities(),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7424")]
 
 
-@backoff.on_predicate(backoff.fibo, lambda configs: len(configs) > 0, 8, jitter=None)
+@backoff.on_predicate(backoff.fibo, lambda configs: len(configs) > 0, max_tries=8, jitter=None)
 def fetch_production_configuration(service):
     """Safely fetches production configuration from 3scale"""
     return service.proxy.list().configs.list(env="production")
