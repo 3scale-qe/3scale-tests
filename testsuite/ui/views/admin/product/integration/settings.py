@@ -2,7 +2,7 @@
 from widgetastic.widget import TextInput
 
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import DeploymentRadio
+from testsuite.ui.widgets import RadioGroup
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
@@ -11,8 +11,8 @@ class ProductSettingsView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/settings"
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
-    deployment = DeploymentRadio('//*[@id="service_deployment_option_input"]')
-    authentication = DeploymentRadio('//*[@id="service_proxy_authentication_method_input"]')
+    deployment = RadioGroup('//*[@id="service_deployment_option_input"]')
+    authentication = RadioGroup('//*[@id="service_proxy_authentication_method_input"]')
     client_id = TextInput(id="service_proxy_attributes_jwt_claim_with_client_id")
     update_button = ThreescaleUpdateButton()
 
@@ -30,12 +30,12 @@ class ProductSettingsView(BaseProductView):
 
     def change_authentication(self, option):
         """Change authentication"""
-        self.authentication.select([option])
+        self.authentication.select(option)
         self.update_button.click()
 
     def change_deployment(self, option):
         """Change deployment"""
-        self.deployment.select([option])
+        self.deployment.select(option)
         self.update_button.click()
 
     def prerequisite(self):
