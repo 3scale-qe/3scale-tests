@@ -3,6 +3,7 @@
 import pytest
 
 from testsuite import settings
+from testsuite.ui.views.devel import SignUpView
 from testsuite.ui.views.devel.login import LoginDevelView
 
 
@@ -58,6 +59,9 @@ def custom_devel_rhsso_login(browser, navigator, provider_account, threescale, t
                               access_code=provider_account['site_access_code'])
         page.do_rhsso_login(name, password)
         cleanup.append(rhsso_username)
+        signup_view = SignUpView(navigator.browser)
+        if signup_view.is_displayed:
+            signup_view.signup("RedHat")
 
     yield _login
 
