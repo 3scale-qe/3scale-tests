@@ -51,16 +51,20 @@ def test_analytics(application, api_client, backend):
     Asserts that the number of sent requests is the same as the number reported
     by analytics.
     """
+    backend_metric = backend.metrics.list()[0]
+
+    analytics = application.threescale_client.analytics
+    prev_hits_backed = analytics.list_by_backend(backend.entity_id,
+                                                 metric_name=backend_metric.entity_name)["total"]
+
     client = api_client()
     num_requests = 5
 
     for _ in range(num_requests):
         assert client.get("/anything/get").status_code == 200
 
-    backend_metric = backend.metrics.list()[0]
-
     analytics = application.threescale_client.analytics
     hits_backed = analytics.list_by_backend(backend.entity_id,
                                             metric_name=backend_metric.entity_name)["total"]
 
-    assert hits_backed == num_requests
+    assert hits_backed == prev_hits_backed + num_requests

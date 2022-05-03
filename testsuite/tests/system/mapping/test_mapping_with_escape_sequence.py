@@ -28,9 +28,11 @@ def test_mapping_with_escape_sequence(api_client, application):
     """When making request to /anything/foo/bar%20%20bar/baz
     then it should pass, metric should increase"""
 
+    analytics = application.threescale_client.analytics
+    prev_hits = analytics.list_by_service(application["service_id"], metric_name="escape_sequence")["total"]
+
     response = api_client().get("/anything/foo/bar%20%20bar/baz")
     assert response.status_code == 200
 
-    analytics = application.threescale_client.analytics
     hits = analytics.list_by_service(application["service_id"], metric_name="escape_sequence")["total"]
-    assert hits == 1
+    assert hits == prev_hits + 1

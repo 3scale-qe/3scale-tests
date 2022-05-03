@@ -23,6 +23,10 @@ endif
 PYTEST = pipenv run python -m pytest --tb=$(TB)
 RUNSCRIPT = pipenv run ./scripts/
 
+ifeq ($(filter $(--store||--load),$(flags)),$(flags))
+	PYTEST += -p no:persistence
+endif
+
 commit-acceptance: pylint flake8 mypy all-is-package
 
 pylint flake8 mypy: pipenv-dev
@@ -44,6 +48,10 @@ test pytest tests: pipenv
 speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
+
+persistence: ## Run speedrun tests compatible with persistence plugin
+persistence: pipenv
+	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s

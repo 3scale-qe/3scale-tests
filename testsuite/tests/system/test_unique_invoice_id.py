@@ -9,7 +9,10 @@ import pytest
 from threescale_api.resources import InvoiceState, Account, ApplicationPlan
 from testsuite import rawobj
 
-pytestmark = pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1203")
+pytestmark = [
+    pytest.mark.nopersistence,
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1203")
+]
 
 ACCOUNTS_COUNT = 10
 

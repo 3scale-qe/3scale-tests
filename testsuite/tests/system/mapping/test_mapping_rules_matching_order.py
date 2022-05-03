@@ -8,6 +8,7 @@ only once.
 """
 
 import pytest
+
 from testsuite import rawobj
 
 pytestmark = pytest.mark.required_capabilities()
@@ -56,15 +57,18 @@ def test_mapping_rules_matching_order(api_client, application):
     Assert that after matching the third one with the last flag set to true,
     no other mapping has been matched, therefor the hits increased only once.
     """
+    analytics = application.threescale_client.analytics
+    prev_metrics_once = analytics.list_by_service(application["service_id"], metric_name="metric_once")["total"]
+    prev_metrics_twice = analytics.list_by_service(application["service_id"], metric_name="metric_twice")["total"]
+
     client = api_client()
 
     response_twice = client.get("/anything/foo/123")
     assert response_twice.status_code == 200
 
-    analytics = application.threescale_client.analytics
     metric_twice = analytics.list_by_service(application["service_id"],
                                              metric_name="metric_twice")["total"]
-    assert metric_twice == 2
+    assert metric_twice == prev_metrics_twice + 2
 
     response_once = client.get("/anything/bar/123")
     assert response_once.status_code == 200
@@ -72,4 +76,4 @@ def test_mapping_rules_matching_order(api_client, application):
     analytics = application.threescale_client.analytics
     metric_once = analytics.list_by_service(application["service_id"],
                                             metric_name="metric_once")["total"]
-    assert metric_once == 1
+    assert metric_once == prev_metrics_once + 1

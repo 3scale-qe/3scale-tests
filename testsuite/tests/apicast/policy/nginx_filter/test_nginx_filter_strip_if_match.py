@@ -7,11 +7,14 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704"),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
+]
 
 
 @pytest.fixture(scope="module",

@@ -10,7 +10,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import randomize
 from testsuite.capabilities import Capability
 
-CAPABILITIES = [Capability.JAEGER]
+pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 
 
 @pytest.fixture(scope="module")

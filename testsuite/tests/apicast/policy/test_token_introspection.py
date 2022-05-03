@@ -12,6 +12,8 @@ import pytest
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
