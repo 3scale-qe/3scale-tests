@@ -56,6 +56,6 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     request = EchoedRequest.create(response)
     assert request.headers["Host"] == parsed_url.hostname
 
-    hits = resilient.stats_service_usage(
+    hits = resilient.analytics_list_by_service(
         application.threescale_client, application["service_id"], "hits", "total", old_usage+1)
     assert hits == old_usage + 1

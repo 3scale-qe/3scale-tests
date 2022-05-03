@@ -96,7 +96,7 @@ def test_custom_policy(application, threescale, config, client):
         for i, metric in enumerate(metrics):
             threshold = hits_before[i] + increments[i]
             hits_after.append(
-                resilient.stats_service_usage(threescale, application["service_id"], metric, "total", threshold))
+                resilient.analytics_list_by_service(threescale, application["service_id"], metric, "total", threshold))
 
         for i, increment in enumerate(increments):
             assert hits_after[i] - hits_before[i] == increment
