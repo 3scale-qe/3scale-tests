@@ -4,7 +4,7 @@ import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import RHSSOIntegrationEditView, \
     RHSSOIntegrationDetailView
-from testsuite.ui.views.devel import BaseDevelView, SignUpView
+from testsuite.ui.views.devel import BaseDevelView
 
 
 @pytest.fixture(scope="module")
@@ -57,11 +57,6 @@ def test_devel_login_rhsso(custom_devel_rhsso_login, navigator, testconfig, rhss
     """
     test_user = testconfig["rhsso"]["test_user"]
     custom_devel_rhsso_login(test_user["username"], test_user["password"], rhsso_setup["username"])
-    signup_view = SignUpView(navigator.browser)
-    assert signup_view.wait_displayed()
-
-    signup_view.signup("RedHat")
-
     devel_view = BaseDevelView(navigator.browser)
     assert devel_view.is_displayed
     assert devel_view.is_logged_in
