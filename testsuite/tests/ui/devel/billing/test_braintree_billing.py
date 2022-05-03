@@ -35,7 +35,6 @@ def no_sca_cards(request, braintree_gateway_no_sca, setup_card):
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.xfail
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
 def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards, braintree):
     """Tests stripe billing"""
@@ -48,7 +47,6 @@ def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.xfail
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
 def test_braintree_no_sca(request, account, threescale, invoice_provider, no_sca_cards, braintree):
     """Tests stripe billing"""

@@ -24,7 +24,6 @@ def ui_application(service, custom_app_plan, custom_ui_application, request):
 
 # pylint: disable=unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6205")
-@pytest.mark.xfail
 def test_search_account(login, navigator, custom_ui_account, ui_application, request):
     """
     Preparation:
@@ -43,18 +42,7 @@ def test_search_account(login, navigator, custom_ui_account, ui_application, req
     app = ui_application(account)
     accounts = navigator.navigate(AccountsView)
 
-    accounts.search(org_name)
-    assert next(accounts.table.rows())[1].text == org_name
-    assert next(accounts.table.rows())[6].text == "Approved"
-
-    accounts.search(username)
-    assert next(accounts.table.rows())[1].text == org_name
-    assert next(accounts.table.rows())[6].text == "Approved"
-
-    accounts.search(email)
-    assert next(accounts.table.rows())[1].text == org_name
-    assert next(accounts.table.rows())[6].text == "Approved"
-
-    accounts.search(app["name"])
-    assert next(accounts.table.rows())[1].text == org_name
-    assert next(accounts.table.rows())[6].text == "Approved"
+    for key in [org_name, username, email, app["name"]]:
+        accounts.search(key)
+        assert accounts.table.row()[1].text == org_name
+        assert accounts.table.row()[5].text == "Approved"
