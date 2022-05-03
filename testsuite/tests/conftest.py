@@ -25,6 +25,7 @@ from testsuite.prometheus import PrometheusClient
 from testsuite.httpx import HttpxHook
 from testsuite.mockserver import Mockserver
 from testsuite.rhsso.objects import Realm
+from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 
@@ -156,6 +157,7 @@ def _global_property(config, name, value):
         xml.add_global_property(name, value)
 
 
+# pylint: disable=too-many-locals
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
     testsuite_version = resources.read_text("testsuite", "VERSION").strip()
@@ -206,7 +208,10 @@ def pytest_report_header(config):
     if config.getoption("--toolbox"):
         toolboximage = weakget(settings)["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
 
-        header.append(f"testsuite: toolbox image = {toolboximage}")
+        toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
+
+        header.append(f"testsuite: toolbox version = {toolboxversion}")
+        header.append(f"testsuite: toolbox image tag = {toolboximage}")
 
     header.append("")
     return header
