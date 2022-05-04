@@ -12,6 +12,7 @@ the request matching that mapping rule is not evaluated by other mapping rules.
 import pytest
 
 from testsuite import rawobj
+from testsuite import resilient
 
 pytestmark = [pytest.mark.nopersistence]
 
@@ -173,6 +174,7 @@ def test(application, client, backend_usages, backends, expect_ok):
         response = client.get(path)
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
-        hits_after = hits(application)
+        hits_after = resilient.analytics_list_by_service(
+            application.threescale_client, application["service_id"], "hits", "total")
         assert hits_after == hits_before + expected_hits_diff, \
             f"For {path} expected different number of hits"
