@@ -8,7 +8,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
-from testsuite.configuration import openshift
 
 pytestmark = [
     pytest.mark.sandbag,  # requires operator in same namespace
@@ -38,7 +37,7 @@ LABELS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 
 
 @pytest.fixture(scope="session")
-def operator():
+def operator(openshift):
     """Return operator pod object."""
     pod = openshift().get_operator().object()
     return pod
