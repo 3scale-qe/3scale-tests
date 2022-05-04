@@ -129,7 +129,9 @@ testsuite/resources/apicast.yml: FORCE
 
 release: ## Create branch of new VERSION (optionally tag VERSION)
 release: tag_release ?= no
-release: export VERSION ?= $(shell cut -d. -f1-3 VERSION)
+ifeq ($(VERSION),)
+release: export VERSION := $(shell cut -d. -f1-3 VERSION)
+endif
 release: Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
 	$(RUNSCRIPT)env-version-check
 	$(RUNSCRIPT)make-next-release $(VERSION)
