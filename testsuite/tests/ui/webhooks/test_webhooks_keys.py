@@ -6,6 +6,8 @@ import xml.etree.ElementTree as Et
 
 import pytest
 from threescale_api.resources import Service
+
+from testsuite import resilient
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 
@@ -67,7 +69,7 @@ def test_user_key_regenerate(login, service, application, account, requestbin, n
 
     app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.regenerate_user_key()
-    application = account.applications.read_by_name(application.entity_name)
+    application = resilient.resource_read_by_name(account.applications, application.entity_name)
 
     webhook = requestbin.get_webhook("key_updated", str(application.entity_id))
     assert webhook is not None

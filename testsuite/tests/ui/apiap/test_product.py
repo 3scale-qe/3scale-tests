@@ -6,7 +6,7 @@ from testsuite.ui.views.admin.product.application import ApplicationPlanDetailVi
 from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
 from testsuite.ui.views.admin.product.integration.backends import ProductBackendsView, ProductAddBackendView
-from testsuite import rawobj
+from testsuite import rawobj, resilient
 from testsuite.utils import blame
 
 
@@ -59,7 +59,7 @@ def test_edit_product(login, navigator, service, threescale):
     """
     edit = navigator.navigate(ProductEditView, product=service)
     edit.update("updated_name", "updated_description")
-    product = threescale.services.read_by_name(service.entity_name)
+    product = resilient.resource_read_by_name(threescale.services, service.entity_name)
 
     assert product["name"] == "updated_name"
     assert product["description"] == "updated_description"
@@ -113,7 +113,7 @@ def test_update_proxy_url(service, login, navigator, threescale):
     """
     settings = navigator.navigate(ProductSettingsView, product=service)
     settings.update_gateway("https://staging.anything.invalid:443", "https://production.anything.invalid:443")
-    product = threescale.services.read_by_name(service.entity_name)
+    product = resilient.resource_read_by_name(threescale.services, service.entity_name)
     proxy = product.proxy.list()
 
     assert proxy["sandbox_endpoint"] == "https://staging.anything.invalid:443"
@@ -130,7 +130,7 @@ def test_assign_backend_to_product(login, navigator, ui_backend, ui_product, thr
     """
     backend = navigator.navigate(ProductAddBackendView, product=ui_product)
     backend.add_backend(ui_backend, "/get")
-    ui_product = threescale.services.read_by_name(ui_product.entity_name)
+    ui_product = resilient.resource_read_by_name(threescale.services, ui_product.entity_name)
     backends = ui_product.backend_usages.list()
 
     assert len(backends) == 1

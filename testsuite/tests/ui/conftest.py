@@ -12,7 +12,7 @@ from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
-from testsuite import rawobj
+from testsuite import rawobj, resilient
 from testsuite.auth0 import auth0_token
 from testsuite.billing import Stripe, Braintree
 from testsuite.config import settings
@@ -186,7 +186,7 @@ def custom_ui_tenant(navigator, threescale, testconfig, request, master_threesca
 
         tenant.create(username=username, email=email+"@anything.invalid", password=password, organization=organisation)
 
-        account = master_threescale.accounts.read_by_name(organisation)
+        account = resilient.resource_read_by_name(master_threescale.accounts, organisation)
         tenant = master_threescale.tenants.read(account.entity_id)
         tenant.wait_tenant_ready()
 
@@ -217,7 +217,7 @@ def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, req
 
         backend = navigator.navigate(BackendNewView)
         backend.create(name, system_name, description, endpoint)
-        backend = threescale.backends.read_by_name(system_name)
+        backend = resilient.resource_read_by_name(threescale.backends, system_name)
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(backend.delete)
         return backend
@@ -241,7 +241,7 @@ def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, req
         custom_admin_login()
         product = navigator.navigate(ProductNewView)
         product.create(name, system_name, description)
-        product = threescale.services.read_by_name(system_name)
+        product = resilient.resource_read_by_name(threescale.services, system_name)
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(product.delete)
         return product
@@ -267,7 +267,7 @@ def custom_ui_account(custom_admin_login, navigator, threescale, request, testco
         custom_admin_login()
         account = navigator.navigate(AccountNewView)
         account.create(name, email, password, org_name)
-        account = threescale.accounts.read_by_name(org_name)
+        account = resilient.resource_read_by_name(threescale.accounts, org_name)
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(account.delete)
@@ -295,7 +295,7 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
         custom_admin_login()
         app = navigator.navigate(ApplicationNewView, account=account)
         app.create(name, description, plan, service)
-        application = account.applications.read_by_name(name)
+        application = resilient.resource_read_by_name(account.applications, name)
 
         application.api_client_verify = testconfig["ssl_verify"]
 
@@ -325,7 +325,7 @@ def custom_ui_app_plan(custom_admin_login, navigator):
         custom_admin_login()
         plan = navigator.navigate(ApplicationPlanNewView, product=service)
         plan.create(name, name)
-        app_plan = service.app_plans.read_by_name(name)
+        app_plan = resilient.resource_read_by_name(service.app_plans, name)
 
         return app_plan
 
@@ -448,7 +448,7 @@ def custom_auth0_login(browser, navigator, threescale, request, testconfig):
 
         def _delete():
             name = email.split("@")[0]
-            user = threescale.provider_account_users.read_by_name(name)
+            user = resilient.resource_read_by_name(threescale.provider_account_users, name)
             user.delete()
 
         if not testconfig["skip_cleanup"] and autoclean:
@@ -478,7 +478,7 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhss
         page.do_rhsso_login(username, password)
 
         def _delete():
-            user = threescale.provider_account_users.read_by_name(rhsso_username)
+            user = resilient.resource_read_by_name(threescale.provider_account_users, rhsso_username)
             user.delete()
 
         if not testconfig["skip_cleanup"] and rhsso_username:

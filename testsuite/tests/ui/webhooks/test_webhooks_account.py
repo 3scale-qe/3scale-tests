@@ -5,7 +5,7 @@ import xml.etree.ElementTree as Et
 
 import pytest
 
-from testsuite import rawobj
+from testsuite import rawobj, resilient
 from testsuite.ui.views.admin.audience.account import UsageRulesView, AccountEditView, AccountsDetailView
 from testsuite.ui.views.admin.audience.account_plan import NewAccountPlanView, AccountPlansView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
@@ -86,7 +86,7 @@ def test_account_plan_changed(account, threescale, login, navigator, requestbin,
     name = blame(request, "app_plan")
     plan_view = navigator.navigate(NewAccountPlanView)
     plan_view.create(name, name)
-    plan = threescale.account_plans.read_by_name(name)
+    plan = resilient.resource_read_by_name(threescale.account_plans, name)
     plan_view = navigator.navigate(AccountPlansView)
     plan_view.publish(plan.entity_id)
     account_view = navigator.navigate(AccountsDetailView, account=account)

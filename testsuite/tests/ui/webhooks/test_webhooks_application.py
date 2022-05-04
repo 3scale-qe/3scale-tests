@@ -6,7 +6,7 @@ import xml.etree.ElementTree as Et
 
 import pytest
 
-from testsuite import rawobj
+from testsuite import rawobj, resilient
 from testsuite.ui.views.admin.audience.application import ApplicationEditView, ApplicationDetailView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
@@ -139,7 +139,7 @@ def test_user_key_updated(custom_app, navigator, login, requestbin, account, ser
     application = custom_app()
     app = navigator.navigate(ApplicationDetailView, application=application, product=service)
     app.regenerate_user_key()
-    application = account.applications.read_by_name(application.entity_name)
+    application = resilient.resource_read_by_name(account.applications, application.entity_name)
 
     webhook = requestbin.get_webhook("user_key_updated", str(application.entity_id))
     assert webhook is not None

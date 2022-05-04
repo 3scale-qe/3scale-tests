@@ -4,6 +4,7 @@ Conftest for auth tests
 # pylint: disable=unused-argument, too-many-arguments
 import pytest
 
+from testsuite import resilient
 from testsuite.ui.views.admin.settings.sso_integrations import NewSSOIntegrationView, SSOIntegrationEditView, \
     SSOIntegrationDetailView
 from testsuite.ui.views.auth import Auth0View, RhssoView
@@ -59,7 +60,7 @@ def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, s
 
     if not testconfig["skip_cleanup"]:
         name = auth0_user["email"].split("@")[0]
-        user = threescale.provider_account_users.read_by_name(name)
+        user = resilient.resource_read_by_name(threescale.provider_account_users, name)
         user.delete()
 
 
@@ -106,7 +107,8 @@ def rhsso_setup(request, custom_admin_login, rhsso_service_info, ui_sso_integrat
     sso.publish()
 
     def _delete():
-        user = threescale.provider_account_users.read_by_name(admin.get_user(rhsso_service_info.user)["username"])
+        user = resilient.resource_read_by_name(threescale.provider_account_users,
+                                               admin.get_user(rhsso_service_info.user)["username"])
         user.delete()
 
     request.addfinalizer(_delete)
