@@ -16,12 +16,11 @@ pytestmark = [
 ]
 
 
-def test_operator_resources(openshift):
+def test_operator_resources(operator):
     """
     Test if operator pod has proper resources defined
     """
-    operator_pod = openshift().get_operator()
-    describe_output = operator_pod.describe()
+    describe_output = operator.describe()
 
     if TESTED_VERSION < Version('2.11'):
         # 2.10-GA

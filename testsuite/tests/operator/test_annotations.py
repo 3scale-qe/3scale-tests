@@ -36,13 +36,6 @@ ANNOTATIONS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 ]
 
 
-@pytest.fixture(scope="session")
-def operator(openshift):
-    """Return operator pod object."""
-    pod = openshift().get_operator().object()
-    return pod
-
-
 @pytest.mark.skipif("TESTED_VERSION >= Version('2.12')")
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_PRE_2_12)
 def test_labels_operator_old(annotation, expected_value, operator):
