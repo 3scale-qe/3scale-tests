@@ -1,13 +1,13 @@
-name: create release
+name: dispatch_release_pullrequest
 on:
   workflow_dispatch:
     inputs:
       version:
-        required: true
-        description: "Use x.y.z format e.g. 2.12.0"
+        required: false
+        description: "Use x.y.z format e.g. 2.12.0 or KEEP EMPTY"
         type: string
 jobs:
-  create-release:
+  dispatch_release_pullrequest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
