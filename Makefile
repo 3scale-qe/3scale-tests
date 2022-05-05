@@ -150,11 +150,12 @@ dist: pipenv fetch-tools
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
 fetch-tools:
-	-rm -Rf testsuite-tools/
-	-curl $(fetch_tools) | tar -xz
+	-rm -Rf ext/testsuite-tools/
+	-mkdir -p ext/
+	-curl $(fetch_tools) | tar -C ext/ -xz
 
 tools:
-	SHARED_NAMESPACE=tools ./testsuite-tools/run.sh
+	SHARED_NAMESPACE=tools ./ext/testsuite-tools/run.sh
 
 VERSION-required:
 ifndef VERSION
