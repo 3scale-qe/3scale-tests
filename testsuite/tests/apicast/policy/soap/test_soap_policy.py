@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/policies/soap/soap_policy_spec.rb
 """
 import pytest
 from testsuite import rawobj
+from testsuite import resilient
 
 
 @pytest.fixture(scope="module")
@@ -19,7 +20,8 @@ def test_soap_policy_action(api_client, application):
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     api_client().get("/get", headers={"Soapaction": "soap_policy_action"})
-    usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    usage_after = resilient.analytics_list_by_service(
+        application.threescale_client, application["service_id"], "hits", "total", usage_before+1)
     assert usage_after == usage_before + 4
 
 
@@ -28,7 +30,8 @@ def test_soap_policy_ctype(api_client, application):
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     api_client().get("/get", headers={"Content-Type": "application/soap+xml;action=soap_policy_ctype"})
-    usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    usage_after = resilient.analytics_list_by_service(
+        application.threescale_client, application["service_id"], "hits", "total", usage_before+1)
     assert usage_after == usage_before + 6
 
 
@@ -38,7 +41,8 @@ def test_soap_policy_action_ctype(api_client, application):
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     api_client().get("/get", headers={"Soapaction": "soap_policy_action",
                                       "Content-Type": "application/soap+xml;action=soap_policy_ctype"})
-    usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    usage_after = resilient.analytics_list_by_service(
+        application.threescale_client, application["service_id"], "hits", "total", usage_before+1)
     assert usage_after == usage_before + 6
 
 
@@ -47,5 +51,6 @@ def test_soap_policy_nothing(api_client, application):
     analytics = application.threescale_client.analytics
     usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
     api_client().get("/get")
-    usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
+    usage_after = resilient.analytics_list_by_service(
+        application.threescale_client, application["service_id"], "hits", "total", usage_before+1)
     assert usage_after == usage_before + 1
