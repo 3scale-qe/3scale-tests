@@ -37,8 +37,8 @@ all-is-package:
 	@echo "Searching for dirs missing __init__.py"
 	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
-# pattern to run testfiles individually
-%.py: FORCE pipenv
+# pattern to run individual testfile or all testfiles in directory
+testsuite/%: FORCE pipenv
 	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
 
 test: ## Run test
