@@ -1,7 +1,6 @@
 """Billing tests for Braintree payment gateway"""
 # pylint: disable=unused-argument
 import pytest
-from threescale_api.resources import InvoiceState
 
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
@@ -42,8 +41,7 @@ def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
-    assert acc_invoices[0]['state'] == InvoiceState.PAID.value
-    assert braintree.invoice_assert(acc_invoices[0])
+    braintree.assert_payment(acc_invoices)
 
 
 # pylint: disable=too-many-arguments
@@ -54,5 +52,4 @@ def test_braintree_no_sca(request, account, threescale, invoice_provider, no_sca
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
-    assert acc_invoices[0]['state'] == InvoiceState.PAID.value
-    assert braintree.invoice_assert(acc_invoices[0])
+    braintree.assert_payment(acc_invoices)

@@ -1,7 +1,6 @@
 """Billing tests for Stripe payment gateway"""
 # pylint: disable=unused-argument
 import pytest
-from threescale_api.resources import InvoiceState
 
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
@@ -27,5 +26,4 @@ def test_stripe(request, account, threescale, stripe_card, invoice_provider, str
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
-    assert acc_invoices[0]['state'] == InvoiceState.PAID.value
-    assert stripe.invoice_assert(account, acc_invoices[0])
+    stripe.assert_payment(account, acc_invoices[0])
