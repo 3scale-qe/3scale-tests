@@ -32,8 +32,7 @@ def test_no_access_message(login, custom_admin_login, navigator, provider_accoun
     assert not dashboard.backends.is_displayed
 
     message = browser.element(".//*[@id='apis']")
-    assert message.text == "You don't have access to any API on the Provider Name account. " \
-                           "Please contact admin to request access."
+    assert "You don't have access to any API on the" in message.text
 
     href = message.find_element_by_tag_name("a").get_attribute("href")
     assert href.endswith(email)
