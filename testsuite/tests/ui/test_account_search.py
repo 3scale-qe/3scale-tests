@@ -45,4 +45,4 @@ def test_search_account(login, navigator, custom_ui_account, ui_application, req
     for key in [org_name, username, email, app["name"]]:
         accounts.search(key)
         assert accounts.table.row()[1].text == org_name
-        assert accounts.table.row()[5].text == "Approved"
+        assert accounts.table.row().state.text == "Approved"
