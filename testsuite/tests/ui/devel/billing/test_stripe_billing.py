@@ -26,4 +26,4 @@ def test_stripe(request, account, threescale, stripe_card, invoice_provider, str
     request.getfixturevalue(invoice_provider)
     acc_invoices = threescale.invoices.list_by_account(account)
     assert len(acc_invoices) - len(old) == 1
-    stripe.assert_payment(account, acc_invoices[0])
+    stripe.assert_payment(acc_invoices[0])
