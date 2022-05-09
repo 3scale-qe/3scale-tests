@@ -1,4 +1,4 @@
-name: release
+name: make_dist
 on:
   push:
     tags:
@@ -8,7 +8,7 @@ env:
   CACERT_CONTENT: ${{ secrets.CACERT }}
   CACERT: custom-ca.crt
 jobs:
-  release:
+  make_dist:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,6 +27,6 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       - name: cacert
         run: echo "$CACERT_CONTENT" > $CACERT
-      - name: release
+      - name: make dist
         run: make dist IMAGENAME="quay.io/rh_integration/3scale-testsuite" PUSHIMAGE=y
 
