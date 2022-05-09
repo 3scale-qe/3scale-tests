@@ -5,10 +5,12 @@ import logging
 import os
 import signal
 import time
+import warnings
 
 import importlib_resources as resources
 import backoff
 import pytest
+from dynaconf.vendor.box.exceptions import BoxKeyError
 from threescale_api import client, errors
 from weakget import weakget
 
@@ -207,8 +209,13 @@ def pytest_report_header(config):
 
     if config.getoption("--toolbox"):
         toolboximage = weakget(settings)["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
+        toolboxversion = "UNKNOWN"
 
-        toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
+        if toolboximage != "UNKNOWN":
+            try:
+                toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
+            except BoxKeyError:
+                warnings.warn("Toolbox executioner is not configured")
 
         header.append(f"testsuite: toolbox version = {toolboxversion}")
         header.append(f"testsuite: toolbox image tag = {toolboximage}")
