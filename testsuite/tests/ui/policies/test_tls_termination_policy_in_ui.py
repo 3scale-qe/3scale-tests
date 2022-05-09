@@ -16,8 +16,10 @@ from testsuite.ui.views.admin.product.integration.policies import ProductPolicie
 from testsuite.utils import blame
 
 # Imports for TLS fixtures
+# noqa # pylint: disable=unused-import
 from testsuite.tests.apicast.policy.tls.conftest import require_openshift, staging_gateway, mount_certificate_secret, \
-    valid_authority, certificate, create_cert, server_authority, manager, superdomain # noqa # pylint: disable=unused-import
+    valid_authority, certificate, create_cert, server_authority, manager, superdomain,\
+    gateway_options, gateway_environment
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
