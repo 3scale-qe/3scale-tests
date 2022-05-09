@@ -33,17 +33,6 @@ LABELS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 ]
 
 
-@pytest.fixture(scope="session")
-def operator(operator_apicast_openshift):
-    """Return operator pod object."""
-
-    def select_operator(apiobject):
-        return apiobject.get_label("app") == "apicast" and apiobject.get_label("control-plane") == "controller-manager"
-
-    pod = operator_apicast_openshift.select_resource("pods", narrow_function=select_operator).object()
-    return pod
-
-
 @pytest.mark.skipif("APICAST_OPERATOR_VERSION >  Version('0.5.2')")  # since threescale 2.12
 @pytest.mark.parametrize("label,expected_value", LABELS_PRE_2_12)
 def test_labels_operator_old(label, expected_value, operator):
