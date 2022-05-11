@@ -3,7 +3,7 @@
 from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput
 
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox
+from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -24,7 +24,14 @@ class ChargingForm(View):
     """Charging form for 3scale billing"""
     ROOT = '//form[contains(@id, "edit_finance_billing_strategy")]'
     charging = ThreescaleCheckBox('//input[@id="finance_billing_strategy_charging_enabled"]')
+    currency = ThreescaleDropdown("//*[@id='finance_billing_strategy_currency']")
     save_btn = ThreescaleSubmitButton()
+
+    def change_currency(self, value):
+        """Change 3scale billing currency"""
+        if self.currency.selected_value() != value:
+            self.currency.select_by_value(value)
+            self.save_btn.click()
 
     @property
     def is_displayed(self):

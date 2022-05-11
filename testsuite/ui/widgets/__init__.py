@@ -182,6 +182,11 @@ class NavigationMenu(Navigation):
 class ThreescaleDropdown(GenericLocatorWidget):
     """Specific dropdown of 3scale pages"""
 
+    def selected_value(self):
+        """Return selected attribute from dropdown"""
+        return self.browser.selenium.find_element_by_xpath("//select/option[@selected='selected']") \
+            .get_attribute("value")
+
     def select_by_value(self, value):
         """Select given value from dropdown"""
         if value:
