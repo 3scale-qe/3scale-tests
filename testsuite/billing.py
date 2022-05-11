@@ -2,8 +2,9 @@
 import braintree
 import stripe
 
+from threescale_api.resources import InvoiceState
 
-# pylint: disable=too-few-public-methods
+
 class Stripe:
     """API for Stripe"""
 
@@ -13,9 +14,9 @@ class Stripe:
         stripe.api_key = api_key
 
     @staticmethod
-    def read_payment(customer_id):
+    def read_payment(invoice):
         """Read Stripe payment"""
-        return [x for x in stripe.PaymentIntent.list() if x['customer'] == customer_id][0]
+        return [x for x in stripe.PaymentIntent.list() if x['metadata']['order_id'] == str(invoice['id'])][0]
 
     @staticmethod
     def read_customer_by_account(account):
@@ -23,21 +24,20 @@ class Stripe:
         return [x for x in stripe.Customer.list() if
                 str(account.entity_id) in x["metadata"].get("3scale_account_reference", [])][0]
 
-    def invoice_assert(self, account, invoice):
+    def assert_payment(self, invoice):
         """Compare 3scale and Stripe invoices"""
-        customer = self.read_customer_by_account(account)
-        stripe_invoice = self.read_payment(customer['id'])
-        invoice_id = stripe_invoice['metadata']['order_id']
+        stripe_invoice = self.read_payment(invoice)
         currency = stripe_invoice['currency']
         # Stripe amount is Integer, e.g. 10,50$ is as 1050 so we need to divide it by 100 to get wanted cost
         cost = stripe_invoice['amount'] / 100
         # Compare 3scale invoice values and Stripe invoice values and check whether Stripe invoice is marked as paid
-        return invoice_id == str(invoice['id']) \
-            and currency == invoice['currency'].lower() \
-            and cost == invoice['cost'] \
-            and stripe_invoice['charges']['data'][0]['paid']
+        assert invoice['state'] == InvoiceState.PAID.value
+        assert currency == invoice['currency'].lower()
+        assert cost == invoice['cost']
+        assert stripe_invoice['charges']['data'][0]['paid']
 
 
+# pylint: disable=too-few-public-methods
 class Braintree:
     """API for braintree"""
 
@@ -51,9 +51,12 @@ class Braintree:
             )
         )
 
-    def invoice_assert(self, invoice):
+    def assert_payment(self, acc_invoices):
         """Compare 3scale invoice and Braintree transaction"""
+        invoice = acc_invoices[0]
         transaction = self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice['id']))
         currency = transaction.first.currency_iso_code
         cost = float(transaction.first.amount)
-        return currency == invoice['currency'] and cost == invoice['cost']
+        assert invoice['state'] == InvoiceState.PAID.value
+        assert currency == invoice['currency']
+        assert cost == invoice['cost']
