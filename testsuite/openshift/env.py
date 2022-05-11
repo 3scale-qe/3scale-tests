@@ -134,6 +134,9 @@ class Environ(Properties):
         """Allow setting many envs at a time."""
         env_args = []
         for name, value in envs.items():
+            # Workaround for the fact that APIcast doesn't recognize "True" as True...
+            if isinstance(value, bool) and value:
+                value = "true"
             env_args.append(f"{name}={value}")
             logger.info("Setting env %s=%s in %s", name, value, self.deployment.resource)
 
@@ -152,6 +155,9 @@ class Environ(Properties):
         if name in self._envs:
             self._envs[name].set(value)
         else:
+            # Workaround for the fact that APIcast doesn't recognize "True" as True...
+            if isinstance(value, bool) and value:
+                value = "true"
             self.openshift.do_action("set", ["env", self.deployment.resource, f"{name}={value}"])
             self.deployment.wait_for()
 
