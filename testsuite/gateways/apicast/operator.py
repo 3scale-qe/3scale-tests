@@ -150,6 +150,7 @@ class OperatorApicast(OpenshiftApicast):
         if self.staging:
             apicast["deploymentEnvironment"] = "staging"
             apicast["cacheConfigurationSeconds"] = 0
+            apicast["configurationLoadMode"] = "lazy"
         else:
             apicast["deploymentEnvironment"] = "production"
             apicast["cacheConfigurationSeconds"] = 300
