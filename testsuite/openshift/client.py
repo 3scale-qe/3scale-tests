@@ -248,10 +248,7 @@ class OpenShiftClient:
         """
         with ExitStack() as stack:
             self.prepare_context(stack)
-            if labels:
-                selector = oc.selector(resource, labels=labels)
-            else:
-                selector = oc.selector(resource)
+            selector = oc.selector(resource, labels=labels)
 
             if narrow_function:
                 selector = selector.narrow(narrow_function)

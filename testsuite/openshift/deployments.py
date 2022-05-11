@@ -129,10 +129,12 @@ class Deployment(ABC):
             d_with_timezone = since_time.replace(tzinfo=timezone.utc)
             time = d_with_timezone.isoformat()
             cmd_args.append(f"--since-time={time}")
-        pod = self.get_pods()
-        # For some reason, the logs can return empty string sometimes, this seems to mitigate it
-        pod.objects()
-        logs = pod.logs(tail, cmd_args=cmd_args)
+        with ExitStack() as stack:
+            self.openshift.prepare_context(stack)
+            pod = self.get_pods()
+            # For some reason, the logs can return empty string sometimes, this seems to mitigate it
+            pod.objects()
+            logs = pod.logs(tail, cmd_args=cmd_args)
         return "".join(logs.values())
 
     def patch(self, patch, patch_type: str = None, timeout=90):
