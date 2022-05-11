@@ -16,7 +16,7 @@ def operator(openshift):
 
     pod = openshift(project=project_name, server="OperatorApicast")\
         .select_resource("pods", narrow_function=select_operator)
-    if pod is not None:
+    if not pod.object_list:
         pod = openshift(project='openshift-operators', server="OperatorApicast")\
             .select_resource("pods", narrow_function=select_operator)
     return pod.object()
