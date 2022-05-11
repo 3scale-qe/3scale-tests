@@ -50,7 +50,7 @@ def test_user_create(ui_account, login, navigator, requestbin, threescale):
 
 
 # pylint: disable=too-many-arguments
-def test_user_update(login, navigator, requestbin, threescale, account):
+def test_user_update(login, navigator, requestbin, threescale, account, request):
     """
      Test:
         - Update user
@@ -61,7 +61,9 @@ def test_user_update(login, navigator, requestbin, threescale, account):
     """
     user = account.users.list()[0]
     user_edit = navigator.navigate(AccountUserEditView, account=account, user=user)
-    user_edit.update("updated_username", "updated@anything.invalid")
+    updated_name = blame(request, "updated")
+    user_edit.update(updated_name, updated_name + "@example.com")
+
     user = account.users.list()[0]
     webhook = requestbin.get_webhook("updated", str(user.entity_id))
     assert webhook is not None
