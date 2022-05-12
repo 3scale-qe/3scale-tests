@@ -11,10 +11,6 @@ default:
     gateway:
       TemplateApicast:
         template: apicast.yml
-      OperatorApicast:
-        openshift:
-          project_name: "apicast-ga"
-          kind: "OpenShiftClient"
       WASMGateway:
         image: "registry.redhat.io/openshift-service-mesh/3scale-auth-wasm-rhel8:0.0.1"
       default:
