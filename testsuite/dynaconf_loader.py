@@ -107,6 +107,26 @@ def _rhsso_password(server_url, token):
                 return None
 
 
+def _apicast_ocp(ocp, settings):
+    """apicast operator can live in different namespace and even openshift"""
+    settings = weakget(settings)["threescale"]["gateway"]["OperatorApicast"]["openshift"] % {}
+    # the assumption is that patterns "3scale-{IDENTIFIER}" and "apicast-{IDENTIFIER}" are used
+    maybe_project_name = ocp.project_name.replace("3scale", "apicast", 1)
+
+    if not settings.get("project_name"):
+        maybe_ocp = OpenShiftClient(
+            project_name=maybe_project_name,
+            server_url=settings.get("server_url"),
+            token=settings.get("token"))
+        if maybe_ocp.project_exists:
+            return maybe_ocp
+
+    return OpenShiftClient(
+        project_name=settings.get("project_name"),
+        server_url=settings.get("server_url"),
+        token=settings.get("token"))
+
+
 # pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
     """Reads and loads in to "settings" a single key or all keys from vault
@@ -131,15 +151,7 @@ def load(obj, env=None, silent=None, key=None):
             server_url=ocp_setup.get("server_url"),
             token=ocp_setup.get("token"))
 
-        apicast_ocp = ocp
-
-        apicast_section = weakget(obj)["threescale"]["gateway"]["OperatorApicast"]["openshift"] % None
-
-        if apicast_section:
-            apicast_ocp = OpenShiftClient(
-                project_name=apicast_section.get("project_name"),
-                server_url=apicast_section.get("server_url"),
-                token=apicast_section.get("token"))
+        apicast_ocp = _apicast_ocp(ocp, obj)
 
         admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
         admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
@@ -200,6 +212,11 @@ def load(obj, env=None, silent=None, key=None):
                     },
                     "TemplateApicast": {
                         "image": _apicast_image(ocp),
+                    },
+                    "OperatorApicast": {
+                        "openshift": {
+                            "project_name": apicast_ocp.project_name
+                        }
                     },
                     "WASMGateway": {
                         "backend_host": backend_route["spec"]["host"]
