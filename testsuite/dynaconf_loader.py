@@ -215,6 +215,7 @@ def load(obj, env=None, silent=None, key=None):
                     },
                     "OperatorApicast": {
                         "openshift": {
+                            "kind": "OpenShiftClient",
                             "project_name": apicast_ocp.project_name
                         }
                     },
