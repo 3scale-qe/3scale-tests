@@ -3,8 +3,25 @@
 import pytest
 
 from testsuite import settings
+from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.views.devel import SignUpView
 from testsuite.ui.views.devel.login import LoginDevelView
+
+
+@pytest.fixture(scope="module")
+def browser(webdriver, request):
+    """
+    Browser representation based on UI settings
+    Args:
+        :param webdriver: Selenium driver configuration
+        :param request: Finalizer for session cleanup
+        :return browser: Browser instance
+    """
+    webdriver.get_driver()
+    webdriver.post_init()
+    started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
+    request.addfinalizer(webdriver.finalize)
+    return started_browser
 
 
 # pylint: disable=too-many-arguments

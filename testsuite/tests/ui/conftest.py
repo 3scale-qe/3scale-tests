@@ -35,18 +35,24 @@ from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
-def browser(request):
+def webdriver():
+    """Creates instance of Web Driver with configuration"""
+    return SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
+                          driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+                          ssl_verify=settings["ssl_verify"],
+                          remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                          binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
+
+
+@pytest.fixture(scope="session")
+def browser(webdriver, request):
     """
     Browser representation based on UI settings
     Args:
+        :param webdriver: Selenium driver configuration
         :param request: Finalizer for session cleanup
         :return browser: Browser instance
     """
-    webdriver = SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                               driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                               ssl_verify=settings["ssl_verify"],
-                               remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                               binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
     webdriver.get_driver()
     webdriver.post_init()
     started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
@@ -55,9 +61,9 @@ def browser(request):
 
 
 @pytest.fixture(scope="session")
-def sessions(browser):
+def sessions():
     """Sessions that were stored during test run"""
-    return Sessions(browser)
+    return Sessions()
 
 
 @pytest.fixture(scope="module")
@@ -76,7 +82,7 @@ def custom_admin_login(browser, sessions, navigator):
         password = password or settings["threescale"]["admin"]["password"]
         browser.url = url
 
-        if not sessions.restore(name, password, url):
+        if not sessions.restore(browser, name, password, url):
             page = navigator.open(LoginView)
             page.do_login(name, password)
             cookies = [browser.selenium.get_cookie('user_session')]
@@ -132,7 +138,7 @@ def custom_devel_login(browser, sessions, navigator, provider_account, account_p
         password = password or account_password
         browser.url = url
 
-        if not sessions.restore(name, password, url):
+        if not sessions.restore(browser, name, password, url):
             page = navigator.open(LoginDevelView,
                                   access_code=provider_account['site_access_code'])
             page.do_login(name, password)
