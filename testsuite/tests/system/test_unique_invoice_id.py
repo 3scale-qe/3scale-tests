@@ -11,8 +11,11 @@ from threescale_api.resources import InvoiceState, Account, ApplicationPlan
 from testsuite import rawobj
 from testsuite.utils import blame, blame_desc
 
+# marked flaky, in jenkins gets "500 Internal Server Error" relatively often,
+# passes from local machine, maybe accounts are created to quickly
 pytestmark = [
     pytest.mark.nopersistence,
+    pytest.mark.flaky,
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1203")
 ]
 
