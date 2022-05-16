@@ -69,20 +69,8 @@ class SeleniumDriver:
 
     def post_init(self):
         """
-        Perform all required post-init workarounds. Should be
-        called _after_ proceeding to desired url.
-
-        :return: None
+        Perform all required post-init actions.
         """
-        # Workaround 'Certificate Error' screen on Microsoft Edge
-        if (self.driver == 'edge' and
-                ('Certificate Error' in self.webdriver.title or
-                 'Login' not in self.webdriver.title)):
-            self.webdriver.get(
-                "javascript:document.getElementById('invalidcert_continue')"
-                ".click()"
-            )
-
         self.webdriver.maximize_window()
 
     def finalize(self):
