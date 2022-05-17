@@ -8,10 +8,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 
-# TODO: add HTTP protocol
-#  Right now the HTTP protocol doesn't work with tinyproxy and HTTP openshift route.
-#  Workaround is to use hostname of the openshift service of HTTPBIN.
-@pytest.fixture(scope="module", params=["https"])
+@pytest.fixture(scope="module", params=["http", "https"])
 def protocol(request):
     """Protocol which is used on http(s) service/proxy/backend"""
     return request.param
