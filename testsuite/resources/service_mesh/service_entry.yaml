@@ -13,11 +13,23 @@ objects:
     hosts:
     - ${HOST}
     ports:
-    - number: 80
-      name: http
-      protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
     location: MESH_EXTERNAL
     resolution: DNS
+- apiVersion: networking.istio.io/v1beta1
+  kind: DestinationRule
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${LABEL}
+  spec:
+    host: ${HOST}
+    trafficPolicy:
+      tls:
+        mode: SIMPLE
+        sni: ${HOST}
 parameters:
 - name: NAME
   description: "Name of the service entry"

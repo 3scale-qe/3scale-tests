@@ -21,15 +21,15 @@ objects:
       system:
         name: system
         upstream:
-          name: outbound|80||${SYSTEM_HOST}
-          url: "http://${SYSTEM_HOST}"
+          name: outbound|443||${SYSTEM_HOST}
+          url: "https://${SYSTEM_HOST}"
           timeout: 5000
         token: ${SYSTEM_TOKEN}
       backend:
         name: backend
         upstream:
-          name: outbound|80||${BACKEND_HOST}
-          url: "http://${BACKEND_HOST}"
+          name: outbound|443||${BACKEND_HOST}
+          url: "https://${BACKEND_HOST}"
           timeout: 5000
         extensions:
         - no_body
