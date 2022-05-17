@@ -1,5 +1,5 @@
 """
-Policy redirecting communication to the HTTP proxy service
+Policy redirecting communication to the Fuse HTTP proxy service
 
 Proxy service is simple camel route, that adds "Fuse-Camel-Proxy" header to the request
 """
