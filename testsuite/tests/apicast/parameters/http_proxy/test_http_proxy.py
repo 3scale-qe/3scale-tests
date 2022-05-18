@@ -28,19 +28,18 @@ def service_proxy_settings(private_base_url):
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment, testconfig):
     """Set HTTP_PROXY to staging gateway."""
-    proxy_endpoint = testconfig["integration"]["service"]["proxy_service"]
+    proxy_endpoint = testconfig["proxy"]["http"]
 
-    gateway_environment.update({"HTTP_PROXY": f"http://{proxy_endpoint}"})
+    gateway_environment.update({"HTTP_PROXY": proxy_endpoint})
     return gateway_environment
 
 
-def test_proxied_request(api_client, private_base_url):
+def test_proxied_request(api_client):
     """Call to /headers should go through Fuse Camel proxy and return 200 OK."""
 
     response = api_client().get("/headers")
     assert response.status_code == 200
 
-    headers = EchoedRequest.create(response).headers
+    echo = EchoedRequest.create(response)
 
-    assert "Fuse-Camel-Proxy" in headers
-    assert headers["Source-Header"] in private_base_url("httpbin_service")
+    assert echo.headers.get("X-Forwarded-By", "MISSING").startswith("MockServer")
