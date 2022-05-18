@@ -9,25 +9,25 @@ class Sessions:
     In a form:
         (username, password, url) : cookie_dict
     """
-    def __init__(self, browser):
+    def __init__(self):
         super().__init__()
-        self.browser = browser
         self.sessions = {}
 
-    def restore(self, username, password, url):
+    def restore(self, browser, username, password, url):
         """
         Tries to restore session for the user.
+        :param browser: the browser to which we will resume the session
         :param username: user name used in key for sessions dict
         :param password: user password used in key for sessions dict
         :param url: url used in key for sessions dict
         :return: True, if the session was restored
         """
         key = (username, password, url)
-        self.browser.selenium.delete_all_cookies()
+        browser.selenium.delete_all_cookies()
         if key in self.sessions:
             for cookie in self.sessions[key]:
-                self.browser.selenium.add_cookie(cookie)
-            self.browser.refresh()
+                browser.selenium.add_cookie(cookie)
+            browser.refresh()
             return True
 
         return False
