@@ -140,10 +140,15 @@ class OperatorApicast(OpenshiftApicast):
         self.deployment.rollout()
 
     def create(self):
+        # Create secret with Provider URL credentials
+        self.openshift.secrets.create(self.name, string_data={
+            "AdminPortalURL": self.portal_endpoint
+        })
+        self._to_delete.append(("secret", self.name))
+
         apicast = APIcast.create_instance(
             openshift=self.openshift,
             name=self.name,
-            provider_url=self.portal_endpoint
         )
         apicast["logLevel"] = "info"
         apicast["openSSLPeerVerificationEnabled"] = False

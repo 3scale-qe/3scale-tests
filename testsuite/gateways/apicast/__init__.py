@@ -104,7 +104,7 @@ class OpenshiftApicast(AbstractApicast, ABC):
                 del self.openshift.routes[route]
 
         for kind, name in self._to_delete:
-            self.openshift.delete(kind, name)
+            self.openshift.delete(kind, name, ignore_not_found=True)
 
     def create(self):
         super().create()

@@ -8,20 +8,14 @@ class APIcast(APIObject):
     """APIcast CRD object supporting modifying all attributes"""
 
     @classmethod
-    def create_instance(cls, openshift: OpenShiftClient, name, provider_url, labels=None):
+    def create_instance(cls, openshift: OpenShiftClient, name, labels=None):
         """
         Creates new barebone instance, that can be customized with additional attributes before committing.
         :param openshift:       Openshift object instance
         :param name:            Name of the resource
-        :param provider_url:    URL to the provider admin portal
         :param labels:          Labels
         :return: Uncommited APIcast instance
         """
-
-        # Create secret with Provider URL credentials credentials
-        openshift.secrets.create(name, string_data={
-            "AdminPortalURL": provider_url
-        })
 
         model = {
             "apiVersion": "apps.3scale.net/v1alpha1",
