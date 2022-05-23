@@ -22,7 +22,7 @@ endif
 
 persistence_file ?= $(resultsdir)/pytest-persistence.pickle
 
-PYTEST = pipenv run python -m pytest --tb=$(TB)
+PYTEST = pipenv run python -m pytest --tb=$(TB) -o cache_dir=$(resultsdir)/.pytest_cache.$(@F)
 RUNSCRIPT = pipenv run ./scripts/
 
 ifeq ($(filter $(--store||--load),$(flags)),$(flags))
