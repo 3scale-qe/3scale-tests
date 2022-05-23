@@ -8,10 +8,7 @@ from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 
-# TODO: add HTTP protocol
-#  Right now the HTTP protocol doesn't work with tinyproxy and HTTP openshift route.
-#  Workaround is to use hostname of the openshift service of HTTPBIN.
-@pytest.fixture(scope="module", params=["https"])
+@pytest.fixture(scope="module", params=["http", "https"])
 def protocol(request):
     """Protocol which is used on http(s) service/proxy/backend"""
     return request.param
@@ -30,8 +27,7 @@ def gateway_environment(gateway_environment, testconfig, tools):
 
     - We need to add rhsso url to NO_PROXY, because each HTTP request from apicast will go through proxy
       Tinyproxy has a problem with http openshift routes
-    - Those tests will fail on 504 when 3scale has a lot of products, because configuration takes a lot of time to load
-      APICAST_LOAD_SERVICES_WHEN_NEEDED fixes the problem
+    - To not load configuration every time, we set APIcast to load configuration on boot instead
     """
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
     superdomain = testconfig["threescale"]["superdomain"]
@@ -41,12 +37,14 @@ def gateway_environment(gateway_environment, testconfig, tools):
                                 "HTTPS_PROXY": proxy_endpoint['https'],
                                 "NO_PROXY":
                                     f"backend-listener,system-master,system-provider,{rhsso_url},{superdomain}",
-                                "APICAST_LOAD_SERVICES_WHEN_NEEDED": True})
+                                "APICAST_CONFIGURATION_LOADER": "boot",
+                                "APICAST_CONFIGURATION_CACHE": 1000})
     return gateway_environment
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks, request):
+def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks, request, staging_gateway):
     """
         Creates service and adds mapping for POST method with path /
         We need to create the service here because there will be 2 services created and they cannot have the same name
@@ -56,4 +54,6 @@ def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_
     metric = service.metrics.list()[0]
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
     service.proxy.deploy()
+
+    staging_gateway.reload()
     return service

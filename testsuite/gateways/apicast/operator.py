@@ -52,6 +52,8 @@ class OperatorEnviron(Properties):
         "APICAST_LOAD_SERVICES_WHEN_NEEDED": "loadServicesWhenNeeded",
         "APICAST_CACHE_STATUS_CODES": "cacheStatusCodes",
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
+        "APICAST_CONFIGURATION_LOADER": "configurationLoadMode",
+        "APICAST_CONFIGURATION_CACHE": "cacheConfigurationSeconds"
     }
 
     REGEX_NAMES: RegexMatcher = {
