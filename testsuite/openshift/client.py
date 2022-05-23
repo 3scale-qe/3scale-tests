@@ -157,14 +157,15 @@ class OpenShiftClient:
             self.prepare_context(stack)
             oc.apply(resource)
 
-    def delete(self, resource_type: str, name: str, force: bool = False):
+    def delete(self, resource_type: str, name: str, force: bool = False, ignore_not_found=False):
         """Delete a resource.
         Args:
             :param resource_type: The resource type to be deleted. Ex.: service, route, deploymentconfig
             :param name: The resource name
             :param force: Pass --force to oc delete
+            :param ignore_not_found: If false, it will fail if the object doesn't exist
         """
-        args = []
+        args = [f"--ignore-not-found={ignore_not_found}"]
         if force:
             args.append("-f")
         self.do_action("delete", [resource_type, name, args])
