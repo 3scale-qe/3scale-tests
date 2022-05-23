@@ -59,7 +59,7 @@ def stripe_gateway(custom_admin_login, navigator, testconfig):
 
 
 @pytest.fixture(scope="module")
-def braintree_gateway(custom_admin_login, navigator, testconfig):
+def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
     """
     Enables Braintree billing gateway.
     Args:
@@ -69,6 +69,8 @@ def braintree_gateway(custom_admin_login, navigator, testconfig):
         custom_admin_login()
         billing = navigator.navigate(BillingSettingsView)
         billing.charging(True)
+        currency = braintree.merchant_currency()
+        billing.charging_form.change_currency(currency)
         billing.braintree(testconfig["braintree"]["public_key"],
                           testconfig["braintree"]["merchant_id"],
                           testconfig["braintree"]["private_key"],
