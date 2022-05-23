@@ -4,7 +4,7 @@ Rewrite of spec/functional_specs/auth/rhsso/open_id_rhsso_will_delete_client_spe
 
 import backoff
 import pytest
-from keycloak import KeycloakGetError
+from keycloak.exceptions import KeycloakGetError
 
 from testsuite import rawobj
 from testsuite.rhsso import OIDCClientAuthHook

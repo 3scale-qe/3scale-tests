@@ -3,7 +3,7 @@ Rewrite of the spec/functional_specs/auth/rhsso/open_id_rhsso_zync_sync_spec.rb
 """
 import backoff
 import pytest
-from keycloak import KeycloakGetError
+from keycloak.exceptions import KeycloakGetError
 
 from testsuite.rhsso import OIDCClientAuthHook
 
