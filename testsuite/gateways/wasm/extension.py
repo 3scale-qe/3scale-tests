@@ -106,6 +106,85 @@ class WASMExtension:
         map_rules = config["content"]["proxy"]["proxy_rules"]
         self.add_mapping_rules(map_rules)
 
+    def add_credentials(self, credentials):
+        """Adds credential into the extension
+            credentials contains list of credentials with attributes:
+            label: one of "user_key" or "app_id" or "app_key",
+            credential_location: one of "query_string", "header" or "authorization"
+            key: search key
+        """
+        ops = []
+        for cred in credentials:
+            obj = None
+            if cred['credential_location'] in {"query_string", "header"}:
+                obj = {cred['credential_location']: {"keys": [cred['key']]}}
+            if cred['credential_location'] == "authorization":
+                raise NotImplementedError
+
+            ops.append({
+                "op": "add",
+                "path": f"/spec/config/services/0/credentials/{cred['label']}/-",
+                "value": obj
+            })
+
+        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+
+    def remove_credentials(self, labels):
+        """Remove credential with 'label' from extension"""
+        ops = []
+        for label in labels:
+            ops.extend([
+                {
+                    "op": "remove",
+                    "path": f"/spec/config/services/0/credentials/{label}"
+                },
+                {
+                    "op": "add",
+                    "path": f"/spec/config/services/0/credentials/{label}",
+                    "value": []
+                }
+            ])
+
+        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+
+    def remove_all_credentials(self):
+        """Remove all credentials in extension"""
+        labels = ["user_key", "app_id", "app_key"]
+        self.remove_credentials(labels)
+
+    def synchronise_credentials(self):
+        """Take credentials from current production config and deploy in extension"""
+        self.remove_all_credentials()
+        # warning: not using backoff that was before used on below function
+        config = self.service.proxy.list().configs.latest(env="production")
+
+        auth_app_id = config["content"]["proxy"]["auth_app_id"]
+        auth_app_key = config["content"]["proxy"]["auth_app_key"]
+        auth_user_key = config["content"]["proxy"]["auth_user_key"]
+
+        # translate 3scale location values to WASM location values
+        credentials_location = config["content"]["proxy"]["credentials_location"]
+        translate = {"query": "query_string", "headers": "header", "authorization": "authorization"}
+        credentials_location = translate[credentials_location]
+
+        auth_method = config["content"]["proxy"]["authentication_method"]
+        credentials = []
+        if auth_method == Service.AUTH_USER_KEY:
+            credentials.append({"label": "user_key",
+                                "key": auth_user_key,
+                                "credential_location": credentials_location})
+        elif auth_method == Service.AUTH_APP_ID_KEY:
+            credentials.append({"label": "app_id",
+                                "key": auth_app_id,
+                                "credential_location": credentials_location})
+            credentials.append({"label": "app_key",
+                                "key": auth_app_key,
+                                "credential_location": credentials_location})
+        elif auth_method == Service.AUTH_OIDC:
+            raise NotImplementedError
+
+        self.add_credentials(credentials)
+
     def delete(self):
         """Deletes extension and all that it created from openshift"""
         self.httpbin.delete_app(self.label, resources="all,sme,gateway,virtualservice")
