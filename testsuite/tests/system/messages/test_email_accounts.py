@@ -15,11 +15,6 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 
-# Asynchronous 3scale e-mail notifications can be significantly delayed in case
-# of many requests, therefore not parallel run for this.
-pytestmark = [pytest.mark.disruptive]
-
-
 @pytest.fixture(scope="module")
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
     "application bound to the account and service with specific description that don't break yaml parsing"
@@ -36,11 +31,12 @@ def mail_template(account, application, testconfig) -> dict:
     """loads the mail templates and substitutes the variables"""
     dirname = os.path.dirname(__file__)
     with open(f"{dirname}/mail_templates.yml", encoding="utf8") as stream:
+        account_email_domain = [i["email"] for i in account.users.list() if i["role"] == "admin"][0].split("@", 1)[1]
         yaml_string = stream.read()
         yaml_string = yaml_string.replace("<test_account>", account.entity_name) \
             .replace("<test_group>", account.entity['org_name']) \
             .replace("<threescale_superdomain>", testconfig["threescale"]["superdomain"]) \
-            .replace("<account_email_domain>", "anything.invalid") \
+            .replace("<account_email_domain>", account_email_domain) \
             .replace("<username>", "admin") \
             .replace("<tenant>", "3scale") \
             .replace("<service>", application['service_name']) \
