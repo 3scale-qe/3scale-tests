@@ -65,7 +65,7 @@ class WASMGateway(AbstractGateway):
         })
 
     def destroy(self):
-        self.mesh.delete_app(self.label, resources="serviceentry")
+        self.mesh.delete_app(self.label, resources="serviceentry,destinationrule")
 
     def add_mapping_rules(self, service, rules):
         """Adds mapping rules into the extension, as they do have to be configured separately"""
