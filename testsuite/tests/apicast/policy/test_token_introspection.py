@@ -46,9 +46,9 @@ def update_policies(service, application, rhsso_service_info):
     """
 
     try:
-        introspection_url = rhsso_service_info.oidc_client.well_know()["introspection_endpoint"]
+        introspection_url = rhsso_service_info.oidc_client.well_known()["introspection_endpoint"]
     except KeyError:
-        introspection_url = rhsso_service_info.oidc_client.well_know()["token_introspection_endpoint"]
+        introspection_url = rhsso_service_info.oidc_client.well_known()["token_introspection_endpoint"]
 
     policy_setting = rawobj.PolicyConfig("token_introspection", {
         "auth-type": "client_id+client_secret",
@@ -76,7 +76,7 @@ def test_rhsso_logout(client, access_token, rhsso_service_info, update_policies)
     response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert response.status_code == 200
 
-    rhsso_service_info.realm.admin.logout(rhsso_service_info.user)
+    rhsso_service_info.realm.admin.user_logout(rhsso_service_info.user)
 
     new_response = client.get("/get", headers={"authorization": "Bearer " + access_token})
     assert new_response.status_code == 403

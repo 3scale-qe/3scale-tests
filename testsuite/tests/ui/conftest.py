@@ -478,7 +478,7 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhss
         browser.selenium.delete_all_cookies()
         browser.refresh()
         user_id = rhsso_service_info.realm.admin.get_user_id(username)
-        rhsso_service_info.realm.admin.logout(user_id)
+        rhsso_service_info.realm.admin.user_logout(user_id)
         browser.url = settings["threescale"]["admin"]["url"]
         page = navigator.open(LoginView)
         page.do_rhsso_login(username, password)

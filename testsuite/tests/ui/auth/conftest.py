@@ -129,7 +129,7 @@ def rhsso_bounce_login(rhsso_setup, navigator, testconfig, browser, rhsso_servic
     bounce_url = rhsso_setup[0].replace("/callback", "/bounce")
     username = testconfig["rhsso"]["test_user"]["username"]
     user_id = rhsso_service_info.realm.admin.get_user_id(username)
-    rhsso_service_info.realm.admin.logout(user_id)
+    rhsso_service_info.realm.admin.user_logout(user_id)
     navigator.open(url=bounce_url)
     provider = RhssoView(browser.root_browser)
     test_user = testconfig["rhsso"]["test_user"]
