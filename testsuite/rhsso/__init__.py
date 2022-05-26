@@ -40,7 +40,7 @@ class RHSSOServiceConfiguration:
         http(s)://<HOST>:<PORT>/auth/realms/<REALM_NAME>
         :return: url
         """
-        return self.oidc_client.well_know()["issuer"]
+        return self.oidc_client.well_known()["issuer"]
 
     def jwks_uri(self):
         """
@@ -48,7 +48,7 @@ class RHSSOServiceConfiguration:
         http(s)://<HOST>:<PORT>o/auth/realms/<REALM_NAME>/protocol/openid-connect/certs
         :return: url
         """
-        return self.oidc_client.well_know()["jwks_uri"]
+        return self.oidc_client.well_known()["jwks_uri"]
 
     def authorization_url(self) -> str:
         """
@@ -85,7 +85,7 @@ class RHSSOServiceConfiguration:
         http(s)://<HOST>:<PORT>/auth/realms/<REALM_NAME>/protocol/openid-connect/token
         :return: url
         """
-        return self.oidc_client.well_know()["token_endpoint"]
+        return self.oidc_client.well_known()["token_endpoint"]
 
     def body_for_token_creation(self, app, use_service_accounts=False) -> str:
         """
