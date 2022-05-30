@@ -31,7 +31,7 @@ class Deployment(ABC):
         """
         self.openshift.do_action("scale", ["--replicas", str(replicas), self.resource])
         if replicas > 0:
-            self.wait_for(self.resource)
+            self.wait_for()
 
     def environ(self) -> Environ:
         """Dict-like access to environment variables"""
