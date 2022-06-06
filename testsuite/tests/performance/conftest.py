@@ -95,7 +95,7 @@ async def services(request, custom_backend, custom_service, custom_app_plan, num
     def _create_services():
         backends_mapping = {}
         for j in range(number_of_backends):
-            backends_mapping[f"/{j}"] = custom_backend(endpoint=private_base_url("httpbin"))
+            backends_mapping[f"/{j}"] = custom_backend(endpoint=private_base_url("httpbin_go"))
         service_settings.update({"name": blame(request, randomize("perf"))})
         svc = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
         custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), svc)
