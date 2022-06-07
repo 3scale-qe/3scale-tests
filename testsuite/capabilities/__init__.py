@@ -1,7 +1,7 @@
 """Module managing testsuite capabilities
 
 Capability is set of (usually) strings which tell us which features are available on this test environment.
-In tests you can use it with pytest.mark.require_capabilities(capability1, capability2, ...)
+In tests you can use it with pytest.mark.required_capabilities(capability1, capability2, ...)
 
 Capabilities are provider by a functions annotated with @capability_provider and should return Set of capabilities
 """
