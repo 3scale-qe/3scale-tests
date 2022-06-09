@@ -1,4 +1,4 @@
-FROM quay.io/centos7/python-38-centos7
+FROM quay.io/centos/centos:stream
 LABEL description="Run 3scale integration tests \
 Default ENTRYPOINT: 'make' and CMD: 'smoke' \
 Bind dynaconf settings to /opt/secrets.yaml \
@@ -15,14 +15,15 @@ ADD $cacert /etc/pki/ca-trust/source/anchors
 ADD https://gist.githubusercontent.com/mijaros/c9c9ed016ce9985d96c6c5c3b35b4050/raw/66587720883554b03a4c24875fa47442db231a51/ca.pem /etc/pki/ca-trust/source/anchors
 RUN update-ca-trust
 
+RUN useradd --no-log-init -u 1001 -g root -m default
 RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz >/tmp/oc.tgz && \
 	tar xzf /tmp/oc.tgz -C /usr/local/bin && \
 	rm /tmp/oc.tgz
 
-RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.5.0/cfssl_1.5.0_linux_amd64 >/usr/local/bin/cfssl && \
+RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
     chmod +x /usr/local/bin/cfssl
 
-RUN yum install -y docker-client openssh-clients && \
+RUN yum install -y python3.9 git make && \
 	yum clean all
 
 RUN pip3 --no-cache-dir install pipenv
