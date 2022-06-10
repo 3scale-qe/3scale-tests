@@ -13,15 +13,16 @@ class DeveloperPortalContentView(BaseAudienceView):
     """View representation of Developer Portal Content page"""
     # path can be different when clicking from dashboard is '/p/admin/cms' and from menu is '/p/admin/cms/templates'
     path_pattern = '/p/admin/cms'
-    open_portal_to_world_btn = Text("//a[@href='/site/dns/open_portal']")
+    quick_links = Text("//a[@href='#quick-links']")
+    snippets = Text("//a[@href='#tips-and-tricks']")
 
     def prerequisite(self):
         return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.open_portal_to_world_btn.is_displayed and \
-               self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.quick_links.is_displayed and \
+               self.snippets.is_displayed and self.path in self.browser.url
 
 
 class DeveloperPortalLogoView(BaseAudienceView):
