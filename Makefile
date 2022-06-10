@@ -111,6 +111,14 @@ all: .ensure-smoke ensure-smoke test disruptive flaky reportportal
 help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+polish-junit: ## Remove skipped tests and logs from passing tests
+polish-junit:
+	gzip -f $(resultsdir)/junit-*.xml
+	# 'cat' on next line is neessary to avoid wipe of the files
+	for file in $(resultsdir)/junit-*.xml.gz; do zcat $$file | xsltproc ./xslt/polish-junit.xsl - >$${file%.gz}; done  # bashism!!!
+	# this deletes something it didn't create, dangerous!!!
+	-rm -f $(resultsdir)/junit-*.xml.gz
+
 reportportal: RP_PROJECT ?= 3scale
 reportportal: RP_LAUNCH_NAME ?= ad-hoc with tests $(shell cat VERSION)
 reportportal:
