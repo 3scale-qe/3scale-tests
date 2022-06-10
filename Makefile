@@ -20,6 +20,8 @@ ifdef junit
 flags += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
 endif
 
+persistence_file ?= $(resultsdir)/pytest-persistence.pickle
+
 PYTEST = pipenv run python -m pytest --tb=$(TB)
 RUNSCRIPT = pipenv run ./scripts/
 
@@ -49,9 +51,13 @@ speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
 
-persistence: ## Run speedrun tests compatible with persistence plugin
+persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) testsuite
+
+persistence-store persistence-load: export _3SCALE_TESTS_skip_cleanup=true
+persistence-store persistence-load: pipenv
+	$(subst -p no:persistence,,$(PYTEST)) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
