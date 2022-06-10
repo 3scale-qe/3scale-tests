@@ -75,6 +75,40 @@ ui: pipenv
 toolbox: pipenv
 	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
 
+test-in-docker: ## Run test in container with selenium sidecar
+test-in-docker: rand := $(shell echo $$RANDOM)  # bashism!!!
+test-in-docker: network := test3scale_$(rand)
+test-in-docker: selenium_name := selenium_$(rand)
+test-in-docker: image ?= quay.io/rh_integration/3scale-testsuite
+test-in-docker: selenium_image ?= selenium/standalone-chrome
+test-in-docker: KUBECONFIG ?= $(HOME)/.kube/config
+test-in-docker: SECRETS_FOR_DYNACONF ?= $(if $(wildcard ./config/.secrets.yaml),./config/.secrets.yaml,./config/settings.local.yaml)
+test-in-docker:
+	docker network create $(network)
+	docker run -d --name $(selenium_name) --network $(network) --network-alias selenium -v /dev/shm:/dev/shm $(selenium_image)
+	-docker run \
+		--network $(network) \
+		-v `readlink -f $(SECRETS_FOR_DYNACONF)`:/opt/secrets.yaml:z \
+		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
+		-v `readlink -f $(resultsdir)`:/test-run-results:z \
+		-e NAMESPACE \
+		`env | grep _3SCALE_TESTS_ | sed 's/^/-e /'` \
+		-e _3SCALE_TESTS_fixtures__ui__browser__source=remote \
+		-e _3SCALE_TESTS_fixtures__ui__browser__remote_url=http://selenium:4444 \
+		$(docker_flags) \
+		$(image) $(cmd)
+	docker rm -f $(selenium_name)
+	docker network rm $(network)
+
+# Weird behavior of make (bug?), target specific variables don't seem to be
+# exported elsewhere. These lines have to be below related target
+ifdef KUBECONFIG
+export KUBECONFIG
+endif
+ifdef SECRETS_FOR_DYNACONF
+export SECRETS_FOR_DYNACONF
+endif
+
 Pipfile.lock: Pipfile
 	pipenv lock
 

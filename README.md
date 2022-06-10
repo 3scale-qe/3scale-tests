@@ -202,6 +202,37 @@ docker run \
 Without any args smoke tests are executed. Any arg as for `make` from examples
 above can be passed to run appropriate set.
 
+### test-in-docker
+
+There is special make target `test-in-docker` that runs the test in docker and
+spins up selenium as sidecar. Basic usage is straightforward, to run smoke
+tests:
+
+`NAMESPACE=3scale make test-in-docker`
+
+This target promotes all `_3SCALE_TESTS_*` env variables to the container.
+
+`SECRETS_FOR_DYNACONF` is also promoted to the image and it is preset to
+`config/.secrets.yaml` by default if that file is present, otherwise
+`config/settings.local.yaml` is set. If `config/.secrets.yaml` exists it must
+be valid (unencrypted) and it is only config bound to the image. Set the
+variable to force `config/settings.local.yaml` or anything else:
+
+`SECRETS_FOR_DYNACONF=$PWD/config/settings.local.yaml NAMESPACE=3scale make test-in-docker`
+
+Variable `cmd` can be used to alter command for the container, to run ui tests:
+
+`NAMESPACE=3scale make test-in-docker cmd=ui`
+
+Custom flags should be set as env variable passed to the docker:
+
+`NAMESPACE=3scale make test-in-docker docker_flags='-e flags=--ui'`
+
+Variable `image` can be set to use custom image:
+
+`make container-image`
+`NAMESPACE=3scale make test-in-docker image=3scale-tests`
+
 ## Debugging
 
 ### Local mode
