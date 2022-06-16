@@ -17,7 +17,7 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
     """
 
     def _sso_integration(sso_type: str, client: str, client_secret: str, realm: str):
-        custom_admin_login()
+        custom_admin_login(fresh=True)
         sso = navigator.navigate(NewSSOIntegrationView)
         sso_id = sso.create(sso_type, client, client_secret, realm)
         sso = threescale.admin_portal_auth_providers.read(sso_id)
@@ -44,7 +44,7 @@ def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, s
         - test authentication flow
         - publish SSO integration
     """
-    custom_admin_login()
+    custom_admin_login(fresh=True)
     auth = testconfig["auth0"]
     integration = ui_sso_integration('auth0', auth["client"], auth["client-secret"], f"https://{auth['domain']}")
 

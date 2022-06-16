@@ -68,18 +68,21 @@ def navigator(browser):
 
 
 @pytest.fixture(scope="module")
-def custom_admin_login(navigator):
+def custom_admin_login(navigator, browser):
     """
     Login fixture for admin portal.
     :param navigator: Navigator Instance
     :return: Login to Admin portal with custom credentials
     """
 
-    def _login(name=None, password=None):
+    def _login(name=None, password=None, fresh=None):
         url = settings["threescale"]["admin"]["url"]
         name = name or settings["threescale"]["admin"]["username"]
         password = password or settings["threescale"]["admin"]["password"]
         page = navigator.open(LoginView, url=url)
+        if fresh:
+            browser.selenium.delete_all_cookies()
+            browser.selenium.refresh()
         if page.is_displayed:
             page.do_login(name, password)
 
@@ -100,7 +103,6 @@ def login(custom_admin_login):
 def master_login(navigator):
     """
     Login to the Master portal with default admin credentials
-    :param browser: Browser instance
     :param navigator: Navigator Instance
     :return: Login with default credentials
     """
@@ -130,7 +132,8 @@ def custom_devel_login(navigator, provider_account, account_password):
         page = navigator.open(LoginDevelView,
                               url=url,
                               access_code=provider_account['site_access_code'])
-        page.do_login(name, password)
+        if page.is_displayed:
+            page.do_login(name, password)
 
     return _login
 
