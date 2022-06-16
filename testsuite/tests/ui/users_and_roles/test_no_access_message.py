@@ -27,6 +27,7 @@ def test_no_access_message(login, custom_admin_login, navigator, provider_accoun
     email = navigator.navigate(SupportEmailsView)
     email = email.support_email.read()
     provider_account_user.activate()
+    browser.selenium.delete_all_cookies()
     custom_admin_login(provider_account_user.entity_name, "123456")
     dashboard = navigator.navigate(DashboardView)
     assert not dashboard.products.is_displayed
