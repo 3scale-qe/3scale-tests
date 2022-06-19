@@ -8,9 +8,9 @@ from datetime import datetime
 
 import backoff
 import pytest
+from PIL import Image
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
-from PIL import Image
 
 from testsuite import rawobj, resilient
 from testsuite.auth0 import auth0_token
@@ -22,13 +22,11 @@ from testsuite.ui.navigation import Navigator
 from testsuite.ui.views.admin.audience.account import AccountNewView
 from testsuite.ui.views.admin.audience.application import ApplicationNewView
 from testsuite.ui.views.admin.backend.backend import BackendNewView
-from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
 from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
 from testsuite.ui.views.master.audience.tenant import TenantNewView
-from testsuite.ui.views.master.foundation import BaseMasterView
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import SeleniumDriver
 from testsuite.utils import blame
@@ -169,11 +167,7 @@ def navigator(browser):
         :param browser: browser based on UI settings
         :return: Navigator instance
     """
-    base_views = [
-        BaseAdminView,
-        BaseMasterView
-    ]
-    navigator = Navigator(browser, base_views)
+    navigator = Navigator(browser)
     return navigator
 
 
