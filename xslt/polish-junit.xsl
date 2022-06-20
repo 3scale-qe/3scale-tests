@@ -7,6 +7,7 @@
     <!-- https://mojo.redhat.com/docs/DOC-1073077 -->
 
     <xsl:param name="rmfails"/>
+    <xsl:param name="rmlogs" select="true()"/>
     <xsl:param name="polarionProperties"/>
 
     <xsl:template match="node()|@*">
@@ -32,6 +33,14 @@
 
     <xsl:template match="testcase[failure or error]">
         <xsl:if test="not($rmfails)">
+            <xsl:copy>
+                <xsl:apply-templates select="node()|@*"/>
+            </xsl:copy>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match='testcase[not(failure or error)]/*[starts-with(name(), "system-")]/text()'>
+        <xsl:if test="not($rmlogs)">
             <xsl:copy>
                 <xsl:apply-templates select="node()|@*"/>
             </xsl:copy>
