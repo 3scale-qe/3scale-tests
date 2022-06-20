@@ -62,7 +62,7 @@ def _guess_version(ocp):
     return str(version)
 
 
-def _guess_apicast_operator_version(ocp):
+def _guess_apicast_operator_version(ocp, settings):
     """Attempt to determine version of apicast operator from subscription"""
 
     version = None
@@ -71,9 +71,17 @@ def _guess_apicast_operator_version(ocp):
         version = version.split("-")[0]
         Version(version)
     except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
-        # returning value that is greater than any apicast version
-        # in result all tests for latest apicast operator will run
-        return "50035350"  # doesn't have to be spot at first glance, this is literal transcript of word "devel"
+        # guess version from the cluster-wide operator
+        try:
+            _ocp = _apicast_ocp(ocp, settings)
+            _ocp.project_name = "openshift-operators"
+            version = _ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
+            version = version.split("-")[0]
+            Version(version)
+        except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
+            # returning value that is greater than any apicast version
+            # in result all tests for latest apicast operator will run
+            return "50035350"  # doesn't have to be spot at first glance, this is literal transcript of word "devel"
 
     return str(version)
 
@@ -190,7 +198,7 @@ def load(obj, env=None, silent=None, key=None):
                         "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
             "threescale": {
                 "version": _guess_version(ocp),
-                "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp),
+                "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp, obj),
                 "superdomain": superdomain,
                 "catalogsource": catalogsource,
                 "admin": {
