@@ -38,7 +38,12 @@ def _whoami():
     # want to catch broad exception and fallback at any circumstance
     # pylint: disable=broad-except
     except Exception:
-        return str(os.getuid())
+        try:
+            # this expression is an equivalent of os.getlogin() for some environments
+            return pwd.getpwuid(os.getuid()).pw_name
+        # pylint: disable=broad-except
+        except Exception:
+            return str(os.getuid())
 
 
 def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
