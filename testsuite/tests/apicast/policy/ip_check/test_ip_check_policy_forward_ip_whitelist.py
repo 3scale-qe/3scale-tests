@@ -7,6 +7,8 @@ import pytest
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def policy_settings(ip4_addresses):

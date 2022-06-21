@@ -5,6 +5,8 @@ import pytest
 
 from testsuite import rawobj
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def service(service):
