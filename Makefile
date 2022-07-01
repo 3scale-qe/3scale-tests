@@ -161,7 +161,7 @@ polish-junit:
 
 reportportal: RP_PROJECT ?= 3scale
 reportportal: RP_LAUNCH_NAME ?= ad-hoc with tests $(shell cat VERSION)
-reportportal:
+reportportal: polish-junit
 	$(RUNSCRIPT)junit2reportportal \
 		--reportportal $(REPORTPORTAL) \
 		--project $(RP_PROJECT) --launch-name "$(RP_LAUNCH_NAME)" \
