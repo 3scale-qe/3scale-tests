@@ -51,17 +51,14 @@ def step(cls, **kwargs):
 class Navigator:
     """Responsible for Views navigation"""
 
-    def __init__(self, browser, base_views):
+    def __init__(self, browser):
         """
-        Initializes Navigator with Browser instance and list of base Views.
-        Base Views are specifically chosen to represent root elements in navigation tree (without any prerequisites)
+        Initializes Navigator with Browser instance.
         Args:
             :param browser: instance of browser
-            :param base_views: Views that are roots in prerequisite hierarchy (does not have any prerequisite)
         """
         self.page_chain = deque()
         self.browser = browser
-        self.base_views = base_views
 
     def navigate(self, cls: Type[CustomView], **kwargs) -> CustomView:
         """
@@ -101,13 +98,14 @@ class Navigator:
 
     def _backtrace(self, cls, **kwargs):
         """
-        Recursively constructs logical path from root to navigated element. This path is saved in queue `page_chain`
+        Recursively constructs logical path from the currently displayed page to the navigated element.
+        This path is saved in queue `page_chain`
         Args:
             :param page_cls: currently processed View class
         """
         page = self.new_page(cls, **kwargs)
         self.page_chain.append(page)
-        if cls in self.base_views or page.is_displayed:
+        if page.is_displayed:
             return
         self._backtrace(page.prerequisite(), **kwargs)
 

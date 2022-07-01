@@ -2,27 +2,11 @@
 Rewrite: ./spec/ui_specs/wizard_spec.rb
 """
 from urllib.parse import urlparse
-import pytest
 
-from testsuite.ui.navigation import Navigator
-from testsuite.utils import blame
 from testsuite.ui.views.admin.wizard import WizardIntroView, \
     WizardBackendApiView, WizardRequestView, WizardEditApiView, \
     WizardResponseView, WizardOutroView
-
-
-@pytest.fixture(scope="module")
-def navigator(browser):
-    """
-        Navigator for 3scale UI pages/Views
-        :param browser: browser based on UI settings
-        :return: Navigator instance
-    """
-    base_views = [
-        WizardIntroView
-    ]
-    navigator = Navigator(browser, base_views)
-    return navigator
+from testsuite.utils import blame
 
 
 # pylint:disable=unused-argument
