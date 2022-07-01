@@ -93,6 +93,7 @@ test-in-docker:
 	docker network create $(network)
 	docker run -d --name $(selenium_name) --network $(network) --network-alias selenium -v /dev/shm:/dev/shm $(selenium_image)
 	-docker run \
+		--rm \
 		--network $(network) \
 		-v `readlink -f $(SECRETS_FOR_DYNACONF)`:/opt/secrets.yaml:z \
 		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
