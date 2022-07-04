@@ -3,11 +3,14 @@ Sets up gateway defined in testsuite settings
 """
 import importlib
 import inspect
+import logging
 import pkgutil
 from typing import Type, Union
 
 from testsuite.config import settings
 from testsuite.gateways.gateways import AbstractGateway, Gateway, new_gateway
+
+log = logging.getLogger(__name__)
 
 # walk through all sub-packages and import all gateway classes
 __all__ = ["gateway", "default", "Gateway"]
@@ -35,4 +38,5 @@ def gateway(kind: Union[Type[Gateway], str] = default, staging: bool = True, **k
     2. Settings block named after the class name (TemplateApicast)
     3. default settings block
     """
+    log.info("Creating gateway(kind=%s, staging=%s, kwargs=%s)", kind, staging, kwargs)
     return new_gateway(globals(), settings["threescale"]["gateway"], kind, staging, **kwargs)
