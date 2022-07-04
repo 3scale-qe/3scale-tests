@@ -1,6 +1,13 @@
 """Helpers for reliable 3scale API calls (usually with retry)"""
 
+import logging
+import time
+
 import backoff
+
+from threescale_api.errors import ApiClientError
+
+log = logging.getLogger(__name__)
 
 
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
@@ -22,3 +29,20 @@ def resource_read_by_name(object_instance, name: str):
     @return: Desired resource object
     """
     return object_instance.read_by_name(name)
+
+
+@backoff.on_exception(backoff.fibo, ApiClientError, max_tries=8, jitter=None)
+def accounts_create(client, params):
+    """
+    Shortly after 3scale deployment or new tenant creation accounts.create can
+    return error `Response(409 Conflict): b''`. Nevertheless the account seems
+    created. This require special handling to ensure proper behavior as well as
+    cleanup.
+    """
+    try:
+        return client.accounts.create(params=params)
+    except ApiClientError as err:
+        if err.code == 422:
+            client.accounts.delete(client.accounts.read_by_name(params["name"]).entity_id)
+            time.sleep(2)
+        raise err
