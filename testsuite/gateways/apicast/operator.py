@@ -126,7 +126,9 @@ class OperatorApicast(OpenshiftApicast):
 
     @staticmethod
     def fits(openshift: OpenShiftClient):
-        return Capability.OCP4 in CapabilityRegistry() and openshift.project_exists
+        return Capability.OCP4 in CapabilityRegistry() \
+                and openshift.project_exists \
+                and openshift.has_apicast_operator
 
     @property
     def deployment(self):

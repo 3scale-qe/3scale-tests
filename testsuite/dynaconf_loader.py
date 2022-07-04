@@ -65,6 +65,8 @@ def _guess_version(ocp):
 def _guess_apicast_operator_version(ocp, settings):
     """Attempt to determine version of apicast operator from subscription"""
 
+    if not ocp.has_apicast_operator:
+        return 0
     version = None
     try:
         version = ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
@@ -128,6 +130,8 @@ def _apicast_ocp(ocp, settings):
             token=settings.get("token"))
         if maybe_ocp.project_exists:
             return maybe_ocp
+        if ocp.has_apicast_operator:
+            return ocp
 
     return OpenShiftClient(
         project_name=settings.get("project_name"),
