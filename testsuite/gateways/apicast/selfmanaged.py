@@ -3,6 +3,8 @@ import inspect
 import logging
 from typing import Union, Type
 
+from weakget import weakget
+
 from testsuite.capabilities import Capability
 from testsuite.gateways.gateways import Gateway, new_gateway
 from testsuite.gateways.apicast import AbstractApicast, OpenshiftApicast
@@ -47,12 +49,23 @@ class SelfManagedApicast(AbstractApicast):
                     if subclass.__name__ == kind:
                         kind = subclass  # type: ignore
                         break
+
+            def _openshift(subclass):
+                """get right openshift for a subclass"""
+                custom = weakget(settings)[subclass.__name__]["openshift"] % None
+                if not custom:
+                    return openshift
+                if isinstance(custom, OpenShiftClient):
+                    return custom
+                return OpenShiftClient(
+                        custom.get("project_name"), custom.get("url"), custom.get("token"))
+
             if not kind:
-                candidates = sorted([i for i in subclasses if i.fits(openshift)], key=lambda x: x.PRIORITY)
+                candidates = sorted([i for i in subclasses if i.fits(_openshift(i))], key=lambda x: x.PRIORITY)
                 if len(candidates):
                     kind = candidates[-1]  # type: ignore
             if kind:
-                LOGGER.debug("Chosen: %s", kind)
+                LOGGER.info("Chosen: %s", kind)
                 classes = {i.__name__: i for i in subclasses}
                 return new_gateway(classes, settings, kind, staging, **kwargs)
             raise NoSuitableApicastError()
