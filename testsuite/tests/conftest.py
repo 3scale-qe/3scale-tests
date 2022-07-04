@@ -333,7 +333,7 @@ def threescale(testconfig):
         testconfig["threescale"]["admin"]["url"],
         testconfig["threescale"]["admin"]["token"],
         ssl_verify=testconfig["ssl_verify"],
-        wait=16
+        wait=0
     )
 
 
