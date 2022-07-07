@@ -236,6 +236,18 @@ class OpenShiftClient:
 
         return self.select_resource("subscriptions", narrow_function=select_operator)
 
+    @property
+    def has_apicast_operator(self):
+        """True if apicast operator is found in local namespace or in openshift-operators"""
+        try:
+            return self.apicast_operator_subscription is not None
+        except oc.OpenShiftPythonException:
+            ocp = OpenShiftClient("openshift-operators", self.server_url, self.token)
+            try:
+                return ocp.apicast_operator_subscription is not None
+            except oc.OpenShiftPythonException:
+                return False
+
     def select_resource(self,
                         resource: str,
                         labels: Optional[Dict[str, str]] = None,
