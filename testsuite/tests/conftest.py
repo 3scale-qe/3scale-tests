@@ -19,7 +19,7 @@ from weakget import weakget
 import testsuite.capabilities.providers
 import testsuite.tools
 
-from testsuite import rawobj, HTTP2, gateways, configuration
+from testsuite import rawobj, HTTP2, gateways, configuration, resilient
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
@@ -333,7 +333,7 @@ def threescale(testconfig):
         testconfig["threescale"]["admin"]["url"],
         testconfig["threescale"]["admin"]["token"],
         ssl_verify=testconfig["ssl_verify"],
-        wait=16
+        wait=0
     )
 
 
@@ -375,7 +375,7 @@ def custom_account(threescale, request, testconfig):
         :param params: dict for remote call, rawobj.Account should be used
     """
     def _custom_account(params, autoclean=True, threescale_client=threescale):
-        acc = threescale_client.accounts.create(params=params)
+        acc = resilient.accounts_create(threescale_client, params=params)
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(acc.delete)
         return acc
