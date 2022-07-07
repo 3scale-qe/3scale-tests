@@ -12,7 +12,7 @@ ARG _resultsdir=/test-run-results
 USER root
 
 ADD $cacert /etc/pki/ca-trust/source/anchors
-ADD https://gist.githubusercontent.com/mijaros/c9c9ed016ce9985d96c6c5c3b35b4050/raw/66587720883554b03a4c24875fa47442db231a51/ca.pem /etc/pki/ca-trust/source/anchors
+ADD https://gist.githubusercontent.com/mdujava/c87f687cbb9bbed0144ddc136758292c/raw/7dbb42e02e2b0fe75074efccd7350e3082cc6655/ca.pem /etc/pki/ca-trust/source/anchors
 RUN update-ca-trust
 
 RUN useradd --no-log-init -u 1001 -g root -m default
