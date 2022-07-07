@@ -7,6 +7,8 @@ objects:
   kind: RequestAuthentication
   metadata:
     name: ${NAME}
+    labels:
+      app: ${LABEL}
   spec:
     selector:
       matchLabels:
@@ -28,3 +30,6 @@ parameters:
   description: "Target of the policy"
   value: "httpbin"
   required: true
+- name: LABEL
+  description: "App label for all resources"
+  value: "label"

@@ -2,7 +2,6 @@
 import pytest
 from threescale_api.resources import Service
 
-from testsuite.gateways.service_mesh import ServiceMeshGateway
 from testsuite.lifecycle_hook import LifecycleHook
 from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 
@@ -25,9 +24,9 @@ class ServiceMeshOIDCClientAuth(OIDCClientAuth):
 class ServiceMeshRHSSOHook(OIDCClientAuthHook, LifecycleHook):
     """RHSSO hook used for Service Mesh"""
 
-    def __init__(self, rhsso_service_info, gateway: ServiceMeshGateway):
+    def __init__(self, rhsso_service_info, gateway):
         super().__init__(rhsso_service_info, "authorization")
-        self.httpbin = gateway.httpbin
+        self.gateway = gateway
 
     # pylint: disable=no-self-use
     def _create_name(self, entity_id):
@@ -35,10 +34,10 @@ class ServiceMeshRHSSOHook(OIDCClientAuthHook, LifecycleHook):
 
     def on_service_create(self, service):
         super().on_service_create(service)
-        self.httpbin.create_policy(self._create_name(service.entity_id), self.rhsso_service_info)
+        self.gateway.create_policy(self._create_name(service.entity_id), self.rhsso_service_info)
 
     def on_service_delete(self, service: Service):
-        self.httpbin.remove_policy(self._create_name(service.entity_id))
+        self.gateway.remove_policy(self._create_name(service.entity_id))
 
     def on_application_create(self, application):
         """Register OIDC auth object for api_client"""

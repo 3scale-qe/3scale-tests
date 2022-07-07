@@ -118,8 +118,15 @@ class WASMExtension:
             obj = None
             if cred['credential_location'] in {"query_string", "header"}:
                 obj = {cred['credential_location']: {"keys": [cred['key']]}}
-            if cred['credential_location'] == "authorization":
+            elif cred['credential_location'] == "authorization":
                 raise NotImplementedError
+            elif cred['credential_location'] == "oidc":
+                obj = {"filter":
+                       {"path": ["envoy.filters.http.jwt_authn", "0"],
+                        "keys": ["azp", "aud"],
+                        "ops": [{"take": {"head": 1}}]
+                        }
+                       }
 
             ops.append({
                 "op": "add",
@@ -181,7 +188,8 @@ class WASMExtension:
                                 "key": auth_app_key,
                                 "credential_location": credentials_location})
         elif auth_method == Service.AUTH_OIDC:
-            raise NotImplementedError
+            credentials.append({"label": "app_id",
+                                "credential_location": "oidc"})
 
         self.add_credentials(credentials)
 

@@ -11,6 +11,7 @@ from testsuite.gateways.service_mesh import ServiceMeshHttpClient
 from testsuite.gateways.wasm.extension import WASMExtension
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.env import Properties
+from testsuite.rhsso import RHSSOServiceConfiguration
 from testsuite.utils import generate_tail
 
 
@@ -71,6 +72,26 @@ class WASMGateway(AbstractGateway):
         """Adds mapping rules into the extension, as they do have to be configured separately"""
         ext = self.extensions[service["id"]]
         ext.add_mapping_rules(rules)
+
+    def create_policy(self, name: str, info: RHSSOServiceConfiguration):
+        """Creates new Policy, used for OIDC authorization, for specific realm setup"""
+        service_id = name.split("-")[1]
+        label = f"{self.label}-{service_id}"
+        params = {
+            "NAME": name,
+            "TARGET": label,
+            "ISSUER": info.issuer_url(),
+            "JWKS": info.jwks_uri(),
+            "LABEL": label
+        }
+        path = resources.files('testsuite.resources.service_mesh').joinpath('policy.yaml')
+        self.httpbin.new_app(path, params)
+
+    def remove_policy(self, name: str):
+        """Removes existing policy"""
+        service_id = name.split("-")[1]
+        label = f"{self.label}-{service_id}"
+        self.httpbin.delete_app(label, "requestauthentications")
 
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
