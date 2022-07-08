@@ -131,7 +131,7 @@ def _apicast_ocp(ocp, settings):
         if maybe_ocp.project_exists:
             return maybe_ocp
         if ocp.has_apicast_operator:
-            return ocp
+            return OpenShiftClient(ocp.project_name, ocp.server_url, ocp.token)
 
     return OpenShiftClient(
         project_name=settings.get("project_name"),
