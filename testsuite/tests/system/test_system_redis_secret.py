@@ -4,7 +4,9 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7822")]
+pytestmark = [
+    pytest.mark.sandbag,  # requires openshift
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7822")]
 
 KEYS = [
     "MESSAGE_BUS_NAMESPACE",

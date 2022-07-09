@@ -23,6 +23,7 @@ def utf_8_special_chars():
     return [''.join(chars[i:i + 10]) for i in range(0, len(chars), 10)]
 
 
+@pytest.mark.sandbag  # requires go-httpbin
 def test_apicast_wont_change_path(api_client, utf_8_special_chars, backend_path):
     """Test checks if any characters from the arrays is not changed by the apicast"""
     client = api_client()
