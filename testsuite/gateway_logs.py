@@ -1,5 +1,6 @@
 """Pytest plugin for collecting gateway logs"""
 from datetime import datetime
+import logging
 
 import pytest
 from _pytest.outcomes import Skipped
@@ -7,6 +8,8 @@ from weakget import weakget
 
 from testsuite.config import settings
 from testsuite.gateways.gateways import Capability
+
+log = logging.getLogger(__name__)
 
 PRINT_LOGS = weakget(settings)["reporting"]["print_app_logs"] % True
 
@@ -26,12 +29,15 @@ def pytest_runtest_setup(item):
         return
     # pylint: disable=protected-access
     request = item._request
-    if "api_client" in request.fixturenames:
-        item.gateways["staging_gateway"] = request.getfixturevalue("staging_gateway")
-    if "prod_client" in request.fixturenames:
-        item.gateways["production_gateway"] = request.getfixturevalue("production_gateway")
+    try:
+        if "api_client" in request.fixturenames:
+            item.gateways["staging_gateway"] = request.getfixturevalue("staging_gateway")
+        if "prod_client" in request.fixturenames:
+            item.gateways["production_gateway"] = request.getfixturevalue("production_gateway")
 
-    _print_logs(item, start_time, "setup", "setup")
+        _print_logs(item, start_time, "setup", "setup")
+    except Exception as err:  # pylint: disable=broad-except
+        log.debug("Can't access gateway logs because of %s", err)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
