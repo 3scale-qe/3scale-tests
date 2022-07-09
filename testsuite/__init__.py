@@ -22,6 +22,8 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
 
 from pathlib import Path  # noqa
 from packaging.version import Version  # noqa
+from weakget import weakget
+import importlib_resources as resources
 
 from testsuite.config import settings  # noqa
 
@@ -73,7 +75,8 @@ if settings["ssl_verify"]:
 else:
     os.environ["OPENSHIFT_CLIENT_PYTHON_DEFAULT_SKIP_TLS_VERIFY"] = "true"
 
-TESTED_VERSION = Version(str(settings["threescale"]["version"]))
-APICAST_OPERATOR_VERSION = Version(str(settings["threescale"]["apicast_operator_version"]))
+TESTED_VERSION = Version(str(
+    weakget(settings)["threescale"]["version"] % resources.files("testsuite").joinpath("VERSION").read_text().strip()))
+APICAST_OPERATOR_VERSION = Version(str(weakget(settings)["threescale"]["apicast_operator_version"] % 0))
 HTTP2 = settings.get("http2", False)
 ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent
