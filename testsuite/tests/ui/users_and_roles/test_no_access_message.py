@@ -2,6 +2,7 @@
 
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
+from selenium.webdriver.common.by import By
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.ui.views.admin.audience.support_emails import SupportEmailsView
@@ -34,5 +35,5 @@ def test_no_access_message(login, custom_admin_login, navigator, provider_accoun
     message = browser.element(".//*[@id='apis']")
     assert "You don't have access to any API on the" in message.text
 
-    href = message.find_element_by_tag_name("a").get_attribute("href")
+    href = message.find_element(By.TAG_NAME, "a").get_attribute("href")
     assert href.endswith(email)

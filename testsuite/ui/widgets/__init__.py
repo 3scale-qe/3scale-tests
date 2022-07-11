@@ -1,6 +1,7 @@
 """ 3scale specific widgets"""
 
 import backoff
+from selenium.webdriver.common.by import By
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
 from widgetastic.widget import GenericLocatorWidget, Widget
@@ -155,7 +156,7 @@ class NavigationMenu(Navigation):
         TODO: Add an exception like in Navigation select method
         """
         for element in self.browser.elements(self.NAVIGATION_ITEMS):
-            element_href = element.find_element_by_tag_name("a").get_attribute("href")
+            element_href = element.find_element(By.TAG_NAME, "a").get_attribute("href")
             if element_href.endswith(href):
                 self.browser.click(element)
                 return
@@ -184,13 +185,13 @@ class ThreescaleDropdown(GenericLocatorWidget):
 
     def selected_value(self):
         """Return selected attribute from dropdown"""
-        return self.browser.selenium.find_element_by_xpath("//select/option[@selected='selected']") \
+        return self.browser.selenium.find_element(By.XPATH, "//select/option[@selected='selected']") \
             .get_attribute("value")
 
     def select_by_value(self, value):
         """Select given value from dropdown"""
         if value:
-            self.browser.selenium.find_element_by_xpath(f"//select/option[@value='{value}']").click()
+            self.browser.selenium.find_element(By.XPATH, f"//select/option[@value='{value}']").click()
 
 
 # pylint: disable=abstract-method
@@ -410,7 +411,7 @@ class ActiveDocV3Section(Widget):
         """
         self.browser.click(self.item_element(method, path))
         self.browser.click(self.browser.element(self.TRY_OUT_BUTTON_LOCATOR))
-        self.browser.selenium.find_element_by_xpath(self.SELECT_OPTION_LOCATOR.format(key)).click()
+        self.browser.selenium.find_element(By.XPATH, self.SELECT_OPTION_LOCATOR.format(key)).click()
         self.browser.click(self.browser.element(self.EXECUTE_BUTTON_LOCATOR))
 
     @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
@@ -426,7 +427,7 @@ class ThreescaleAnalyticsDropdown(GenericLocatorWidget):
         """Select specific metric to be displayed"""
         self.wait_displayed()
         self.click()
-        self.browser.selenium.find_element_by_xpath(f"//*[text()='{value}']").click()
+        self.browser.selenium.find_element(By.XPATH, f"//*[text()='{value}']").click()
 
     def text(self):
         """Get text of metric"""

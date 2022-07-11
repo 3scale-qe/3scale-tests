@@ -10,7 +10,7 @@ class SettingsTabs(View, Navigable):
     ROOT = "//ul[contains(@class, 'nav-tabs')]"
     details_tab = Text("//a[@href='/admin/account']")
     users_tab = Text("//a[@href='/admin/account/users']")
-    invitations_tab = Text("//a[ends-with(@href, '/invitations')]")
+    invitations_tab = Text("//a[contains(@href, '/invitations')]")
     invoices_tab = Text("//a[@href='/admin/account/invoices']")
     stripe_cc_tab = Text("//a[@href='/admin/account/stripe']")
     braintree_cc_tab = Text("//a[@href='/admin/account/braintree_blue']")
