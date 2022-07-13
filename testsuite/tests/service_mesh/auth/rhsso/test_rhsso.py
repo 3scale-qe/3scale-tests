@@ -6,7 +6,7 @@ from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
 
-pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_ADAPTER)
+pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 
 
 def test_rhsso_auth(api_client, service):
@@ -17,11 +17,11 @@ def test_rhsso_auth(api_client, service):
     assert response.request.headers["Authorization"].startswith("Bearer")
 
 
-def test_rhsso_no_auth(api_client):
+def test_rhsso_no_auth(api_client, no_auth_status_code):
     """Check if OIDC connect without auth won't work"""
     client = api_client()
 
     client.auth = None
     response = client.get("/get")
 
-    assert response.status_code == 401
+    assert response.status_code == no_auth_status_code

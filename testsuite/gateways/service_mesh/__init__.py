@@ -56,6 +56,14 @@ class ServiceMeshGateway(AbstractGateway):
             self.mesh.environ.set_many(self.env_vars)
             self.mesh.destroy()
 
+    def create_policy(self, name: str, info):
+        """Creates new Policy, used for OIDC authorization, for specific realm setup"""
+        self.httpbin.create_policy(name, info)
+
+    def remove_policy(self, name: str):
+        """Removes existing policy"""
+        self.httpbin.remove_policy(name)
+
     @property
     def environ(self):
         """Returns environ for Service Mesh Gateway"""
