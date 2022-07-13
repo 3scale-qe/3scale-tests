@@ -196,22 +196,7 @@ class DeploymentConfig(Deployment):
         self.openshift.do_action("rollout", ["status", self.resource])
 
     def wait_for(self, timeout: int = 90):
-        with ExitStack() as stack:
-            self.openshift.prepare_context(stack)
-            stack.enter_context(oc.timeout(timeout))
-
-            dc_data = oc.selector(self.resource).object()
-            dc_version = dc_data.model.status.latestVersion
-            oc.selector(
-                "pods",
-                labels={
-                    "deployment": f"{self.name}-{dc_version}"
-                }
-            ).until_all(
-                success_func=lambda pod: (
-                    pod.model.status.phase == "Running" and pod.model.status.containerStatuses[0].ready
-                )
-            )
+        self.openshift.do_action("rollout", ["status", f"--timeout={timeout}s", self.resource])
 
     def get_pods(self):
         def select_pod(apiobject):
