@@ -100,6 +100,7 @@ test-in-docker:
 		-v `readlink -f $(resultsdir)`:/test-run-results:z \
 		-e NAMESPACE \
 		`env | grep _3SCALE_TESTS_ | sed 's/^/-e /'` \
+		`env | grep ^flags= | sed 's/^/-e /'` \
 		-e _3SCALE_TESTS_fixtures__ui__browser__source=remote \
 		-e _3SCALE_TESTS_fixtures__ui__browser__remote_url=http://selenium:4444 \
 		$(docker_flags) \
