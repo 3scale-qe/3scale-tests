@@ -665,6 +665,9 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = custom_application(rawobj.Application("CustomApp", plan))
     """
 
+    # sometimes create() fails with 404 because account can not be found, maybe async issue, give it another try
+    @backoff.on_exception(
+        backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None, giveup=lambda e: e.code != 404)
     def _custom_application(params, autoclean=True, hooks=None, annotate=True, account=account):
         params = params.copy()
         for hook in _select_hooks("before_application", hooks):
