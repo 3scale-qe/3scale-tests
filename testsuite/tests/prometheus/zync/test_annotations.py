@@ -9,6 +9,7 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.configuration import openshift
 
 pytestmark = [
+    pytest.mark.sandbag,  # requires openshift
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6509"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
 ]

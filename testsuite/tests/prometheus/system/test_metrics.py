@@ -35,6 +35,7 @@ METRICS_SIDEKIQ = [
 ]
 
 pytestmark = [
+    pytest.mark.sandbag,  # requires openshfit
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4743"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
 ]

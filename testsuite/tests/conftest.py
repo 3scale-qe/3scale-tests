@@ -162,17 +162,17 @@ def _global_property(config, name, value):
 # pylint: disable=too-many-locals
 def pytest_report_header(config):
     """Add basic details about testsuite configuration"""
-    testsuite_version = resources.read_text("testsuite", "VERSION").strip()
+    testsuite_version = resources.files("testsuite").joinpath("VERSION").read_text().strip()
     environment = settings["env_for_dynaconf"]
     openshift = settings.get("openshift", {}).get("servers", {}).get("default", {}).get("server_url", "UNKNOWN")
     project = _oc_3scale_project()
     threescale = settings["threescale"]["admin"]["url"]
-    version = settings["threescale"]["version"]
+    version = weakget(settings)["threescale"]["version"] % testsuite_version
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
         title = title.split("/")[-1]  # this is due to possible job structure in jenkins
-    title = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
+    title = f"{title} {_oc_3scale_project()} {version}"
     projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
     team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
 
@@ -517,10 +517,10 @@ def private_base_url(testconfig, tools):
     Args:
         :param kind: Desired type of backend; possible values 'primary' (default), 'httpbin', 'echo-api'"""
 
-    default = weakget(testconfig)["fixtures"]["private_base_url"]["default"] % "echo-api"
+    default = weakget(testconfig)["fixtures"]["private_base_url"]["default"] % "echo_api"
     special = weakget(testconfig)["fixtures"]["private_base_url"]["special"] % "mockserver"
 
-    def _private_base_url(kind="default+ssl"):
+    def _private_base_url(kind="default"):
         kind = kind.replace("default", default).replace("special", special)
         return tools[kind]
 

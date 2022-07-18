@@ -6,6 +6,7 @@ from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.env import Properties
 
 if TYPE_CHECKING:
+    from typing import Optional
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
 
@@ -22,10 +23,14 @@ class SystemApicast(AbstractApicast):
                     Capability.JAEGER}
     HAS_PRODUCTION = True
 
-    def __init__(self, staging: bool, openshift: "OpenShiftClient"):
+    def __init__(self, staging: bool, openshift: "Optional[OpenShiftClient]" = None):
         self.staging = staging
-        self.deployment = openshift.deployment("dc/apicast-staging" if staging else "dc/apicast-production")
-        self.openshift: "OpenShiftClient" = openshift
+        self.openshift: "Optional[OpenShiftClient]" = openshift
+
+    @property
+    def deployment(self):
+        """Return deployment config name of this apicast"""
+        return self.openshift.deployment("dc/apicast-staging" if self.staging else "dc/apicast-production")
 
     @property
     def environ(self) -> Properties:
