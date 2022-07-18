@@ -517,10 +517,10 @@ def private_base_url(testconfig, tools):
     Args:
         :param kind: Desired type of backend; possible values 'primary' (default), 'httpbin', 'echo-api'"""
 
-    default = weakget(testconfig)["fixtures"]["private_base_url"]["default"] % "echo-api"
+    default = weakget(testconfig)["fixtures"]["private_base_url"]["default"] % "echo_api"
     special = weakget(testconfig)["fixtures"]["private_base_url"]["special"] % "mockserver"
 
-    def _private_base_url(kind="default+ssl"):
+    def _private_base_url(kind="default"):
         kind = kind.replace("default", default).replace("special", special)
         return tools[kind]
 
