@@ -1,8 +1,7 @@
 """Selenium factory for creating  Threescale browser instances to run UI tests. """
 
 from selenium import webdriver
-from msedge.selenium_tools import EdgeOptions
-from msedge.selenium_tools.remote_connection import RemoteConnection, EdgeRemoteConnection
+from selenium.webdriver.remote.remote_connection import RemoteConnection
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 from testsuite.ui.exception import WebDriverError
@@ -139,14 +138,10 @@ class SeleniumDriver:
         """
         if self.driver == 'chrome':
             browser_options = webdriver.ChromeOptions()
-            command_executor = RemoteConnection(self.remote_url + '/wd/hub', resolve_ip=False)
+            command_executor = RemoteConnection(self.remote_url + '/wd/hub')
         elif self.driver == 'firefox':
             browser_options = webdriver.FirefoxOptions()
-            command_executor = RemoteConnection(self.remote_url + '/wd/hub', resolve_ip=False)
-        elif self.driver == 'edge':
-            browser_options = EdgeOptions()
-            browser_options.use_chromium = True
-            command_executor = EdgeRemoteConnection(self.remote_url + '/wd/hub')
+            command_executor = RemoteConnection(self.remote_url + '/wd/hub')
         else:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'

@@ -1,4 +1,5 @@
 """Settings Devel portal View containing credit card details for Braintree payment gateway"""
+from selenium.webdriver.common.by import By
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 from widgetastic_patternfly import Button
 
@@ -52,7 +53,7 @@ class BraintreeCCForm(View):
             f"{credit_card.exp_month:02d}{credit_card.exp_year}")
 
     def _iframe_fill(self, frame_id, widget, value):
-        frame = self.browser.selenium.find_element_by_xpath(f"//iframe[@name='{frame_id}']")
+        frame = self.browser.selenium.find_element(By.XPATH, f"//iframe[@name='{frame_id}']")
         self.browser.selenium.switch_to.frame(frame)
         widget.fill(value)
         self.browser.selenium.switch_to.default_content()

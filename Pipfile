@@ -31,7 +31,6 @@ python-keycloak = "*"
 backoff = "*"
 websocket_client = "*"
 httpx = {version = "*", extras = ["http2"]}
-msedge-selenium-tools = "*"
 webdriver-manager = "*"
 widgetastic-core = "*"
 widgetastic-patternfly4 = "*"
