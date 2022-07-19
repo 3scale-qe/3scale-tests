@@ -87,6 +87,7 @@ class _HttpbinGoRequest(EchoedRequest):
         super().__init__(response)
         self.headers = _flatten(self.headers)
         self.params = _flatten(self.params)
+        self.path = urllib.parse.urlparse(self.json["url"]).path
 
 
 class _MockServerRequest(EchoedRequest):
