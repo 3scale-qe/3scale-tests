@@ -156,7 +156,7 @@ polish-junit: ## Remove skipped tests and logs from passing tests
 polish-junit:
 	gzip -f $(resultsdir)/junit-*.xml
 	# 'cat' on next line is neessary to avoid wipe of the files
-	for file in $(resultsdir)/junit-*.xml.gz; do zcat $$file | xsltproc ./xslt/polish-junit.xsl - >$${file%.gz}; done  # bashism!!!
+	for file in $(resultsdir)/junit-*.xml.gz; do zcat $$file | $(RUNSCRIPT)xslt-apply ./xslt/polish-junit.xsl >$${file%.gz}; done  # bashism!!!
 	# this deletes something it didn't create, dangerous!!!
 	-rm -f $(resultsdir)/junit-*.xml.gz
 
