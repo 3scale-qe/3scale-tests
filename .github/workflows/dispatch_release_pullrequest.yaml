@@ -1,4 +1,5 @@
 name: dispatch_release_pullrequest
+description: First step to build new release & container image.
 on:
   workflow_dispatch:
     inputs:
