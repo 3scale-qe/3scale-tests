@@ -1,5 +1,4 @@
 name: dispatch_github_release
-description: Verify RC build before this!
 on:
   workflow_dispatch
 
