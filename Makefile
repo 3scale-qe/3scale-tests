@@ -16,14 +16,14 @@ endif
 PIPENV_VERBOSITY ?= -1
 PIPENV_IGNORE_VIRTUALENVS ?= 1
 
-ifdef junit
-flags += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
-endif
-
 persistence_file ?= $(resultsdir)/pytest-persistence.pickle
 
 PYTEST = pipenv run python -m pytest --tb=$(TB) -o cache_dir=$(resultsdir)/.pytest_cache.$(@F)
 RUNSCRIPT = pipenv run ./scripts/
+
+ifdef junit
+PYTEST += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
+endif
 
 ifeq ($(filter $(--store||--load),$(flags)),$(flags))
 	PYTEST += -p no:persistence
