@@ -135,7 +135,11 @@ pipenv-dev: .make-pipenv-sync-dev
 container-image: ## Build container image
 container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
-	$(RUNSCRIPT)docker-build $(IMAGENAME) latest
+ifdef CACERT
+	docker build -t $(IMAGENAME) --build-arg=$(CACERT) .
+else
+	docker build -t $(IMAGENAME) .
+endif
 
 clean: ## clean pip deps
 clean: mostlyclean
@@ -195,10 +199,18 @@ release: Pipfile.lock testsuite/resources/apicast.yml pipenv-dev
 
 dist: ## Build (and push optionally) distribution-ready container image
 dist: IMAGENAME ?= 3scale-testsuite
+dist: _version = $(shell git describe --tags --abbrev=0)
 dist: pipenv fetch-tools
-	git checkout v`$(RUNSCRIPT)docker-tags -1`
+	git checkout $(_version)
 	test -e VERSION
-	$(RUNSCRIPT)docker-build $(IMAGENAME) `$(RUNSCRIPT)docker-tags`
+ifdef CACERT
+	docker build `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` --build-arg "cacert=$(CACERT)" .
+else
+	docker build `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` .
+endif
+ifdef PUSHIMAGE
+	docker push `$(RUNSCRIPT)semver-docker-tags $(IMAGENAME) $(_version) 4`
+endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
 fetch-tools:

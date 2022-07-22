@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Usage: semver-docker-tag image version num
+#
+# Where:
+#  image is the name of container image to build
+#  version is the version for which docker tags should be determined
+#  num is number of version fragments divided by a dot '.'. Usually 3
+
+semver_docker_tags() {
+	local image="$1"
+	local version=$2
+	local num=$3
+	local versions="$4"
+	if (echo $version|grep -q rc); then
+		echo $image:$version
+	elif [ $num == 0 ]; then
+		echo "$versions"|grep -v rc|sort -V|tail -1|grep -q ^$version && echo $image:latest
+	else
+		local tag=`echo $version|cut -f1-$num -d.`
+		local next=`expr $num - 1`
+		echo "$versions"|grep -v rc|grep $tag|sort -V|tail -1|grep -q ^$version && echo $image:$tag `semver_docker_tags "$image" $version $next "$versions"`
+	fi
+}
+
+semver_docker_tags "$1" $2 $3 "`git tag`"
