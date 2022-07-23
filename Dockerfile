@@ -49,8 +49,9 @@ ENV junit=yes
 ENV resultsdir=$_resultsdir
 ENV PYTEST_ADDOPTS="-o cache_dir=$_resultsdir/.pytest-cache"
 
-RUN make mostlyclean pipenv && \
-	rm -Rf $HOME/.cache/*
+RUN echo umask 002 >>$HOME/.bashrc \
+	&& make mostlyclean pipenv \
+	&& rm -Rf $HOME/.cache/*
 
 ENTRYPOINT [ "make" ]
 CMD [ "smoke" ]
