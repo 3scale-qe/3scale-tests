@@ -172,7 +172,7 @@ def pytest_report_header(config):
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
         title = title.split("/")[-1]  # this is due to possible job structure in jenkins
-    title = f"{title} {_oc_3scale_project()} {version}"
+    title = weakget(settings)["reporting"]["title"] % f"{title} {_oc_3scale_project()} {version}"
     projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
     team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
 
