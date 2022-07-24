@@ -5,12 +5,11 @@ the requests to a correct backend.
 from urllib.parse import urlparse
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6415")]
 
 

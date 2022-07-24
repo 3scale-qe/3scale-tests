@@ -5,14 +5,12 @@ import random
 import string
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.config import settings
 from testsuite.toolbox import toolbox
 import testsuite.utils
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
+pytestmark = pytest.mark.require_version("2.7")
 
 HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS', 'PATCH']
 # 'TRACE', 'CONNECT' are not supported by 3scale

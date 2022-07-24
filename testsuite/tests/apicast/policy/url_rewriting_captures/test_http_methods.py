@@ -4,12 +4,11 @@ In 2.10 version the HTTP methods were added
 """
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+pytestmark = [pytest.mark.require_version("2.10"),
               pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-6270")]
 
 

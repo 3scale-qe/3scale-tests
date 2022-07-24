@@ -4,12 +4,10 @@ APICAST_PATH_ROUTING is in use
 """
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 from testsuite.capabilities import Capability
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+pytestmark = [pytest.mark.require_version("2.9"),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4152"),
               pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
 

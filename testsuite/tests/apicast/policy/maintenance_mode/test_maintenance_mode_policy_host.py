@@ -9,14 +9,13 @@ from typing import Tuple
 import pytest
 import pytest_cases
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.tests.apicast.policy.maintenance_mode import config_cases_host
 
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6552")]
 
 

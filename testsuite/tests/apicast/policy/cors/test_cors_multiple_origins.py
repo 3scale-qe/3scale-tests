@@ -6,13 +6,11 @@ If not, the "Access-Control-Allow-Origin" is not set.
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 
 pytestmark = [
-              pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+              pytest.mark.require_version("2.10"),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6569"),
              ]
 

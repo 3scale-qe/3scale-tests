@@ -2,14 +2,12 @@
 Update api_backend on service without backend configured
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.require_version("2.9"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3626")]
 
 

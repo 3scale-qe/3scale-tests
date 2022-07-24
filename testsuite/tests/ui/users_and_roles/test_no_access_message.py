@@ -1,15 +1,13 @@
 """Test for no access message in Dashboard"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 from selenium.webdriver.common.by import By
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.ui.views.admin.audience.support_emails import SupportEmailsView
 from testsuite.ui.views.admin.foundation import DashboardView
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6321")]
 
 

@@ -2,11 +2,10 @@
 Test if APIAP routing only match paths that start with the routing path of the backend
 """
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.8.1')"),
+    pytest.mark.require_version("2.8.1"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4736")]
 
 

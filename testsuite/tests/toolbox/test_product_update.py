@@ -3,13 +3,12 @@
 import re
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
+pytestmark = pytest.mark.require_version("2.7")
 
 
 @pytest.fixture(scope="module", params=['product_copy', 'service_copy'])

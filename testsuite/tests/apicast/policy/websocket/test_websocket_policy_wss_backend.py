@@ -1,15 +1,14 @@
 """Basic test for websocket policy with wss backend_api"""
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
 # websockets may fail on some deployments probably because of TLS config mismatch
 pytestmark = [
         pytest.mark.sandbag,
-        pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
+        pytest.mark.require_version("2.8")]
 
 
 @pytest.fixture(scope="module")

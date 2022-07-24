@@ -7,10 +7,8 @@ import base64
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from threescale_api.resources import Service
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 NUM_OF_REQUESTS = 10
@@ -19,7 +17,7 @@ pytestmark = [
     # can not be run in parallel
     pytest.mark.disruptive,
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6453"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.require_version("2.10"),
 ]
 
 

@@ -3,9 +3,7 @@ When request is sent to system, requests metric in prometheus is increased.
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 METRICS_MASTER = [
     # new metrics introduced in THREESCALE-4743
@@ -37,7 +35,7 @@ METRICS_SIDEKIQ = [
 pytestmark = [
     pytest.mark.sandbag,  # requires openshfit
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4743"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.require_version("2.10"),
 ]
 
 

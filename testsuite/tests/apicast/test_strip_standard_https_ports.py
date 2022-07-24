@@ -3,14 +3,13 @@ When APIcast sends a request to a standard port, it should strip the port from t
 """
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import blame
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2235")]
 
 

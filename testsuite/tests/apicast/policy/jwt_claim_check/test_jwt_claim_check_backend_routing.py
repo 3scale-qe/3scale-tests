@@ -3,13 +3,11 @@ When routing policy is used together with the jwt claim check, the jwt should st
 restrict the access to the resource.
 """
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6410")]
 
 ERROR_MESSAGE = "Invalid JWT check"

@@ -1,8 +1,6 @@
 """ Tests for MessageBus variables in system-redis secret """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.sandbag,  # requires openshift
@@ -23,14 +21,14 @@ def system_redis_secret(openshift):
     return secret
 
 
-@pytest.mark.skipif("TESTED_VERSION >= Version('2.12')")
+@pytest.mark.before_version("2.12")
 @pytest.mark.parametrize("key", KEYS)
 def test_message_bus_secrets(system_redis_secret, key):
     """ test of env variable presence """
     assert key in system_redis_secret
 
 
-@pytest.mark.skipif("TESTED_VERSION < Version('2.12')")
+@pytest.mark.require_version("2.12")
 @pytest.mark.parametrize("key", KEYS)
 def test_message_bus_secrets_missing(system_redis_secret, key):
     """ test of env variable absence """
