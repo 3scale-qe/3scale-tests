@@ -42,7 +42,7 @@ def accounts_create(client, params):
     try:
         return client.accounts.create(params=params)
     except ApiClientError as err:
-        if err.code == 422:
+        if err.code == 409:
             client.accounts.delete(client.accounts.read_by_name(params["name"]).entity_id)
             time.sleep(2)
         raise err
