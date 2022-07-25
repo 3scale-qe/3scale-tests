@@ -7,7 +7,6 @@ Bind a dir to /test-run-results to get reports \
 Set NAMESPACE env variable"
 
 ARG cacert=https://password.corp.redhat.com/RH-IT-Root-CA.crt
-ARG _resultsdir=/test-run-results
 
 USER root
 
@@ -46,8 +45,7 @@ ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
 ENV WORKON_HOME=/opt/workdir/virtualenvs
 ENV junit=yes
-ENV resultsdir=$_resultsdir
-ENV PYTEST_ADDOPTS="-o cache_dir=$_resultsdir/.pytest-cache"
+ENV resultsdir=/test-run-results
 
 RUN echo umask 002 >>$HOME/.bashrc \
 	&& make mostlyclean pipenv \
