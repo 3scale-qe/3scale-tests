@@ -121,7 +121,7 @@ class AccountEditView(BaseAudienceView):
     """View representation of Edit Account page"""
     path_pattern = "/buyers/accounts/{account_id}/edit"
     org_name = TextInput(id="account_org_name")
-    update_button = GenericLocatorWidget("//input[@value='Update Account']")
+    update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
 
     def __init__(self, parent, account):

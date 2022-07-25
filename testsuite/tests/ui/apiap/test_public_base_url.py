@@ -23,8 +23,8 @@ def test_public_base_url(login, navigator, service, browser):
     settings = navigator.navigate(ProductSettingsView, product=service)
     settings.update_gateway(staging='https://localhost:80', production='https://localhost:80')
 
-    staging = Text(browser, '//*[@id="service_proxy_attributes_sandbox_endpoint_input"]/p[2]')
-    production = Text(browser, '//*[@id="service_proxy_attributes_endpoint_input"]/p[2]')
+    staging = Text(browser, '//input[@id="service_proxy_attributes_sandbox_endpoint"]')
+    production = Text(browser, '//input[@id="service_proxy_attributes_endpoint"]')
 
     assert staging.text == "can't be localhost"
     assert production.text == "can't be localhost"

@@ -55,19 +55,16 @@ class CheckBoxGroup(GenericLocatorWidget):
     """
     OPTIONS_SECTION = '/fieldset/ol'
     OPTIONS_SECTION_OL_CLASS = '//fieldset/ol[contains(@class, "{}")]'
-    OPTIONS_SECTION_FIELDSET_NAME = '//fieldset[contains(@name, "{}")]/ol'
 
     OPTIONS = './li'
     OPTIONS_INPUT = OPTIONS + '/label/input'
     OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
 
     # pylint: disable=too-many-arguments
-    def __init__(self, parent=None, locator=None, ol_identifier=None, field_set_identifier=None, logger=None):
+    def __init__(self, parent=None, locator=None, ol_identifier=None, logger=None):
         super().__init__(parent, locator, logger)
         if ol_identifier:
             self.locator = locator + self.OPTIONS_SECTION_OL_CLASS.format(ol_identifier)
-        elif field_set_identifier:
-            self.locator = locator + self.OPTIONS_SECTION_FIELDSET_NAME.format(field_set_identifier)
         else:
             self.locator = locator + self.OPTIONS_SECTION
 

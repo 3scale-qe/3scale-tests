@@ -15,14 +15,10 @@ class WebhooksView(BaseSettingsView):
     path_pattern = '/p/admin/webhooks/edit'
     webhook_active = GenericLocatorWidget('//*[@id="web_hook_active"]')
     webhook_provider = GenericLocatorWidget('//*[@id="web_hook_provider_actions"]')
-    accounts = CheckBoxGroup('//*/fieldset[contains(@name,"trigger webhooks")]',
-                             field_set_identifier="Accounts")
-    users = CheckBoxGroup('//*/fieldset[contains(@name,"trigger webhooks")]',
-                          field_set_identifier="Users")
-    applications = CheckBoxGroup('//*/fieldset[contains(@name,"trigger webhooks")]',
-                                 field_set_identifier="Applications")
-    keys = CheckBoxGroup('//*/fieldset[contains(@name,"trigger webhooks")]',
-                         field_set_identifier="Keys")
+    accounts = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Accounts']/../../..")
+    users = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Users']/../../..")
+    applications = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Applications']/../../..")
+    keys = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Keys']/../../..")
     checkbox_names = {"Accounts": ["web_hook_account_created_on", "web_hook_account_updated_on",
                                    "web_hook_account_plan_changed_on", "web_hook_account_deleted_on"],
                       "Users": ["web_hook_user_created_on", "web_hook_user_updated_on", "web_hook_user_deleted_on"],
