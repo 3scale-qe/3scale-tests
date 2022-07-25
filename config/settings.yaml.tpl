@@ -39,6 +39,7 @@ default:
     https: http://tinyproxy-service.tiny-proxy.svc:8888
   reporting:
     print_app_logs: true # whether to print application logs during testing
+    title: Brief Description # custom title used for junit/polarion reporting
     testsuite_properties:
       polarion_project_id: PROJECTID
       polarion_response_myteamsname: teamname
