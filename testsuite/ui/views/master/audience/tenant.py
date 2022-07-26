@@ -1,12 +1,12 @@
 """View representations of Tenants pages"""
-from widgetastic.widget import TextInput, GenericLocatorWidget, Text
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.master.audience import BaseMasterAudienceView
 from testsuite.ui.widgets import AudienceTable
 from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, \
-    ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
+    ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton, ThreescaleUpdateButton
 
 
 class TenantsView(BaseMasterAudienceView):
@@ -121,7 +121,7 @@ class TenantEditView(BaseMasterAudienceView):
     """View representation of Edit Tenant page"""
     path_pattern = "/buyers/accounts/{account_id}/edit"
     org_name = TextInput(id="account_org_name")
-    update_button = GenericLocatorWidget("//input[@value='Update Account']")
+    update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
 
     def __init__(self, parent, account):

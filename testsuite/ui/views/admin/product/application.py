@@ -76,7 +76,7 @@ class ApplicationPlanNewView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/application_plans/new"
     name = TextInput(id="application_plan_name")
     system_name = TextInput(id="application_plan_system_name")
-    create_button = GenericLocatorWidget("//input[contains(@class,'create')]")
+    create_button = ThreescaleCreateButton()
 
     def create(self, name: str, system_name: str):
         """Create application plan"""
