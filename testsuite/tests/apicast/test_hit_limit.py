@@ -13,6 +13,7 @@ After waiting for the time in the 'retry-after' header, the request should
 be accepted.
 """
 
+from datetime import datetime
 import time
 
 import backoff
@@ -143,6 +144,10 @@ def test_retry_after(silver_client):
     After waiting the time from the 'retry-after' header, the following requests
     should be again accepted
     """
+
+    # wait for the beginning of next minute
+    time.sleep(61 - datetime.utcnow().second)
+
     response = make_requests(silver_client)
 
     assert response.status_code == 429
