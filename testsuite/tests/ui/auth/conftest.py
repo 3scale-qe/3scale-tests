@@ -17,7 +17,7 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
     """
 
     def _sso_integration(sso_type: str, client: str, client_secret: str, realm: str):
-        custom_admin_login()
+        custom_admin_login(fresh=True)
         sso = navigator.navigate(NewSSOIntegrationView)
         sso_id = sso.create(sso_type, client, client_secret, realm)
         sso = threescale.admin_portal_auth_providers.read(sso_id)
@@ -44,7 +44,7 @@ def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, s
         - test authentication flow
         - publish SSO integration
     """
-    custom_admin_login()
+    custom_admin_login(fresh=True)
     auth = testconfig["auth0"]
     integration = ui_sso_integration('auth0', auth["client"], auth["client-secret"], f"https://{auth['domain']}")
 
@@ -71,10 +71,9 @@ def auth0_login(auth0_setup, auth0_user, custom_auth0_login):
 
 
 @pytest.fixture
-def auth0_bounce_login(auth0_setup, navigator, browser, auth0_user):
+def auth0_bounce_login(auth0_setup, browser, auth0_user):
     """Login into 3scale via RHSSO using /bounce URL"""
-    bounce_url = auth0_setup[0].replace("/callback", "/bounce")
-    navigator.open(url=bounce_url)
+    browser.url = auth0_setup[0].replace("/callback", "/bounce")
     provider = Auth0View(browser.root_browser)
     provider.login(auth0_user["email"], "RedHat123")
 
@@ -124,13 +123,12 @@ def rhsso_login(rhsso_setup, testconfig, custom_rhsso_login, rhsso_service_info)
 
 
 @pytest.fixture()
-def rhsso_bounce_login(rhsso_setup, navigator, testconfig, browser, rhsso_service_info, threescale):
+def rhsso_bounce_login(rhsso_setup, testconfig, browser, rhsso_service_info, threescale):
     """Login into 3scale via RHSSO using /bounce URL"""
-    bounce_url = rhsso_setup[0].replace("/callback", "/bounce")
     username = testconfig["rhsso"]["test_user"]["username"]
     user_id = rhsso_service_info.realm.admin.get_user_id(username)
     rhsso_service_info.realm.admin.user_logout(user_id)
-    navigator.open(url=bounce_url)
+    browser.url = rhsso_setup[0].replace("/callback", "/bounce")
     provider = RhssoView(browser.root_browser)
     test_user = testconfig["rhsso"]["test_user"]
     provider.login(test_user["username"], test_user["password"])

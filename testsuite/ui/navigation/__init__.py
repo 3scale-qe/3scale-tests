@@ -79,20 +79,19 @@ class Navigator:
         filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
         return cls(self.browser, **filtered_kwargs)
 
-    # pylint: disable=inconsistent-return-statements
     def open(self, cls: Type[CustomView] = None, url: str = None, **kwargs) -> Optional[CustomView]:
         """
         Directly opens desired View, by inserting its `path` in to browser or url
         Args:
             :param cls: Class of desired View
-            :param url: Custom host URL
+            :param url: New host URL for the View
             :return: Instance of the opened View
         """
-        if url:
-            self.browser.url = url
-            return None
         page = self.new_page(cls, **kwargs)
-        self.browser.set_path(page.path)
+        if url:
+            self.browser.url = url + page.path
+        else:
+            self.browser.set_path(page.path)
         page.post_navigate(**kwargs)
         return page
 
