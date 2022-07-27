@@ -4,9 +4,7 @@ Check if annotations of apicast-operator pod are present
 from typing import Tuple, List, Union
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 
 pytestmark = [
@@ -36,7 +34,7 @@ ANNOTATIONS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 ]
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION >  Version('0.6.0')")  # since threescale 2.12
+@pytest.mark.before_apicast_operator_version("0.7.0")  # since threescale 2.12
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_PRE_2_12)
 def test_labels_operator_old(annotation, expected_value, operator):
     """ Test labels of operator pod. """
@@ -46,7 +44,7 @@ def test_labels_operator_old(annotation, expected_value, operator):
         assert value == expected_value
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION <= Version('0.6.0')")
+@pytest.mark.require_apicast_operator_version("0.7.0")
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_POST_2_12)
 def test_labels_operator_new(annotation, expected_value, operator):
     """ Test labels of operator pod. """

@@ -3,14 +3,13 @@ Test caching policy policy. Changing caching type to None. Policy remains active
 https://issues.redhat.com/browse/THREESCALE-4464
 """
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+pytestmark = [pytest.mark.require_version("2.11"),
               pytest.mark.disruptive,
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4464")]
 

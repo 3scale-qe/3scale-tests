@@ -4,17 +4,16 @@ Test that content caching policy is working correctly with env:
     - APICAST_CACHE_MAX_TIME = max time that content can be cached
 """
 import time
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame, randomize
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+pytestmark = [pytest.mark.require_version("2.9"),
               pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
 
 

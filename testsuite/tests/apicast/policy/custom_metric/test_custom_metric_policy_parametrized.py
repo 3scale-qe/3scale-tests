@@ -5,17 +5,16 @@ metric based on the response from the upstream API
 """
 import pytest
 import pytest_cases
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 from pytest_cases import parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
-from testsuite import rawobj, resilient, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, resilient
 
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
+    pytest.mark.require_version("2.9")]
 
 
 @pytest.fixture(scope="module")

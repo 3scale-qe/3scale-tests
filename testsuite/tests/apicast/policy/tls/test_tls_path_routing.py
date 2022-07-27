@@ -4,9 +4,8 @@ from urllib.parse import urlsplit
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded
@@ -16,8 +15,8 @@ pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8000"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8252"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')")
+    pytest.mark.require_version("2.12"),
+    pytest.mark.require_apicast_operator_version("0.6.0")
 ]
 
 

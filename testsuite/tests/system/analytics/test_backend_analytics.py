@@ -3,11 +3,10 @@ Tests the analytics at the backend level
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.require_version("2.9"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3159")]
 
 

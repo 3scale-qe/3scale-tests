@@ -4,15 +4,13 @@ Test that http routes will be created and managed by zync
 
 from urllib.parse import urlparse
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 
 # This test can be done only with system apicast
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+pytestmark = [pytest.mark.require_version("2.9"),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3545"),
               pytest.mark.required_capabilities(Capability.SAME_CLUSTER, Capability.PRODUCTION_GATEWAY),
               pytest.mark.disruptive]

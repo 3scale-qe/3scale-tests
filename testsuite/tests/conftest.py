@@ -9,6 +9,7 @@ import warnings
 
 import importlib_resources as resources
 import backoff
+from packaging.version import Version
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from threescale_api import client, errors
@@ -19,7 +20,7 @@ from weakget import weakget
 import testsuite.capabilities.providers
 import testsuite.tools
 
-from testsuite import rawobj, HTTP2, gateways, configuration, resilient
+from testsuite import rawobj, HTTP2, gateways, configuration, resilient, TESTED_VERSION, APICAST_OPERATOR_VERSION
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
@@ -78,6 +79,26 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding performance tests")
     if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
         pytest.skip("Excluding UI tests")
+    if "require_version" in marks:
+        for mark in item.iter_markers(name="require_version"):
+            for version in mark.args:
+                if TESTED_VERSION < Version(version):
+                    pytest.skip(f"Requires 3scale v{version}")
+    if "before_version" in marks:
+        for mark in item.iter_markers(name="before_version"):
+            for version in mark.args:
+                if TESTED_VERSION >= Version(version):
+                    pytest.skip(f"Obsoleted in 3scale v{version}")
+    if "require_apicast_operator_version" in marks:
+        for mark in item.iter_markers(name="require_apicast_operator_version"):
+            for version in mark.args:
+                if APICAST_OPERATOR_VERSION < Version(version):
+                    pytest.skip(f"Requires apicast-operator v{version}")
+    if "before_apicast_operator_version" in marks:
+        for mark in item.iter_markers(name="before_apicast_operator_version"):
+            for version in mark.args:
+                if APICAST_OPERATOR_VERSION >= Version(version):
+                    pytest.skip(f"Obsoleted in apicast-operator v{version}")
     if item.config.getoption("--drop-sandbag"):
         sandbag_caps = (Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER)
         if "sandbag" in marks or "xfail" in marks:

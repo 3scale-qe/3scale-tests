@@ -3,13 +3,12 @@ Testing that the request/response content limit policy does not limit anything w
 default value
 """
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.utils import random_string
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.require_version("2.10"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
 
 

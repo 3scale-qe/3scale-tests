@@ -4,13 +4,12 @@ Test Prometheus metric for content_caching.
 from datetime import datetime, timedelta
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import APICAST_OPERATOR_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.nopersistence,
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.5.2')"),
+    pytest.mark.require_apicast_operator_version("0.5.2"),
     pytest.mark.required_capabilities(Capability.OCP4, Capability.APICAST),
     ]
 

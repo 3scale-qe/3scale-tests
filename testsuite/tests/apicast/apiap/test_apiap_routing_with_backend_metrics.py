@@ -2,13 +2,12 @@
 Test apiap routing combined with metrics counting
 """
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
 
 # case[N] fixtures create tests that have to be executed in specific order
 pytestmark = [
     pytest.mark.disruptive,
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.require_version("2.9"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")]
 
 

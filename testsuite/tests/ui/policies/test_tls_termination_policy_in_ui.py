@@ -5,9 +5,7 @@
 import pytest
 import requests
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
@@ -22,7 +20,7 @@ from testsuite.tests.apicast.policy.tls.conftest import require_openshift, stagi
     gateway_options, gateway_environment
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.require_version("2.11"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390")]
 
 
