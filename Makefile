@@ -209,7 +209,7 @@ else
 	docker build `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` .
 endif
 ifdef PUSHIMAGE
-	$(RUNSCRIPT)semver-docker-tags $(IMAGENAME) $(_version) 4|xargs -l docker push
+	$(RUNSCRIPT)semver-docker-tags $(IMAGENAME) $(_version) 4|xargs -d' ' -l docker push
 endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
