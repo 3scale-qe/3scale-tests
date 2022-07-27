@@ -34,12 +34,11 @@ from testsuite.utils import blame
 @pytest.fixture(scope="session")
 def webdriver():
     """Creates instance of Web Driver with configuration"""
-    webdriver = Webdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                          driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                          ssl_verify=settings["ssl_verify"],
-                          remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                          binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
-    return webdriver
+    return Webdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
+                     driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+                     ssl_verify=settings["ssl_verify"],
+                     remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                     binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +69,8 @@ def navigator(browser):
 @pytest.fixture(scope="module")
 def custom_admin_login(navigator, browser):
     """
-    Login fixture for admin portal.
+    Returns parametrized Login fixture for Admin portal.
+    To remove cookies and previous login session (from Admin portal), set `fresh` flag to True.
     :param navigator: Navigator Instance
     :return: Login to Admin portal with custom credentials
     """
