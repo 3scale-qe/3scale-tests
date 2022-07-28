@@ -1,4 +1,13 @@
-"""Basic test for websocket policy with wss backend_api"""
+"""
+Basic test for websocket policy with wss backend_api
+
+IMPORTANT: At this moment only used go-httbin supports websockets. At the same
+moment go-httpbin support HTTP/2 (also only only) and ALPN negotiation. Due to
+that this test doesn't work on openshift where
+'ingress.operator.openshift.io/default-enable-http2=true' is enabled. In such
+case tests ends with 502 error.
+https://docs.openshift.com/container-platform/4.9/networking/ingress-operator.html#nw-http2-haproxy_configuring-ingress
+"""
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
@@ -6,7 +15,7 @@ import pytest
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
-# websockets may fail on some deployments probably because of TLS config mismatch
+# websockets may fail for reason described above
 pytestmark = [
         pytest.mark.sandbag,
         pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
