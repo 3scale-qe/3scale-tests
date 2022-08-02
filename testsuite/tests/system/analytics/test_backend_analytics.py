@@ -5,6 +5,7 @@ Tests the analytics at the backend level
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import resilient
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
@@ -64,7 +65,11 @@ def test_analytics(application, api_client, backend):
         assert client.get("/anything/get").status_code == 200
 
     analytics = application.threescale_client.analytics
-    hits_backed = analytics.list_by_backend(backend.entity_id,
-                                            metric_name=backend_metric.entity_name)["total"]
+    hits_backed = resilient.analytics_list_by_backend(
+        application.threescale_client,
+        backend.entity_id,
+        backend_metric.entity_name,
+        "total",
+        prev_hits_backed+num_requests)
 
     assert hits_backed == prev_hits_backed + num_requests

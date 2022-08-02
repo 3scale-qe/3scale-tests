@@ -18,6 +18,14 @@ def analytics_list_by_service(threescale, service_id, metric_name, key, threshol
     return value
 
 
+@backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
+def analytics_list_by_backend(threescale, backend_id, metric_name, key, threshold=0):
+    """Get usage stats for service"""
+    value = threescale.analytics.list_by_backend(backend_id, metric_name=metric_name)[key]
+    assert value >= threshold
+    return value
+
+
 @backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=7, jitter=None)
 def resource_read_by_name(object_instance, name: str):
     """
