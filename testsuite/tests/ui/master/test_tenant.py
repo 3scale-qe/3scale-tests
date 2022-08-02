@@ -5,6 +5,7 @@ import pytest
 
 from testsuite import resilient
 from testsuite.ui.views.admin.login import LoginView
+from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 from testsuite.ui.utils import assert_displayed_in_new_tab
@@ -42,7 +43,7 @@ def test_create_tenant(master_login, ui_tenant, tenant_name, navigator, browser,
     assert detail_view.admin_domain.text == account.entity['admin_domain']
 
     assert_displayed_in_new_tab(browser, detail_view.open_public_domain, LandingView)
-    assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, LoginView)
+    assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, DashboardView)
 
 
 # pylint: disable=unused-argument

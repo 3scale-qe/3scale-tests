@@ -51,6 +51,7 @@ class TenantDetailView(BaseMasterAudienceView):
     admin_domain = Text(".//th[contains(text(),'Admin domain')]/parent::*/td/a")
     resume_b = Button("Resume", classes=[Button.LINK])
     suspend_b = Button("Suspend", classes=[Button.LINK])
+    impersonate_b = Text(".//a[contains(@href,'impersonation')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -77,6 +78,10 @@ class TenantDetailView(BaseMasterAudienceView):
     def open_admin_domain(self):
         """a helper function to open admin-portal"""
         self.admin_domain.click()
+
+    def impersonate(self):
+        """Impersonates the tenant - gets into admin portal of tenant already logged in"""
+        self.impersonate_b.click()
 
     def prerequisite(self):
         return TenantsView
