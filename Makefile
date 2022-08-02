@@ -213,10 +213,11 @@ ifdef PUSHIMAGE
 endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
+fetch-tools: _targetdir=ext/testsuite-tools
 fetch-tools:
-	-rm -Rf ext/testsuite-tools/
-	-mkdir -p ext/
-	-curl $(fetch_tools) | tar -C ext/ -xz
+	-rm -Rf $(_targetdir)
+	-mkdir -p $(_targetdir)
+	-curl -L $(fetch_tools) | tar --strip-components=1 -C $(_targetdir) -xz
 
 tools:
 	SHARED_NAMESPACE=tools ./ext/testsuite-tools/run.sh
