@@ -122,104 +122,78 @@ def pytest_collection_modifyitems(session, config, items):
             item.user_properties.append(("issue-id", issue_id))
 
 
-def _oc_3scale_project():
-    """Just a one liner to not repeat really long line"""
-
-    return weakget(settings)["openshift"]["projects"]["threescale"]["name"] % "UNKNOWN"
-
-
-# Currently this doesn't work with xdist
 # https://github.com/pytest-dev/pytest/issues/7767
-# Therefore _global_property hack is present below
-# **AND** therefore @fixture commented out to avoid properties
-# doubled on single execution. Once xdist issue will be fixed
-# this will be updated
-# @pytest.fixture(scope="session", autouse=True)
-def testsuite_properties(record_testsuite_property):
-    """Add custom testsuite properties to junit"""
-
-    title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
-    runid = f"{title} {_oc_3scale_project()} {settings['threescale']['version']}"
-    projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
-    team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
-
-    record_testsuite_property("polarion-project-id", projectid)
-    record_testsuite_property("polarion-response-myteamsname", team)
-    record_testsuite_property("polarion-testrun-title", runid)
-    record_testsuite_property("polarion-lookup-method", "name")
-
-
-# pylint: disable=import-outside-toplevel,protected-access
-def _global_property(config, name, value):
-    """Temporary hack as record_global_property doesn't work with xdist"""
+# pylint: disable=import-outside-toplevel
+def _junit_testsuite_property(config, name, value):
+    """Record a property to junit on testsuite level"""
 
     from _pytest.junitxml import xml_key
-    xml = config._store.get(xml_key, None)
+    xml = config.stash.get(xml_key, None)
     if xml:
         xml.add_global_property(name, value)
 
 
-# pylint: disable=too-many-locals
-def pytest_report_header(config):
-    """Add basic details about testsuite configuration"""
+def pytest_metadata(metadata):
+    """Update testsuite metadata"""
+    _settings = weakget(settings)
+
     testsuite_version = resources.files("testsuite").joinpath("VERSION").read_text().strip()
-    environment = settings["env_for_dynaconf"]
-    openshift = settings.get("openshift", {}).get("servers", {}).get("default", {}).get("server_url", "UNKNOWN")
-    project = _oc_3scale_project()
-    threescale = settings["threescale"]["admin"]["url"]
-    version = weakget(settings)["threescale"]["version"] % testsuite_version
+    version = _settings["threescale"]["version"] % testsuite_version
+    namespace = _settings["openshift"]["projects"]["threescale"]["name"] % "UNKNOWN"
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
         title = title.split("/")[-1]  # this is due to possible job structure in jenkins
-    title = weakget(settings)["reporting"]["title"] % f"{title} {_oc_3scale_project()} {version}"
-    projectid = weakget(settings)["reporting"]["testsuite_properties"]["polarion_project_id"] % "None"
-    team = weakget(settings)["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None"
+    title = _settings["reporting"]["title"] % f"{title} {namespace} {version}"
 
-    _global_property(config, "openshift-url", openshift)
-    _global_property(config, "openshift-namespace", project)
-    _global_property(config, "testsuite-version", testsuite_version)
-    _global_property(config, "polarion-project-id", projectid)
-    _global_property(config, "polarion-response-myteamsname", team)
-    _global_property(config, "polarion-testrun-title", title)
-    _global_property(config, "polarion-testrun-id", title.replace(".", "_").replace(" ", "_"))
-    _global_property(config, "polarion-testrun-status-id", "inprogress")
-    _global_property(config, "polarion-lookup-method", "name")
-
-    header = [
-        "",
-        f"testsuite: testsuite version = {testsuite_version}",
-        f"testsuite: environment = {environment}",
-        f"testsuite: openshift = {openshift}",
-        f"testsuite: project = {project}",
-        f"testsuite: threescale = {threescale}",
-        f"testsuite: for 3scale version = {version}",
-        ]
+    metadata.update({
+        "env_for_dynaconf": settings["env_for_dynaconf"],
+        "testsuite-version": testsuite_version,
+        "_3SCALE_TESTS_threescale__admin__url": _settings["threescale"]["admin"]["url"] % "UNKNOWN",
+        "_3SCALE_TESTS_threescale__version": version,
+        "_3SCALE_TESTS_openshift__servers__default__server_url":
+            _settings["openshift"]["servers"]["default"]["server_url"] % "UNKNOWN",
+        "NAMESPACE": namespace,
+        "polarion-testrun-title": title,
+        "polarion-testrun-id": title.replace(".", "_").replace(" ", "_"),
+        "polarion-testrun-status-id": "inprogress",
+        "polarion-project-id": _settings["reporting"]["testsuite_properties"]["polarion_project_id"] % "None",
+        "polarion-response-myteamsname":
+            _settings["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None",
+        "polarion-lookup-method": "name",
+    })
 
     if Capability.OCP4 in CapabilityRegistry():
-        apicast_project = \
-            weakget(settings)["threescale"]["gateway"]["OperatorApicast"]["openshift"]["project_name"] % "None"
-        apicast_version = settings["threescale"]["apicast_operator_version"]
-        catalogsource = weakget(settings)["threescale"]["catalogsource"] % "UNKNOWN"
-        _global_property(config, "openshift-catalogsource", catalogsource)
 
-        header.append(f"testsuite: Apicast operator project = {apicast_project}")
-        header.append(f"testsuite: for Apicast operator version = {apicast_version}")
-        header.append(f"testsuite: catalogsource = {catalogsource}")
+        metadata["_3SCALE_TESTS_threescale__gateway__OperatorApicast__openshift__project_name"] = \
+            _settings["threescale"]["gateway"]["OperatorApicast"]["openshift"]["project_name"] % "None"
+        metadata["_3SCALE_TESTS_threescale__apicast_operator_version"] = \
+            _settings["threescale"]["apicast_operator_version"] % "UNKNOWN"
+        metadata["_3SCALE_TESTS_threescale__catalogsource"] = _settings["threescale"]["catalogsource"] % "UNKNOWN"
 
-    if config.getoption("--toolbox"):
-        toolboximage = weakget(settings)["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
-        toolboxversion = "UNKNOWN"
+    toolboximage = _settings["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
+    toolboxversion = "UNKNOWN"
 
-        if toolboximage != "UNKNOWN":
-            try:
-                toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
-            except BoxKeyError:
-                warnings.warn("Toolbox executioner is not configured")
+    if toolboximage != "UNKNOWN":
+        try:
+            toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
+        except BoxKeyError:
+            warnings.warn("Toolbox executioner is not configured")
 
-        header.append(f"testsuite: toolbox version = {toolboxversion}")
-        header.append(f"testsuite: toolbox image tag = {toolboximage}")
+    metadata["toolbox-version"] = toolboxversion
+    metadata["_3SCALE_TESTS_toolbox__podman_image"] = toolboximage
 
+
+# pylint: disable=protected-access
+def pytest_report_header(config):
+    """Report testsuite metadata"""
+    header = [""]
+    for key in sorted(config._metadata.keys()):
+        header.append(f"testsuite: {key}={config._metadata[key]}")
+        _junit_testsuite_property(config, key, config._metadata[key])
+    for key in sorted(k for k in os.environ if k.startswith("_3SCALE_TESTS")):
+        header.append(f"env: {key}={os.environ[key]}")
+        _junit_testsuite_property(config, key, os.environ[key])
     header.append("")
     return header
 

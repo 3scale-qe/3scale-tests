@@ -55,6 +55,7 @@ stripe= "*"
 braintree = "*"
 pillow = "*"
 pytest-persistence = "*"
+pytest-metadata = "*"
 
 [requires]
 python_version = "3"
