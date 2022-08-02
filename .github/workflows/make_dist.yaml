@@ -4,7 +4,6 @@ on:
     tags:
       - v*
 env:
-  fetch_tools: ${{ secrets.FETCH_TOOLS }}
   CACERT_CONTENT: ${{ secrets.CACERT }}
   CACERT: custom-ca.crt
 jobs:
@@ -27,6 +26,10 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       - name: cacert
         run: echo "$CACERT_CONTENT" > $CACERT
+      - name: tools
+        run: echo "::set-output name=url::$(gh api /repos/3scale-qe/tools/releases/latest --jq .tarball_url)"
       - name: make dist
         run: make dist IMAGENAME="quay.io/rh_integration/3scale-testsuite" PUSHIMAGE=y
+        env:
+          fetch_tools: ${{steps.tools.outputs.url}}
 
