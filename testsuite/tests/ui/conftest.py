@@ -27,18 +27,18 @@ from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
 from testsuite.ui.views.master.audience.tenant import TenantNewView
 from testsuite.ui.views.master.login import MasterLoginView
-from testsuite.ui.webdriver import Webdriver
+from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
 def webdriver():
     """Creates instance of Web Driver with configuration"""
-    return Webdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                     driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                     ssl_verify=settings["ssl_verify"],
-                     remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                     binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
+    return ThreescaleWebdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
+                               driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+                               ssl_verify=settings["ssl_verify"],
+                               remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                               binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
 
 
 @pytest.fixture(scope="module")

@@ -88,11 +88,22 @@ class _Firefox:
         return self.webdriver
 
 
-class Webdriver:
+class ThreescaleWebdriver:
     """
-    Selenium driver of desired provider.
-    It is also capable of finalizing the browser when it's not needed anymore.
+    Selenium web driver of the desired provider.
+    Usage:
+        # Init
+        correct driver factory classes (`_Chrome` and `_Firefox`) are initialized based on the required `driver`.
+        This will the call correct `DriverManager` and install the web driver if the local `source` is selected.
 
+        # Execution
+        `start_session()` calls respective factory class, which initialize installed WebDriver
+        (`webdriver.Remote` if the `source` is remote) and returns an instance of WebDriver with
+        running browser session.
+
+        # Finalize
+        to clean-up after tests, perform `finalize()`. This quits the driver and closes every associated window.
+        Note that the installed web driver is not removed by this action.
     """
 
     # pylint: disable=too-many-arguments
