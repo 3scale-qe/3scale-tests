@@ -49,8 +49,21 @@ class MailhogClient:
         assert response.status_code == 200, f"The request to mailhog failed: {response.status_code} {response.text}"
         return response
 
+    def _all_messages(self, start):
+        """Do the paging, return all"""
+        response = self.messages(start=start, limit=500)
+        count = response["count"] + start
+        while count < response["total"] - start:
+            chunk = self.messages(start=count, limit=500)
+            response["items"] += chunk["items"]
+            response["count"] += chunk["count"]
+            count = response["count"]
+        return response
+
     def messages(self, start: int = 0, limit: int = 25):
         """Gets sent emails to the mailhog"""
+        if limit == -1:
+            return self._all_messages(start)
         params = {"start": start, "limit": limit}
         response = self.request(params=params, endpoint="api/v2/messages")
         # The quotes are in the returned json escaped by two backslashes and python

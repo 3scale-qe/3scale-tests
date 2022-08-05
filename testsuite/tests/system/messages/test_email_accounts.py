@@ -81,10 +81,10 @@ def test_emails_after_account_creation(mailhog_client, mail_template):
     """
     tpl = mail_template  # safe few letters
 
-    messages = mailhog_client.messages()["items"]
+    messages = mailhog_client.messages(limit=-1)["items"]
     assert messages, "Mailhog inbox is empty"
 
-    messages = [m for m in messages if message_match(tpl, "Headers", headers(m)["X-SMTPAPI"])]
+    messages = [m for m in messages if message_match(tpl, "Headers", headers(m).get("X-SMTPAPI", "DO NOT MATCH"))]
     assert messages, f"Didn't find assumed X-SMTPAPI: {tpl['Headers']}"
 
     messages = [m for m in messages if headers(m, filter_keys=tpl["equal_templates"].keys()) == tpl["equal_templates"]]
