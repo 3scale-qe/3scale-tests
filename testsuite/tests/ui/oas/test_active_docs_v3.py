@@ -67,9 +67,8 @@ def prod_client(prod_client):
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope='module')
-def ui_active_doc(custom_admin_login, request, navigator, service, oas3_spec):
+def ui_active_doc(login, request, navigator, service, oas3_spec):
     """Active doc. bound to service created via UI"""
-    custom_admin_login()
     name = blame(request, "active_doc_v3")
     system_name = blame(request, "system_name")
     edit = navigator.navigate(ActiveDocsNewView)
@@ -95,6 +94,7 @@ def test_active_docs_v3_generate_endpoints(login, navigator, ui_active_doc, serv
     """
     preview_page = navigator.navigate(ActiveDocsDetailView, product=service,
                                       active_doc=ui_active_doc)
+    navigator.browser.selenium.refresh()
     preview_page.wait_displayed()
     assert preview_page.oas3.active_docs_section.endpoints == ['/pets', '/pets', '/pets/{id}', '/pets/{id}']
     key = f"{application.entity_name} - {service['name']}"

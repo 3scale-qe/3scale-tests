@@ -1,76 +1,151 @@
 """Selenium factory for creating  Threescale browser instances to run UI tests. """
 
+
 from selenium import webdriver
-from selenium.webdriver.remote.remote_connection import RemoteConnection
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver import FirefoxProfile
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+
 from testsuite.ui.exception import WebDriverError
 
 
-class SeleniumDriver:
+class _Chrome:
+    """Factory class for Chrome browser"""
+
+    def __init__(self, source, ssl_verify, remote_url=None, binary_path=None):
+        self.source = source
+        self.remote_url = remote_url
+        self.binary_path = binary_path
+        self.webdriver = None
+        self.options = ChromeOptions()
+
+        if not ssl_verify:
+            self.options.set_capability("acceptInsecureCerts", True)
+
+    def install(self):
+        """Installs the web driver"""
+        if self.source == 'local':
+            self.binary_path = ChromeDriverManager().install()
+
+    def start_session(self):
+        """Initializes and starts web browser"""
+        if self.source == 'remote':
+            self.webdriver = webdriver.Remote(command_executor=self.remote_url + '/wd/hub',
+                                              options=self.options)
+        elif self.source in ('local', 'binary'):
+            self.webdriver = webdriver.Chrome(service=ChromeService(executable_path=self.binary_path),
+                                              options=self.options)
+        else:
+            raise ValueError(
+                '"{}" source is not supported. Please use one of {}'
+                .format(self.source, ('local', 'binary', 'remote'))
+            )
+
+        return self.webdriver
+
+
+class _Firefox:
+    """Factory class for Firefox browser"""
+
+    def __init__(self, source, ssl_verify, remote_url=None, binary_path=None):
+        self.source = source
+        self.remote_url = remote_url
+        self.binary_path = binary_path
+        self.webdriver = None
+        self.options = FirefoxOptions()
+
+        profile = FirefoxProfile()
+        # default Firefox profile preference `open_newwindow` is set to 2. This causes the links open
+        # in the new window instead of a new tab.
+        profile.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
+        if not ssl_verify:
+            profile.accept_untrusted_certs = True
+        self.options.profile = profile
+
+    def install(self):
+        """Installs the web driver"""
+        if self.source == 'local':
+            self.binary_path = GeckoDriverManager().install()
+
+    def start_session(self):
+        """Initializes and starts web browser"""
+        if self.source == 'remote':
+            self.webdriver = webdriver.Remote(command_executor=self.remote_url + '/wd/hub',
+                                              options=self.options)
+        elif self.source in ('local', 'binary'):
+            self.webdriver = webdriver.Firefox(service=FirefoxService(executable_path=self.binary_path),
+                                               options=self.options)
+        else:
+            raise ValueError(
+                '"{}" source is not supported. Please use one of {}'
+                .format(self.source, ('local', 'binary', 'remote'))
+            )
+
+        return self.webdriver
+
+
+class ThreescaleWebdriver:
     """
-    Selenium driver of desired provider.
-    It is also capable of finalizing the browser when it's not needed anymore.
+    Selenium web driver of the desired provider.
+    Usage:
+        # Init
+        correct driver factory classes (`_Chrome` and `_Firefox`) are initialized based on the required `driver`.
+        This will the call correct `DriverManager` and install the web driver if the local `source` is selected.
 
-    Usage::
-        # init
-        driver = SeleniumDriver
+        # Execution
+        `start_session()` calls respective factory class, which initialize installed WebDriver
+        (`webdriver.Remote` if the `source` is remote) and returns an instance of WebDriver with
+        running browser session.
 
-        # get factory browser
-        browser = driver.get_browser()
-
-        # navigate to desired url
-        # [...]
-
-        # perform post-init steps (e.g. skipping certificate error screen)
-        driver.post_init()
-
-        # perform your test steps
-        # [...]
-
-        # perform factory clean-up
-        driver.finalize()
+        # Finalize
+        to clean-up after tests, perform `finalize()`. This quits the driver and closes every associated window.
+        Note that the installed web driver is not removed by this action.
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, source, driver, ssl_verify, remote_url=None, binary_path=None):
+    def __init__(self, driver, source, ssl_verify, remote_url=None, binary_path=None):
         """
         Initializes factory with either specified or fetched from settings values.
-        :param str source: Browser source name. One of  ('local', 'binary', 'remote')
         :param str driver: Browser name. One of ('chrome', 'firefox')
+        :param str source: Browser source name. One of  ('local', 'binary', 'remote')
         :param str ssl_verify: option for certificates ignore
         :param str optional remote_url: URL of remote webdriver
         """
-        self.source = source
         self.driver = driver
-        self.ssl_verify = ssl_verify
+        self.source = source
         self.remote_url = remote_url or 'http://127.0.0.1:4444'
         self.binary_path = binary_path
         self.webdriver = None
+        self.session = None
 
-    # pylint: disable=no-else-return
-    def get_driver(self):
-        """
-        Returns selenium webdriver instance of selected source and browser.
-
-        :return: selenium webdriver instance
-        :raises: ValueError: If wrong provider or browser specified.
-        """
-        if self.source in ('local', 'binary'):
-            return self._get_selenium_driver()
-        elif self.source == 'remote':
-            return self._get_remote_driver()
+        if self.driver == 'chrome':
+            self.webdriver = _Chrome(source, ssl_verify, remote_url, binary_path)
+        elif self.driver == 'firefox':
+            self.webdriver = _Firefox(source, ssl_verify, remote_url, binary_path)
         else:
             raise ValueError(
-                '"{}" browser is not supported. Please use one of {}'
-                .format(self.source, ('local', 'remote', 'binary'))
+                '"{}" webdriver is not supported. Please use one of {}'
+                .format(self.driver, ('chrome', 'firefox'))
             )
+        self.webdriver.install()
+
+    def start_session(self):
+        """
+        Starts installed webdriver session.
+        """
+        self.session = self.webdriver.start_session()
+        self.post_init()
+        return self.session
 
     def post_init(self):
         """
         Perform all required post-init actions.
         """
-        self.webdriver.maximize_window()
+        self.session.maximize_window()
 
     def finalize(self):
         """
@@ -78,81 +153,6 @@ class SeleniumDriver:
         :raises: WebDriverError: If problem with browser happens finalization occurs.
         """
         try:
-            self.webdriver.quit()
+            self.session.quit()
         except Exception as exception:
             raise WebDriverError("Problem with browser finalization") from exception
-
-    def _get_selenium_driver(self):
-        """
-        Returns selenium webdriver instance of selected browser.
-        :note: Should not be called directly, use :meth:get_driver to choose which browser will be used.
-        :raises: ValueError: If wrong browser is specified.
-        """
-        if self.driver == 'chrome':
-            options = webdriver.ChromeOptions()
-            if not self.ssl_verify:
-                options.set_capability("acceptInsecureCerts", True)
-
-            if self.source == 'binary':
-                executor = self.binary_path
-            elif self.source == 'local':
-                executor = ChromeDriverManager().install()
-            else:
-                raise ValueError(
-                    '"{}" source is not supported. Please use one of {}'
-                    .format(self.source, ('local', 'binary', 'remote'))
-                )
-
-            self.webdriver = webdriver.Chrome(executable_path=executor,
-                                              chrome_options=options)
-        elif self.driver == 'firefox':
-            browser_profile = webdriver.FirefoxProfile()
-            # default Firefox profile preference `open_newwindow` is set to 2. This causes the links open
-            # in the new window instead of a new tab.
-            browser_profile.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
-            if not self.ssl_verify:
-                browser_profile.accept_untrusted_certs = True
-            if self.source == 'binary':
-                executor = self.binary_path
-            elif self.source == 'local':
-                executor = GeckoDriverManager().install()
-            else:
-                raise ValueError(
-                    '"{}" source is not supported. Please use one of {}'
-                    .format(self.source, ('local', 'binary', 'remote'))
-                )
-
-            self.webdriver = webdriver.Firefox(firefox_profile=browser_profile,
-                                               executable_path=executor)
-        else:
-            raise ValueError(
-                '"{}" webdriver is not supported. Please use one of {}'
-                .format(self.driver, ('chrome', 'firefox', 'edge'))
-            )
-        return self.webdriver
-
-    def _get_remote_driver(self):
-        """
-        :return:  Returns remote webdriver instance of selected browser
-        :note: Should not be called directly, use :meth:get_browser to choose which browser will be used
-        """
-        if self.driver == 'chrome':
-            browser_options = webdriver.ChromeOptions()
-            command_executor = RemoteConnection(self.remote_url + '/wd/hub')
-        elif self.driver == 'firefox':
-            browser_options = webdriver.FirefoxOptions()
-            command_executor = RemoteConnection(self.remote_url + '/wd/hub')
-        else:
-            raise ValueError(
-                '"{}" webdriver is not supported. Please use one of {}'
-                .format(self.driver, ('chrome', 'firefox', 'edge'))
-            )
-
-        if not self.ssl_verify and self.driver != 'edge':
-            browser_options.set_capability("acceptInsecureCerts", True)
-
-        self.webdriver = webdriver.Remote(
-            command_executor=command_executor,
-            options=browser_options
-        )
-        return self.webdriver

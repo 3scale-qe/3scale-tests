@@ -8,15 +8,14 @@ from datetime import datetime
 
 import backoff
 import pytest
-from PIL import Image
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
+from PIL import Image
 
 from testsuite import rawobj, resilient
 from testsuite.auth0 import auth0_token
 from testsuite.billing import Stripe, Braintree
 from testsuite.config import settings
-from testsuite.tests.ui import Sessions
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
 from testsuite.ui.views.admin.audience.account import AccountNewView
@@ -28,21 +27,21 @@ from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
 from testsuite.ui.views.master.audience.tenant import TenantNewView
 from testsuite.ui.views.master.login import MasterLoginView
-from testsuite.ui.webdriver import SeleniumDriver
+from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame
 
 
 @pytest.fixture(scope="session")
 def webdriver():
     """Creates instance of Web Driver with configuration"""
-    return SeleniumDriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                          driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                          ssl_verify=settings["ssl_verify"],
-                          remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                          binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
+    return ThreescaleWebdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
+                               driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+                               ssl_verify=settings["ssl_verify"],
+                               remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+                               binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def browser(webdriver, request):
     """
     Browser representation based on UI settings
@@ -51,113 +50,9 @@ def browser(webdriver, request):
         :param request: Finalizer for session cleanup
         :return browser: Browser instance
     """
-    webdriver.get_driver()
-    webdriver.post_init()
-    started_browser = ThreeScaleBrowser(selenium=webdriver.webdriver)
+    browser = ThreeScaleBrowser(selenium=webdriver.start_session())
     request.addfinalizer(webdriver.finalize)
-    return started_browser
-
-
-@pytest.fixture(scope="session")
-def sessions():
-    """Sessions that were stored during test run"""
-    return Sessions()
-
-
-@pytest.fixture(scope="module")
-def custom_admin_login(browser, sessions, navigator):
-    """
-    Login fixture for admin portal.
-    :param browser: Browser instance
-    :param sessions: Dict-like instance that contains all available browserSessions that were used within scope=session
-    :param navigator: Navigator Instance
-    :return: Login to Admin portal with custom credentials
-    """
-
-    def _login(name=None, password=None):
-        url = settings["threescale"]["admin"]["url"]
-        name = name or settings["threescale"]["admin"]["username"]
-        password = password or settings["threescale"]["admin"]["password"]
-        browser.url = url
-
-        if not sessions.restore(browser, name, password, url):
-            page = navigator.open(LoginView)
-            page.do_login(name, password)
-            cookies = [browser.selenium.get_cookie('user_session')]
-            sessions.save(name, password, url, values=cookies)
-
-    return _login
-
-
-@pytest.fixture
-def login(custom_admin_login):
-    """
-    Login to the Admin portal with default admin credentials
-    :param custom_admin_login: Parametrized login method
-    :return: Login with default credentials
-    """
-    return custom_admin_login()
-
-
-@pytest.fixture
-def master_login(browser, navigator):
-    """
-    Login to the Master portal with default admin credentials
-    :param browser: Browser instance
-    :param navigator: Navigator Instance
-    :return: Login with default credentials
-    """
-    url = settings["threescale"]["master"]["url"]
-    name = settings["threescale"]["master"]["username"]
-    password = settings["threescale"]["master"]["password"]
-    browser.url = url
-
-    page = navigator.open(MasterLoginView)
-
-    if page.is_displayed:
-        page.do_login(name, password)
-
-
-@pytest.fixture(scope="module")
-def custom_devel_login(browser, sessions, navigator, provider_account, account_password):
-    """
-    Login to Developer portal with specific account or credentials
-    :param browser: Browser instance
-    :param sessions: Dict-like instance that contains all available browserSessions that were used within scope=session
-    :param navigator: Navigator Instance
-    :param provider_account: Currently used provider account (tenant)
-    :param account_password: fixture that returns default account password
-    :return: Login to Developer portal with custom credentials (account or name-password pair)
-    """
-
-    def _login(account=None, name=None, password=None):
-        url = settings["threescale"]["devel"]["url"]
-        name = name or account['org_name']
-        password = password or account_password
-        browser.url = url
-
-        if not sessions.restore(browser, name, password, url):
-            page = navigator.open(LoginDevelView,
-                                  access_code=provider_account['site_access_code'])
-            page.do_login(name, password)
-            cookies = [browser.selenium.get_cookie('access_code'),
-                       browser.selenium.get_cookie('user_session')]
-            cookies = [cookie for cookie in cookies if cookie is not None]
-            sessions.save(name, password, url, values=cookies)
-
-    return _login
-
-
-@pytest.fixture
-def devel_login(account, custom_devel_login):
-    """
-    return custom_admin_login()
-    Login to the Developer portal with new account
-    :param account: Source of login credentials
-    :param custom_devel_login: Parametrized developer portal login method
-    :return: Login to Developer portal with account created by session scoped fixture
-    """
-    return custom_devel_login(account=account)
+    return browser
 
 
 @pytest.fixture(scope="module")
@@ -171,9 +66,93 @@ def navigator(browser):
     return navigator
 
 
+@pytest.fixture(scope="module")
+def custom_admin_login(navigator, browser):
+    """
+    Returns parametrized Login fixture for Admin portal.
+    To remove cookies and previous login session (from Admin portal), set `fresh` flag to True.
+    :param navigator: Navigator Instance
+    :return: Login to Admin portal with custom credentials
+    """
+
+    def _login(name=None, password=None, fresh=None):
+        url = settings["threescale"]["admin"]["url"]
+        name = name or settings["threescale"]["admin"]["username"]
+        password = password or settings["threescale"]["admin"]["password"]
+        page = navigator.open(LoginView, url=url)
+        if fresh:
+            browser.selenium.delete_all_cookies()
+            browser.selenium.refresh()
+        if page.is_displayed:
+            page.do_login(name, password)
+
+    return _login
+
+
+@pytest.fixture(scope="module")
+def login(custom_admin_login):
+    """
+    Login to the Admin portal with default admin credentials
+    :param custom_admin_login: Parametrized login method
+    :return: Login with default credentials
+    """
+    return custom_admin_login()
+
+
+@pytest.fixture(scope="module")
+def master_login(navigator):
+    """
+    Login to the Master portal with default admin credentials
+    :param navigator: Navigator Instance
+    :return: Login with default credentials
+    """
+    url = settings["threescale"]["master"]["url"]
+    name = settings["threescale"]["master"]["username"]
+    password = settings["threescale"]["master"]["password"]
+    page = navigator.open(MasterLoginView, url=url)
+
+    if page.is_displayed:
+        page.do_login(name, password)
+
+
+@pytest.fixture(scope="module")
+def custom_devel_login(navigator, provider_account, account_password):
+    """
+    Login to Developer portal with specific account or credentials
+    :param navigator: Navigator Instance
+    :param provider_account: Currently used provider account (tenant)
+    :param account_password: fixture that returns default account password
+    :return: Login to Developer portal with custom credentials (account or name-password pair)
+    """
+
+    def _login(account=None, name=None, password=None):
+        url = settings["threescale"]["devel"]["url"]
+        name = name or account['org_name']
+        password = password or account_password
+        page = navigator.open(LoginDevelView,
+                              url=url,
+                              access_code=provider_account['site_access_code'])
+        if page.is_displayed:
+            page.do_login(name, password)
+
+    return _login
+
+
+@pytest.fixture(scope="module")
+def devel_login(account, custom_devel_login):
+    """
+    return custom_admin_login()
+    Login to the Developer portal with new account
+    :param account: Source of login credentials
+    :param custom_devel_login: Parametrized developer portal login method
+    :return: Login to Developer portal with account created by session scoped fixture
+    """
+    return custom_devel_login(account=account)
+
+
 # pylint: disable=unused-argument, too-many-arguments
 @pytest.fixture(scope="module")
-def custom_ui_tenant(navigator, threescale, testconfig, request, master_threescale):
+def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, master_threescale):
     """Parametrized custom Tenant created via UI"""
 
     def _custom_ui_tenant(username: str = "",
