@@ -8,6 +8,7 @@ from datetime import datetime
 
 import backoff
 import pytest
+import pytest_html
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
@@ -311,6 +312,37 @@ def custom_ui_app_plan(custom_admin_login, navigator):
     return _custom_ui_app_plan
 
 
+# this is set in pytest_exception_interact() and used
+# in pytest_html_results_table_html() as it is not directly accessible there
+html_report = None  # pylint: disable=invalid-name
+
+
+def pytest_html_results_table_html(report, data):
+    """
+    Make image path relative to resultsdir; skip logs if passed
+
+    For obvious reason this is heavily dependent on html report structure,
+    if that change this will stop working
+    """
+    if report.passed:
+        del data[:]
+
+    for i in data:
+        href = None
+        img = None
+        try:
+            basedir = os.path.dirname(html_report)
+            href = i[0].attr.href
+            img = i[0][0].uniobj
+        except (TypeError, AttributeError, IndexError):
+            continue
+        if href:
+            i[0].attr.href = os.path.relpath(href, start=basedir)
+        if img:
+            new = os.path.relpath(href, start=basedir)
+            i[0][0].uniobj = i[0][0].uniobj.replace(href, new, 1)
+
+
 def pytest_exception_interact(node, call, report):
     """
         Method that is being invoked, when a test fails (hook)
@@ -325,13 +357,20 @@ def pytest_exception_interact(node, call, report):
        :param call: in depth summary of what exception was thrown
        :param report: generated summary of the test output
     """
-    if report.failed:
+    if report.failed or hasattr(report, "wasxfail"):
         browser = node.funcargs.get("browser")
         if not browser:
             return
 
         try:
-            fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            filepath = fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            extra = getattr(report, "extra", [])
+            extra.append(pytest_html.extras.image(filepath))
+            report.extra = extra
+
+            global html_report  # pylint: disable=global-statement,invalid-name
+            html_report = node.config.getoption("--html")
+
         # pylint: disable=broad-except
         except Exception:
             traceback.print_exc()
@@ -404,7 +443,9 @@ def fullpage_screenshot(driver, file_path):
         part += 1
 
     date = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
-    stitched_image.save(file_path + f"/{date}.png")
+    fullpath = f"{file_path}/{date}.png"
+    stitched_image.save(fullpath)
+    return fullpath
 
 
 @pytest.fixture(scope="module")

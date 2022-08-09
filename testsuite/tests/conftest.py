@@ -102,6 +102,28 @@ def pytest_runtest_setup(item):
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
 
 
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):  # pylint: disable=unused-argument
+    """Add jira link to html report"""
+    pytest_html = item.config.pluginmanager.getplugin("html")
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, "extra", [])
+    if report.when == "setup":
+        for marker in item.iter_markers(name="issue"):
+            issue = marker.args[0]
+            issue_id = issue.rstrip("/").split("/")[-1]
+            extra.append(pytest_html.extras.url(issue, name=issue_id))
+        report.extra = extra
+
+
+@pytest.mark.optionalhook
+def pytest_html_results_table_html(report, data):
+    """Remove logs for passed tests"""
+    if report.passed:
+        del data[:]
+
+
 # pylint: disable=unused-argument
 def pytest_collection_modifyitems(session, config, items):
     """
