@@ -25,6 +25,10 @@ ifdef junit
 PYTEST += --junitxml=$(resultsdir)/junit-$(@F).xml -o junit_suite_name=$(@F)
 endif
 
+ifdef html
+PYTEST += --html=$(resultsdir)/report-$(@F).html
+endif
+
 ifeq ($(filter $(--store||--load),$(flags)),$(flags))
 	PYTEST += -p no:persistence
 endif
