@@ -76,7 +76,7 @@ performance-smoke: pipenv
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
 
 ui: pipenv
-	$(PYTEST) --ui $(flags) testsuite/tests/ui
+	$(PYTEST) --ui --html=$(resultsdir)/report-ui.html $(flags) testsuite/tests/ui
 
 toolbox: pipenv
 	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
