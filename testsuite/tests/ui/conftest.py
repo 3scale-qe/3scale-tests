@@ -8,6 +8,7 @@ from datetime import datetime
 
 import backoff
 import pytest
+import pytest_html
 from PIL import Image
 from auth0.v3.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
@@ -332,6 +333,29 @@ def custom_ui_app_plan(custom_admin_login, navigator):
     return _custom_ui_app_plan
 
 
+def pytest_html_results_table_html(report, data):
+    """
+    Make image path relative to resultsdir; skip logs if passed
+
+    For obvious reason this is heavily dependent on html report structure,
+    if that change this will stop working
+    """
+    if report.passed:
+        del data[:]
+
+    resultsdir = "%s/" % _resultsdir().rstrip("/")
+    for i in data:
+        try:
+            href = i[0].attr.href
+            img = i[0][0].uniobj
+        except (TypeError, AttributeError, IndexError):
+            continue
+        if href:
+            i[0].attr.href = i[0].attr.href.replace(resultsdir, "", 1)
+        if img:
+            i[0][0].uniobj = i[0][0].uniobj.replace(resultsdir, "", 1)
+
+
 def pytest_exception_interact(node, call, report):
     """
         Method that is being invoked, when a test fails (hook)
@@ -352,10 +376,18 @@ def pytest_exception_interact(node, call, report):
             return
 
         try:
-            fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            filepath = fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            extra = getattr(report, "extra", [])
+            extra.append(pytest_html.extras.image(filepath))
         # pylint: disable=broad-except
         except Exception:
             traceback.print_exc()
+
+
+def _resultsdir():
+    """Return path to resultsdir"""
+    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../..')
+    return os.environ.get("resultsdir", no_argument_dir)
 
 
 def get_resultsdir_path(node):
@@ -364,9 +396,7 @@ def get_resultsdir_path(node):
     """
 
     xml = node.config.getoption('--junitxml')
-    # path to "3scape-py-testsuite" folder
-    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../..')
-    resultsdir = os.environ.get("resultsdir", no_argument_dir)
+    resultsdir = _resultsdir()
     failed_test_name = node.nodeid.replace('/', '.').replace('.py::', '.')
 
     if not xml:
@@ -425,7 +455,9 @@ def fullpage_screenshot(driver, file_path):
         part += 1
 
     date = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
-    stitched_image.save(file_path + f"/{date}.png")
+    fullpath = f"{file_path}/{date}.png"
+    stitched_image.save(fullpath)
+    return fullpath
 
 
 @pytest.fixture(scope="module")
