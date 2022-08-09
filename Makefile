@@ -99,7 +99,7 @@ test-in-docker:
 		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
 		-v `readlink -f $(resultsdir)`:/test-run-results:z \
 		-e NAMESPACE \
-		`env | grep _3SCALE_TESTS_ | sed 's/^/-e /'` \
+		`env | awk -F= '/^_3SCALE_TESTS_/{print "-e", $$1}'` \
 		-e flags \
 		-e _3SCALE_TESTS_fixtures__ui__browser__source=remote \
 		-e _3SCALE_TESTS_fixtures__ui__browser__remote_url=http://selenium:4444 \
