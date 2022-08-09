@@ -10,7 +10,7 @@ import pytest
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
 def assert_message_received(mailhog, text):
     """Resilient test on presence of expected message with retry"""
-    messages = mailhog.messages()
+    messages = mailhog.messages(limit=-1)
     ids = list(m["ID"] for m in messages["items"] if text in m["Content"]["Body"])
     assert len(ids) == 1, f"Expected 1 mail, found {len(ids)}"
     return ids
