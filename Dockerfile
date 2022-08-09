@@ -20,7 +20,7 @@ RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/opensh
 RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
     chmod +x /usr/local/bin/cfssl
 
-RUN yum install -y python3.9 git make && \
+RUN yum install -y python3.9 git make gettext && \
 	yum clean all
 
 RUN pip3 --no-cache-dir install pipenv
