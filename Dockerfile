@@ -44,8 +44,9 @@ ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
 ENV WORKON_HOME=/opt/workdir/virtualenvs
 ENV junit=yes
 ENV resultsdir=/test-run-results
+ENV BASH_ENV=~/.profile
 
-RUN echo umask 002 >>$HOME/.bashrc \
+RUN echo umask 002 | tee -a $HOME/.profile >>$HOME/.bashrc \
 	&& make mostlyclean pipenv \
 	&& rm -Rf $HOME/.cache/*
 
