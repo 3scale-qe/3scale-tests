@@ -4,6 +4,8 @@
 	container-image \
 	clean
 
+SHELL = /bin/bash
+
 TB ?= short
 LOGLEVEL ?= INFO
 
