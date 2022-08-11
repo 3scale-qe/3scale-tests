@@ -118,3 +118,40 @@ def test_move_policy(login, navigator, policy_service, api_client, policy_applic
 
     response = api_client(app=policy_application).get('/anything')
     assert response.status_code == 333
+
+
+# pylint: disable=unused-argument
+def test_edit_policy_widgets(login, navigator, policy_service, api_client, policy_application):
+    """
+    Test:
+        - Create service via API
+        - Navigate to Policies page and add URL Rewriting policy with rewriting command via UI
+        - Assert that policy was added and is applied
+        - Navigate to the configuration page and promote new configuration to the staging phase
+        - Fetch product policies
+        - Assert that new URL Rewriting policy configuration was successfully applied
+        - Assert that new URL Rewriting policy correctly modifying path
+    """
+    policies_page = navigator.navigate(ProductPoliciesView, product=policy_service)
+    policies_page.add_policy(Policies.URL_REWRITING.value)
+    assert policies_page.policy_section.has_item(Policies.URL_REWRITING.value)
+
+    policies_page.policy_section.edit_policy(Policies.URL_REWRITING.value)
+    policies_page.url_rewrite_policy_view.add_rewriting_command(regex="hello", replace="get", operation="gsub")
+    policies_page.update_policy_chain_button.click()
+    assert policies_page.outdated_config.is_displayed
+
+    configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
+    configuration_page.configuration.staging_promote_btn.click()
+
+    policies: list = policy_service.proxy.list()["policies_config"]
+    assert len(policies) == 2
+    url_rewriting_policy = policies[1]
+
+    assert url_rewriting_policy["name"] == "url_rewriting"
+    assert url_rewriting_policy["configuration"]["commands"][0]["regex"] == "hello"
+    assert url_rewriting_policy["configuration"]["commands"][0]["replace"] == "get"
+    assert url_rewriting_policy["configuration"]["commands"][0]["op"] == "gsub"
+
+    response = api_client(app=policy_application).get('/hello')
+    assert response.json()["path"] == "/get"

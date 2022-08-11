@@ -1,5 +1,6 @@
 """View representations of products integration policies section pages"""
 import enum
+from typing import Literal
 
 from widgetastic.widget import TextInput, View, FileInput
 from widgetastic_patternfly4 import Button
@@ -15,6 +16,7 @@ class Policies(enum.Enum):
     THREESCALE_APICAST = "3scale APIcast"
     ECHO = "Echo"
     THREESCALE_REFERRER = "3scale Referrer"
+    URL_REWRITING = "URL Rewriting"
 
 
 class EchoPolicyView(View):
@@ -70,6 +72,30 @@ class TlsTerminationPolicyView(View):
         return self.add_cert_btn.is_displayed
 
 
+class URLRewritePolicyView(View):
+    """URL Rewrite policy section content as nested view in ProductPoliciesView"""
+    add_command_btn = Button(locator=".//fieldset[contains(@id, 'root_commands')]//button")
+    add_query_args_btn = Button(locator=".//fieldset[contains(@id, 'root_query_args_commands')]//button")
+    regex_input = TextInput(id="root_commands_0_regex")
+    replace_input = TextInput(id="root_commands_0_replace")
+    operation_select = ThreescaleDropdown('//*[@id="root_commands_0_op"]')
+    update_policy_btn = ThreescaleSubmitButton()
+
+    def add_rewriting_command(self, regex, replace, operation: Literal["sub", "gsub"]):
+        """Add new command to URL Rewrite policy, edit command values and update policy"""
+        self.add_command_btn.click()
+
+        self.regex_input.fill(regex)
+        self.replace_input.fill(replace)
+        self.operation_select.select_by_value(operation)
+
+        self.update_policy_btn.click()
+
+    @property
+    def is_displayed(self):
+        return self.add_command_btn.is_displayed and self.add_query_args_btn.is_displayed
+
+
 class ProductPoliciesView(BaseProductView):
     """View representation of Product's Policies page"""
     path_pattern = "/apiconfig/services/{product_id}/policies/edit"
@@ -80,6 +106,7 @@ class ProductPoliciesView(BaseProductView):
     policy_section = PolicySection()
     echo_policy_view = View.nested(EchoPolicyView)
     tls_termination_policy_view: TlsTerminationPolicyView = View.nested(TlsTerminationPolicyView)
+    url_rewrite_policy_view: URLRewritePolicyView = View.nested(URLRewritePolicyView)
 
     def add_policy(self, policy: Policies):
         """Add policy to policy chain by name"""
