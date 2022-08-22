@@ -43,6 +43,7 @@ ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
 ENV WORKON_HOME=/opt/workdir/virtualenvs
 ENV junit=yes
+ENV html=yes
 ENV resultsdir=/test-run-results
 ENV BASH_ENV=~/.profile
 

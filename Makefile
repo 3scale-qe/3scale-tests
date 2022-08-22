@@ -24,7 +24,11 @@ PYTEST = pipenv run python -m pytest --tb=$(TB) -o cache_dir=$(resultsdir)/.pyte
 RUNSCRIPT = pipenv run ./scripts/
 
 ifdef junit
-PYTEST += --junitxml=$(resultsdir)/junit-$@.xml -o junit_suite_name=$@
+PYTEST += --junitxml=$(resultsdir)/junit-$(@F).xml -o junit_suite_name=$(@F)
+endif
+
+ifdef html
+PYTEST += --html=$(resultsdir)/report-$(@F).html
 endif
 
 ifeq ($(filter $(--store||--load),$(flags)),$(flags))
