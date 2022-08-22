@@ -4,21 +4,31 @@ import argparse
 import io
 import itertools
 import os
+import sys
 import time
 
 from lxml import etree
 import requests
 
 aparser = argparse.ArgumentParser(description="Upload junit to polarion")
-aparser.add_argument("--polarion", required=True, help="URL to polarion")
-aparser.add_argument("--username", required=True, help="polarion username")
-aparser.add_argument("--password-variable", required=True, help="env variable with password")
+aparser.add_argument("--polarion", help="URL to polarion, default: POLARION env", default=os.environ.get("POLARION"))
+aparser.add_argument("--username", help="polarion username, default: POLARIONUSER env", default=os.environ.get("POLARIONUSER"))
+aparser.add_argument("--password-variable", help="env variable with password, default: POLARIONPASSWD", default="POLARIONPASSWD")
 aparser.add_argument("--skip-fails", action="store_true", default=False, help="Do not upload failures")
 aparser.add_argument("junitfile", nargs="+", help="junit file to import")
 args = aparser.parse_args()
 
 username = args.username
-password = os.environ[args.password_variable]
+password = os.environ.get(args.password_variable)
+
+if not args.polarion:
+    sys.exit("You must define polarion URL")
+
+if not args.username:
+    sys.exit("You must define username")
+
+if not password:
+    sys.exit("You must define password-variable")
 
 session = requests.Session()
 session.auth = requests.auth.HTTPBasicAuth(username, password)
