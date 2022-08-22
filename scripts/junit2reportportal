@@ -32,8 +32,15 @@ stream = io.BytesIO()
 
 with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip:
     for junitfile in args.junitfile:
-        content = etree.tostring(polish(etree.parse(junitfile)))
-        azip.writestr(os.path.basename(junitfile), content)
+        if zipfile.is_zipfile(junitfile):
+            with zipfile.ZipFile(junitfile) as inzip:
+                for file in [i for i in zipfile.Path(inzip, at="archive/").iterdir() if i.name.startswith("junit-")]:
+                    with file.open() as junit:
+                        content = etree.tostring(polish(etree.parse(junit)))
+                        azip.writestr(file.name, content)
+        else:
+            content = etree.tostring(polish(etree.parse(junitfile)))
+            azip.writestr(os.path.basename(junitfile), content)
 
 token = os.environ[args.token_variable]
 reportportal = args.reportportal.rstrip("/")
