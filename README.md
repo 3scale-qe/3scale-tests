@@ -256,4 +256,4 @@ can be checked.
 TBD
 
 ## Contribute
-Refer to [CONTRIBUTE.md](CONTRIBUTE.md)
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md)
