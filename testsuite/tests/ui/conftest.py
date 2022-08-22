@@ -18,14 +18,16 @@ from testsuite.billing import Stripe, Braintree
 from testsuite.config import settings
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
-from testsuite.ui.views.admin.audience.account import AccountNewView
-from testsuite.ui.views.admin.audience.application import ApplicationNewView
+from testsuite.ui.views.admin.foundation import DashboardView
+from testsuite.ui.views.admin.audience.account import AccountNewView, AccountsView
+from testsuite.ui.views.admin.audience.application import ApplicationNewView, ApplicationsView
+from testsuite.ui.views.admin.product.product import ProductsView
 from testsuite.ui.views.admin.backend.backend import BackendNewView
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
 from testsuite.ui.views.admin.product.product import ProductNewView
 from testsuite.ui.views.devel.login import LoginDevelView
-from testsuite.ui.views.master.audience.tenant import TenantNewView
+from testsuite.ui.views.master.audience.tenant import TenantNewView, TenantDetailView
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame
@@ -152,14 +154,37 @@ def devel_login(account, custom_devel_login):
 
 # pylint: disable=unused-argument, too-many-arguments
 @pytest.fixture(scope="module")
-def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, master_threescale):
+def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, master_threescale, browser):
     """Parametrized custom Tenant created via UI"""
+
+    @backoff.on_predicate(backoff.constant, lambda ready: not ready, interval=6, max_tries=5, jitter=None,
+                          on_backoff=lambda _: browser.selenium.refresh())
+    def _wait_displayed_with_refresh(func):
+        """Runs function and expects True. If False is returned, backoff and browser refresh happens."""
+        return func()
+
+    def _ui_wait_tenant_ready(tenant):
+        """
+        When assert is not raised, there is some chance the tenant is actually ready.
+        Ui version of tenant.wait_for_tenant
+        """
+        tenant = navigator.navigate(TenantDetailView, account=tenant)
+        with browser.new_tab(tenant.impersonate):
+            assert _wait_displayed_with_refresh(
+                lambda: DashboardView.is_displayed)
+            assert _wait_displayed_with_refresh(
+                lambda: navigator.navigate(AccountsView).table.row()[0].text != 'No results.')
+            assert _wait_displayed_with_refresh(
+                lambda: navigator.navigate(ApplicationsView).table.row()[0].text != 'No results.')
+            assert _wait_displayed_with_refresh(
+                lambda: navigator.navigate(ProductsView).table.row()[0].text != 'No results.')
 
     def _custom_ui_tenant(username: str = "",
                           email: str = "",
                           password: str = "",
                           organisation: str = "",
-                          autoclean=True):
+                          autoclean=True,
+                          wait=True):
 
         tenant = navigator.navigate(TenantNewView)
 
@@ -167,10 +192,12 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
 
         account = resilient.resource_read_by_name(master_threescale.accounts, organisation)
         tenant = master_threescale.tenants.read(account.entity_id)
-        tenant.wait_tenant_ready()
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
+
+        if wait:
+            _ui_wait_tenant_ready(tenant)
 
         return tenant
 
