@@ -172,14 +172,15 @@ polish-junit:
 	# this deletes something it didn't create, dangerous!!!
 	-rm -f $(resultsdir)/junit-*.xml.gz
 
-reportportal: RP_PROJECT ?= 3scale
-reportportal: RP_LAUNCH_NAME ?= ad-hoc with tests $(shell cat VERSION)
+reportportal: ## Upload results to reportportal. Appropriate variables for juni2reportportal must be set
+reportportal: export RP_PROJECT ?= 3scale
+reportportal: export RP_LAUNCH_NAME ?= ad-hoc with tests $(shell cat VERSION)
 reportportal: polish-junit
-	$(RUNSCRIPT)junit2reportportal \
-		--reportportal $(REPORTPORTAL) \
-		--project $(RP_PROJECT) --launch-name "$(RP_LAUNCH_NAME)" \
-		--token-variable RP_TOKEN \
-		$(resultsdir)/junit-*.xml
+	$(RUNSCRIPT)junit2reportportal $(resultsdir)/junit-*.xml
+
+polarion: ## Upload results to polarion. Appropriate variables for juni2polarion must be set
+polarion: polish-junit
+	$(RUNSCRIPT)junit2polarion $(resultsdir)/junit-*.xml
 
 testsuite/resources/apicast.yml: export VERSION ?= $(shell cut -d. -f1-3 VERSION)
 testsuite/resources/apicast.yml: FORCE
