@@ -1,4 +1,4 @@
-name: dispatch_release_pullrequest
+name: dispatch_1_rc_pullrequest
 on:
   workflow_dispatch:
     inputs:
@@ -7,7 +7,7 @@ on:
         description: "Use x.y.z format e.g. 2.12.0 or KEEP EMPTY"
         type: string
 jobs:
-  dispatch_release_pullrequest:
+  dispatch_1_rc_pullrequest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
