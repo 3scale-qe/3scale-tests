@@ -28,6 +28,8 @@ jobs:
         run: echo "$CACERT_CONTENT" > $CACERT
       - name: tools
         run: echo "::set-output name=url::$(gh api /repos/3scale-qe/tools/releases/latest --jq .tarball_url)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: make dist
         run: make dist IMAGENAME="quay.io/rh_integration/3scale-testsuite" PUSHIMAGE=y
         env:
