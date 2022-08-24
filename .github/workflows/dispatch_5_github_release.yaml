@@ -1,9 +1,9 @@
-name: dispatch_github_release
+name: dispatch_5_github_release
 on:
   workflow_dispatch
 
 jobs:
-  dispatch_github_release:
+  dispatch_5_github_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
