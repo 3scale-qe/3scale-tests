@@ -1,5 +1,5 @@
 """Essential Views for Product Views"""
-from widgetastic.widget import GenericLocatorWidget, Text
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
@@ -14,6 +14,13 @@ class ProductsView(BaseAdminView):
     table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
         "Name": Text("./a")
     })
+    search_bar = TextInput(locator="//input[@type='search']")
+    search_button = GenericLocatorWidget("//button[contains(@aria-label,'search')]")
+
+    def search(self, value: str):
+        """Search in product table by given value"""
+        self.search_bar.fill(value)
+        self.search_button.click()
 
     @step("BaseProductView")
     def detail(self, product):
