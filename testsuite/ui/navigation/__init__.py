@@ -93,6 +93,7 @@ class Navigator:
         else:
             self.browser.set_path(page.path)
         page.post_navigate(**kwargs)
+        page.wait_displayed()
         return page
 
     def _backtrace(self, cls, **kwargs):
