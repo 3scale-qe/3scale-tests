@@ -27,7 +27,7 @@ from testsuite.ui.views.admin.backend.backend import BackendNewView
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
 from testsuite.ui.views.admin.product.product import ProductNewView
-from testsuite.ui.views.devel.login import LoginDevelView
+from testsuite.ui.views.devel.login import LoginView as DeveloperLoginView
 from testsuite.ui.views.master.audience.tenant import TenantNewView, TenantDetailView
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
@@ -132,7 +132,7 @@ def custom_devel_login(navigator, provider_account, account_password):
         url = settings["threescale"]["devel"]["url"]
         name = name or account['org_name']
         password = password or account_password
-        page = navigator.open(LoginDevelView,
+        page = navigator.open(DeveloperLoginView,
                               url=url,
                               access_code=provider_account['site_access_code'])
         if page.is_displayed:
