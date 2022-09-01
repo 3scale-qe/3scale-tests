@@ -31,7 +31,7 @@ ifdef html
 PYTEST += --html=$(resultsdir)/report-$(@F).html
 endif
 
-ifeq ($(filter $(--store||--load),$(flags)),$(flags))
+ifeq ($(filter-out --store --load,$(flags)),$(flags))
 	PYTEST += -p no:persistence
 endif
 
