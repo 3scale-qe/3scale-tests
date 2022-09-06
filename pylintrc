@@ -16,7 +16,8 @@ load-plugins=pylint.extensions.no_self_use
 disable=duplicate-code,  # reports false alarms AND can't be disabled locally; pylint issue #214
         fixme,  # ignore TODOs
 	consider-using-f-string,  # % string operator is absolutely fine
-        redefined-outer-name
+        redefined-outer-name,
+        missing-timeout  # socket timeout is set globally, no need to specify it in calls
 
 [FORMAT]
 # Maximum number of characters on a single line.
