@@ -68,8 +68,7 @@ def token(application_oauth, rhsso_service_info):
     """
     Access token for 3scale application that is connected with RHSSO
     """
-    app_key = application_oauth.keys.list()["keys"][0]["key"]["value"]
-    return rhsso_service_info.password_authorize(application_oauth["client_id"], app_key).token['access_token']
+    return rhsso_service_info.access_token(application_oauth)
 
 
 @pytest.fixture(scope="module")

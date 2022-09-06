@@ -41,8 +41,7 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
      - the request and the response contain the extra 'X-RESPONSE-CUSTOM-JWT' header
      - the extra 'X-RESPONSE-CUSTOM-JWT' headers contain the correct values
     """
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
-    token = rhsso_service_info.password_authorize(application["client_id"], app_key).token['access_token']
+    token = rhsso_service_info.access_token(application)
     client = api_client()
 
     # Auth session needs to be None when we are testing access_token
