@@ -67,8 +67,8 @@ def test_rhsso_tokens(applications, prod_client, setup_benchmark):
     """
     for app in applications:
         client = prod_client(app)
-        assert client.get("/0/anything").status_code == 200
-        assert client.post("/0/anything").status_code == 200
+        assert client.get("/0/anything/").status_code == 200
+        assert client.post("/0/anything/").status_code == 200
 
     benchmark = setup_benchmark.create_benchmark()
     run = benchmark.start()

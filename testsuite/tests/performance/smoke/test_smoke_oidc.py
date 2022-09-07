@@ -64,8 +64,8 @@ def test_smoke_oidc(applications, setup_benchmark, prod_client):
     """
     for app in applications:
         client = prod_client(app)
-        assert client.get("/0/anything").status_code == 200
-        assert client.post("/0/anything").status_code == 200
+        assert client.get("/0/anything/").status_code == 200
+        assert client.post("/0/anything/").status_code == 200
 
     benchmark = setup_benchmark.create_benchmark()
     run = benchmark.start()
