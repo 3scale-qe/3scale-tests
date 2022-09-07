@@ -3,18 +3,28 @@
 import argparse
 import io
 import os
+import sys
 import zipfile
 
 from lxml import etree
 import requests
 
 aparser = argparse.ArgumentParser(description="Upload junit to reportportal")
-aparser.add_argument("--reportportal", required=True, help="URL of reportportal")
-aparser.add_argument("--project", required=True, help="reportportal project where to import")
-aparser.add_argument("--launch-name", required=True, help="Desired launch name in reportportal")
-aparser.add_argument("--token-variable", required=True, help="env variable with auth token")
+aparser.add_argument("--reportportal", help="URL of reportportal. default: REPORTPORTAL env", default=os.environ.get("REPORTPORTAL"))
+aparser.add_argument("--project", help="reportportal project where to import. default: RP_PROJECT env", default=os.environ.get("RP_PROJECT"))
+aparser.add_argument("--launch-name", help="Desired launch name in reportportal. default: RP_LAUNCH_NAME env", default=os.environ.get("RP_LAUNCH_NAME", os.environ.get("RP_LAUNCH")))
+aparser.add_argument("--token-variable", help="env variable with auth token. default: RP_TOKEN", default="RP_TOKEN")
 aparser.add_argument("junitfile", nargs="+", help="junit file to import")
 args = aparser.parse_args()
+
+if not args.reportportal:
+    sys.exit("You must define reportportal URL")
+if not args.project:
+    sys.exit("You must define reportportal project")
+if not args.launch_name:
+    sys.exit("You must define reportportal launch")
+if not args.token_variable:
+    sys.exit("You must define correct token-variable")
 
 polish = etree.XSLT(etree.parse("./xslt/polish-junit.xsl"))
 
@@ -22,15 +32,20 @@ stream = io.BytesIO()
 
 with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip:
     for junitfile in args.junitfile:
-        content = etree.tostring(polish(etree.parse(junitfile)))
-        azip.writestr(os.path.basename(junitfile), content)
+        if zipfile.is_zipfile(junitfile):
+            with zipfile.ZipFile(junitfile) as inzip:
+                for file in [i for i in zipfile.Path(inzip, at="archive/").iterdir() if i.name.startswith("junit-")]:
+                    with file.open() as junit:
+                        content = etree.tostring(polish(etree.parse(junit)))
+                        azip.writestr(file.name, content)
+        else:
+            content = etree.tostring(polish(etree.parse(junitfile)))
+            azip.writestr(os.path.basename(junitfile), content)
 
 token = os.environ[args.token_variable]
-launch = args.launch_name
-project = args.project
 reportportal = args.reportportal.rstrip("/")
 
 auth = {"Authorization": f"Bearer {token}"}
-launch_import = f"{reportportal}/api/v1/{project}/launch/import"
+launch_import = f"{reportportal}/api/v1/{args.project}/launch/import"
 
-print(requests.post(launch_import, files={"file": (f"{launch}.zip", stream.getbuffer(), "application/zip")}, headers=auth).text)
+print(requests.post(launch_import, files={"file": (f"{args.launch_name}.zip", stream.getbuffer(), "application/zip")}, headers=auth).text)

@@ -4,21 +4,32 @@ import argparse
 import io
 import itertools
 import os
+import sys
 import time
+import zipfile
 
 from lxml import etree
 import requests
 
 aparser = argparse.ArgumentParser(description="Upload junit to polarion")
-aparser.add_argument("--polarion", required=True, help="URL to polarion")
-aparser.add_argument("--username", required=True, help="polarion username")
-aparser.add_argument("--password-variable", required=True, help="env variable with password")
+aparser.add_argument("--polarion", help="URL to polarion, default: POLARION env", default=os.environ.get("POLARION"))
+aparser.add_argument("--username", help="polarion username, default: POLARIONUSER env", default=os.environ.get("POLARIONUSER"))
+aparser.add_argument("--password-variable", help="env variable with password, default: POLARIONPASSWD", default="POLARIONPASSWD")
 aparser.add_argument("--skip-fails", action="store_true", default=False, help="Do not upload failures")
 aparser.add_argument("junitfile", nargs="+", help="junit file to import")
 args = aparser.parse_args()
 
 username = args.username
-password = os.environ[args.password_variable]
+password = os.environ.get(args.password_variable)
+
+if not args.polarion:
+    sys.exit("You must define polarion URL")
+
+if not args.username:
+    sys.exit("You must define username")
+
+if not password:
+    sys.exit("You must define password-variable")
 
 session = requests.Session()
 session.auth = requests.auth.HTTPBasicAuth(username, password)
@@ -46,25 +57,38 @@ def searchlist(response):
 
 
 def wait(idlist, url):
+    print(url)
     for jobid in idlist:
         query = f"//table[@id='jobs']//tr/td[2][text() = '{jobid}']"
         while len(etree.fromstring(session.get(url).text, html_parser).xpath(query)) > 0:
             time.sleep(4)
 
 
-for xmlfile in args.junitfile:
+def upload(xmlfile):
     polished = polish(etree.parse(xmlfile), **xargs)
     testcases = Testcases(polished, approver=f"'{username}'")
     requirements = Requirements(polished, approver=f"'{username}'")
 
     response = session.post(f"{polarion}/import/requirement", files=files(requirements))
+    print("requirements:")
     print(response.text)
     wait(searchlist(response), f"{polarion}/import/requirement-queue")
 
     response = session.post(f"{polarion}/import/testcase", files=files(testcases))
+    print("testcases:")
     print(response.text)
     wait(searchlist(response), f"{polarion}/import/testcase-queue")
 
     response = session.post(f"{polarion}/import/xunit", files=files(polished))
+    print("xunit:")
     print(response.text)
     wait(searchlist(response), f"{polarion}/import/xunit-queue")
+
+for xmlfile in args.junitfile:
+    if zipfile.is_zipfile(xmlfile):
+        with zipfile.ZipFile(xmlfile) as inzip:
+            for file in [i for i in zipfile.Path(inzip, at="archive/").iterdir() if i.name.startswith("junit-")]:
+                with file.open() as junit:
+                    upload(junit)
+    else:
+        upload(xmlfile)
