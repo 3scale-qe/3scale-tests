@@ -120,4 +120,5 @@ def get_rhsso_client(application, rhsso_service_info):
 
 def token(application, rhsso_service_info, username):
     """Access token for 3scale application that is connected with RHSSO"""
-    return rhsso_service_info.access_token(application)
+    app_key = application.keys.list()["keys"][0]["key"]["value"]
+    return rhsso_service_info.password_authorize(application["client_id"], app_key, username)["access_token"]
