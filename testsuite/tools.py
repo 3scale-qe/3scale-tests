@@ -29,11 +29,11 @@ from testsuite.config import settings
 from testsuite.configuration import openshift
 
 _tr = {
-    "echo_api": "echo-api+ssl",
-    "httpbin": "mockserver+ssl",
-    "httpbin_nossl": "mockserver",
+    "echo_api": "mockserver+ssl",
+    "httpbin": "go-httpbin+ssl",
+    "httpbin_nossl": "go-httpbin",
     "httpbin_go": "go-httpbin+ssl",
-    "httpbin_service": "echo-api+svc:9292",
+    "httpbin_service": "go-httpbin+svc",
     "httpbin_go_service": "go-httpbin+svc",
     "jaeger": "jaeger-query"}
 
