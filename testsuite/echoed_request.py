@@ -99,9 +99,9 @@ class _HttpbinGoRequest(EchoedRequest):
         super().__init__(response)
         self.headers = _flatten(self.headers)
         self.params = _flatten_single_params(self.params)
-        try:
+        if "url" in self.json:
             self.path = urllib.parse.urlparse(self.json["url"]).path
-        except KeyError:
+        elif "URL" in self.json:
             self.path = urllib.parse.urlparse(self.json["URL"]).path
 
 
