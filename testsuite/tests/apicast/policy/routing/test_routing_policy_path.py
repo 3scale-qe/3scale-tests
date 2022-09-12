@@ -11,18 +11,24 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
+def private_base_url(private_base_url):
+    """Use echo_api as service backend"""
+    return private_base_url("echo_api")
+
+
+@pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     """
     Require compatible backend to be used
     """
-    return rawobj.Proxy(private_base_url("echo_api"))
+    return rawobj.Proxy(private_base_url)
 
 
 @pytest.fixture(scope="module")
 def httpbin_host(private_base_url):
     """Custom hostname to be set via policy"""
 
-    return urlsplit(private_base_url("httpbin")).hostname
+    return urlsplit(private_base_url).hostname
 
 
 @pytest.fixture(scope="module")
@@ -36,7 +42,7 @@ def service(service, private_base_url, httpbin_host):
     proxy = service.proxy.list()
 
     # let's convert URL to use IP address to have it different from Host header
-    (scheme, netloc, path, query, fragment) = urlsplit(private_base_url("httpbin"))
+    (scheme, netloc, path, query, fragment) = urlsplit(private_base_url)
 
     hostname = netloc
     user = None
