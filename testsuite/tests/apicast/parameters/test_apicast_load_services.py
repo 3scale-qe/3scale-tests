@@ -42,6 +42,7 @@ def test_mapping_rule_hit(api_client, staging_gateway, load_service):
     staging_gateway.environ["APICAST_LOAD_SERVICES_WHEN_NEEDED"] = load_service
 
     client = api_client()
+    client.get("/get")  # post request doesn't retry on unavailable service
 
     response = client.post('/post')
     assert response.status_code == 200
