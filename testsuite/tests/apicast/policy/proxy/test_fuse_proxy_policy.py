@@ -23,13 +23,20 @@ def policy_settings(testconfig):
 
 
 @pytest.fixture(scope="module")
+def private_base_url(private_base_url):
+    """Use service URL as backend to avoid hostname conflicts with router.
+    Don't use https"""
+    return private_base_url("mockserver+svc:1080")
+
+
+@pytest.fixture(scope="module")
 def backends_mapping(private_base_url, custom_backend):
     """
     Creates httpbin backend: "/"
     Proxy service used in this test does not support HTTP over TLS (https) protocol,
     therefore http is preferred instead
     """
-    return {"/": custom_backend("netty-proxy", private_base_url("httpbin_service"))}
+    return {"/": custom_backend("netty-proxy", private_base_url)}
 
 
 def test_http_proxy_policy(api_client, private_base_url):
@@ -41,4 +48,4 @@ def test_http_proxy_policy(api_client, private_base_url):
     assert response.status_code == 200
     headers = EchoedRequest.create(response).headers
     assert "Fuse-Camel-Proxy" in headers
-    assert headers["Source-Header"] in private_base_url("httpbin_service")
+    assert headers["Source-Header"] in private_base_url

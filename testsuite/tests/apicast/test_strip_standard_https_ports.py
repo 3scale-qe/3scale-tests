@@ -14,7 +14,7 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2235")]
 
 
-@pytest.fixture(scope="module", params=["httpbin_service",
+@pytest.fixture(scope="module", params=["mockserver+svc:1080",
                                         "httpbin",
                                         "httpbin_nossl"])
 def private_base_url_and_expected_port(private_base_url, request):
