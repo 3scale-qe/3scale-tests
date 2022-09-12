@@ -5,6 +5,7 @@ Expected: to return specified code eg 328 and message of service unavailability.
 """
 
 from typing import Tuple
+from urllib.parse import urlparse
 
 import pytest
 import pytest_cases
@@ -21,15 +22,21 @@ pytestmark = [
 
 
 @pytest.fixture
+def echo_api_base_url(private_base_url):
+    """Return URL of echo_api"""
+    return private_base_url("echo_api")
+
+
+@pytest.fixture
 def backend_bin(custom_backend, private_base_url):
     """Httpbin backend"""
     return custom_backend("backend_bin", endpoint=private_base_url("httpbin"))
 
 
 @pytest.fixture
-def backend_echo(custom_backend, private_base_url):
+def backend_echo(custom_backend, echo_api_base_url):
     """Echo-api backend"""
-    return custom_backend("backend_echo", endpoint=private_base_url("echo_api"))
+    return custom_backend("backend_echo", endpoint=echo_api_base_url)
 
 
 @pytest.fixture
@@ -59,7 +66,7 @@ def mapping_rules(service, backend_bin, backend_echo):
 
 
 @pytest.fixture
-def policy_settings_alt(service) -> dict:
+def policy_settings_alt(service, echo_api_base_url) -> dict:
     """set the maintenance mode policy before Apicast in the chain"""
     service = service.proxy.list().policies.insert(0, rawobj.PolicyConfig(
         "maintenance_mode",
@@ -68,7 +75,7 @@ def policy_settings_alt(service) -> dict:
                 {"left_type": "liquid",
                  "right_type": "plain",
                  "left": "{{ upstream.host }}",
-                 "right": "echo-api",
+                 "right": urlparse(echo_api_base_url).hostname.split(".", 1)[0],
                  "op": "matches"}], "combine_op": "or"},
             "status": 328,
             "message": "SERVICE UNAVAILABLE"
