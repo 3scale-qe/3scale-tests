@@ -37,8 +37,9 @@ class EchoedRequest:
         """Factory method to create different backends"""
 
         data = response.json()
+        headers = data.get("headers", {})
 
-        if "HTTP_HOST" in data["headers"]:
+        if "HTTP_HOST" in headers:
             return _EchoApiRequest(response)
 
         if "keepAlive" in data and "secure" in data:
@@ -47,10 +48,10 @@ class EchoedRequest:
         if "queryStringParameters" in data:
             return _MockServerRequest(response)
 
-        if list in [type(i) for i in data["headers"].values()]:
+        if list in [type(i) for i in headers.values()]:
             return _HttpbinGoRequest(response)
 
-        if list in [type(i) for i in data["args"] if len(i) == 1]:
+        if list in [type(i) for i in data.get("args", {}) if len(i) == 1]:
             return _HttpbinGoRequest(response)
 
         return EchoedRequest(response)
