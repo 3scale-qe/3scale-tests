@@ -81,13 +81,24 @@ def _flatten(dict_):
     return CaseInsensitiveDict(data=dict_)
 
 
+def _flatten_single_params(params):
+    """Httpbin returns single param/arg as string, let's follow this"""
+    if params is None:
+        return None
+    params = params.copy()
+    for k, val in params.items():
+        if isinstance(val, list) and len(val) == 1:
+            params[k] = val[0]
+    return params
+
+
 class _HttpbinGoRequest(EchoedRequest):
     """Wrapper over Httpbin go backend"""
 
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
         self.headers = _flatten(self.headers)
-        self.params = _flatten(self.params)
+        self.params = _flatten_single_params(self.params)
         try:
             self.path = urllib.parse.urlparse(self.json["url"]).path
         except KeyError:
@@ -99,4 +110,4 @@ class _MockServerRequest(EchoedRequest):
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
         self.headers = _flatten(self.headers)
-        self.params = _flatten(self.json.get("queryStringParameters", {}))
+        self.params = _flatten_single_params(self.json.get("queryStringParameters", {}))
