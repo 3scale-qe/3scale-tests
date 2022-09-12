@@ -39,7 +39,9 @@ def test_token_headers(request, client_function, token):
     assert response.status_code == 200
 
     echoed_response = EchoedRequest.create(response)
-    assert echoed_response.headers.get("Access-Token") == token
+    headers = echoed_response.headers
+    # httpbin converts header to Access-Token while others not
+    assert headers.get("access_token", headers.get("Access-Token")) == token
 
 
 @pytest.mark.parametrize("client_function", [
