@@ -49,11 +49,11 @@ def _url(openshift, key, namespace):
         port = 8080
         if ":" in option:
             _, port = option.split(":", 1)
-        return f"http://{key}.{namespace}.svc:{port}/"
+        return f"http://{key}.{namespace}.svc:{port}"
     hostname = openshift.routes[key]["spec"]["host"]
     if option == "ssl":
-        return f"https://{hostname}:443/"
-    return f"http://{hostname}:80/"
+        return f"https://{hostname}:443"
+    return f"http://{hostname}:80"
 
 
 class OpenshiftProject:
