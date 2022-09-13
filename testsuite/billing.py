@@ -16,7 +16,13 @@ class Stripe:
     @staticmethod
     def read_payment(invoice):
         """Read Stripe payment"""
-        return [x for x in stripe.PaymentIntent.list() if x['metadata']['order_id'] == str(invoice['id'])][0]
+        payment_intent = [x for x in stripe.PaymentIntent.list() if x['metadata']['order_id'] == str(invoice['id'])]
+        if len(payment_intent) == 0:
+            order_charge = [x for x in stripe.PaymentIntent.list()
+                            if x['metadata']['order_id'] == str(invoice['id'])][0]
+            raise RuntimeError(f"{order_charge.get('failure_message', 'Unknown')} "
+                               f"({order_charge.get('failure_code', 'Unknown')})")
+        return payment_intent[0]
 
     @staticmethod
     def read_customer_by_account(account):
