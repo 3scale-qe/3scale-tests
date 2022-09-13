@@ -31,7 +31,7 @@ def service(service, private_base_url, httpbin_host):
     Set policy settings
     """
     routing_policy_op = {"operations": [
-        {"op": "==", "value": "/anything", "match": "path"}]}
+        {"op": "==", "value": "/anything/anything", "match": "path"}]}
 
     proxy = service.proxy.list()
 
@@ -68,7 +68,7 @@ def test_routing_policy_path_anything(api_client, httpbin_host):
     """
     Test for the request path send to /anything to httpbin.org/anything
     """
-    response = api_client().get("/anything")
+    response = api_client().get("/anything/anything")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
