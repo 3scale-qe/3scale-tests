@@ -100,7 +100,7 @@ class SignUpView(BaseDevelView):
     email = TextInput(id="account_user_email")
     signup_button = GenericLocatorWidget("//input[@type='submit']")
 
-    def signup(self, org: str, username: str = None, email: str = None):
+    def signup(self, org: str, username: str = None, email: str = None, submit: bool = True):
         """Signup into devel portal"""
         self.organization.wait_displayed()
         self.organization.fill(org)
@@ -108,7 +108,8 @@ class SignUpView(BaseDevelView):
             self.username.fill(username)
         if email:
             self.email.fill(email)
-        self.signup_button.click()
+        if submit:
+            self.signup_button.click()
 
     @property
     def is_displayed(self):
