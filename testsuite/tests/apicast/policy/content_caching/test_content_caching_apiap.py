@@ -101,17 +101,17 @@ def test_other_service_cache(client, client2):
     """
     Test that cache of one product will not be used on the request of another product to the same backend
     """
-    response = client.get("/echo-api/test", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request = EchoedRequest.create(response)
 
-    response = client.get("/echo-api/test", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 
     # another service should not hit the cache on same path and same backend
-    response = client2.get("/echo-api/test", headers=dict(origin="localhost"))
+    response = client2.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request2 = EchoedRequest.create(response)
@@ -120,7 +120,7 @@ def test_other_service_cache(client, client2):
     assert echoed_request.json['uuid'] != echoed_request2.json['uuid']
 
     # Request to first service should be still cached
-    response = client.get("/echo-api/test", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 

@@ -110,7 +110,7 @@ def client2(application2, api_client):
 
 def test_wont_cache(client, private_base_url):
     """Test that redirected request (302 status code) will not be cached"""
-    payload = {'url': private_base_url("echo_api")}
+    payload = {'url': f'{private_base_url("echo_api")}/uuid'}
     response = client.get("/httpbin/redirect-to", params=payload, headers=dict(origin="localhost"))
     # First request was redirected
     assert response.history[0].status_code == 302
@@ -134,12 +134,12 @@ def test_will_cache(client, client2):
     """
     Test that requests will be cached with status code 200 and the cache will expire after 30 seconds
     """
-    response = client.get("/echo-api/testing", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request = EchoedRequest.create(response)
 
-    response = client.get("/echo-api/testing", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
     echoed_request_cached = EchoedRequest.create(response)
@@ -148,7 +148,7 @@ def test_will_cache(client, client2):
     assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']
 
     # another service wont hit the cache with the same request
-    response = client2.get("/echo-api/testing", headers=dict(origin="localhost"))
+    response = client2.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
 
@@ -159,7 +159,7 @@ def test_will_cache(client, client2):
     time.sleep(40)
 
     # request expired
-    response = client.get("/echo-api/testing", headers=dict(origin="localhost"))
+    response = client.get("/echo-api/uuid", headers=dict(origin="localhost"))
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "EXPIRED"
     echoed_request_new = EchoedRequest.create(response)
