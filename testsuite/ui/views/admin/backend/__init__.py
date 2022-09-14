@@ -47,7 +47,7 @@ class BaseBackendView(BaseAdminView):
     displayed Backend (this applies for all Views that inherits from BaseBackendView).
     This value is verified in `is_displayed` method.
     """
-    NAV_ITEMS = ['Overview', 'Analytics', 'Methods & Metrics', 'Mapping Rules']
+    NAV_ITEMS = ['Overview', 'Analytics', 'Methods and Metrics', 'Mapping Rules']
     nav = NavigationMenu(id='mainmenu')
 
     def __init__(self, parent, backend, **kwargs):
