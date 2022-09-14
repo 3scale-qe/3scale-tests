@@ -22,7 +22,7 @@ def gateway_kind():
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
     "Dict of proxy settings to be used when service created"
-    return rawobj.Proxy(private_base_url("httpbin_service"))
+    return rawobj.Proxy(private_base_url("go-httpbin"))
 
 
 @pytest.fixture(scope="module")
