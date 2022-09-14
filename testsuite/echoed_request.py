@@ -63,6 +63,8 @@ class _EchoApiRequest(EchoedRequest):
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
         self.headers = self.__process_headers()
+        if isinstance(self.params, str) and len(self.params) == 0:
+            self.params = {}
 
     def __process_headers(self) -> CaseInsensitiveDict:
         headers = self.headers

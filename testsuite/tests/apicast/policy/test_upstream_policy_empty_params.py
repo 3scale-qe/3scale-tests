@@ -36,4 +36,4 @@ def test_upstream_policy_empty_params(api_client):
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/v1"
-    assert echoed_request.params == ""
+    assert echoed_request.params == {}
