@@ -29,11 +29,11 @@ from testsuite.config import settings
 from testsuite.configuration import openshift
 
 _tr = {
-    "echo_api": "echo-api+ssl",
-    "httpbin": "mockserver+ssl",
-    "httpbin_nossl": "mockserver",
+    "echo_api": "mockserver+ssl",
+    "httpbin": "go-httpbin+ssl",
+    "httpbin_nossl": "go-httpbin",
     "httpbin_go": "go-httpbin+ssl",
-    "httpbin_service": "echo-api+svc:9292",
+    "httpbin_service": "go-httpbin+svc",
     "httpbin_go_service": "go-httpbin+svc",
     "jaeger": "jaeger-query"}
 
@@ -49,11 +49,11 @@ def _url(openshift, key, namespace):
         port = 8080
         if ":" in option:
             _, port = option.split(":", 1)
-        return f"http://{key}.{namespace}.svc:{port}/"
+        return f"http://{key}.{namespace}.svc:{port}"
     hostname = openshift.routes[key]["spec"]["host"]
     if option == "ssl":
-        return f"https://{hostname}:443/"
-    return f"http://{hostname}:80/"
+        return f"https://{hostname}:443"
+    return f"http://{hostname}:80"
 
 
 class OpenshiftProject:
