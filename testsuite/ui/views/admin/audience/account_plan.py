@@ -1,6 +1,6 @@
 """View representations of Account plan pages"""
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text
-from widgetastic_patternfly4 import PatternflyTable
+from widgetastic_patternfly4 import PatternflyTable, Dropdown
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -11,11 +11,13 @@ class AccountPlansView(BaseAudienceView):
     """View representation of Account Plans Listing page"""
     path_pattern = '/buyers/account_plans'
     new_plan = Text("//a[@href='/admin/buyers/account_plans/new']")
-    table = PatternflyTable("//*[@id='plans']")
+    table = PatternflyTable("//*[@data-ouia-component-id='OUIA-Generated-Table-2']", column_widgets={
+        3: Dropdown(""),
+    })
 
-    def publish(self, plan_id):
+    def publish(self, plan_name):
         """Publish account plan"""
-        self.table.row(_row__attr=('id', f'account_plan_{plan_id}'))[3].click()
+        self.table.row(name=plan_name)[3].widget.item_select("Publish")
 
     @step("NewAccountPlanView")
     def new(self):
