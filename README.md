@@ -204,13 +204,33 @@ above can be passed to run appropriate set.
 
 ### test-in-docker
 
-There is special make target `test-in-docker` that runs the test in docker and
-spins up selenium as sidecar. Basic usage is straightforward, to run smoke
+There is special make target that runs the test in docker/podman/container and
+spins up also selenium as sidecar. Basic usage is straightforward, to run smoke
 tests:
 
 `NAMESPACE=3scale make test-in-docker`
 
 This target promotes all `_3SCALE_TESTS_*` env variables to the container.
+
+`$KUBECONFIG` and `$resultsdir` are mounted. The user has to ensure that these
+files have correct permissions, especially kubeconfig can be by default created
+without necessary permissions. Group permissions should be enough, group should
+have write access to `$resultsdir`.
+
+By default `$resultsdir` is set to current dir. It is good idea to create
+dedicated directory for results and set `$resultsdir` accordingly.
+
+This target runs command `docker`, podman can be used with appropriate symlink.
+
+Actully podman can be smoother way to go. In case of docker some other settings
+may be needed to avoid little troubles (a clash of file ownership between
+container and host). The recommendation is to use extra `docker_flags` (this
+can be also exported as env variable):
+
+```NAMESPACE=3scale make test-in-docker docker_flags="-u `id -u`:`id -g` --group-add 0"```
+
+These flags work unless userns-remap is in use. As userns-remap has to be
+enabled explicitly person who did this should know how to deal with that.
 
 `SECRETS_FOR_DYNACONF` is also promoted to the image and it is preset to
 `config/.secrets.yaml` by default if that file is present, otherwise
@@ -224,9 +244,9 @@ Variable `cmd` can be used to alter command for the container, to run ui tests:
 
 `NAMESPACE=3scale make test-in-docker cmd=ui`
 
-Custom flags should be set as env variable passed to the docker:
+Env variable `flags` is also promoted to the container, this works as expected:
 
-`NAMESPACE=3scale make test-in-docker docker_flags='-e flags=--ui'`
+`NAMESPACE=3scale make test-in-docker flags=--ui`
 
 Variable `image` can be set to use custom image:
 
