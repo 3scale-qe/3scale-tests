@@ -79,6 +79,28 @@ def prod_client(production_gateway, application, request):
     return _prod_client
 
 
+@pytest.fixture
+def redis_url(tools, testconfig):
+    """
+    apicast "owned" redis to store global values
+
+    Fixture is callable because of former implementation/interace
+
+    """
+    def _redis_url(scope):
+        """if scope id 'global' returns URL, otherwise empty string"""
+        if scope != "global":
+            return ""
+        try:
+            redis = tools["apicast-testing-redis+svc:6379"]
+            redis = redis.replace("http", "redis", 1)
+            redis_url = f"{redis}/1"
+        except KeyError:
+            redis_url = testconfig['redis']['url']
+        return redis_url
+    return _redis_url
+
+
 @pytest_cases.fixture
 def client(application, prod_client):
     """

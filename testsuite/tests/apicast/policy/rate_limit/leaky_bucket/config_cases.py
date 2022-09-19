@@ -8,7 +8,6 @@ from typing import Tuple
 
 from pytest_cases import parametrize
 
-from testsuite.config import settings
 from testsuite import rawobj
 from testsuite.utils import randomize
 
@@ -17,7 +16,7 @@ DEFAULT_BURST = 1
 
 
 @parametrize('scope', ['service', 'global'])
-def case_matching_simple(scope: str) -> Tuple[dict, bool, str]:
+def case_matching_simple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """Simple case of leaky bucket limiter with matching condition"""
     configuration = [config(operation_conf(), scope)]
     policy_config = leaky_bucket_policy(configuration, redis_url(scope))
@@ -25,7 +24,7 @@ def case_matching_simple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_matching_liquid_simple(scope: str) -> Tuple[dict, bool, str]:
+def case_matching_liquid_simple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """Case with matching condition using liquid"""
     configuration = [config(operation_conf(operation="matches", left="{{ uri }}", left_type="liquid", right="/.*"),
                             scope)]
@@ -34,7 +33,7 @@ def case_matching_liquid_simple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_matching_multiple(scope: str) -> Tuple[dict, bool, str]:
+def case_matching_multiple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """
         Case with 2 leaky bucket limiters with matching condition
             First leaky bucket limiter:
@@ -50,7 +49,7 @@ def case_matching_multiple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_matching_prepend_multiple(scope: str) -> Tuple[dict, bool, str]:
+def case_matching_prepend_multiple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """
         Case with 2 leaky bucket limiters with matching condition
             First leaky bucket limiter:
@@ -66,7 +65,7 @@ def case_matching_prepend_multiple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_non_matching_simple(scope: str) -> Tuple[dict, bool, str]:
+def case_non_matching_simple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """Simple case of leaky bucket limiter with non matching condition. The rate limit should not be applied."""
     configuration = [config(operation_conf(operation="!="), scope)]
     policy_config = leaky_bucket_policy(configuration, redis_url(scope))
@@ -74,7 +73,7 @@ def case_non_matching_simple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_non_matching_liquid_simple(scope: str) -> Tuple[dict, bool, str]:
+def case_non_matching_liquid_simple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """Case with non matching condition using liquid. The rate limit should not be applied."""
     configuration = [
         config(operation_conf(operation="matches", left="{{ uri }}", left_type="liquid", right="/does_not_exist"),
@@ -84,7 +83,7 @@ def case_non_matching_liquid_simple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_non_matching_multiple(scope: str) -> Tuple[dict, bool, str]:
+def case_non_matching_multiple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """
         Case with 2 leaky bucket limiters with non matching condition
             First leaky bucket limiter:
@@ -102,7 +101,7 @@ def case_non_matching_multiple(scope: str) -> Tuple[dict, bool, str]:
 
 
 @parametrize('scope', ['service', 'global'])
-def case_non_matching_prepend_multiple(scope: str) -> Tuple[dict, bool, str]:
+def case_non_matching_prepend_multiple(scope: str, redis_url) -> Tuple[dict, bool, str]:
     """
         Case with 2 leaky bucket limiters with non matching condition
             First leaky bucket limiter:
@@ -151,11 +150,3 @@ def operation_conf(operation="matches", right="1", right_type="plain", left="1",
         "op": operation,
         "right": right,
         "right_type": right_type}
-
-
-def redis_url(scope: str):
-    """
-    Redis URL if the scope is global
-    empty string ("") otherwise
-    """
-    return settings['redis']['url'] if scope == "global" else ""
