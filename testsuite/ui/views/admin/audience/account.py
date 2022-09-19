@@ -1,5 +1,6 @@
 """View representations of Accounts pages"""
 
+from selenium.common.exceptions import NoSuchElementException
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import PatternflyTable
 
@@ -235,7 +236,7 @@ class InvoiceDetailView(BaseAudienceView):
         self.issue_button.click(handle_alert=True)
         self.browser.wait_for_element(self.charge_button, timeout=10)
 
-    def charge(self):
+    def charge(self, invoice=None):
         """Charges the invoices (PENDING -> PAID)"""
         # Charge button has two alerts which completely messed up with widgetastic.
         # https://issues.redhat.com/browse/THREESCALE-7276
@@ -243,7 +244,13 @@ class InvoiceDetailView(BaseAudienceView):
         self.browser.handle_double_alert()
 
         # Wait until charge is done
-        self.browser.wait_for_element(self.paid_field, timeout=5)
+        try:
+            self.browser.wait_for_element(self.paid_field, timeout=5)
+        except NoSuchElementException as err:
+            if invoice is not None:
+                latest_transaction = invoice.payment_transactions.list()[-1]
+                raise RuntimeError(latest_transaction["message"]) from err
+            raise err
 
     def prerequisite(self):
         return AccountInvoicesView
