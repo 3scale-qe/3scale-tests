@@ -210,8 +210,8 @@ def matching_rule(request):
 
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
-    """httpbin is needed as this tool implements delayed request"""
-    return rawobj.Proxy(private_base_url("httpbin"))
+    """A tool that implements delayed request is needed"""
+    return rawobj.Proxy(private_base_url("mockserver"))
 
 
 @pytest.fixture
