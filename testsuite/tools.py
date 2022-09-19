@@ -49,6 +49,7 @@ def _url(openshift, key, namespace):
         port = 8080
         if ":" in option:
             _, port = option.split(":", 1)
+        openshift.do_action("get", ["svc", key])  # just check if the service exists
         return f"http://{key}.{namespace}.svc:{port}"
     hostname = openshift.routes[key]["spec"]["host"]
     if option == "ssl":
