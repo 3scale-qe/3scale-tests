@@ -31,6 +31,7 @@ class LoginView(BaseDevelView):
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
     flash_message = View.nested(FlashMessage)
+    skip_wait_displayed = True
 
     def do_login(self, name, password):
         """Perform login"""
