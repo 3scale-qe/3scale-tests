@@ -83,8 +83,6 @@ class BillingSettingsView(BaseAudienceView):
 
     def stripe(self, secret_key: str, pub_key: str, webhook: str):
         """Set up Stripe as billing gateway if not already enabled"""
-        if self.gateway_form.gateway.all_selected_values[0] == 'stripe':
-            return
         self.gateway_form.gateway.select_by_value('stripe')
         self.gateway_form.options.fill({
             'secret_key': secret_key,
