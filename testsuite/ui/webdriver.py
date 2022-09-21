@@ -2,7 +2,6 @@
 
 
 from selenium import webdriver
-from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -57,14 +56,8 @@ class _Firefox:
         self.binary_path = binary_path
         self.webdriver = None
         self.options = FirefoxOptions()
-
-        profile = FirefoxProfile()
-        # default Firefox profile preference `open_newwindow` is set to 2. This causes the links open
-        # in the new window instead of a new tab.
-        profile.DEFAULT_PREFERENCES["frozen"]["browser.link.open_newwindow"] = 3
-        if not ssl_verify:
-            profile.accept_untrusted_certs = True
-        self.options.profile = profile
+        self.options.set_preference("browser.link.open_newwindow", 3)
+        self.options.set_preference("webdriver_accept_untrusted_certs", ssl_verify)
 
     def install(self):
         """Installs the web driver"""
