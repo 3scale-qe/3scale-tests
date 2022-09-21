@@ -28,7 +28,7 @@ PYTEST += --junitxml=$(resultsdir)/junit-$(@F).xml -o junit_suite_name=$(@F)
 endif
 
 ifdef html
-PYTEST += --html=$(resultsdir)/report-$(@F).html
+PYTEST += --html=$(resultsdir)/report-$(@F).html --self-contained-html
 endif
 
 ifeq ($(filter-out --store --load,$(flags)),$(flags))
