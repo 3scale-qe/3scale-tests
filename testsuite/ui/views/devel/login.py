@@ -93,6 +93,7 @@ class ReCaptcha(View):
 
 class BasicSignUpView(SignUpView):
     """View for Sign Up into devel portal as developer with default sign up flow"""
+    path_pattern = '/signup'
     password = TextInput(id="account_user_password")
     password2 = TextInput(id="account_user_password_confirmation")
     recaptcha = View.nested(ReCaptcha)

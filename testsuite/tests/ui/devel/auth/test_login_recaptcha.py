@@ -22,15 +22,6 @@ def ui_devel_account(request, testconfig, threescale):
         request.addfinalizer(usr.delete)
 
 
-@pytest.fixture(scope="module")
-def devel_open_portal(navigator, provider_account):
-    """
-    Opens the developer portal and passes in the access code.
-    """
-    navigator.open(LoginView, url=settings["threescale"]["devel"]["url"],
-                   access_code=provider_account['site_access_code'])
-
-
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
 def spam_protection_setup(login, navigator):
@@ -59,9 +50,8 @@ def params(request):
     return params
 
 
-# pylint: disable=unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6695")
-def test_devel_recaptcha_sing_up(spam_protection_setup, devel_open_portal, ui_devel_account, navigator, browser):
+def test_devel_recaptcha_sing_up(spam_protection_setup, provider_account, ui_devel_account, navigator):
     """
     Test
         - Navigates and fills up the Sign Up page on developer portal
@@ -69,7 +59,8 @@ def test_devel_recaptcha_sing_up(spam_protection_setup, devel_open_portal, ui_de
         - Checks the checkbox
         - Submits the form and checks that the success website appears
     """
-    signup_view = navigator.open(BasicSignUpView)
+    signup_view = navigator.open(BasicSignUpView, url=settings["threescale"]["devel"]["url"],
+                                 access_code=provider_account['site_access_code'])
 
     username = ui_devel_account
     email = f"{username}@anything.invalid"
@@ -86,8 +77,7 @@ def test_devel_recaptcha_sing_up(spam_protection_setup, devel_open_portal, ui_de
     assert login_success.is_displayed
 
 
-# pylint: disable=unused-argument
-def test_devel_forgot_password_recaptcha(spam_protection_setup, devel_open_portal, custom_account, navigator, params):
+def test_devel_forgot_password_recaptcha(spam_protection_setup, custom_account, navigator, params):
     """
     Test
         - Navigates and fills up the Lost password page on developer portal
