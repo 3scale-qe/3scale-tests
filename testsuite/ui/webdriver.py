@@ -15,15 +15,13 @@ from testsuite.ui.exception import WebDriverError
 class _Chrome:
     """Factory class for Chrome browser"""
 
-    def __init__(self, source, ssl_verify, remote_url=None, binary_path=None):
+    def __init__(self, source, accept_insecure_certs, remote_url=None, binary_path=None):
         self.source = source
         self.remote_url = remote_url
         self.binary_path = binary_path
         self.webdriver = None
         self.options = ChromeOptions()
-
-        if not ssl_verify:
-            self.options.set_capability("acceptInsecureCerts", True)
+        self.options.set_capability("acceptInsecureCerts", accept_insecure_certs)
 
     def install(self):
         """Installs the web driver"""
@@ -50,14 +48,14 @@ class _Chrome:
 class _Firefox:
     """Factory class for Firefox browser"""
 
-    def __init__(self, source, ssl_verify, remote_url=None, binary_path=None):
+    def __init__(self, source, accept_insecure_certs, remote_url=None, binary_path=None):
         self.source = source
         self.remote_url = remote_url
         self.binary_path = binary_path
         self.webdriver = None
         self.options = FirefoxOptions()
         self.options.set_preference("browser.link.open_newwindow", 3)
-        self.options.set_preference("webdriver_accept_untrusted_certs", ssl_verify)
+        self.options.set_preference("webdriver_accept_untrusted_certs", accept_insecure_certs)
 
     def install(self):
         """Installs the web driver"""
@@ -114,11 +112,12 @@ class ThreescaleWebdriver:
         self.binary_path = binary_path
         self.webdriver = None
         self.session = None
+        accept_insecure_certs = not ssl_verify
 
         if self.driver == 'chrome':
-            self.webdriver = _Chrome(source, ssl_verify, remote_url, binary_path)
+            self.webdriver = _Chrome(source, accept_insecure_certs, remote_url, binary_path)
         elif self.driver == 'firefox':
-            self.webdriver = _Firefox(source, ssl_verify, remote_url, binary_path)
+            self.webdriver = _Firefox(source, accept_insecure_certs, remote_url, binary_path)
         else:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'
