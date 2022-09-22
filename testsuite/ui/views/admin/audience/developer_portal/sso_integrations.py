@@ -1,11 +1,11 @@
 """View representations of SSO Integrations pages for developer portal"""
-from widgetastic.widget import TextInput, Text, GenericLocatorWidget
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import ThreescaleCheckBox
-from testsuite.ui.widgets.buttons import ThreescaleEditButton
+from testsuite.ui.widgets.buttons import ThreescaleEditButton, ThreescaleUpdateButton
 
 
 class SSOIntegrationsView(BaseAudienceView):
@@ -69,7 +69,7 @@ class RHSSOIntegrationEditView(BaseAudienceView):
     client_id = TextInput(id="authentication_provider_client_id")
     client_secret = TextInput(id="authentication_provider_client_secret")
     realm = TextInput(id="authentication_provider_realm")
-    update_button = GenericLocatorWidget("//input[contains(@class,'update')]")
+    update_button = ThreescaleUpdateButton()
 
     def __init__(self, parent, integration):
         super().__init__(parent, integration_id=integration.entity_id)
@@ -128,7 +128,7 @@ class Auth0IntegrationEditView(BaseAudienceView):
     client_id = TextInput(id="authentication_provider_client_id")
     client_secret = TextInput(id="authentication_provider_client_secret")
     site = TextInput(id="authentication_provider_site")
-    update_button = GenericLocatorWidget("//input[contains(@class,'update')]")
+    update_button = ThreescaleUpdateButton()
 
     def __init__(self, parent, integration):
         super().__init__(parent, integration_id=integration.entity_id)

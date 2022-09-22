@@ -88,7 +88,7 @@ def test_account_plan_changed(account, threescale, login, navigator, requestbin,
     plan_view.create(name, name)
     plan = resilient.resource_read_by_name(threescale.account_plans, name)
     plan_view = navigator.navigate(AccountPlansView)
-    plan_view.publish(plan.entity_id)
+    plan_view.publish(plan.entity_name)
     account_view = navigator.navigate(AccountsDetailView, account=account)
     account_view.change_plan(plan.entity_id)
 
