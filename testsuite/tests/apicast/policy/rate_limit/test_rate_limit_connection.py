@@ -136,7 +136,7 @@ async def get(client, limit_me, relpath):
 
 
 @pytest.fixture
-def policy_settings(variation, key_scope, matching_rule, testconfig, logger):
+def policy_settings(variation, key_scope, matching_rule, redis_url, logger):
     """Configure rate_limit policy
 
     Set connection_limiters to allow CONNECTIONS connections and burst of BURST
@@ -161,7 +161,7 @@ def policy_settings(variation, key_scope, matching_rule, testconfig, logger):
                 connection_limiter(key_scope, matching_rule, "{{ remote_addr }}, 500)")]})
 
     if key_scope == "global":
-        rate_limit["configuration"]["redis_url"] = testconfig["redis"]["url"]
+        rate_limit["configuration"]["redis_url"] = redis_url("global")
 
     logger.info("rate_limit policy:\n" + pformat(rate_limit))
 
@@ -210,8 +210,8 @@ def matching_rule(request):
 
 @pytest.fixture(scope="module")
 def service_proxy_settings(private_base_url):
-    """httpbin is needed as this tool implements delayed request"""
-    return rawobj.Proxy(private_base_url("httpbin"))
+    """A tool that implements delayed request is needed"""
+    return rawobj.Proxy(private_base_url("mockserver"))
 
 
 @pytest.fixture
