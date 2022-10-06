@@ -15,7 +15,7 @@ aparser = argparse.ArgumentParser(description="Upload junit to polarion")
 aparser.add_argument("--polarion", help="URL to polarion, default: POLARION env", default=os.environ.get("POLARION"))
 aparser.add_argument("--username", help="polarion username, default: POLARIONUSER env", default=os.environ.get("POLARIONUSER"))
 aparser.add_argument("--password-variable", help="env variable with password, default: POLARIONPASSWD", default="POLARIONPASSWD")
-aparser.add_argument("--skip-fails", action="store_true", default=False, help="Do not upload failures")
+aparser.add_argument("--skip-fails", action="store_true", default=bool(int(os.environ.get("POLARION_SKIP_FAILS", 0))), help="Do not upload failures")
 aparser.add_argument("junitfile", nargs="+", help="junit file to import")
 args = aparser.parse_args()
 
