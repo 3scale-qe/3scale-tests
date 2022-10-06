@@ -31,7 +31,7 @@ class WASMExtension:
         self.extension_name = f"threescale-extension-{self.service['id']}"
         configuration = service.proxy.list().configs.list(env="production")[0]
         token = configuration["proxy_config"]["content"]["backend_authentication_value"]
-        self.httpbin.new_app(self.base_path.joinpath('extension.yaml'), {
+        self.httpbin.new_app(self.base_path.joinpath('plugin.yaml'), {
             "NAME": self.extension_name,
             "LABEL": self.label,
             "BACKEND_HOST": self.backend_endpoint,
@@ -66,7 +66,7 @@ class WASMExtension:
             ops.append(
                 {
                     "op": "add",
-                    "path": "/spec/config/services/0/mapping_rules/-",
+                    "path": "/spec/pluginConfig/services/0/mapping_rules/-",
                     "value": {
                         "method": rule["http_method"],
                         "pattern": rule["pattern"],
@@ -80,23 +80,23 @@ class WASMExtension:
                     }
                 }
             )
-        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+        self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
 
     def remove_all_mapping_rules(self):
         """Remove all mapping rules in extension"""
         ops = [
             {
                 "op": "remove",
-                "path": "/spec/config/services/0/mapping_rules"
+                "path": "/spec/pluginConfig/services/0/mapping_rules"
             },
             {
                 "op": "add",
-                "path": "/spec/config/services/0/mapping_rules",
+                "path": "/spec/pluginConfig/services/0/mapping_rules",
                 "value": []
             }
         ]
 
-        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+        self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
 
     def synchronise_mapping_rules(self):
         """Take all mapping rules from current production config and deploy in extension"""
@@ -130,11 +130,11 @@ class WASMExtension:
 
             ops.append({
                 "op": "add",
-                "path": f"/spec/config/services/0/credentials/{cred['label']}/-",
+                "path": f"/spec/pluginConfig/services/0/credentials/{cred['label']}/-",
                 "value": obj
             })
 
-        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+        self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
 
     def remove_credentials(self, labels):
         """Remove credential with 'label' from extension"""
@@ -143,16 +143,16 @@ class WASMExtension:
             ops.extend([
                 {
                     "op": "remove",
-                    "path": f"/spec/config/services/0/credentials/{label}"
+                    "path": f"/spec/pluginConfig/services/0/credentials/{label}"
                 },
                 {
                     "op": "add",
-                    "path": f"/spec/config/services/0/credentials/{label}",
+                    "path": f"/spec/pluginConfig/services/0/credentials/{label}",
                     "value": []
                 }
             ])
 
-        self.httpbin.patch("sme", self.extension_name, ops, patch_type="json")
+        self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
 
     def remove_all_credentials(self):
         """Remove all credentials in extension"""
@@ -195,4 +195,4 @@ class WASMExtension:
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""
-        self.httpbin.delete_app(self.label, resources="all,sme,gateway,virtualservice")
+        self.httpbin.delete_app(self.label, resources="all,wasmplugin,sme,gateway,virtualservice")

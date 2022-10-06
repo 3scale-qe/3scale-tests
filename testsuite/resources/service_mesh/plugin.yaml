@@ -1,0 +1,96 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: threescale-extension
+objects:
+- apiVersion: extensions.istio.io/v1alpha1
+  kind: WasmPlugin
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${LABEL}
+  spec:
+    url: oci://${IMAGE}
+    phase: AUTHZ
+    priority: 100
+    selector:
+      matchLabels:
+        app: ${SELECTOR}
+    pluginConfig:
+      api: v1
+      system:
+        name: system
+        upstream:
+          name: outbound|443||${SYSTEM_HOST}
+          url: "https://${SYSTEM_HOST}"
+          timeout: 5000
+        token: ${SYSTEM_TOKEN}
+      backend:
+        name: backend
+        upstream:
+          name: outbound|443||${BACKEND_HOST}
+          url: "https://${BACKEND_HOST}"
+          timeout: 5000
+        extensions:
+        - no_body
+      services:
+      - id: ${SERVICE_ID}
+        token: ${SERVICE_TOKEN}
+        authorities:
+        - "*"
+        credentials:
+          user_key:
+            - query_string:
+                keys:
+                  - user_key
+            - header:
+                keys:
+                  - user_key
+          app_id:
+            - header:
+                keys:
+                  - app_id
+            - query_string:
+                keys:
+                  - app_id
+          app_key:
+            - header:
+                keys:
+                  - app_key
+            - query_string:
+                keys:
+                  - app_key
+        mapping_rules:
+        - method: GET
+          pattern: "/"
+          usages:
+          - name: hits
+            delta: 1
+parameters:
+- name: NAME
+  description: "Name of the WASM extension"
+  required: true
+- name: SELECTOR
+  description: "Workload selector label"
+  required: true
+- name: SYSTEM_HOST
+  description: "Hostname (without protocol, port and path) of the system"
+  required: true
+- name: BACKEND_HOST
+  description: "Hostname (without protocol, port and path) of the backend"
+  required: true
+- name: SYSTEM_TOKEN
+  description: "System token"
+  required: true
+- name: SERVICE_ID
+  description: "Service ID"
+  required: true
+- name: SERVICE_TOKEN
+  description: "Service Token for backend authorization"
+  required: true
+- name: LABEL
+  description: "App label for all resources"
+  required: true
+- name: IMAGE
+  description: "3scale WASM extension image"
+  required: true
