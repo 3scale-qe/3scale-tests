@@ -22,6 +22,7 @@ from pathlib import Path
 import logging
 import os
 import os.path
+import re
 
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
@@ -49,13 +50,24 @@ def _testsuite_version():
         return version.read().strip()
 
 
-def _guess_version(ocp):
+def _is_devrelease(namespace):
+    """Return true whether installation source should be considered alpha build"""
+    if re.match(r"3scale-[^-]+-dev", namespace):
+        return True
+    if re.match(r"3scale-alpha", namespace):
+        return True
+    return False
+
+
+def _guess_version(ocp, namespace):
     """Attempt to determine version from amp-system imagestream"""
 
     version = None
     try:
         version = ocp.image_stream_tag_from_trigger("dc/apicast-production")
         Version(version)
+        if _is_devrelease(namespace):
+            version += "-dev"
     except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
         return ".".join(_testsuite_version().split(".")[:2])
 
@@ -201,7 +213,7 @@ def load(obj, env=None, silent=None, key=None):
                     "default": {
                         "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
             "threescale": {
-                "version": _guess_version(ocp),
+                "version": _guess_version(ocp, project),
                 "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp, obj),
                 "superdomain": superdomain,
                 "catalogsource": catalogsource,
