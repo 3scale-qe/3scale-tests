@@ -175,6 +175,6 @@ def test(application, client, backend_usages, backends, expect_ok):
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
         hits_after = resilient.analytics_list_by_service(
-            application.threescale_client, application["service_id"], "hits", "total")
+            application.threescale_client, application["service_id"], "hits", "total", hits_before+expected_hits_diff)
         assert hits_after == hits_before + expected_hits_diff, \
             f"For {path} expected different number of hits"
