@@ -227,8 +227,12 @@ fetch-tools:
 	-mkdir -p $(_targetdir)
 	-curl -L $(fetch_tools) | tar --strip-components=1 -C $(_targetdir) -xz
 
+# For now deploy all tools to same namespace, it is safe unless more deployment
+# methods are used. Different deployment method of tools should be used for such cases.
+tools: export THREESCALE_NAMESPACE ?= tools
+tools: export SHARED_NAMESPACE ?= tools
 tools:
-	SHARED_NAMESPACE=tools ./ext/testsuite-tools/run.sh
+	./ext/testsuite-tools/run.sh
 
 VERSION-required:
 ifndef VERSION
