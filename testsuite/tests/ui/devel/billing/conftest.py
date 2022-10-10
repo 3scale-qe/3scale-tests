@@ -36,9 +36,9 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
         view.add_item(**line_item)
 
     view.issue()
-    view.charge()
-    invoice_id = view.id_field.text
-    return threescale.invoices.read(invoice_id)
+    invoice = threescale.invoices.list_by_account(account)[0]
+    view.charge(invoice)
+    return invoice
 
 
 @pytest.fixture(scope="module")
