@@ -19,7 +19,7 @@ def test_wizard_correct_request(navigator, login, request, private_base_url):
         - Assert that response page is displayed with successful request
         - Assert that wizard outer page is displayed
     """
-    backend_url = private_base_url("echo-api")
+    backend_url = private_base_url("echo_api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"
@@ -52,7 +52,7 @@ def test_wizard_bad_request(navigator, login, request, private_base_url):
         - Assert that response page is displayed with successful request
     """
     wrong_backend_url = "https://wrong_url.invalid"
-    correct_backend_url = private_base_url("echo-api")
+    correct_backend_url = private_base_url("echo_api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"
@@ -91,7 +91,7 @@ def test_wizard_link_to_product(navigator, login, request, browser, private_base
         - Navigate to next page
         - Assert that request page is displayed
     """
-    backend_url = private_base_url("echo-api")
+    backend_url = private_base_url("echo_api")
     backend_name = blame(request, "backend-name")
     product_name = blame(request, "product-name")
     backend_path = "/whatever"
