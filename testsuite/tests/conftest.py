@@ -19,7 +19,7 @@ from weakget import weakget
 import testsuite.capabilities.providers
 import testsuite.tools
 
-from testsuite import rawobj, HTTP2, gateways, configuration, resilient
+from testsuite import TESTED_VERSION, rawobj, HTTP2, gateways, configuration, resilient
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
@@ -70,6 +70,8 @@ def pytest_runtest_setup(item):
     """Exclude disruptive tests by default, require explicit option"""
 
     marks = [i.name for i in item.iter_markers()]
+    if "skipif_devrelease" in marks and TESTED_VERSION.is_devrelease:
+        pytest.skip("Excluding on development release")
     if "disruptive" in marks and not item.config.getoption("--disruptive"):
         pytest.skip("Excluding disruptive tests")
     if "/toolbox/" in item.nodeid and not item.config.getoption("--toolbox"):
