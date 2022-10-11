@@ -53,6 +53,7 @@ def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6209")
+@pytest.mark.skipif_devrelease
 def test_3scale_version_in_ui(login, navigator):
     """
     Test:
