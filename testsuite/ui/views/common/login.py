@@ -14,7 +14,11 @@ class LoginForm(View):
     password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
     submit = ThreescaleSubmitButton()
 
-    def do_login(self, name, password):
+    def fill_passwd(self, passwd: str):
+        """Method fill password field with password logging disabled"""
+        self.password_field.fill(passwd, sensitive=True)
+
+    def do_login(self, name: str, password: str):
         """
         Method handle login to 3scale admin portal
         :param name: User username for login
@@ -22,7 +26,7 @@ class LoginForm(View):
         :return DashboardView page object
         """
         self.username_field.fill(name)
-        self.password_field.fill(password)
+        self.fill_passwd(password)
         self.submit.click()
 
     @property
