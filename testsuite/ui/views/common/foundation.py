@@ -4,6 +4,22 @@ Module contains Base View used for all Views that are the same in Admin and Mast
 from widgetastic.widget import GenericLocatorWidget, View, Text
 
 
+class FlashMessage(View):
+    """View that represents the Flash Message (div bar) on top of the page when some information is provided to user"""
+    flash_message = Text('//*[(@id="flashWrapper" or @id="flash-messages")]/div[1]')
+
+    def string_in_flash_message(self, message):
+        """
+        Checks whether the flash message contains substring
+        Note: Compared string need to be lowercase
+        """
+        return message in self.flash_message.text.lower()
+
+    @property
+    def is_displayed(self):
+        return self.flash_message.is_displayed
+
+
 class NotFoundView(View):
     """Base Not Found/404 page object"""
     logo = GenericLocatorWidget(locator="//h1[@id='logo']")
