@@ -195,4 +195,4 @@ class WASMExtension:
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""
-        self.httpbin.delete_app(self.label, resources="all,wasmplugin,sme,gateway,virtualservice")
+        self.httpbin.delete_app(self.label, resources="all,wasmplugin,sme,gateways.networking.istio.io,virtualservice")
