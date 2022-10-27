@@ -10,7 +10,6 @@ and return 404 response code or 403 if using WASMGateway
 
 import pytest
 from testsuite import rawobj
-from testsuite.gateways.wasm import WASMGateway
 
 pytestmark = pytest.mark.required_capabilities()
 
@@ -64,16 +63,7 @@ def client(application, api_client):
     return api_client(disable_retry_status_list={404})
 
 
-@pytest.fixture(scope="session")
-def error_status_code(staging_gateway):
-    """'Not found' / 'Method not allowed' status codes
-        are different when using WASMGateway"""
-    if isinstance(staging_gateway, WASMGateway):
-        return 403
-    return 404
-
-
-def test_mapping(client, endpoints_and_methods, error_status_code):
+def test_mapping(client, endpoints_and_methods):
     """
     Make following request calls and assert they succeed:
         - GET request call to '/ip'
@@ -100,7 +90,7 @@ def test_mapping(client, endpoints_and_methods, error_status_code):
     assert response.status_code == 200
 
     response = client.post("/ip")
-    assert response.status_code == error_status_code
+    assert response.status_code == 404
 
     response = client.get("/imaginary")
-    assert response.status_code == error_status_code
+    assert response.status_code == 404
