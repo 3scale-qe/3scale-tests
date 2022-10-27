@@ -29,8 +29,6 @@ class WASMExtension:
         })
 
         self.extension_name = f"threescale-extension-{self.service['id']}"
-        configuration = service.proxy.list().configs.list(env="production")[0]
-        token = configuration["proxy_config"]["content"]["backend_authentication_value"]
         self.httpbin.new_app(self.base_path.joinpath('plugin.yaml'), {
             "NAME": self.extension_name,
             "LABEL": self.label,
@@ -38,7 +36,6 @@ class WASMExtension:
             "SYSTEM_HOST": self.portal_endpoint,
             "SYSTEM_TOKEN": self.portal_token,
             "SERVICE_ID": service["id"],
-            "SERVICE_TOKEN": token,
             "IMAGE": image,
             "SELECTOR": self.label
         })
@@ -195,4 +192,4 @@ class WASMExtension:
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""
-        self.httpbin.delete_app(self.label, resources="all,wasmplugin,sme,gateways.networking.istio.io,virtualservice")
+        self.httpbin.delete_app(self.label, resources="all,wasmplugin,gateways.networking.istio.io,virtualservice")

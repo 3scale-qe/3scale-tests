@@ -35,7 +35,6 @@ objects:
         - no_body
       services:
       - id: ${SERVICE_ID}
-        token: ${SERVICE_TOKEN}
         authorities:
         - "*"
         credentials:
@@ -60,12 +59,6 @@ objects:
             - query_string:
                 keys:
                   - app_key
-        mapping_rules:
-        - method: GET
-          pattern: "/"
-          usages:
-          - name: hits
-            delta: 1
 parameters:
 - name: NAME
   description: "Name of the WASM extension"
@@ -87,7 +80,7 @@ parameters:
   required: true
 - name: SERVICE_TOKEN
   description: "Service Token for backend authorization"
-  required: true
+  required: false
 - name: LABEL
   description: "App label for all resources"
   required: true
