@@ -1,5 +1,8 @@
 """Test for apicast logs with 414 Request-URI Too Large response"""
 import pytest
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 WARN_MESSAGES = [
     'using uninitialized "target_host" variable while logging request',
@@ -9,6 +12,7 @@ WARN_MESSAGES = [
 ]
 
 
+@pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7906")
 def test_uri_too_large(api_client, staging_gateway):
     """
