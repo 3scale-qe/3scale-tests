@@ -29,10 +29,10 @@ WORKDIR /opt/workdir/3scale-py-testsuite
 
 COPY . .
 
-RUN mkdir -m 0770 /test-run-results && \
-	mkdir -m 0770 -p /opt/workdir/virtualenvs && \
-	chmod -R g+w /opt/workdir/* && \
-	chmod g+w /opt
+RUN mkdir -m 0777 /test-run-results && \
+	mkdir -m 0777 -p /opt/workdir/virtualenvs && \
+	chmod -R a+w /opt/workdir/* && \
+	chmod a+w /opt
 
 USER default
 
