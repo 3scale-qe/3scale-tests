@@ -207,6 +207,13 @@ def pytest_metadata(metadata):
     metadata["toolbox-version"] = toolboxversion
     metadata["_3SCALE_TESTS_toolbox__podman_image"] = toolboximage
 
+    for key in sorted(k for k in os.environ if k.startswith("_3SCALE_TESTS")):
+        ikey = key.lower()
+        if "password" in ikey or "token" in ikey or "secret" in ikey or "_key" in ikey:
+            metadata[f"env {key}"] = "*****"
+        else:
+            metadata[f"env {key}"] = os.environ[key]
+
 
 # pylint: disable=protected-access
 def pytest_report_header(config):
@@ -215,9 +222,6 @@ def pytest_report_header(config):
     for key in sorted(config._metadata.keys()):
         header.append(f"testsuite: {key}={config._metadata[key]}")
         _junit_testsuite_property(config, key, config._metadata[key])
-    for key in sorted(k for k in os.environ if k.startswith("_3SCALE_TESTS")):
-        header.append(f"env: {key}={os.environ[key]}")
-        _junit_testsuite_property(config, key, os.environ[key])
     header.append("")
     return header
 
