@@ -94,7 +94,11 @@ test-in-docker: selenium_name := selenium_$(rand)
 test-in-docker: image ?= quay.io/rh_integration/3scale-testsuite
 test-in-docker: selenium_image ?= selenium/standalone-chrome
 test-in-docker: KUBECONFIG ?= $(HOME)/.kube/config
+test-in-docker: DOCKERCONFIGJSON ?= $(HOME)/.docker/config.json
 test-in-docker: SECRETS_FOR_DYNACONF ?= $(if $(wildcard ./config/.secrets.yaml),./config/.secrets.yaml,./config/settings.local.yaml)
+ifdef use_dockerconfig
+test-in-docker: _dockerconfigjson = -v `readlink -f $(DOCKERCONFIGJSON)`:/run/dockerconfig.json:z -e DOCKERCONFIGJSON=/run/dockerconfig.json
+endif
 test-in-docker:
 	docker network create $(network)
 	docker run -d --name $(selenium_name) --network $(network) --network-alias selenium -v /dev/shm:/dev/shm $(selenium_image)
@@ -105,6 +109,7 @@ test-in-docker:
 		-v `readlink -f $(SECRETS_FOR_DYNACONF)`:/opt/secrets.yaml:z \
 		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
 		-v `readlink -f $(resultsdir)`:/test-run-results:z \
+		$(_dockerconfigjson) \
 		-e NAMESPACE \
 		`env | awk -F= '/^_3SCALE_TESTS_/{print "-e", $$1}'` \
 		-e flags \
@@ -122,6 +127,9 @@ export KUBECONFIG
 endif
 ifdef SECRETS_FOR_DYNACONF
 export SECRETS_FOR_DYNACONF
+endif
+ifdef DOCKERCONFIGJSON
+export DOCKERCONFIGJSON
 endif
 
 Pipfile.lock: Pipfile
