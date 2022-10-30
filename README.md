@@ -221,25 +221,16 @@ tests:
 
 This target promotes all `_3SCALE_TESTS_*` env variables to the container.
 
-`$KUBECONFIG` and `$resultsdir` are mounted. The user has to ensure that these
-files have correct permissions, especially kubeconfig can be by default created
-without necessary permissions. Group permissions should be enough, group should
-have write access to `$resultsdir`.
+`$KUBECONFIG` and `$resultsdir` are mounted. To ensure process within the
+container has correct permissions to these files current userid is preserved
+inside the container. This should work unless remapping of userids is
+customized As this feature has to be enabled explicitly person who did this
+should know how to deal with that.
 
 By default `$resultsdir` is set to current dir. It is good idea to create
 dedicated directory for results and set `$resultsdir` accordingly.
 
 This target runs command `docker`, podman can be used with appropriate symlink.
-
-Actully podman can be smoother way to go. In case of docker some other settings
-may be needed to avoid little troubles (a clash of file ownership between
-container and host). The recommendation is to use extra `docker_flags` (this
-can be also exported as env variable):
-
-```NAMESPACE=3scale make test-in-docker docker_flags="-u `id -u`:`id -g` --group-add 0"```
-
-These flags work unless userns-remap is in use. As userns-remap has to be
-enabled explicitly person who did this should know how to deal with that.
 
 `SECRETS_FOR_DYNACONF` is also promoted to the image and it is preset to
 `config/.secrets.yaml` by default if that file is present, otherwise
