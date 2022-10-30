@@ -57,6 +57,10 @@ speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
 
+sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
+sandbag: pipenv
+	$(PYTEST) -n4 -m 'not flaky' --sandbag $(flags) testsuite
+
 persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) testsuite
