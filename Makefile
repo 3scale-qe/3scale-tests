@@ -218,6 +218,10 @@ else
 endif
 ifdef PUSHIMAGE
 	$(RUNSCRIPT)semver-docker-tags $(IMAGENAME) $(_version) 4|tr ' ' '\n'|xargs -l docker push
+ifdef PUSH_EXTRA
+	docker tag $(IMAGENAME) $(PUSH_EXTRA)
+	docker push $(PUSH_EXTRA)
+endif
 endif
 	-[ -n "$$NOSWITCH" ] || git checkout -
 
