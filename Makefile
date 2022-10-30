@@ -46,45 +46,45 @@ all-is-package:
 	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 # pattern to run individual testfile or all testfiles in directory
-testsuite/%: FORCE pipenv
+testsuite/%: FORCE pipenv check-secrets.yaml
 	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
 
 test: ## Run test
-test pytest tests: pipenv
+test pytest tests: pipenv check-secrets.yaml
 	$(PYTEST) -n4 -m 'not flaky' --dist loadfile $(flags) testsuite
 
 speedrun: ## Bigger than smoke faster than test
-speedrun: pipenv
+speedrun: pipenv check-secrets.yaml
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
 
 persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
-persistence: pipenv
+persistence: pipenv check-secrets.yaml
 	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) testsuite
 
 persistence-store persistence-load: export _3SCALE_TESTS_skip_cleanup=true
-persistence-store persistence-load: pipenv
+persistence-store persistence-load: pipenv check-secrets.yaml
 	$(subst -p no:persistence,,$(PYTEST)) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
 debug: test
 
-smoke: pipenv
+smoke: pipenv check-secrets.yaml
 	$(PYTEST) -n6 -msmoke $(flags) testsuite
 
-flaky: pipenv
+flaky: pipenv check-secrets.yaml
 	$(PYTEST) -mflaky $(flags) testsuite
 
-disruptive: pipenv
+disruptive: pipenv check-secrets.yaml
 	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite
 
-performance-smoke: pipenv
+performance-smoke: pipenv check-secrets.yaml
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
 
-ui: pipenv
+ui: pipenv check-secrets.yaml
 	$(PYTEST) --ui $(flags) testsuite/tests/ui
 
-toolbox: pipenv
+toolbox: pipenv check-secrets.yaml
 	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
 
 test-in-docker: ## Run test in container with selenium sidecar
@@ -96,6 +96,7 @@ test-in-docker: selenium_image ?= selenium/standalone-chrome
 test-in-docker: KUBECONFIG ?= $(HOME)/.kube/config
 test-in-docker: SECRETS_FOR_DYNACONF ?= $(if $(wildcard ./config/.secrets.yaml),./config/.secrets.yaml,./config/settings.local.yaml)
 test-in-docker:
+test-in-docker: check-secrets.yaml
 	docker network create $(network)
 	docker run -d --name $(selenium_name) --network $(network) --network-alias selenium -v /dev/shm:/dev/shm $(selenium_image)
 	-docker run \
@@ -233,6 +234,16 @@ tools: export THREESCALE_NAMESPACE ?= tools
 tools: export SHARED_NAMESPACE ?= tools
 tools:
 	./ext/testsuite-tools/run.sh
+
+define n
+
+
+endef
+check-secrets.yaml:
+ifeq ($(shell grep -lIL . config/.secrets.yaml), config/.secrets.yaml)
+	$(error config/.secrets.yaml contains binary data! See README.md$nEither (if you can):$n $$ git crypt unlock$nor delete it:$n $$ rm config/.secrets.yaml$n)
+endif
+
 
 VERSION-required:
 ifndef VERSION
