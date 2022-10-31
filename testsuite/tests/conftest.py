@@ -1,5 +1,6 @@
 "top-level conftest"
 
+from itertools import chain
 import inspect
 import logging
 import os
@@ -60,6 +61,9 @@ def pytest_addoption(parser):
     parser.addoption(
         "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)")
     parser.addoption(
+        "--sandbag", action="store_true", default=False,
+        help="Run ONLY demanding/slow tests skipped by --drop-sandbag (default: False)")
+    parser.addoption(
         "--drop-nopersistence", action="store_true", default=False, help="Skip tests incompatible with persistence "
                                                                          "plugin (default: False)")
 
@@ -70,6 +74,7 @@ def pytest_runtest_setup(item):
     """Exclude disruptive tests by default, require explicit option"""
 
     marks = [i.name for i in item.iter_markers()]
+    sandbag_caps = (Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER)
     if "skipif_devrelease" in marks and TESTED_VERSION.is_devrelease:
         pytest.skip("Excluding on development release")
     if "disruptive" in marks and not item.config.getoption("--disruptive"):
@@ -81,7 +86,6 @@ def pytest_runtest_setup(item):
     if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
         pytest.skip("Excluding UI tests")
     if item.config.getoption("--drop-sandbag"):
-        sandbag_caps = (Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER)
         if "sandbag" in marks or "xfail" in marks:
             pytest.skip("Dropping sandbag")
         elif "required_capabilities" in marks:
@@ -90,6 +94,11 @@ def pytest_runtest_setup(item):
                 for cap in mark.args:
                     if cap in sandbag_caps:
                         pytest.skip("Dropping sandbag")
+    if item.config.getoption("--sandbag"):
+        required_capabilities = set(chain(*{m.args for m in item.iter_markers("required_capabilities")}))
+        # sandbag is something marked, xfailing or having specific requirements
+        if not ("sandbag" in marks or "xfail" in marks or set(sandbag_caps) & required_capabilities):
+            pytest.skip("Running sandbag only")
     if item.config.getoption("--drop-nopersistence"):
         if "nopersistence" in marks:
             pytest.skip("Dropping nopersistence")
