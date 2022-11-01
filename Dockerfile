@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream
+FROM quay.io/centos/centos:stream9
 LABEL description="Run 3scale integration tests \
 Default ENTRYPOINT: 'make' and CMD: 'smoke' \
 Bind dynaconf settings to /opt/secrets.yaml \
@@ -20,7 +20,7 @@ RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.29/opens
 RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
     chmod +x /usr/local/bin/cfssl
 
-RUN yum install -y python3.9 git make gettext && \
+RUN yum install -y python3.9 pip make gettext && \
 	yum clean all
 
 RUN pip3 --no-cache-dir install pipenv
@@ -29,10 +29,10 @@ WORKDIR /opt/workdir/3scale-py-testsuite
 
 COPY . .
 
-RUN mkdir -m 0770 /test-run-results && \
-	mkdir -m 0770 -p /opt/workdir/virtualenvs && \
-	chmod -R g+w /opt/workdir/* && \
-	chmod g+w /opt
+RUN mkdir -m 0777 /test-run-results && \
+	mkdir -m 0777 -p /opt/workdir/virtualenvs && \
+	chmod -R a+w /opt/workdir/* && \
+	chmod a+w /opt
 
 USER default
 
