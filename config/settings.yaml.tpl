@@ -123,6 +123,7 @@ development:
     # cmd: "rpm"
     # cmd: "gem"
     # ruby_version: "rh-ruby24"
+    local_client: false  # if true run the command locally not via ssh
     cmd: "podman"
     podman_cert_dir: "/var/data"
     podman_cert_name: "ca-bundle.crt"

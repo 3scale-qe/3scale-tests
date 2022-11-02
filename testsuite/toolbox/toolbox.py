@@ -2,7 +2,8 @@
 
 import logging
 import os
-from io import BytesIO
+import subprocess
+from io import BytesIO, StringIO
 
 import jsondiff
 import paramiko
@@ -30,12 +31,53 @@ def get_toolbox_cmd(cmd_in):
     raise ValueError(f"Unsupported toolbox command: {settings['toolbox']['cmd']}")
 
 
+class LocalChannel:
+    """paramiko interface to local command execution, implementation of Channel"""
+    def __init__(self, stream, returncode):
+        self.stream = stream
+        self.returncode = returncode
+        self.channel = self
+
+    def readlines(self):
+        """returns lines"""
+        return StringIO(self.stream.decode("utf-8")).readlines()
+
+    def recv_exit_status(self):
+        """return returncode"""
+        return self.returncode
+
+
+class LocalClient:
+    """paramiko interface to local command execution"""
+    @staticmethod
+    def exec_command(command):
+        """Runs the command locally"""
+        result = subprocess.run(command, capture_output=True, shell=True, check=False)
+        return None, LocalChannel(result.stdout, result.returncode), LocalChannel(result.stderr, None)
+
+    def close(self):
+        """Does nothing"""
+
+    def open_sftp(self):
+        """Mimics sftp interface of paramiko"""
+        return self
+
+    @staticmethod
+    def putfo(stream, remote_file):
+        """sftp interface to write file"""
+        with open(remote_file, "wb") as target:
+            target.write(stream.read())
+
+
 def ssh_client():
     """
     Function returns ssh client. Client should be closed!
 
     @return ssh client
     """
+    if settings.get("toolbox", {}).get("local_client"):
+        return LocalClient()
+
     client = paramiko.client.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
     client.load_system_host_keys()
