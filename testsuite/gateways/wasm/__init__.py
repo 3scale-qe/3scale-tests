@@ -96,10 +96,9 @@ class WASMGateway(AbstractGateway):
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
-        ext.synchronise_credentials()
+        if ext.synchronise_credentials():
+            ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
 
-        # wait needed for WASM to load new configuration, fixme: should be replaced with wait for wasm sync
-        ext.httpbin.deployment(f"dc/{ext.httpbin_name}").wait_for()
         return ServiceMeshHttpClient(app=application,
                                      cert=cert,
                                      disable_retry_status_list=disable_retry_status_list,

@@ -39,6 +39,7 @@ class WASMExtension:
             "IMAGE": image,
             "SELECTOR": self.label
         })
+        self.credentials = None
 
         self.httpbin.deployment(f"dc/{self.httpbin_name}").wait_for()
 
@@ -103,14 +104,27 @@ class WASMExtension:
         map_rules = config["content"]["proxy"]["proxy_rules"]
         self.add_mapping_rules(map_rules)
 
-    def add_credentials(self, credentials):
-        """Adds credential into the extension
-            credentials contains list of credentials with attributes:
+    def replace_credentials(self, credentials):
+        """Replaces previous credentials and deploys new into the extension.
+            `credentials` contains list of credentials with attributes:
             label: one of "user_key" or "app_id" or "app_key",
-            credential_location: one of "query_string", "header" or "authorization"
+            credential_location: one of "query_string", "header", "authorization", or "oidc"
             key: search key
         """
         ops = []
+        for label in ["user_key", "app_id", "app_key"]:
+            ops.extend([
+                {
+                    "op": "remove",
+                    "path": f"/spec/pluginConfig/services/0/credentials/{label}"
+                },
+                {
+                    "op": "add",
+                    "path": f"/spec/pluginConfig/services/0/credentials/{label}",
+                    "value": []
+                }
+            ])
+
         for cred in credentials:
             obj = None
             if cred['credential_location'] in {"query_string", "header"}:
@@ -157,8 +171,11 @@ class WASMExtension:
         self.remove_credentials(labels)
 
     def synchronise_credentials(self):
-        """Take credentials from current production config and deploy in extension"""
-        self.remove_all_credentials()
+        """
+        Take credentials from current production config and deploy in extension
+        only if credentials changed.
+        Returns True if credentials changed or were not synchronised before, otherwise false
+         """
         # warning: not using backoff that was before used on below function
         config = self.service.proxy.list().configs.latest(env="production")
 
@@ -188,7 +205,11 @@ class WASMExtension:
             credentials.append({"label": "app_id",
                                 "credential_location": "oidc"})
 
-        self.add_credentials(credentials)
+        if not self.credentials or self.credentials != credentials:
+            self.credentials = credentials
+            self.replace_credentials(credentials)
+            return True
+        return False
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""
