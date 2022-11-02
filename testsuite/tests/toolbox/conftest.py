@@ -9,14 +9,29 @@ from testsuite.config import settings
 from testsuite.utils import blame
 
 
+# pylint: disable=unused-argument
+@pytest.fixture(scope="session", autouse=True)
+def fixed_order(custom_tenant, custom_account, custom_user):
+    """Ensure proper order of initialization **AND** cleanup
+
+    Order in initialization of session scoped fixtures in toolbox tests is
+    somehow incorrect. That causes error during cleanup when fixtures are
+    executed in wrong order. It doesn't seem to be easy to find particular
+    order problems and for example custom_tenant fixture probably can't be
+    fixed at all as it is included indirectly by module scoped fixture that may
+    (or may not) cause that custom_tenant is initialized always too late (and
+    cleaned too early).
+    """
+
+
 @pytest.fixture(scope="module")
-def dest_client(request) -> client.ThreeScaleClient:
+def dest_client(custom_tenant, request) -> client.ThreeScaleClient:
     """ Returns threescale client to destination instance """
     if 'toolbox' in settings and 'destination_endpoint' in settings['toolbox']:
         destination_endpoint = settings['toolbox']['destination_endpoint']
         destination_provider = settings['toolbox']['destination_provider_key']
     else:
-        tenant = request.getfixturevalue("custom_tenant")()
+        tenant = custom_tenant()
 
         destination_endpoint = tenant.admin_base_url
 
