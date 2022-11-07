@@ -45,7 +45,7 @@ def webdriver():
 
 
 @pytest.fixture(scope="module")
-def browser(webdriver, request):
+def browser(webdriver, request, metadata):
     """
     Browser representation based on UI settings
     Args:
@@ -55,6 +55,8 @@ def browser(webdriver, request):
     """
     browser = ThreeScaleBrowser(selenium=webdriver.start_session())
     request.addfinalizer(webdriver.finalize)
+    caps = webdriver.webdriver.webdriver.caps
+    metadata["Browser"] = f"{caps['browserName']} {caps['browserVersion']}"
     return browser
 
 
