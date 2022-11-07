@@ -47,8 +47,17 @@ calls.
 
 Container image can be built with script that provisions necessary
 tools/services to openshift in tools project, `make tools` does the job. To
-have it functional, tools namespace has to exist and pull secret linked to
-relevant service accounts, e.g.:
+have it 100% functional a pull-secret is needed. There are two options to provide it.
+
+Builtin and easier to use method is to use `use_dockerconfig` variable and
+define config file (~/.docker/config is used by default):
+
+```bash
+DOCKERCONFIGJSON=/path/to/docker-config make tools use_dockerconfig=1
+```
+
+The other method is to create tools namespace and pull secret linked to
+relevant service accounts in advance, e.g.:
 
 ```bash
 oc create -f pull-secret.yaml -n tools
