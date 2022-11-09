@@ -5,6 +5,9 @@ pylint = "*"
 types-requests = "*"
 types-PyYAML = "*"
 types-paramiko = "*"
+types-braintree = "*"
+types-stripe = "*"
+types-Pillow = "*"
 # Have commented out python-language-server to make it available quickly
 # for the development
 #python-language-server = "*"
