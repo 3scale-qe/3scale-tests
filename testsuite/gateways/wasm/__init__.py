@@ -22,10 +22,12 @@ class WASMGateway(AbstractGateway):
     CAPABILITIES = {Capability.SERVICE_MESH, Capability.SERVICE_MESH_WASM}
 
     # pylint: disable=too-many-arguments
-    def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient, portal_endpoint, backend_host, image):
+    def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient,
+                 portal_endpoint, backend_host, image, pull_secret):
         self.label = generate_tail()
         self.httpbin = httpbin
         self.image = image
+        self.pull_secret = pull_secret
         self.mesh = mesh
 
         res = urlparse(portal_endpoint).netloc.split("@")
@@ -42,7 +44,8 @@ class WASMGateway(AbstractGateway):
 
     def on_service_create(self, service: Service):
         self.extensions[service["id"]] = WASMExtension(self.httpbin, self.mesh, self.portal_host, self.portal_token,
-                                                       self.backend_host, self.image, self.label, service)
+                                                       self.backend_host, self.image, self.label, service,
+                                                       self.pull_secret)
 
     def on_service_delete(self, service: Service):
         self.extensions[service["id"]].delete()

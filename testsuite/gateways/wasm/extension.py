@@ -11,7 +11,7 @@ class WASMExtension:
     """Class representing once instance of WASMExtension, including deployed Httpbin as there is 1:1 mapping"""
     # pylint: disable=too-many-arguments
     def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient, portal_endpoint,
-                 portal_token, backend_endpoint, image, parent_label, service: Service) -> None:
+                 portal_token, backend_endpoint, image, parent_label, service: Service, pull_secret) -> None:
         self.httpbin = httpbin
         self.mesh = mesh
         self.portal_endpoint = portal_endpoint
@@ -37,7 +37,8 @@ class WASMExtension:
             "SYSTEM_TOKEN": self.portal_token,
             "SERVICE_ID": service["id"],
             "IMAGE": image,
-            "SELECTOR": self.label
+            "SELECTOR": self.label,
+            "PULL_SECRET": pull_secret
         })
         self.credentials = None
 
