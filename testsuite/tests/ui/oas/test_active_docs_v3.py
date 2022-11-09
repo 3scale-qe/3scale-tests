@@ -42,10 +42,12 @@ def oas3_spec():
     user_key = {
         "name": "user_key",
         "description": "Your access API Key",
-        "type": "string",
         "in": "query",
         "x-data-threescale-name": "user_keys",
-        "required": True
+        "required": True,
+        "schema": {
+            "type": "string",
+        }
     }
     oas_spec = resources.files("testsuite.resources.oas3").joinpath("petstore-expanded.json").read_text()
     json_spec = json.loads(oas_spec)
@@ -77,8 +79,7 @@ def ui_active_doc(login, request, navigator, service, oas3_spec):
                      description="Active docs V3",
                      service=service,
                      oas_spec=oas3_spec,
-                     publish_option=True,
-                     skip_validation_option=True)
+                     publish_option=True)
     return service.active_docs.list()[0]
 
 
