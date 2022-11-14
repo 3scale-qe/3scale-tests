@@ -95,7 +95,7 @@ test-in-docker: ## Run test in container with selenium sidecar
 test-in-docker: rand := $(shell cut -d- -f1 /proc/sys/kernel/random/uuid)
 test-in-docker: network := test3scale_$(rand)
 test-in-docker: selenium_name := selenium_$(rand)
-test-in-docker: image ?= quay.io/rh_integration/3scale-testsuite
+test-in-docker: image ?= ghcr.io/3scale-qe/3scale-tests
 test-in-docker: selenium_image ?= selenium/standalone-chrome
 test-in-docker: KUBECONFIG ?= $(HOME)/.kube/config
 test-in-docker: DOCKERCONFIGJSON ?= $(HOME)/.docker/config.json
