@@ -16,7 +16,9 @@ class AccountsView(BaseAudienceView):
     # TODO search will be separated into the AudienceTable Widget later.
     path_pattern = '/buyers/accounts'
     new_account = Text("//a[@href='/buyers/accounts/new']")
-    table = AudienceTable("//*[@id='buyer_accounts']")
+    table = AudienceTable("//*[@id='buyer_accounts']", column_widgets={
+        'Group/Org.': Text('./a')
+    })
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
 
@@ -33,7 +35,7 @@ class AccountsView(BaseAudienceView):
     @step("AccountsDetailView")
     def detail(self, account):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.click()
+        self.table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.widget.click()
 
     def prerequisite(self):
         return BaseAudienceView
