@@ -103,6 +103,11 @@ test-in-docker: SECRETS_FOR_DYNACONF ?= $(if $(wildcard ./config/.secrets.yaml),
 ifdef use_dockerconfig
 test-in-docker: _dockerconfigjson = -v `readlink -f $(DOCKERCONFIGJSON)`:/run/dockerconfig.json:z -e DOCKERCONFIGJSON=/run/dockerconfig.json
 endif
+ifeq ($(shell docker --version 2>/dev/null|grep -i podman),)
+test-in-docker: _docker_flags = -u $(shell id -u):$(shell id -g) --group-add 0
+else
+test-in-docker: _docker_flags = --userns=keep-id
+endif
 test-in-docker:
 test-in-docker: check-secrets.yaml
 	docker network create $(network)
@@ -120,6 +125,7 @@ test-in-docker: check-secrets.yaml
 		-e flags \
 		-e _3SCALE_TESTS_fixtures__ui__browser__source=remote \
 		-e _3SCALE_TESTS_fixtures__ui__browser__remote_url=http://selenium:4444 \
+		$(_docker_flags) \
 		$(docker_flags) \
 		$(image) $(cmd)
 	docker rm -f $(selenium_name)
