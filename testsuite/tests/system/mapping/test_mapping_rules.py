@@ -91,6 +91,8 @@ def test_mapping(client, endpoints_and_methods):
 
     response = client.post("/ip")
     assert response.status_code == 404
+    assert "No Mapping Rule matched" in response.content.decode("utf8")
 
     response = client.get("/imaginary")
     assert response.status_code == 404
+    assert "No Mapping Rule matched" in response.content.decode("utf8")
