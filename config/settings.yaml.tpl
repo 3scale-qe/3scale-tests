@@ -22,6 +22,15 @@ default:
         openshift:  # Only needed if run without OpenShift
             project_name: ""{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
             kind: "OpenShiftClient"
+      WASMGateway:
+        image: "{WASM_IMAGE}"  # wasm image build for pulling
+        pull_secret: "{PULL_SECRET}"  # name of pull secret resource in same namespace as httpbin
+        httpbin:
+          project_name: "{HTTPBIN_NAMESPACE}"
+          kind: "OpenShiftClient"
+        mesh:
+          project_name: "{SERVICE_MESH_NAMESPACE}"
+          kind: "OpenShiftClient"
   openshift:
     servers:
       default:
