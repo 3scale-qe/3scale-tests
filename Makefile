@@ -157,7 +157,8 @@ Pipfile.lock: Pipfile
 # this dir is created for compatibility with pipelines that try to collect
 # artifacts and expect this dir in case of html report
 $(resultsdir)/assets:
-	mkdir $@
+	mkdir -p $@
+	touch $@/empty
 
 # a hack to ensure assets/ exists (explained few lines above) all targets that
 # should handle compatibility require pipenv (unfortunately few other targets
