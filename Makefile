@@ -99,7 +99,6 @@ test-in-docker: image ?= ghcr.io/3scale-qe/3scale-tests
 test-in-docker: selenium_image ?= selenium/standalone-chrome
 test-in-docker: KUBECONFIG ?= $(HOME)/.kube/config
 test-in-docker: DOCKERCONFIGJSON ?= $(HOME)/.docker/config.json
-test-in-docker: SECRETS_FOR_DYNACONF ?= $(if $(wildcard ./config/.secrets.yaml),./config/.secrets.yaml,./config/settings.local.yaml)
 ifdef use_dockerconfig
 test-in-docker: _dockerconfigjson = -v `readlink -f $(DOCKERCONFIGJSON)`:/run/dockerconfig.json:z -e DOCKERCONFIGJSON=/run/dockerconfig.json
 endif
@@ -107,6 +106,9 @@ ifeq ($(shell docker --version 2>/dev/null|grep -i podman),)
 test-in-docker: _docker_flags = -u $(shell id -u):$(shell id -g) --group-add 0
 else
 test-in-docker: _docker_flags = --userns=keep-id
+endif
+ifdef SECRETS_FOR_DYNACONF
+test-in-docker: _secrets_for_dynaconf = -v `readlink -f $(SECRETS_FOR_DYNACONF)`:/opt/secrets.yaml:z
 endif
 test-in-docker:
 test-in-docker: check-secrets.yaml
@@ -116,7 +118,8 @@ test-in-docker: check-secrets.yaml
 		-it \
 		--rm \
 		--network $(network) \
-		-v `readlink -f $(SECRETS_FOR_DYNACONF)`:/opt/secrets.yaml:z \
+		$(_secrets_for_dynaconf) \
+		-v `readlink -f ./config`:/opt/workdir/3scale-py-testsuite/config:z \
 		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
 		-v `readlink -f $(resultsdir)`:/test-run-results:z \
 		$(_dockerconfigjson) \
@@ -135,9 +138,6 @@ test-in-docker: check-secrets.yaml
 # exported elsewhere. These lines have to be below related target
 ifdef KUBECONFIG
 export KUBECONFIG
-endif
-ifdef SECRETS_FOR_DYNACONF
-export SECRETS_FOR_DYNACONF
 endif
 ifdef DOCKERCONFIGJSON
 export DOCKERCONFIGJSON
