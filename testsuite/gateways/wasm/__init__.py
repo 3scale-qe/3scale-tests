@@ -22,10 +22,12 @@ class WASMGateway(AbstractGateway):
     CAPABILITIES = {Capability.SERVICE_MESH, Capability.SERVICE_MESH_WASM}
 
     # pylint: disable=too-many-arguments
-    def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient, portal_endpoint, backend_host, image):
+    def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient,
+                 portal_endpoint, backend_host, image, pull_secret):
         self.label = generate_tail()
         self.httpbin = httpbin
         self.image = image
+        self.pull_secret = pull_secret
         self.mesh = mesh
 
         res = urlparse(portal_endpoint).netloc.split("@")
@@ -42,7 +44,8 @@ class WASMGateway(AbstractGateway):
 
     def on_service_create(self, service: Service):
         self.extensions[service["id"]] = WASMExtension(self.httpbin, self.mesh, self.portal_host, self.portal_token,
-                                                       self.backend_host, self.image, self.label, service)
+                                                       self.backend_host, self.image, self.label, service,
+                                                       self.pull_secret)
 
     def on_service_delete(self, service: Service):
         self.extensions[service["id"]].delete()
@@ -96,11 +99,9 @@ class WASMGateway(AbstractGateway):
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
-        ext.synchronise_mapping_rules()
-        ext.synchronise_credentials()
+        if ext.synchronise_credentials():
+            ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
 
-        # wait needed for WASM to load new configuration, fixme: should be replaced with wait for wasm sync
-        ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
         return ServiceMeshHttpClient(app=application,
                                      cert=cert,
                                      disable_retry_status_list=disable_retry_status_list,

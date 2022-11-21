@@ -13,6 +13,7 @@ default:
         template: apicast.yml
       WASMGateway:
         image: "registry.redhat.io/openshift-service-mesh/3scale-auth-wasm-rhel8:0.0.1"
+        pull_secret: "pull-secret"  # name of pull secret resource in same namespace as httpbin
       default:
         kind: "SystemApicast"
   rhsso:
