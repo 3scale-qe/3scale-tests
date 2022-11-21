@@ -64,6 +64,9 @@ class APIManager(APIObject):
     def _scale(self, spec_locator, deployments, replicas, wait_for_replicas=None):
         """Generic scale function that requires path where to set replicas and on which deployments to wait"""
         current_replicas = self.get_path(spec_locator)
+        # APIManager consider 1 replica as default and doesn't set the value in CRD by default
+        if current_replicas is Missing:
+            current_replicas = 1
         wait_for_replicas = wait_for_replicas or current_replicas
 
         # Safer way than using only apply()
