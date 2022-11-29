@@ -29,7 +29,7 @@ def test_account_will_receive_email(mailhog_client, threescale, account):
     test_message_body = f"body_test_account_will_receive_email+{account.entity['org_name']}"
 
     threescale.threescale_client.accounts\
-        .send_message(entity_id=account.entity_id, body=test_message_body)
+        .send_message(entity_id=account.entity_id, subject="test message", body=test_message_body)
 
     ids = assert_message_received(mailhog_client, test_message_body)
     mailhog_client.delete(ids)
