@@ -42,6 +42,17 @@ class RadioGroup(GenericLocatorWidget):
         element = self.browser.element(self.OPTIONS_BY_ID.format(option))
         element.click()
 
+    # pylint: disable=arguments-differ
+    def read(self):
+        """
+        Read the selected option
+        """
+        options = self.browser.elements(self.OPTIONS_INPUT)
+        for option in options:
+            if option.is_selected():
+                return option.get_dom_attribute('id')
+        return None
+
 
 # pylint: disable=abstract-method
 # Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
