@@ -14,9 +14,9 @@ def check_availability(prometheus, backend_listener_url):
     """
     if not prometheus.has_metric(
             "apisonator_listener_response_codes",
-            lambda: requests.get(f'{backend_listener_url}/transactions/authorize.xml')):
-        warn_and_skip("The Prometheus is not configured to run this test."
-                      " The scraping of metrics from all pods is not set up. The test has been skipped")
+            trigger_request=lambda: requests.get(f'{backend_listener_url}/transactions/authorize.xml')):
+        warn_and_skip("The Prometheus is not configured to run this test. The collection"
+                      " of basic metrics is not set up. The test has been skipped.")
 
 
 @pytest.fixture(scope="session")
@@ -43,8 +43,8 @@ def prometheus_response_codes_for_metric(prometheus):
     Given a prometheus query, returns dict with response
     codes and counts associated with the response code
     """
-    def response_codes_for_metric(query):
-        metric_response_codes = prometheus.get_metric(query)
+    def response_codes_for_metric(key, labels):
+        metric_response_codes = prometheus.get_metrics(key, labels)
         response_codes_count = {}
         for response_code_metric in metric_response_codes:
             response_codes_count[response_code_metric['metric']['resp_code']] \

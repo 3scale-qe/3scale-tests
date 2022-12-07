@@ -898,8 +898,10 @@ def prometheus(testconfig, openshift):
         return PrometheusClient(testconfig["prometheus"]["url"])
 
     routes = openshift().routes.for_service('prometheus-operated')
+    operator_based = True
     if len(routes) == 0:
         routes = openshift().routes.for_service('prometheus')
+        operator_based = False
 
     if len(routes) == 0:
         warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")
@@ -907,4 +909,4 @@ def prometheus(testconfig, openshift):
     protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
     prometheus_url = protocol + routes[0]['spec']['host']
 
-    return PrometheusClient(prometheus_url)
+    return PrometheusClient(prometheus_url, operator_based=operator_based)
