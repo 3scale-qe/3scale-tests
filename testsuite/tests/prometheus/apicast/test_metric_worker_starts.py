@@ -19,8 +19,9 @@ def test_metric_worker(prometheus, production_gateway):
     """
 
     ocp = production_gateway.openshift
-    pod = production_gateway.deployment.get_pods()
-    pod_name = pod.names()[0]
+    pods = production_gateway.deployment.get_pods().objects()
+    pod = [pod for pod in pods if pod.model.status.phase == "Running"][0]
+    pod_name = pod.name()
 
     labels = {"container": "apicast-production"}
     #  pod label is only propagated in operator based prometheus, in template based querying only by container is fine
