@@ -10,6 +10,7 @@ import warnings
 
 import importlib_resources as resources
 import backoff
+import openshift as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from threescale_api import client, errors
@@ -24,6 +25,7 @@ from testsuite import TESTED_VERSION, rawobj, HTTP2, gateways, configuration, re
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
+
 from testsuite.prometheus import PrometheusClient
 from testsuite.httpx import HttpxHook
 from testsuite.mockserver import Mockserver
@@ -894,19 +896,42 @@ def prometheus(testconfig, openshift):
     Returns an instance of Prometheus client.
     Skips the tests when Prometheus is not present in the project.
     """
-    if "prometheus" in testconfig:
-        return PrometheusClient(testconfig["prometheus"]["url"])
+    threescale_namespace = weakget(settings)["openshift"]["projects"]["threescale"]["name"] % None
+
+    if "prometheus" in testconfig and "url" in testconfig["prometheus"]:
+        if "token" in testconfig["prometheus"]:
+            token = testconfig["prometheus"]["token"]
+        return PrometheusClient(testconfig["prometheus"]["url"], token=token, namespace=threescale_namespace)
+
+    if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
+        warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped. "
+                      "Without Openshift configuration you need to set up Prometheus url. (token/namespace if needed)")
+
+    def _prepare_prometheus_endpoint(routes):
+        protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
+        return protocol + routes[0]['spec']['host']
+
+    openshift_monitoring = openshift(project="openshift-monitoring")
+    routes = openshift_monitoring.routes.for_service("thanos-querier")
+    if len(routes) > 0:
+        token = oc.whoami(cmd_args="-t")
+        prometheus_url = _prepare_prometheus_endpoint(routes)
+        prometheus_client = PrometheusClient(prometheus_url, True, token, threescale_namespace)
+        if prometheus_client.has_metric("rails_requests_total"):
+            return prometheus_client
 
     routes = openshift().routes.for_service('prometheus-operated')
-    operator_based = True
-    if len(routes) == 0:
-        routes = openshift().routes.for_service('prometheus')
-        operator_based = False
+    if len(routes) > 0:
+        prometheus_url = _prepare_prometheus_endpoint(routes)
+        prometheus_client = PrometheusClient(prometheus_url, True)
+        if prometheus_client.has_metric("rails_requests_total"):
+            return prometheus_client
 
-    if len(routes) == 0:
-        warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")
+    routes = openshift().routes.for_service('prometheus')
+    if len(routes) > 0:
+        prometheus_url = _prepare_prometheus_endpoint(routes)
+        prometheus_client = PrometheusClient(prometheus_url, False)
+        if prometheus_client.has_metric("rails_requests_total"):
+            return prometheus_client
 
-    protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
-    prometheus_url = protocol + routes[0]['spec']['host']
-
-    return PrometheusClient(prometheus_url, operator_based=operator_based)
+    warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")

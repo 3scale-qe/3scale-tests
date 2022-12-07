@@ -45,14 +45,21 @@ class PrometheusClient:
     Note: Contains only methods being used by actual tests.
     """
 
-    def __init__(self, endpoint: str, operator_based: bool = None):
+    def __init__(self, endpoint: str, operator_based: bool = None, token: str = None, namespace: str = None):
         """
         Args:
             :param endpoint: url where prometheus is deployed
             :param operator_based: if prometheus is expected to gather new info based on PodMonitor or other CRD
+            :param token: Bearer token if such auth is required
+            :param namespace: namespace of 3scale in case of prometheus gathering multiple 3scale instances
         """
         self.endpoint = endpoint
+        self.token = token
+        self.namespace = namespace
         self.operator_based = operator_based
+        self.headers = None
+        if self.token:
+            self.headers = {"Authorization": f"Bearer {self.token}"}
 
     def _do_request(self, path: str, **kwargs):
         """Make a request to prometheus api.
@@ -64,7 +71,7 @@ class PrometheusClient:
         url = urljoin(self.endpoint, path)
         ssl_verify = settings["ssl_verify"]
 
-        return requests.get(url, verify=ssl_verify, **kwargs)
+        return requests.get(url, verify=ssl_verify, headers=self.headers, **kwargs)
 
     def get_metrics(self, key: str = "", labels: Optional[Dict[str, str]] = None) -> list:
         """Get a metric by metric key or labels.
@@ -73,6 +80,10 @@ class PrometheusClient:
           :param key: Key name to be queried in prometheus
           :param labels: Labels to be put inside {} of prometheus query
         """
+        if self.namespace:
+            labels = labels or {}
+            labels.setdefault("namespace", self.namespace)
+
         params = _params(key, labels)
 
         response = self._do_request("/api/v1/query", params=params)
@@ -99,9 +110,13 @@ class PrometheusClient:
             as it does not have to be always present in Prometheus (e. g. fresh install).
             When empty, the trigger call is not invoked.
         """
-        labels = None
+        labels = {}
+
+        if self.namespace:
+            labels["namespace"] = self.namespace
+
         if target:
-            labels = {"container": target}
+            labels["container"] = target
         try:
             has_metric = len(self.get_metrics(key=metric, labels=labels)) > 0
             if not has_metric and trigger_request is not None:
