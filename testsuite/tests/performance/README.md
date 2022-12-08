@@ -9,7 +9,7 @@ Hyperfoil is a microservice-oriented distributed benchmark framework.
 
 The performance test consists of two files:
 
-* `.hf.yaml` contains the performance test (benchmark), which will be executed on the hyperfoil.
+* `.hf.yaml` contains the performance test (benchmark), which will be executed on the hyperfoil. (located in templates directory)
 
 * `test_.py` Test consist of the following phases:
     * **SETUP:** Test creates 3scale objects, configure openshift, and adds necessary configuration to the benchmark template (`.hf.yaml` file).
@@ -18,16 +18,21 @@ The performance test consists of two files:
  
  
 ## How to run?
-To run the performance tests, you need to setup hyperfoil first.
-The testsuite needs to have a hyperfoil controller accessible with URL and the configuration for agents.
+To run the performance tests, you need to set up hyperfoil first.
+The testsuite needs to have a hyperfoil controller accessible with URL. Each set of tests have preconfigured number of agents and its properties but this configuration can be overridden in configuration file by `shared_templates` definition.
 Testsuites `setting.yaml` contains predefined settings for clustered hyperfoil.
 
 ### Configuration
+
+The minimal configuration for running performance tests is to set correct Hyperfoil URL.
+
  ```yaml
 hyperfoil:
   url: "http://hyperfoil-<URL>.com"
-  shared_template:
 ```
+
+#### Overriding agents configuration
+Each test has preconfigured Hyperfoil agents definition, but it can be changed using the configuration file as follows.
 Content of`shared_template` will be merged into each benchmark YAML definition.
 
 * #### **Clustered hyperfoil**
@@ -44,8 +49,10 @@ Content of`shared_template` will be merged into each benchmark YAML definition.
       shared_template:
         agents:
           agent-one:
+            host: 127.0.0.1
+            port: 22
+            stop: true
     ```
-    This is the minimum configuration needed to run smoke tests.
 
 * #### **Manually deployed hyperfoil**
       Right now, we focus on running the testsuite with clustered hyperfoil. 
@@ -71,16 +78,9 @@ When you configured hyperfoil, you need to configure the testsuite. Steps can be
 **WARNING**
 
 You are running the performance tests, which can generate multiple requests per second.
-Keep in mind that you need to choose your own backend. Otherwise, your actions can be considered as a DDoS attack.
+Keep in mind that you need to choose your own deployment of backend. Otherwise, your actions can be considered as a DDoS attack.
 
-Performance tests are only using the primary backend.
-    
-```yaml
-threescale:
-  service:
-    backends:
-      primary: http://httpbin.httpbin.svc:8080
-``` 
+Performance tests are only using the httpbin-go backend which is used by default (needs [tools](https://github.com/3scale-qe/tools) deployed).
 
 The smoke tests can be run with the following command.
 ```shell script
