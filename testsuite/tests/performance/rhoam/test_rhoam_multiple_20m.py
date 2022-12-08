@@ -54,6 +54,12 @@ def number_of_apps():
 
 
 @pytest.fixture(scope='module')
+def number_of_agents():
+    """Number of Hyperfoil agents to be spawned"""
+    return 2
+
+
+@pytest.fixture(scope='module')
 def create_mapping_rules():
     """
     Returns function that will be run for each backend usage
@@ -93,7 +99,7 @@ def services(services, create_mapping_rules):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'rhoam/template_multiple_oidc_20m.hf.yaml')
+    return os.path.join(root_path, 'rhoam/templates/template_multiple_oidc_20m.hf.yaml')
 
 
 @pytest.fixture(scope='module')

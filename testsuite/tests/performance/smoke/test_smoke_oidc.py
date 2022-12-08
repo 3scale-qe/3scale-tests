@@ -37,7 +37,7 @@ def services(services):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'smoke/template_oidc.hf.yaml')
+    return os.path.join(root_path, 'smoke/templates/template_oidc.hf.yaml')
 
 
 @pytest.fixture(scope='module')
