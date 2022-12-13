@@ -1,11 +1,12 @@
 """View representations of products application section pages"""
-from widgetastic.widget import Text, TextInput
-from widgetastic_patternfly4 import PatternflyTable
+from widgetastic.widget import Text, TextInput, View
+from widgetastic_patternfly4 import PatternflyTable, Select
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import GenericLocatorWidget
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleCreateButton
+from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleCreateButton, ThreescaleSubmitButton
+from testsuite.ui.views.common.foundation import FlashMessage
 
 
 class ApplicationPlansView(BaseProductView):
@@ -15,6 +16,9 @@ class ApplicationPlansView(BaseProductView):
         "Name": Text("./a")
     })
     create_button = ThreescaleCreateButton()
+    change_plan_button = ThreescaleSubmitButton()
+    default_plan_select = Select()
+    notification = View.nested(FlashMessage)
 
     @step("ApplicationPlanDetailView")
     def detail(self, application_plan):

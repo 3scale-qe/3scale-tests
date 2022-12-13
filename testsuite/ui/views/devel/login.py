@@ -2,24 +2,10 @@
 from time import sleep
 from widgetastic.widget import TextInput, Text, View
 
+from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
 from testsuite.ui.views.devel import BaseDevelView, SignUpView
-
-
-class FlashMessage(View):
-    """View that represents the Flash Message (div bar) on top of the page when some information is provided to user"""
-    flash_message = Text('//*[@id="flash-messages"]/div/div')
-
-    def string_in_flash_message(self, message):
-        """
-        Checks whether the flash message contains substring
-        """
-        return message in self.flash_message.text.lower()
-
-    @property
-    def is_displayed(self):
-        return self.flash_message.is_displayed
 
 
 class LoginView(BaseDevelView):

@@ -68,16 +68,3 @@ def test_application_delete(service, custom_app_plan, custom_ui_application, acc
     app = account.applications.read_by_name(app["name"])
 
     assert app is None
-
-
-def test_app_plan_create(custom_ui_app_plan, request, service):
-    """
-    Test:
-        - create application plan via UI
-        - assert that plan was created
-    """
-    name = blame(request, "app-plan")
-    plan = custom_ui_app_plan(name, service)
-
-    assert plan
-    assert plan['name'] == name
