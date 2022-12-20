@@ -14,9 +14,17 @@ class TenantsView(BaseMasterAudienceView):
     # TODO search will be separated into the AudienceTable Widget later.
     path_pattern = '/buyers/accounts'
     new_account = Text("//a[@href='/p/admin/accounts/new']")
-    table = AudienceTable("//*[@id='buyer_accounts']")
+    tenants_table = AudienceTable("//*[@id='buyer_accounts']", column_widgets={
+        'Group/Org.': Text('./a'),
+        5: Text("./ul/li/a[contains(@class, 'actions')]")
+    })
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
+
+    def impersonate(self, account):
+        """Impersonate tenant and switch browser context to new tab"""
+        self.tenants_table.row(_row__attr=('id', f'account_{account.entity_id}'))[5].click()
+        self.parent_browser.switch_to_window(self.parent_browser.window_handles[-1])
 
     def search(self, value: str):
         """Search in Tenant table by given value"""
@@ -31,7 +39,7 @@ class TenantsView(BaseMasterAudienceView):
     @step("TenantDetailView")
     def detail(self, account):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.click()
+        self.tenants_table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.widget.click()
 
     def prerequisite(self):
         return BaseMasterAudienceView
@@ -39,7 +47,7 @@ class TenantsView(BaseMasterAudienceView):
     @property
     def is_displayed(self):
         return BaseMasterAudienceView.is_displayed.fget(self) and self.new_account.is_displayed and \
-               self.table.is_displayed and self.path_pattern in self.browser.url
+               self.tenants_table.is_displayed and self.path_pattern in self.browser.url
 
 
 class TenantDetailView(BaseMasterAudienceView):

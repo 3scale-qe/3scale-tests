@@ -9,7 +9,7 @@ from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 from testsuite.ui.utils import assert_displayed_in_new_tab
-from testsuite.ui.views.master.audience.tenant import TenantDetailView, TenantEditView
+from testsuite.ui.views.master.audience.tenant import TenantDetailView, TenantEditView, TenantsView
 from testsuite.ui.views.devel import LandingView
 
 
@@ -21,8 +21,14 @@ def tenant_name(request):
 
 @pytest.fixture(scope="module")
 def ui_tenant(tenant_name, custom_ui_tenant):
-    """ overrides the ui_tenant fixture and creates and returns new tenant """
+    """ Overrides the ui_tenant fixture and creates and returns new tenant """
     return custom_ui_tenant(username=tenant_name, email=tenant_name, password="12345678", organisation=tenant_name)
+
+
+@pytest.fixture(scope="module")
+def tenant(custom_tenant):
+    """Returns tenant created via api"""
+    return custom_tenant()
 
 
 # pylint: disable=too-many-arguments, unused-argument
@@ -47,14 +53,13 @@ def test_create_tenant(master_login, ui_tenant, tenant_name, navigator, browser,
 
 
 # pylint: disable=unused-argument
-def test_edit_tenant(master_login, navigator, custom_tenant, master_threescale):
+def test_edit_tenant(master_login, navigator, tenant, master_threescale):
     """
     Test:
         - Create tenant via API
         - Edit tenant via UI
         - check whether it was edited
     """
-    tenant = custom_tenant()
     account_id = tenant.entity['signup']['account']['id']
     account = master_threescale.accounts.read(account_id)
 
@@ -78,7 +83,6 @@ def test_delete_tenant(master_login, navigator, master_threescale, custom_tenant
     """
 
     tenant = custom_tenant(autoclean=False)
-    tenant.wait_tenant_ready()
     account_id = tenant.entity['signup']['account']['id']
     account = master_threescale.accounts.read(account_id)
 
@@ -95,7 +99,7 @@ def test_delete_tenant(master_login, navigator, master_threescale, custom_tenant
 
 
 # pylint: disable=unused-argument
-def test_resume_tenant(master_login, navigator, master_threescale, custom_tenant, browser):
+def test_resume_tenant(master_login, navigator, master_threescale, tenant, browser):
     """
     Test:
         - Create and Delete tenant via API
@@ -103,8 +107,6 @@ def test_resume_tenant(master_login, navigator, master_threescale, custom_tenant
         - Assert that the resume was successful
     """
 
-    tenant = custom_tenant()
-    tenant.wait_tenant_ready()
     account_id = tenant.entity['signup']['account']['id']
     account = master_threescale.accounts.read(account_id)
     tenant.delete()
@@ -119,3 +121,23 @@ def test_resume_tenant(master_login, navigator, master_threescale, custom_tenant
 
     assert_displayed_in_new_tab(browser, detail_view.open_public_domain, LandingView)
     assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, LoginView)
+
+
+def test_impersonate_tenant(master_login, navigator, master_threescale, tenant, browser):
+    """
+    Test check impersonation functionality:
+        - create tenant
+        - login into master portal
+        - impersonate new created tenant
+        - assert that the impersonation was successful
+            - dashboard is displayed
+            - url is correct
+    """
+    account_id = tenant.entity['signup']['account']['id']
+    account = master_threescale.accounts.read(account_id)
+
+    tenants_view = navigator.navigate(TenantsView)
+    tenants_view.impersonate(account)
+    admin_dashboard = DashboardView(browser)
+    assert account["admin_domain"] in browser.url
+    assert admin_dashboard.is_displayed
