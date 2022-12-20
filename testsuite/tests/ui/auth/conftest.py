@@ -35,8 +35,7 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
 
 
 @pytest.fixture(scope="module")
-def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, set_callback_urls, auth0_user,
-                threescale):
+def auth0_setup(ui_sso_integration, testconfig, navigator, set_callback_urls, auth0_user, threescale):
     """
     Preparation for Auth0 tests:
         - Crate Auth0 SSO integration
@@ -44,7 +43,6 @@ def auth0_setup(custom_admin_login, testconfig, ui_sso_integration, navigator, s
         - test authentication flow
         - publish SSO integration
     """
-    custom_admin_login(fresh=True)
     auth = testconfig["auth0"]
     integration = ui_sso_integration('auth0', auth["client"], auth["client-secret"], f"https://{auth['domain']}")
 
@@ -80,8 +78,7 @@ def auth0_bounce_login(auth0_setup, browser, auth0_user):
 
 # pylint: disable=too-many-locals
 @pytest.fixture(scope="module")
-def rhsso_setup(request, custom_admin_login, rhsso_service_info, ui_sso_integration, navigator, testconfig,
-                threescale):
+def rhsso_setup(ui_sso_integration, request, rhsso_service_info, navigator, testconfig, threescale):
     """
     Preparation for RHSSO tests:
         - Crate RHSSO SSO integration
@@ -89,7 +86,6 @@ def rhsso_setup(request, custom_admin_login, rhsso_service_info, ui_sso_integrat
         - test authentication flow
         - publish SSO integration
     """
-    custom_admin_login()
     admin = rhsso_service_info.realm.admin
     client_id = rhsso_service_info.client.client_id
     client = admin.get_client(client_id)["clientId"]

@@ -524,7 +524,7 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhss
         rhsso_service_info.realm.admin.user_logout(user_id)
         browser.url = settings["threescale"]["admin"]["url"]
         page = navigator.open(LoginView)
-        page.do_rhsso_login(username, password)
+        page.do_rhsso_login(username, password, realm=rhsso_service_info.realm.name)
 
         def _delete():
             user = resilient.resource_read_by_name(threescale.provider_account_users, rhsso_username)

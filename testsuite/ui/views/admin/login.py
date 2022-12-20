@@ -46,16 +46,21 @@ class LoginView(View, Navigable):
         auth = Auth0View(self.browser.root_browser)
         auth.login(email, password)
 
-    def do_rhsso_login(self, username, password):
+    def do_rhsso_login(self, username, password, realm=None):
         """
         Method handle login to 3scale admin portal via RHSSO
-        :param email: User email for login
+        :param username: User email for login
         :param password: User password for login
+        :param realm: RHSSO realm name (if more than one RHSSO integration is used)
         :return DashboardView page object
         """
         if not self.rhsso_link.is_displayed:
             raise Exception("RHSSO provider is not configured for admin portal")
-        self.rhsso_link.click()
+        if realm:
+            # RHOAM creates its own RHSSO integration, which we don't want to use
+            self.browser.element(f"//a[contains(@href,'{realm}')]").click()
+        else:
+            self.rhsso_link.click()
         auth = RhssoView(self.browser.root_browser)
         auth.login(username, password)
 
