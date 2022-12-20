@@ -20,6 +20,17 @@ class ApplicationPlansView(BaseProductView):
     default_plan_select = Select()
     notification = View.nested(FlashMessage)
 
+    def change_default_plan(self, plan_name: str):
+        """
+        Change default application plan
+        plan_name: Name of application plan
+        """
+        self.default_plan_select.item_select(plan_name)
+        if self.change_plan_button.is_enabled:
+            self.change_plan_button.click()
+        else:
+            raise ValueError("Change button is not enabled")
+
     @step("ApplicationPlanDetailView")
     def detail(self, application_plan):
         """Detail of Application plan"""
