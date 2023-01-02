@@ -7,6 +7,7 @@ from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalLo
 
 
 # pylint: disable=unused-argument
+@pytest.mark.sandbag  # doesn't work on RHOAM
 @pytest.mark.parametrize("file_name", ["rh-3scale.png", "3scale_logo.png", "rh-3scale-gif.gif"])
 def test_logo_upload(login, navigator, file_name):
     """

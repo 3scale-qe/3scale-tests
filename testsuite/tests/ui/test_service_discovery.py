@@ -23,6 +23,7 @@ def service(login, navigator, threescale, testconfig, request):
 
 @pytest.mark.isssue("https://issues.redhat.com/browse/THREESCALE-8867")
 @pytest.mark.flaky  # Due to attached issue this test will successfully pass only once in 5 minutes
+@pytest.mark.sandbag  # Doesn't work on RHOAM
 def test_service_discovery(api_client):
     """Test that discovered service can be used"""
     response = api_client().get("/get")
