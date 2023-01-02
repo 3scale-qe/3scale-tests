@@ -112,6 +112,9 @@ test-in-docker: _secrets_for_dynaconf = -v `readlink -f $(SECRETS_FOR_DYNACONF)`
 endif
 test-in-docker:
 test-in-docker: check-secrets.yaml
+ifdef pull
+	docker pull $(image)
+endif
 	docker network create $(network)
 	docker run -d --name $(selenium_name) --network $(network) --network-alias selenium -v /dev/shm:/dev/shm $(selenium_image)
 	-docker run \
