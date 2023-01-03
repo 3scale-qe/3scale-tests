@@ -123,6 +123,7 @@ test-in-docker: check-secrets.yaml
 		-v `readlink -f $(KUBECONFIG)`:/opt/kubeconfig:z \
 		-v `readlink -f $(resultsdir)`:/test-run-results:z \
 		$(_dockerconfigjson) \
+		-e ENV_FOR_DYNACONF \
 		-e NAMESPACE \
 		`env | awk -F= '/^_3SCALE_TESTS_/{print "-e", $$1}'` \
 		-e flags \
