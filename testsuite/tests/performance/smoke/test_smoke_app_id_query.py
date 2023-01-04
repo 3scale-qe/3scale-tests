@@ -83,7 +83,7 @@ async def services(services, create_mapping_rules, event_loop):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'smoke/template_app_id_query.hf.yaml')
+    return os.path.join(root_path, 'smoke/templates/template_app_id_query.hf.yaml')
 
 
 @pytest.fixture(scope='module')

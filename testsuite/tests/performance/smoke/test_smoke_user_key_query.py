@@ -13,6 +13,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.perf_utils import HyperfoilUtils
 
+# Maximal runtime of test (need to cover all performance stages)
 MAX_RUN_TIME = 5 * 60
 
 pytestmark = [pytest.mark.performance]
@@ -72,7 +73,7 @@ async def services(services, create_mapping_rules, event_loop):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'smoke/template_user_key_query.hf.yaml')
+    return os.path.join(root_path, 'smoke/templates/template_user_key_query.hf.yaml')
 
 
 @pytest.fixture(scope='module')

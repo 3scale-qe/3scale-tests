@@ -53,11 +53,5 @@ default:
         remote_url: http://127.0.0.1:4444
         binary_path: ""
 
-
-  hyperfoil:
-    shared_template:
-      # We need to add agents definition for clustered hyperfoil to each test
-      agents:
-        agent-one:
   cfssl:
     binary: "cfssl"

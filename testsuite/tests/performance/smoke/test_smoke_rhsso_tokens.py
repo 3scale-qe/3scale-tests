@@ -38,7 +38,7 @@ def services(services):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'smoke/template_rhsso_tokens.hf.yaml')
+    return os.path.join(root_path, 'smoke/templates/template_rhsso_tokens.hf.yaml')
 
 
 @pytest.fixture(scope='module')

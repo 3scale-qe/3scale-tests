@@ -25,6 +25,12 @@ PAYLOAD_FILES = {'payload_5KB.txt': 5 * 1042,
                  'payload_5MB.txt': 5 * 1024 * 1024}
 
 
+@pytest.fixture(scope='module')
+def number_of_agents():
+    """Number of Hyperfoil agents to be spawned"""
+    return 2
+
+
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
@@ -44,7 +50,7 @@ def services(services):
 @pytest.fixture(scope='module')
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'rhoam/20M_5pLogins.hf.yaml')
+    return os.path.join(root_path, 'rhoam/templates/20M_5pLogins.hf.yaml')
 
 
 @pytest.fixture(scope='module')

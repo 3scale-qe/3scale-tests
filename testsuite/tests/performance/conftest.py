@@ -5,6 +5,7 @@ import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
+from weakget import weakget
 
 import pytest
 
@@ -56,10 +57,20 @@ def hyperfoil_utils(hyperfoil_client, template, request):
 
 
 @pytest.fixture(scope='module')
-def shared_template(testconfig):
-    """Shared template for hyperfoil test"""
-    shared_template = testconfig.get('hyperfoil', {}).get('shared_template', {})
-    return shared_template.to_dict()
+def shared_template(testconfig, number_of_agents):
+    """Shared template for hyperfoil test, to set up agents
+    By default is used configuration of agents set per test file, this can be overridden in configuration files.
+    Default value is set to one agent.
+    """
+    if weakget(testconfig)["hyperfoil"]["shared_template"] % False:
+        shared_template = testconfig.get('hyperfoil', {}).get('shared_template', {}).to_dict()
+    else:
+        shared_template: dict = {'agents': {}}
+        for i in range(1, number_of_agents + 1):
+            agent = {'host': 'localhost', 'port': 22, 'stop': True}
+            shared_template['agents'][f'agent-{i}'] = agent
+
+    return shared_template
 
 
 @pytest.fixture(scope="module")
