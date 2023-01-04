@@ -7,6 +7,9 @@ from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, Successfu
     ForgotPasswordView
 from testsuite.utils import blame
 
+# requires special setup, internet access
+pytestmark = pytest.mark.sandbag
+
 
 @pytest.fixture(scope="function")
 def ui_devel_account(request, testconfig, threescale):

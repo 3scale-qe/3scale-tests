@@ -5,7 +5,10 @@ import pytest
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
 
-pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762")
+pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762"),
+    pytest.mark.sandbag,  # requires patched deployment
+]
 
 
 @pytest.fixture(scope="module")
