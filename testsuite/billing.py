@@ -14,6 +14,19 @@ class Stripe:
         stripe.api_key = api_key
 
     @staticmethod
+    def create_webhook(admin_url):
+        """Creates Stripe webhook that listens to `payment_intent.succeeded` event"""
+        return stripe.WebhookEndpoint.create(
+            url=admin_url,
+            enabled_events=["payment_intent.succeeded"],
+        )
+
+    @staticmethod
+    def delete_webhook(webhook_id):
+        """Deletes Stripe webhook"""
+        stripe.WebhookEndpoint.delete(webhook_id)
+
+    @staticmethod
     def read_payment(invoice):
         """Read Stripe payment"""
         return [x for x in stripe.PaymentIntent.list() if x['metadata']['order_id'] == str(invoice['id'])][0]

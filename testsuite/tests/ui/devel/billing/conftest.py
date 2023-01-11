@@ -3,6 +3,7 @@ import pytest
 from threescale_api.resources import InvoiceState
 
 from testsuite import rawobj
+from testsuite.config import settings
 from testsuite.ui.objects import BillingAddress
 from testsuite.ui.views.admin.audience.account import InvoiceDetailView
 from testsuite.ui.views.admin.audience.billing import BillingSettingsView
@@ -47,15 +48,27 @@ def billing_address():
     return BillingAddress("Red Hat", "Street 5", "Bratislava", "Slovakia", "", "123456789", "12345")
 
 
+@pytest.fixture(scope="session")
+def stripe_webhook(stripe, request):
+    """Creates Stripe webhook and returns its signing secret"""
+    webhook = stripe.create_webhook(settings["threescale"]["admin"]["url"])
+
+    def _delete():
+        stripe.delete_webhook(webhook.id)
+
+    request.addfinalizer(_delete)
+    return webhook.secret
+
+
 @pytest.fixture(scope="module")
-def stripe_gateway(custom_admin_login, navigator, testconfig):
+def stripe_gateway(custom_admin_login, navigator, testconfig, stripe_webhook):
     """Enables Stripe billing gateway"""
     custom_admin_login()
     billing = navigator.navigate(BillingSettingsView)
     billing.charging(True)
     billing.stripe(testconfig["stripe"]["secret_key"],
                    testconfig["stripe"]["publishable_key"],
-                   "empty-webhook")
+                   stripe_webhook)
 
 
 @pytest.fixture(scope="module")
