@@ -21,7 +21,7 @@ def service(login, navigator, threescale, testconfig, request):
     return service
 
 
-@pytest.mark.isssue("https://issues.redhat.com/browse/THREESCALE-8867")
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8867")
 @pytest.mark.flaky  # Due to attached issue this test will successfully pass only once in 5 minutes
 def test_service_discovery(api_client):
     """Test that discovered service can be used"""
