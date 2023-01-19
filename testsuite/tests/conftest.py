@@ -337,8 +337,13 @@ def testconfig():
 
 
 @pytest.fixture(scope="session")
-def threescale(testconfig):
+def threescale(testconfig, request):
     "Threescale client"
+
+    if weakget(testconfig)["fixtures"]["threescale"]["private-tenant"] % False:
+        custom_tenant = request.getfixturevalue("custom_tenant")
+        tenant = custom_tenant()
+        return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=0)
 
     return client.ThreeScaleClient(
         testconfig["threescale"]["admin"]["url"],
