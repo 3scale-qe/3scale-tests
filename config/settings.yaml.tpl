@@ -54,7 +54,7 @@ default:
       polarion_response_myteamsname: teamname
   fixtures:
     threescale:
-      private-tenant: False  # if true standalone tenant is created to run all the tests
+      private_tenant: False  # if true standalone tenant is created to run all the tests
     jaeger:
       url: "" # route to the jaeger-query service for the querying of traces
       config:
