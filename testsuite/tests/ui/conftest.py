@@ -9,7 +9,7 @@ from datetime import datetime
 import backoff
 import pytest
 import pytest_html
-from auth0.v3.management import auth0
+from auth0.management import auth0
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
