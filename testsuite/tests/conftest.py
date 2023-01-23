@@ -179,10 +179,14 @@ def pytest_metadata(metadata):
         title = title.split("/")[-1]  # this is due to possible job structure in jenkins
     title = _settings["reporting"]["title"] % f"{title} {namespace} {version}"
 
+    admin_url = _settings["threescale"]["admin"]["url"] % "UNKNOWN"
+    if _settings["fixtures"]["threescale"]["private_tenant"] % False:
+        admin_url = "(private tenant created on the fly is in use)"
+
     metadata.update({
         "env_for_dynaconf": settings["env_for_dynaconf"],
         "testsuite-version": testsuite_version,
-        "_3SCALE_TESTS_threescale__admin__url": _settings["threescale"]["admin"]["url"] % "UNKNOWN",
+        "_3SCALE_TESTS_threescale__admin__url": admin_url,
         "_3SCALE_TESTS_threescale__version": version,
         "_3SCALE_TESTS_openshift__servers__default__server_url":
             _settings["openshift"]["servers"]["default"]["server_url"] % "UNKNOWN",
