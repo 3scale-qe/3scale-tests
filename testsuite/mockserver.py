@@ -2,6 +2,7 @@
 from urllib.parse import urljoin
 import json
 
+from requests import HTTPError
 from weakget import weakget
 import backoff
 import requests
@@ -63,3 +64,12 @@ class Mockserver:
             data=json.dumps(matcher))
         response.raise_for_status()
         return response
+
+    def verify_sequence(self, expected_requests) -> bool:
+        """Verifies that a sequence of requests was received on a Mockserver"""
+        response = requests.put(
+            urljoin(self._url, "/mockserver/verifySequence"),
+            data=json.dumps({"httpRequests": expected_requests}))
+        if response.status_code == 400:
+            raise HTTPError("Invalid matcher format", response=response)
+        return response.status_code == 202
