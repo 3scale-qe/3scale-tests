@@ -1,6 +1,7 @@
 """This module implements an openshift interface with openshift oc client wrapper."""
 
 import enum
+from functools import cache
 import json
 import os
 from contextlib import ExitStack
@@ -324,3 +325,9 @@ class OpenShiftClient:
         """Returns absolute repository url for an image stream"""
         stream = self.do_action("get", ["imagestream", image_stream, "-o", "yaml"], parse_output=True)
         return stream.model.status.dockerImageRepository
+
+    @property
+    @cache
+    def version(self):
+        """Openshift Platform server version"""
+        return oc.get_server_version()

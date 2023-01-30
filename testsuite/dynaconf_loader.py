@@ -206,6 +206,7 @@ def load(obj, env=None, silent=None, key=None):
 
         data = {
             "openshift": {
+                "version": ocp.version,
                 "projects": {
                     "threescale": {
                         "name": project}},

@@ -173,11 +173,14 @@ def pytest_metadata(metadata):
     testsuite_version = resources.files("testsuite").joinpath("VERSION").read_text().strip()
     version = _settings["threescale"]["version"] % testsuite_version
     namespace = _settings["openshift"]["projects"]["threescale"]["name"] % "UNKNOWN"
+    ocp_version = _settings["openshift"]["version"] % ""
+    if ocp_version:
+        ocp_version = f"ocp{ocp_version}"
 
     title = os.environ.get("JOB_NAME", "Ad-hoc").split()[0]
     if "/" in title:
         title = title.split("/")[-1]  # this is due to possible job structure in jenkins
-    title = _settings["reporting"]["title"] % f"{title} {namespace} {version}"
+    title = _settings["reporting"]["title"] % f"{title} {namespace} {version} {ocp_version}".strip()
 
     admin_url = _settings["threescale"]["admin"]["url"] % "UNKNOWN"
     if _settings["fixtures"]["threescale"]["private_tenant"] % False:
