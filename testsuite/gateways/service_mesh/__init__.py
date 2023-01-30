@@ -17,7 +17,7 @@ class ServiceMeshGateway(AbstractGateway):
 
     CAPABILITIES = {Capability.SERVICE_MESH}
 
-    def __init__(self, openshift, httpbin, mesh, portal_endpoint):
+    def __init__(self, openshift, httpbin, mesh, portal_endpoint) -> None:
         self.env_vars: Dict[str, str] = {}
         self.identifier = generate_tail()
         self.openshift = openshift

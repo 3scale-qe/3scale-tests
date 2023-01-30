@@ -65,7 +65,7 @@ def shared_template(testconfig, number_of_agents):
     if weakget(testconfig)["hyperfoil"]["shared_template"] % False:
         shared_template = testconfig.get('hyperfoil', {}).get('shared_template', {}).to_dict()
     else:
-        shared_template: dict = {'agents': {}}
+        shared_template = {'agents': {}}
         for i in range(1, number_of_agents + 1):
             agent = {'host': 'localhost', 'port': 22, 'stop': True}
             shared_template['agents'][f'agent-{i}'] = agent

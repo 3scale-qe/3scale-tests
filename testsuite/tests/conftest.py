@@ -27,7 +27,6 @@ from testsuite.openshift.client import OpenShiftClient
 from testsuite.prometheus import PrometheusClient
 from testsuite.httpx import HttpxHook
 from testsuite.mockserver import Mockserver
-from testsuite.rhsso.objects import Realm
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
@@ -499,7 +498,7 @@ def rhsso_service_info(request, testconfig, tools):
     rhsso = RHSSO(server_url=tools["no-ssl-sso"],
                   username=cnf["username"],
                   password=cnf["password"])
-    realm: Realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)
+    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)
 
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
