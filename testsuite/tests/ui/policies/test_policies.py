@@ -144,7 +144,7 @@ def test_edit_policy_widgets(login, navigator, policy_service, api_client, polic
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
     configuration_page.configuration.staging_promote_btn.click()
 
-    policies: list = policy_service.proxy.list()["policies_config"]
+    policies = policy_service.proxy.list()["policies_config"]
     assert len(policies) == 2
     url_rewriting_policy = policies[1]
 
