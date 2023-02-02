@@ -11,7 +11,7 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION <= Version('2.12')"),
+    pytest.mark.skipif("TESTED_VERSION <= Version('2.13')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8483"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8484")
 ]
