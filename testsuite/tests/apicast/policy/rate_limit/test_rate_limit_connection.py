@@ -227,6 +227,11 @@ async def client(application):
     """client needs to wait more than WAIT time"""
     async with application.api_client() as client:
         client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
+        # pylint: disable=protected-access
+        # no public interface to this, not sure this particular change helps
+        # too early to build one (maybe after couple of months or a year of
+        # presence of this comment here
+        client._status_forcelist.add(502)
         yield client
 
 
@@ -239,6 +244,11 @@ async def client2(key_scope, request):
         app2 = request.getfixturevalue("app2")
         async with app2.api_client() as client:
             client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
+            # pylint: disable=protected-access
+            # no public interface to this, not sure this particular change helps
+            # too early to build one (maybe after couple of months or a year of
+            # presence of this comment here
+            client._status_forcelist.add(502)
             yield client
     else:
         yield
