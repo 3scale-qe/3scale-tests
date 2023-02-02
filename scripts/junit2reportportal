@@ -21,8 +21,6 @@ if not args.reportportal:
     sys.exit("You must define reportportal URL")
 if not args.project:
     sys.exit("You must define reportportal project")
-if not args.launch_name:
-    sys.exit("You must define reportportal launch")
 if not args.token_variable:
     sys.exit("You must define correct token-variable")
 
@@ -30,17 +28,28 @@ polish = etree.XSLT(etree.parse("./xslt/polish-junit.xsl"))
 
 stream = io.BytesIO()
 
+xml = None
 with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip:
     for junitfile in args.junitfile:
         if zipfile.is_zipfile(junitfile):
             with zipfile.ZipFile(junitfile) as inzip:
                 for file in [i for i in zipfile.Path(inzip, at="archive/").iterdir() if i.name.startswith("junit-")]:
                     with file.open() as junit:
-                        content = etree.tostring(polish(etree.parse(junit)))
+                        xml = etree.parse(junit)
+                        content = etree.tostring(polish(xml))
                         azip.writestr(file.name, content)
         else:
-            content = etree.tostring(polish(etree.parse(junitfile)))
+            xml = etree.parse(junitfile)
+            content = etree.tostring(polish(xml))
             azip.writestr(os.path.basename(junitfile), content)
+
+if not args.launch_name:
+    try:
+        args.launch_name = xml.xpath("//property[@name = 'polarion-testrun-title']/@value")[0]
+    except Exception:
+        pass
+if not args.launch_name:
+    sys.exit("You must define reportportal launch")
 
 token = os.environ[args.token_variable]
 reportportal = args.reportportal.rstrip("/")
