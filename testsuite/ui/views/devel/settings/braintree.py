@@ -100,6 +100,7 @@ class BraintreeCCView(BaseDevelView):
         self.customer_form.save.click()
 
         if credit_card.sca:
+            self.otp_form.wait_displayed(timeout="20s")
             self.otp_form.complete_auth()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
