@@ -148,3 +148,36 @@ development:
     url: "" # URL for hyperfoil controller
   cfssl:
     binary: "cfssl" # Path to the cfssl binary
+  images:
+    apicast:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
+    apicast_operator: # Multi-arch manifest digest
+    threescale_backend:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
+    threescale_memcached:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
+    threescale_system:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
+    threescale_zync:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
+    threescale_operator: # Multi-arch manifest digest
