@@ -2,6 +2,7 @@
 from time import sleep
 from widgetastic.widget import TextInput, Text, View
 
+from testsuite.ui.exception import UIException
 from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
@@ -33,7 +34,7 @@ class LoginView(BaseDevelView):
         :return DashboardView page object
         """
         if not self.auth0_link.is_displayed:
-            raise Exception("Auth0 provider is not configured for admin portal")
+            raise UIException("Auth0 provider is not configured for admin portal")
         self.auth0_link.click()
         auth = Auth0View(self.browser.root_browser)
         auth.login(email, password)
@@ -46,7 +47,7 @@ class LoginView(BaseDevelView):
         :return DashboardView page object
         """
         if not self.rhsso_link.is_displayed:
-            raise Exception("RHSSO provider is not configured for admin portal")
+            raise UIException("RHSSO provider is not configured for admin portal")
         self.rhsso_link.click()
         auth = RhssoView(self.browser.root_browser)
         auth.login(username, password)
@@ -140,7 +141,7 @@ class ForgotPasswordView(BaseDevelView):
         Checks if reCaptcha exists and if it does, it execute the recaptcha verification
         """
         if not self.recaptcha.is_displayed:
-            raise Exception("Recaptcha was not found on the website")
+            raise UIException("Recaptcha was not found on the website")
         self.recaptcha.check_recaptcha()
 
     def prerequisite(self):

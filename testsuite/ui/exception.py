@@ -1,19 +1,23 @@
 """UI exception classes"""
 
 
-class ReadOnlyWidgetError(Exception):
+class UIException(Exception):
+    """Generic exception for all UI errors"""
+
+
+class ReadOnlyWidgetError(UIException):
     """Exception raised when trying to fill a read only widget"""
 
 
-class DisabledWidgetError(Exception):
+class DisabledWidgetError(UIException):
     """Exception raised when a widget is disabled"""
 
 
-class DestinationNotDisplayedError(Exception):
+class DestinationNotDisplayedError(UIException):
     """Raised when navigation destination view was not displayed"""
 
 
-class WebDriverError(Exception):
+class WebDriverError(UIException):
     """Raised when webdriver problem occurs"""
 
 

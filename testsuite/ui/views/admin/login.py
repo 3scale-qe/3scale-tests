@@ -1,6 +1,7 @@
 """ Representation of Login specific views"""
 from widgetastic.widget import View, Text
 
+from testsuite.ui.exception import UIException
 from testsuite.ui.navigation import Navigable
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.views.auth import Auth0View, RhssoView
@@ -41,7 +42,7 @@ class LoginView(View, Navigable):
         :return DashboardView page object
         """
         if not self.auth0_link.is_displayed:
-            raise Exception("Auth0 provider is not configured for admin portal")
+            raise UIException("Auth0 provider is not configured for admin portal")
         self.auth0_link.click()
         auth = Auth0View(self.browser.root_browser)
         auth.login(email, password)
@@ -55,7 +56,7 @@ class LoginView(View, Navigable):
         :return DashboardView page object
         """
         if not self.rhsso_link.is_displayed:
-            raise Exception("RHSSO provider is not configured for admin portal")
+            raise UIException("RHSSO provider is not configured for admin portal")
         if realm:
             # RHOAM creates its own RHSSO integration, which we don't want to use
             self.browser.element(f"//a[contains(@href,'{realm}')]").click()
