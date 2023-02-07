@@ -271,7 +271,7 @@ class HttpxBaseClientAuth(Auth):
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         """Authenticates requests with 3scale credentials"""
         if self.location == 'authorization':
-            key, value = self.credentials.values()
+            key, value = self.credentials.values()  # pylint: disable=unbalanced-dict-unpacking
             request.headers['Authorization'] = basic_auth_string(key, value)
         elif self.location == 'headers':
             self._prepare_headers(request)
