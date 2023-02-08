@@ -29,7 +29,7 @@ def api_client(testconfig):
 @pytest.fixture
 def invoice(threescale, account):
     """Crate invoice through API"""
-    invoice = threescale.invoices.create(dict(account_id=account['id']))
+    invoice = threescale.invoices.create({"account_id": account['id']})
 
     yield invoice
 

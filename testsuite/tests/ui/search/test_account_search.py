@@ -55,10 +55,12 @@ def custom_account(custom_account, request):
     Parametrized custom Account
     """
     def _custom(name):
-        custom_account(dict(org_name=name,
-                            username=blame(request, "username"),
-                            email=f"{blame(request, 'email')}@anything.invalid",
-                            password="123456"))
+        custom_account({
+            "org_name": name,
+            "username": blame(request, "username"),
+            "email": f"{blame(request, 'email')}@anything.invalid",
+            "password": "123456",
+        })
 
     return _custom
 
@@ -99,9 +101,12 @@ def test_search_non_existing_value(request, login, navigator, custom_account):
         - you search account by non-existing-value it won't return anything
     """
     username = blame(request, "username")
-    params = dict(org_name=blame(request, "org_name"), username=username,
-                  email=f"{blame(request, 'email')}@anything.invalid",
-                  password="123456")
+    params = {
+        "org_name": blame(request, "org_name"),
+        "username": username,
+        "email": f"{blame(request, 'email')}@anything.invalid",
+        "password": "123456",
+    }
     custom_account(params)
 
     accounts = navigator.navigate(AccountsView)
@@ -121,9 +126,12 @@ def test_search_short_keyword(login, navigator, custom_account, request):
         - you search account by specific org_name it will return the correct one
     """
     org_name = blame(request, "org-cz")
-    params = dict(org_name=org_name, username=blame(request, "username"),
-                  email=f"{blame(request, 'email')}@anything.invalid",
-                  password="123456")
+    params = {
+        "org_name": org_name,
+        "username": blame(request, "username"),
+        "email": f"{blame(request, 'email')}@anything.invalid",
+        "password": "123456",
+    }
     custom_account(params)
     accounts = navigator.navigate(AccountsView)
 

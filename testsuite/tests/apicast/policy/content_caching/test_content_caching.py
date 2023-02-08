@@ -58,47 +58,52 @@ def is_expired(response):
 
 def test_caching_working_correctly(client):
     "content caching is working correctly when matchs"
-
+    origin_localhost = {"origin": "localhost"}
     path = "/test/{0}".format(uuid.uuid4())
 
-    assert not is_hit(client.get(path, headers=dict(origin="localhost")))
+    assert not is_hit(client.get(path, headers=origin_localhost))
 
     for i in range(0, 10):
-        assert is_hit(client.get(path, headers=dict(origin="localhost"))), "Request {} didn't hit the cache".format(i)
+        assert is_hit(client.get(path, headers=origin_localhost)), "Request {} didn't hit the cache".format(i)
 
 
 def test_caching_different_urls_with_same_subpath(client):
     "content caching is doing the right thing when path/subpaths are involved"
-    assert not is_hit(client.get("/test/test", headers=dict(origin="localhost")))
-    assert is_hit(client.get("/test/test", headers=dict(origin="localhost")))
+    origin_localhost = {"origin": "localhost"}
 
-    assert not is_hit(client.get("/test", headers=dict(origin="localhost")))
-    assert is_hit(client.get("/test", headers=dict(origin="localhost")))
+    assert not is_hit(client.get("/test/test", headers=origin_localhost))
+    assert is_hit(client.get("/test/test", headers=origin_localhost))
+
+    assert not is_hit(client.get("/test", headers=origin_localhost))
+    assert is_hit(client.get("/test", headers=origin_localhost))
 
 
 def test_caching_timeouts(client):
     "Validate caching timeouts time"
+    origin_localhost = {"origin": "localhost"}
 
     path = "/test/{0}".format(uuid.uuid4())
 
-    assert not is_hit(client.get(path, headers=dict(origin="localhost")))
-    assert is_hit(client.get(path, headers=dict(origin="localhost")))
+    assert not is_hit(client.get(path, headers=origin_localhost))
+    assert is_hit(client.get(path, headers=origin_localhost))
 
     # Default timeout is 60, but timers are here, so this should be safe enough
     time.sleep(70)
 
-    assert is_expired(client.get(path, headers=dict(origin="localhost")))
-    assert is_hit(client.get(path, headers=dict(origin="localhost")))
+    assert is_expired(client.get(path, headers=origin_localhost))
+    assert is_hit(client.get(path, headers=origin_localhost))
 
 
 def test_caching_body_check(client):
     """Check same body response"""
-    response = client.get('/uuid', headers=dict(origin="localhost"))
+    origin_localhost = {"origin": "localhost"}
+
+    response = client.get('/uuid', headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request = EchoedRequest.create(response)
 
-    response = client.get('/uuid', headers=dict(origin="localhost"))
+    response = client.get('/uuid', headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 

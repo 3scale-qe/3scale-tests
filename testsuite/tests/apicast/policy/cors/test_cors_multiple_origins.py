@@ -41,7 +41,7 @@ def test_cors_headers_for_same_origin(api_client):
     Asserts that the "Access-Control-Allow-Origin" response header is set to the
     value of the request "origin" header.
     """
-    response = api_client().get("/get", headers=dict(origin="foo.example.com"))
+    response = api_client().get("/get", headers={"origin": "foo.example.com"})
     assert response.headers.get("Access-Control-Allow-Origin") == "foo.example.com"
 
 
@@ -50,5 +50,5 @@ def test_cors_headers_for_disallowed_origin(api_client):
     Sends a url in "origin" header not matching the regex.
     Asserts that the "Access-Control-Allow-Origin" response header is not set by the policy
     """
-    response = api_client().get("/get", headers=dict(origin="disallowed.example.com"))
+    response = api_client().get("/get", headers={"origin": "disallowed.example.com"})
     assert "Access-Control-Allow-Origin" not in response.headers

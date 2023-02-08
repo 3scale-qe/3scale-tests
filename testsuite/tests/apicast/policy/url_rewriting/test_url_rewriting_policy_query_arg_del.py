@@ -17,7 +17,7 @@ def policy_settings():
 
 def test_url_rewriting_policy_delete_arg_req(api_client):
     """Args should be deleted for the request"""
-    response = api_client().get("/get", params=dict(arg="old_value", arg2="value"))
+    response = api_client().get("/get", params={"arg": "old_value", "arg2": "value"})
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

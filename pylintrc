@@ -18,7 +18,6 @@ disable=duplicate-code,  # reports false alarms AND can't be disabled locally; p
 	consider-using-f-string,  # % string operator is absolutely fine
         redefined-outer-name,
         missing-timeout,  # socket timeout is set globally, no need to specify it in calls
-        use-dict-literal
 
 [FORMAT]
 # Maximum number of characters on a single line.

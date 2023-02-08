@@ -127,7 +127,7 @@ def account(custom_account, request, testconfig, dest_client, import_oas):
     # pylint: disable=unused-argument
     iname = blame(request, "account")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
-    account.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
+    account.update({"name": iname, "username": iname, "email": f"{iname}@anything.invalid"})
     return custom_account(threescale_client=dest_client, params=account)
 
 
@@ -299,8 +299,10 @@ def test_request(import_oas, oas, rhsso_service_info, application):
     path = '/anything/products'
     if oas['type'] == 'oas3':
         # this url should be updated because of https://issues.redhat.com/browse/THREESCALE-5925
-        update_params = dict(credentials_location='authorization',
-                             oidc_issuer_endpoint=rhsso_service_info.authorization_url())
+        update_params = {
+            "credentials_location": "authorization",
+            "oidc_issuer_endpoint": rhsso_service_info.authorization_url(),
+        }
         proxy = service.proxy.list()
         proxy.update(params=update_params)
         pol = proxy.policies.list()

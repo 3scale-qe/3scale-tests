@@ -18,7 +18,7 @@ def line_items():
 @pytest.fixture
 def api_invoice(account, threescale, line_items):
     """Invoice created through API"""
-    invoice = threescale.invoices.create(dict(account_id=account['id']))
+    invoice = threescale.invoices.create({"account_id": account['id']})
     for line_item in line_items:
         invoice.line_items.create(line_item)
 
@@ -96,10 +96,14 @@ def account(threescale, custom_account, request, account_password):
     """Preconfigured account existing over whole testing session"""
     iname = randomize("id")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=False, monthly_charging_enabled=False)
-    account.update(dict(
-        name=iname, username=iname,
-        email=f"{iname}@anything.invalid",
-        password=account_password))
+    account.update(
+        {
+            "name": iname,
+            "username": iname,
+            "email": f"{iname}@anything.invalid",
+            "password": account_password,
+        }
+    )
 
     def _cancel_invoices():
         """If the tests fails and the invoices are kept open, it wont remove the account until they are cancelled"""

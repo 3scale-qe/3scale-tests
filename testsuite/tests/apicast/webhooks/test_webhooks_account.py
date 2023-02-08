@@ -34,7 +34,8 @@ def params(request):
     :return: params for custom account
     """
     name = blame(request, "id")
-    return dict(name=name, username=name, org_name=name, email=f"{name}@anything.invalid")
+
+    return {"name": name, "username": name, "org_name": name, "email": f"{name}@anything.invalid"}
 
 
 def test_account_created(custom_account, params, requestbin):

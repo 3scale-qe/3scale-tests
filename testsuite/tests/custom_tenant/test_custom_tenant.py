@@ -26,10 +26,14 @@ def account(custom_account, request, account_password):
     """Local module scoped account to utilize custom tenant"""
     iname = blame(request, "id")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
-    account.update(dict(
-        name=iname, username=iname,
-        email=f"{iname}@example.com",
-        password=account_password))
+    account.update(
+        {
+            "name": iname,
+            "username": iname,
+            "email": f"{iname}@example.com",
+            "password": account_password,
+        }
+    )
     account = custom_account(params=account)
 
     return account

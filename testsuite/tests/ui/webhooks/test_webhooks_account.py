@@ -110,7 +110,7 @@ def test_account_deleted(custom_account, requestbin, login, navigator, request):
     """
     name = blame(request, "ui_account")
     params = rawobj.Account(name, None, None)
-    params.update(dict(name=name, username=name, email=f"{name}@anything.invalid"))
+    params.update({"name": name, "username": name, "email": f"{name}@anything.invalid"})
     account = custom_account(params=params, autoclean=False)
 
     account_view = navigator.navigate(AccountEditView, account=account)
