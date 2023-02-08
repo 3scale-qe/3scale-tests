@@ -196,6 +196,7 @@ class ThreescaleDropdown(GenericLocatorWidget):
         return self.browser.selenium.find_element(By.XPATH, "//select/option[@selected='selected']") \
             .get_attribute("value")
 
+    @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
     def select_by_value(self, value):
         """Select given value from dropdown"""
         if value:
