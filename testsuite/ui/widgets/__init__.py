@@ -70,6 +70,7 @@ class CheckBoxGroup(GenericLocatorWidget):
     OPTIONS = './li'
     OPTIONS_INPUT = OPTIONS + '/label/input'
     OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
+    OPTIONS_BY_TEXT = OPTIONS + '/label[normalize-space(.)="{}"]/input'
 
     # pylint: disable=too-many-arguments
     def __init__(self, parent=None, locator=None, ol_identifier=None, logger=None):
@@ -93,6 +94,18 @@ class CheckBoxGroup(GenericLocatorWidget):
         self.clear_all()
         for option in options:
             element = self.browser.element(self.OPTIONS_BY_ID.format(option))
+            if not element.is_selected():
+                element.click()
+
+    def check_by_text(self, options: list):
+        """
+        Uncheck all checkboxes of the group
+        Selects check box element from the list.
+        :param options: List of string id-s of options
+        """
+        self.clear_all()
+        for option in options:
+            element = self.browser.element(self.OPTIONS_BY_TEXT.format(option))
             if not element.is_selected():
                 element.click()
 
@@ -200,6 +213,10 @@ class ThreescaleDropdown(GenericLocatorWidget):
         """Select given value from dropdown"""
         if value:
             self.browser.selenium.find_element(By.XPATH, f"//select/option[@value='{value}']").click()
+
+    def select_by_text(self, text):
+        """Select given text from dropdown"""
+        self.browser.selenium.find_element(By.XPATH, f"//select/option[normalize-space(.)='{text}']").click()
 
 
 # pylint: disable=abstract-method
@@ -441,3 +458,29 @@ class ThreescaleAnalyticsDropdown(GenericLocatorWidget):
         """Get text of metric"""
         self.wait_displayed()
         return self.browser.element(self.locator).text
+
+
+class ThreescaleButtonGroup(GenericLocatorWidget):
+    """Specific Button Group of 3scale pages"""
+
+    SELECTED = "./a[1]"
+    DROPDOWN_ITEMS = "./ul/li/a"
+    DROPDOWN_TOGGLE = "./a[2]"
+
+    def __init__(self, parent=None,
+                 locator="",
+                 logger=None):
+        super().__init__(parent=parent, locator=locator, logger=logger)
+
+    def select(self, option):
+        """Select button from button group"""
+        button = self.browser.element(self.SELECTED)
+        if button.get_dom_attribute("href") == option:
+            button.click()
+            return
+        items = self.browser.elements(self.DROPDOWN_ITEMS)
+        for item in items:
+            if item.get_dom_attribute("href") == option:
+                self.browser.element(self.DROPDOWN_TOGGLE).click()
+                item.click()
+                return

@@ -121,7 +121,7 @@ def master_login(navigator):
 
 
 @pytest.fixture(scope="module")
-def custom_devel_login(navigator, provider_account, account_password):
+def custom_devel_login(navigator, provider_account, account_password, browser):
     """
     Login to Developer portal with specific account or credentials
     :param navigator: Navigator Instance
@@ -130,10 +130,13 @@ def custom_devel_login(navigator, provider_account, account_password):
     :return: Login to Developer portal with custom credentials (account or name-password pair)
     """
 
-    def _login(account=None, name=None, password=None):
+    def _login(account=None, name=None, password=None, fresh=None):
         url = settings["threescale"]["devel"]["url"]
         name = name or account['org_name']
         password = password or account_password
+        if fresh:
+            browser.selenium.delete_all_cookies()
+            browser.selenium.refresh()
         page = navigator.open(DeveloperLoginView,
                               url=url,
                               access_code=provider_account['site_access_code'])
