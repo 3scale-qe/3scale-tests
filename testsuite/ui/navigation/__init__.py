@@ -107,6 +107,8 @@ class Navigator:
         page = self.new_page(cls, **kwargs)
         self.page_chain.append(page)
         if page.is_displayed:
+            if len(self.page_chain) == 1:
+                page.browser.refresh()
             return
         self._backtrace(page.prerequisite(), **kwargs)
 

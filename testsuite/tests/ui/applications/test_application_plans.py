@@ -24,7 +24,7 @@ def test_app_plan_create(custom_ui_app_plan, request, service):
 # pylint: disable=unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-825")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-def test_default_app_plan_change(login, service, custom_app_plan, navigator):
+def test_default_app_plan_change(request, login, service, custom_app_plan, navigator):
     """
     Test of default application plan change:
         - assert the change button is disabled
@@ -33,8 +33,8 @@ def test_default_app_plan_change(login, service, custom_app_plan, navigator):
         - change the plan on select, assert change button is available
         - go back to previous plan and confirm change button is disabled
     """
-    plan1 = custom_app_plan(rawobj.ApplicationPlan("PlanA"), service)
-    plan2 = custom_app_plan(rawobj.ApplicationPlan("PlanB"), service)
+    plan1 = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app-plan")), service)
+    plan2 = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app-plan")), service)
     app_plans_view = navigator.navigate(ApplicationPlansView, product=service)
 
     assert not app_plans_view.change_plan_button.is_enabled
@@ -53,14 +53,14 @@ def test_default_app_plan_change(login, service, custom_app_plan, navigator):
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8979")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-def test_unset_default_app_plan(login, service, custom_app_plan, navigator):
+def test_unset_default_app_plan(request, login, service, custom_app_plan, navigator):
     """
     Test unset default application plan:
         - change the default application plan and assert if confirmation notice is received
         - unset default plan
         - assert confirmation notice is received and application plans page is displayed
     """
-    app_plan = custom_app_plan(rawobj.ApplicationPlan("PlanA"), service)
+    app_plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app-plan")), service)
     app_plans_view = navigator.navigate(ApplicationPlansView, product=service)
     app_plans_view.change_default_plan(app_plan["name"])
     assert app_plans_view.notification.is_displayed
