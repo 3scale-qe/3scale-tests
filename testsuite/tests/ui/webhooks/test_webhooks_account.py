@@ -74,6 +74,8 @@ def test_account_updated(ui_account, login, navigator, request, requestbin, thre
 
 
 # pylint: disable=too-many-arguments, too-many-locals, unused-argument
+@pytest.mark.xfail
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9214")
 def test_account_plan_changed(account, threescale, login, navigator, requestbin, request, account_plans):
     """
     Test:
