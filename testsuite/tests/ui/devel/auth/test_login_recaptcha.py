@@ -49,7 +49,7 @@ def params(request):
     """
     name = blame(request, "ui_account")
     params = rawobj.Account(name, monthly_billing_enabled=False, monthly_charging_enabled=False)
-    params.update(dict(name=name, username=name, email=f"{name}@anything.invalid"))
+    params.update({"name": name, "username": name, "email": f"{name}@anything.invalid"})
     return params
 
 

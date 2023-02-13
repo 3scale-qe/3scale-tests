@@ -245,13 +245,17 @@ def modify_apps_account(modify_product, request, custom_application,
     # pylint: disable=too-many-arguments
     iname = blame(request, "account")
     acc_raw = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
-    acc_raw.update(dict(name=iname, username=iname, email=f"{iname}@anything.invalid"))
+    acc_raw.update({"name": iname, "username": iname, "email": f"{iname}@anything.invalid"})
     account_up = custom_account(acc_raw)
 
     username = blame(request, 'us')
     domain = testconfig["threescale"]["superdomain"]
-    usr = dict(username=username, email=f"{username}@{domain}",
-               password=blame(request, ''), account_id=account_up['id'])
+    usr = {
+        "username": username,
+        "email": f"{username}@{domain}",
+        "password": blame(request, ""),
+        "account_id": account_up["id"],
+    }
     custom_user(account_up, params=usr)
 
     plan_silver = my_applications_plans[2]

@@ -12,7 +12,7 @@ def provider_account(provider_account):
     If `site_access_code` was changed in tests, it is restored to its original value"""
     access_code = provider_account['site_access_code']
     yield provider_account
-    provider_account.update(dict(site_access_code=access_code))
+    provider_account.update({"site_access_code": access_code})
 
 
 # pylint: disable=unused-argument
@@ -41,6 +41,6 @@ def test_empty_access_code(browser, provider_account):
     browser.url = settings["threescale"]["devel"]["url"]
     assert AccessView(browser).is_displayed
 
-    provider_account.update(dict(site_access_code=""))
+    provider_account.update({"site_access_code": ""})
     browser.selenium.refresh()
     assert LandingView(browser).is_displayed

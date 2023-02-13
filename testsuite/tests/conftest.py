@@ -380,10 +380,14 @@ def account(custom_account, request, testconfig, account_password):
     "Preconfigured account existing over whole testing session"
     iname = blame(request, "id")
     account = rawobj.Account(org_name=iname, monthly_billing_enabled=None, monthly_charging_enabled=None)
-    account.update(dict(
-        name=iname, username=iname,
-        email=f"{iname}@example.com",
-        password=account_password))
+    account.update(
+        {
+            "name": iname,
+            "username": iname,
+            "email": f"{iname}@example.com",
+            "password": account_password,
+        }
+    )
     account = custom_account(params=account)
 
     return account
@@ -410,8 +414,12 @@ def user(custom_user, account, request, testconfig):
     "Preconfigured user existing over whole testing session"
     username = blame(request, 'us')
     domain = testconfig["threescale"]["superdomain"]
-    usr = dict(username=username, email=f"{username}@{domain}",
-               password=blame(request, ''), account_id=account['id'])
+    usr = {
+        "username": username,
+        "email": f"{username}@{domain}",
+        "password": blame(request, ""),
+        "account_id": account["id"],
+    }
     usr = custom_user(account, params=usr)
 
     return usr

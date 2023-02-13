@@ -20,5 +20,5 @@ def policy_settings(certificates_and_code):
     certificates, _, _ = certificates_and_code
     config = []
     for certificate in certificates:
-        config.append(dict(pem_certificate=certificate.certificate))
+        config.append({"pem_certificate": certificate.certificate})
     return rawobj.PolicyConfig("tls_validation", {"whitelist": config})

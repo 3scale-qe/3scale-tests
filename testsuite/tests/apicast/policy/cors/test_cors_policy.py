@@ -27,7 +27,7 @@ def service(service):
 
 def test_cors_headers_for_same_origin(api_client):
     """Standard request"""
-    response = api_client().get("/get", headers=dict(origin="localhost"))
+    response = api_client().get("/get", headers={"origin": "localhost"})
     assert response.headers.get("Access-Control-Allow-Origin") == "localhost"
     assert response.headers.get("Access-Control-Allow-Credentials") == 'true'
 
@@ -51,5 +51,5 @@ def test_cors_headers_for_different_origin(api_client):
     Access-Control-Allow-Origin is not added to a request with origin header with
     not allowed origin
     """
-    response = api_client().get("/get", headers=dict(origin="foo.bar.example.com"))
+    response = api_client().get("/get", headers={"origin": "foo.bar.example.com"})
     assert "Access-Control-Allow-Origin" not in response.headers

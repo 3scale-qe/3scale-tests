@@ -20,7 +20,7 @@ def my_services(custom_service, service, request):
 def my_accounts(custom_account, account, request):
     """Accounts fixture"""
     iname = blame(request, "account")
-    return (account, custom_account(dict(name=iname, username=iname, org_name=iname)))
+    return (account, custom_account({"namd": iname, "username": iname, "org_name": iname}))
 
 
 @pytest.fixture(scope="module")
@@ -28,9 +28,15 @@ def my_account_users(request, user, custom_user, my_accounts, testconfig):
     """Account users fixture"""
     username = blame(request, 'user')
     domain = testconfig["threescale"]["superdomain"]
-    user2 = custom_user(my_accounts[1],
-                        dict(username=username, email=f"{username}@{domain}",
-                             password=blame(request, ''), account_id=my_accounts[1]['id']))
+    user2 = custom_user(
+        my_accounts[1],
+        {
+            "username": username,
+            "email": f"{username}@{domain}",
+            "password": blame(request, ""),
+            "account_id": my_accounts[1]["id"],
+        },
+    )
     return (user, user2)
 
 

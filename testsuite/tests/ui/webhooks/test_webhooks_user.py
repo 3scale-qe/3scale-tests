@@ -85,7 +85,7 @@ def test_user_delete(login, navigator, requestbin, threescale, custom_account, r
     """
     name = blame(request, "ui_account")
     params = rawobj.Account(name, None, None)
-    params.update(dict(name=name, username=name, email=f"{name}@anything.invalid"))
+    params.update({"name": name, "username": name, "email": f"{name}@anything.invalid"})
     account = custom_account(params=params, autoclean=False)
 
     user = account.users.list()[0]

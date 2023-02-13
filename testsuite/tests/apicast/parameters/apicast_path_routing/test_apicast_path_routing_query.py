@@ -44,7 +44,7 @@ def test_args(client2):
     """
     Checks that request with query param will match mapping rule
     """
-    response = client2.get('/anything/foo', params=dict(baz='baz'))
+    response = client2.get('/anything/foo', params={"baz": "baz"})
 
     assert response.status_code == 200
 

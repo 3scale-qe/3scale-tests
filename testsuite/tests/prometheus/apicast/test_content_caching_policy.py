@@ -44,10 +44,11 @@ def test_content_caching(request, prometheus, client, apicast):
     """
     Test if cache works correctly and if prometheus contains content_caching metric.
     """
+    origin_localhost = {"origin": "localhost"}
     client = request.getfixturevalue(client)()
     # """Hit apicast so that we can have metrics from it and that we can cache incoming requests"""
     # """Apicast needs to load configuration in order to cache incoming requests"""
-    client.get("/get", headers=dict(origin="localhost"))
+    client.get("/get", headers=origin_localhost)
 
     @backoff.on_predicate(backoff.fibo, lambda x: not x, max_tries=10, jitter=None)
     def wait():
@@ -60,11 +61,11 @@ def test_content_caching(request, prometheus, client, apicast):
 
     counts_before = extract_caching(prometheus, "content_caching", apicast)
 
-    response = client.get("/anything/test", headers=dict(origin="localhost"))
+    response = client.get("/anything/test", headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
 
-    response = client.get("/anything/test", headers=dict(origin="localhost"))
+    response = client.get("/anything/test", headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 
