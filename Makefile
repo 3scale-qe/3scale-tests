@@ -102,9 +102,7 @@ test-in-docker: DOCKERCONFIGJSON ?= $(HOME)/.docker/config.json
 ifdef use_dockerconfig
 test-in-docker: _dockerconfigjson = -v `readlink -f $(DOCKERCONFIGJSON)`:/run/dockerconfig.json:z -e DOCKERCONFIGJSON=/run/dockerconfig.json
 endif
-ifeq ($(shell docker --version 2>/dev/null|grep -i podman),)
-test-in-docker: _docker_flags = -u $(shell id -u):$(shell id -g) --group-add 0
-else
+ifeq ($(shell docker --version 2>/dev/null|grep -o podman), podman)
 test-in-docker: _docker_flags = --userns=keep-id
 endif
 ifdef SECRETS_FOR_DYNACONF
@@ -132,6 +130,7 @@ endif
 		-e flags \
 		-e _3SCALE_TESTS_fixtures__ui__browser__source=remote \
 		-e _3SCALE_TESTS_fixtures__ui__browser__remote_url=http://selenium:4444 \
+		-u $(shell id -u) \
 		$(_docker_flags) \
 		$(docker_flags) \
 		$(image) $(cmd)
