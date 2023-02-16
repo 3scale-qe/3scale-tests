@@ -13,7 +13,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: github_pre_release
-        shell: bash
         run: git log --no-merges --pretty=oneline|grep -m1 'v[0-9.]*rc[0-9]*'|(read COMMIT MSG; gh release create "v${MSG##*-v}" -p --generate-notes --target $COMMIT)
         env:
           # github-actions account doesn't seem to trigger events, therefore different account must be used
