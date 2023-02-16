@@ -30,13 +30,12 @@ def gateway_environment(gateway_environment, testconfig, tools):
     - To not load configuration every time, we set APIcast to load configuration on boot instead
     """
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
-    superdomain = testconfig["threescale"]["superdomain"]
     proxy_endpoint = testconfig["proxy"]
 
     gateway_environment.update({"HTTP_PROXY": proxy_endpoint['http'],
                                 "HTTPS_PROXY": proxy_endpoint['https'],
                                 "NO_PROXY":
-                                    f"backend-listener,system-master,system-provider,{rhsso_url},{superdomain}",
+                                    f"backend-listener,system-master,system-provider,{rhsso_url}",
                                 "APICAST_CONFIGURATION_LOADER": "boot",
                                 "APICAST_CONFIGURATION_CACHE": 1000})
     return gateway_environment

@@ -31,12 +31,11 @@ def gateway_environment(gateway_environment, testconfig, tools):
         - NO_PROXY - needed to skip proxy for internal services: system, backend, sso
     """
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
-    superdomain = testconfig["threescale"]["superdomain"]
     https_proxy = testconfig["proxy"]["https"]
 
     gateway_environment.update({"HTTPS_PROXY": https_proxy,
                                 "NO_PROXY":
-                                    f"backend-listener,system-master,system-provider,{rhsso_url},{superdomain}"})
+                                    f"backend-listener,system-master,system-provider,{rhsso_url}"})
     return gateway_environment
 
 
