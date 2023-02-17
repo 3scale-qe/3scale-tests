@@ -12,6 +12,6 @@ jobs:
         #   at least 2 reviews requested,
         #   at least one approve already provided,
         #   the approve is at least 10 days old.
-        run: gh pr list --json number,reviewRequests,reviews --jq '.[]|select((.reviewRequests|length > 1) and (.reviews[]|select(.state == "APPROVED" and (.submittedAt|fromdateiso8601 < now - 10*24*60*60))|length > 1) and (.reviews[]|select(.state == "APPROVED")|length == 1) and ([.reviews[].state]|contains(["CHANGES_REQUESTED", "COMMENTED"])|not)).number' | xargs -r -l gh pr review --approve
+        run: gh pr list --json number,reviewRequests,reviews --jq '.[]|select((.reviewRequests|length > 0) and (.reviews[]|select(.state == "APPROVED" and (.submittedAt|fromdateiso8601 < now - 10*24*60*60))|length > 1) and ([.reviews[]|select(.state == "APPROVED")]|length == 1) and ([.reviews[].state]|contains(["COMMENTED"])|not) and ([.reviews[].state]|contains(["CHANGES_REQUESTED"])|not)).number' | xargs -r -l gh pr review --approve
         env:
           GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
