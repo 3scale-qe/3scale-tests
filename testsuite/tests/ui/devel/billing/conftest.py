@@ -17,20 +17,31 @@ def line_items():
 
 @pytest.fixture
 def api_invoice(account, threescale, line_items):
-    """Invoice created through API"""
+    """
+    Creates and charges invoice through API.
+    Asserts if a new invoice was created and charged.
+    """
+    old_invoices = threescale.invoices.list_by_account(account)
     invoice = threescale.invoices.create({"account_id": account['id']})
     for line_item in line_items:
         invoice.line_items.create(line_item)
 
     invoice.state_update(InvoiceState.PENDING)
     invoice.charge()
-    return invoice
+    new_invoices = threescale.invoices.list_by_account(account)
+    assert len(new_invoices) - len(old_invoices) == 1
+
+    return new_invoices[0]
 
 
 @pytest.fixture
 def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
-    """Invoice created through UI"""
+    """
+    Creates and charges invoice through UI.
+    Asserts if a new invoice was created and charged.
+    """
     custom_admin_login()
+    old_invoices = threescale.invoices.list_by_account(account)
     view = navigator.navigate(InvoiceDetailView, account=account)
     for line_item in line_items:
         view.add_item(**line_item)
@@ -38,7 +49,11 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
     view.issue()
     invoice = threescale.invoices.list_by_account(account)[0]
     view.charge(invoice)
-    return invoice
+    new_invoices = threescale.invoices.list_by_account(account)
+    assert len(new_invoices) - len(old_invoices) == 1
+    assert view.state_field.text == "Paid"
+
+    return new_invoices[0]
 
 
 @pytest.fixture(scope="module")
@@ -106,7 +121,7 @@ def account(threescale, custom_account, request, account_password):
     )
 
     def _cancel_invoices():
-        """If the tests fails and the invoices are kept open, it wont remove the account until they are cancelled"""
+        """If the tests fail and the invoices are kept open, it won't remove the account until they are cancelled"""
         for invoice in threescale.invoices.list_by_account(account):
             if invoice["state"] == InvoiceState.OPEN.value or invoice["state"] == InvoiceState.PENDING.value:
                 invoice.state_update(InvoiceState.CANCELLED)

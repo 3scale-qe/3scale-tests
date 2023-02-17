@@ -22,8 +22,5 @@ def stripe_card(request, account, stripe_gateway, custom_devel_login, billing_ad
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
 def test_stripe(request, account, threescale, stripe_card, invoice_provider, stripe):
     """Tests stripe billing"""
-    old = threescale.invoices.list_by_account(account)
-    request.getfixturevalue(invoice_provider)
-    acc_invoices = threescale.invoices.list_by_account(account)
-    assert len(acc_invoices) - len(old) == 1
-    stripe.assert_payment(acc_invoices[0])
+    invoice = request.getfixturevalue(invoice_provider)
+    stripe.assert_payment(invoice)

@@ -36,23 +36,15 @@ def no_sca_cards(request, braintree_gateway_no_sca, setup_card):
     setup_card(cc_details)
 
 
-# pylint: disable=too-many-arguments
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
-def test_braintree_sca(request, account, threescale, invoice_provider, sca_cards, braintree):
+def test_braintree_sca(request, invoice_provider, sca_cards, braintree):
     """Tests stripe billing"""
-    old = threescale.invoices.list_by_account(account)
-    request.getfixturevalue(invoice_provider)
-    acc_invoices = threescale.invoices.list_by_account(account)
-    assert len(acc_invoices) - len(old) == 1
-    braintree.assert_payment(acc_invoices)
+    invoice = request.getfixturevalue(invoice_provider)
+    braintree.assert_payment(invoice)
 
 
-# pylint: disable=too-many-arguments
 @pytest.mark.parametrize("invoice_provider", ["api_invoice", "ui_invoice"])
-def test_braintree_no_sca(request, account, threescale, invoice_provider, no_sca_cards, braintree):
+def test_braintree_no_sca(request, invoice_provider, no_sca_cards, braintree):
     """Tests stripe billing"""
-    old = threescale.invoices.list_by_account(account)
-    request.getfixturevalue(invoice_provider)
-    acc_invoices = threescale.invoices.list_by_account(account)
-    assert len(acc_invoices) - len(old) == 1
-    braintree.assert_payment(acc_invoices)
+    invoice = request.getfixturevalue(invoice_provider)
+    braintree.assert_payment(invoice)
