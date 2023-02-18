@@ -5,7 +5,6 @@ from threescale_api.resources import InvoiceState
 from testsuite import rawobj
 from testsuite.ui.objects import BillingAddress
 from testsuite.ui.views.admin.audience.account import InvoiceDetailView
-from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.utils import randomize
 
 
@@ -16,94 +15,56 @@ def line_items():
 
 
 @pytest.fixture
-def api_invoice(account, threescale, line_items):
+def create_api_invoice(account, threescale, line_items):
     """
     Creates and charges invoice through API.
     Asserts if a new invoice was created and charged.
     """
-    old_invoices = threescale.invoices.list_by_account(account)
-    invoice = threescale.invoices.create({"account_id": account['id']})
-    for line_item in line_items:
-        invoice.line_items.create(line_item)
+    def _api_invoice():
+        old_invoices = threescale.invoices.list_by_account(account)
+        invoice = threescale.invoices.create({"account_id": account['id']})
+        for line_item in line_items:
+            invoice.line_items.create(line_item)
 
-    invoice.state_update(InvoiceState.PENDING)
-    invoice.charge()
-    new_invoices = threescale.invoices.list_by_account(account)
-    assert len(new_invoices) - len(old_invoices) == 1
+        invoice.state_update(InvoiceState.PENDING)
+        invoice.charge()
+        new_invoices = threescale.invoices.list_by_account(account)
+        assert len(new_invoices) - len(old_invoices) == 1
 
-    return new_invoices[0]
+        return new_invoices[0]
+
+    return _api_invoice
 
 
 @pytest.fixture
-def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
+def create_ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
     """
     Creates and charges invoice through UI.
     Asserts if a new invoice was created and charged.
     """
-    custom_admin_login()
-    old_invoices = threescale.invoices.list_by_account(account)
-    view = navigator.navigate(InvoiceDetailView, account=account)
-    for line_item in line_items:
-        view.add_item(**line_item)
+    def _ui_invoice():
+        custom_admin_login()
+        old_invoices = threescale.invoices.list_by_account(account)
+        view = navigator.navigate(InvoiceDetailView, account=account)
+        for line_item in line_items:
+            view.add_item(**line_item)
 
-    view.issue()
-    invoice = threescale.invoices.list_by_account(account)[0]
-    view.charge(invoice)
-    new_invoices = threescale.invoices.list_by_account(account)
-    assert len(new_invoices) - len(old_invoices) == 1
-    assert view.state_field.text == "Paid"
+        view.issue()
+        invoice = threescale.invoices.list_by_account(account)[0]
+        view.charge(invoice)
+        new_invoices = threescale.invoices.list_by_account(account)
+        assert len(new_invoices) - len(old_invoices) == 1
+        assert view.state_field.text == "Paid"
 
-    return new_invoices[0]
+        return new_invoices[0]
+
+    return _ui_invoice
 
 
 @pytest.fixture(scope="module")
 def billing_address():
     """Billing Address for Credit Card details"""
     return BillingAddress("Red Hat", "Street 5", "Bratislava", "Slovakia", "", "123456789", "12345")
-
-
-@pytest.fixture(scope="module")
-def stripe_gateway(custom_admin_login, navigator, testconfig):
-    """Enables Stripe billing gateway"""
-    custom_admin_login()
-    billing = navigator.navigate(BillingSettingsView)
-    billing.charging(True)
-    billing.stripe(testconfig["stripe"]["secret_key"],
-                   testconfig["stripe"]["publishable_key"],
-                   "empty-webhook")
-
-
-@pytest.fixture(scope="module")
-def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
-    """
-    Enables Braintree billing gateway.
-    Args:
-        :param sca: enable or disable SCA for the gateway; possible values True or False
-    """
-    def _braintree(sca):
-        custom_admin_login()
-        billing = navigator.navigate(BillingSettingsView)
-        billing.charging(True)
-        currency = braintree.merchant_currency()
-        billing.charging_form.change_currency(currency)
-        billing.braintree(testconfig["braintree"]["public_key"],
-                          testconfig["braintree"]["merchant_id"],
-                          testconfig["braintree"]["private_key"],
-                          sca)
-
-    return _braintree
-
-
-@pytest.fixture(scope="module")
-def braintree_gateway_sca(braintree_gateway):
-    """Ensures Braintree billing gateway with SCA enabled"""
-    braintree_gateway(True)
-
-
-@pytest.fixture(scope="module")
-def braintree_gateway_no_sca(braintree_gateway):
-    """Ensures Braintree billing gateway with SCA disabled"""
-    braintree_gateway(False)
 
 
 @pytest.fixture(scope="module")
