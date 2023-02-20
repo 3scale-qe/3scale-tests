@@ -1,7 +1,6 @@
 """"Test for TLS Apicast with backend routing"""
 
 import pytest
-import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
@@ -35,8 +34,16 @@ def backends_mapping(custom_backend, private_base_url):
             "/foo/boo": custom_backend("backend2", endpoint=f"{private_base_url('echo_api')}/backend2")}
 
 
+@pytest.fixture(scope="module")
+def client(api_client, valid_authority):
+    """Overwrite verify with correct ca"""
+    client = api_client()
+    client.verify = valid_authority.files["certificate"]
+    return client
+
+
 # pylint: disable=protected-access
-def test_tls_backend_routing(api_client):
+def test_tls_backend_routing(client):
     """
     Preparation:
         - Creates TLS Apicast
@@ -47,16 +54,12 @@ def test_tls_backend_routing(api_client):
         - Make request to path `/foo/boo`
         - Assert that it was routed to the right backend
     """
-    client = api_client()
-    url1 = f'{client._base_url}/bar?user_key={client.auth.credentials["user_key"]}'
-    url2 = f'{client._base_url}/foo/boo?user_key={client.auth.credentials["user_key"]}'
-    session = requests.Session()
     for _ in range(5):
-        response = session.get(url1, verify=False)
+        response = client.get("/bar")
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json['path'] == '/backend1'
-        response = session.get(url2, verify=False)
+        response = client.get("/foo/boo")
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json['path'] == '/backend2'
