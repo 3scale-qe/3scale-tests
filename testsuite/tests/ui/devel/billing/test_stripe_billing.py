@@ -20,11 +20,14 @@ def stripe_gateway(custom_admin_login, navigator, testconfig):
 @pytest.fixture(scope="module")
 def setup_card(account, custom_devel_login, billing_address, navigator):
     """Credit card setup"""
-    def _setup(cc_number, sca):
+    def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
-        cc_details = CreditCard(cc_number, 123, 10, 25, sca)
+        cc_details = CreditCard(cc_number, 123, 10, 25)
         cc_view = navigator.navigate(StripeCCView)
         cc_view.add_cc_details(billing_address, cc_details)
+        if verify_3ds:
+            cc_view.challenge_form.complete_auth()
+        return cc_view
 
     return _setup
 

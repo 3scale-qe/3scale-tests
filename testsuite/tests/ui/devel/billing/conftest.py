@@ -17,21 +17,16 @@ def line_items():
 @pytest.fixture
 def create_api_invoice(account, threescale, line_items):
     """
-    Creates and charges invoice through API.
-    Asserts if a new invoice was created and charged.
+    Creates a new invoice via API.
     """
     def _api_invoice():
-        old_invoices = threescale.invoices.list_by_account(account)
+        account_invoices = threescale.invoices.list_by_account(account)
         invoice = threescale.invoices.create({"account_id": account['id']})
         for line_item in line_items:
             invoice.line_items.create(line_item)
-
-        invoice.state_update(InvoiceState.PENDING)
-        invoice.charge()
-        new_invoices = threescale.invoices.list_by_account(account)
-        assert len(new_invoices) - len(old_invoices) == 1
-
-        return new_invoices[0]
+        invoice = invoice.state_update(InvoiceState.PENDING)
+        assert len(threescale.invoices.list_by_account(account)) - len(account_invoices) == 1
+        return invoice
 
     return _api_invoice
 

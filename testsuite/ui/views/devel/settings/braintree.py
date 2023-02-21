@@ -1,5 +1,7 @@
 """Settings Devel portal View containing credit card details for Braintree payment gateway"""
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from wait_for import TimedOutError
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 from widgetastic_patternfly import Button
 
@@ -41,6 +43,7 @@ class BraintreeCCForm(View):
     cc_number = TextInput(id="credit-card-number")
     cvv = TextInput(id="cvv")
     expiration = TextInput(id="expiration")
+    alert = Text(".//p[@class='alert alert-danger']")
 
     def add(self, credit_card: CreditCard):
         """Adds a new card for Braintree"""
@@ -59,18 +62,35 @@ class BraintreeCCForm(View):
         self.browser.selenium.switch_to.default_content()
 
 
-class OTPForm(View):
+class ChallengeForm(View):
     """3DS Braintree verification form"""
     FRAME = '//iframe[@id="Cardinal-CCA-IFrame"]'
     otp_input = TextInput(name="challengeDataEntry")
-    submit = ThreescaleSubmitButton()
+    submit_btn = ThreescaleSubmitButton()
+    cancel_btn = GenericLocatorWidget(".//input[@value='CANCEL']")
 
-    def complete_auth(self):
-        """Complete authentication"""
-        self.otp_input.wait_displayed()
+    def complete(self):
+        """Complete authentication challenge"""
+        self.otp_input.wait_displayed(timeout="20s")
         self.otp_input.fill("1234")
-        self.browser.element(self.submit).submit()
+        self.browser.element(self.submit_btn).submit()
         self.browser.selenium.switch_to.default_content()
+        self._wait_challenge_completed()
+
+    def cancel(self):
+        """Cancel authentication challenge"""
+        self.otp_input.wait_displayed(timeout="20s")
+        self.cancel_btn.click()
+        self.browser.selenium.switch_to.default_content()
+        self._wait_challenge_completed()
+
+    def _wait_challenge_completed(self):
+        """Wait for `BraintreeCCView` to reflect all changes when 3DS challenge was completed (or closed)"""
+        self.browser.wait_for_element(
+            ".//dt[normalize-space(.)='Credit card number']|"
+            ".//p[@class='alert alert-danger']",
+            timeout=20
+        )
 
 
 class BraintreeCCView(BaseDevelView):
@@ -85,7 +105,7 @@ class BraintreeCCView(BaseDevelView):
 
     customer_form = View.nested(CustomerForm)
     cc_form = View.nested(BraintreeCCForm)
-    otp_form = View.nested(OTPForm)
+    challenge_form = View.nested(ChallengeForm)
 
     def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details for the user"""
@@ -98,11 +118,29 @@ class BraintreeCCView(BaseDevelView):
 
         self.cc_form.add(credit_card)
         self.customer_form.save.click()
+        self.wait_for_cc_form()
 
-        if credit_card.sca:
-            self.otp_form.wait_displayed(timeout="20s")
-            self.otp_form.complete_auth()
-        self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
+    def alert(self):
+        """Return the text of alert if present"""
+        try:
+            self.cc_form.alert.wait_displayed()
+            return self.cc_form.alert.read()
+        except TimedOutError as exc:
+            raise NoSuchElementException("Alert was expected on the Braintree CC form page") from exc
+
+    def wait_for_cc_form(self):
+        """
+        When credit card form is submitted, only 3 UI actions can happen:
+            - Credit card is correctly stored
+            - Storing credit card yields an error
+            - 3DS challenge is displayed
+        """
+        self.browser.wait_for_element(
+            ".//dt[normalize-space(.)='Credit card number']|"
+            ".//p[@class='alert alert-danger']|"
+            ".//iframe[@id='Cardinal-CCA-IFrame']",
+            timeout=20
+        )
 
     def prerequisite(self):
         return SettingsTabs
