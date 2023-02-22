@@ -476,10 +476,11 @@ def custom_provider_account_user(request, threescale, testconfig):
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request):
+def staging_gateway(request, testconfig):
     """Staging gateway"""
     gateway = gateways.gateway(staging=True)
-    request.addfinalizer(gateway.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gateway.destroy)
     gateway.create()
 
     return gateway

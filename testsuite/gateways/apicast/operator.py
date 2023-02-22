@@ -218,3 +218,24 @@ class OperatorApicast(OpenshiftApicast):
         self.apicast.modify_and_apply(_add_jaeger)
         self.reload()
         return self.name
+
+    def __getstate__(self):
+        """
+        Custom serializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__getstate__
+        """
+        return {
+            "reload": self.reload,
+            "name": self.name,
+            "openshift": self.openshift,
+        }
+
+    def __setstate__(self, state):
+        """
+        Custom deserializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
+        """
+        openshift = state["openshift"]
+        apicast = openshift.do_action("get", ["apicast"]).object(APIcast)
+        self.apicast = apicast
+        self._environ = OperatorEnviron(apicast, state["reload"])
