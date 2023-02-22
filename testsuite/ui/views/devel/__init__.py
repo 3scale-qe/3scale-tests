@@ -2,6 +2,7 @@
 from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 
 from testsuite.ui.navigation import Navigable, step
+from testsuite.ui.widgets import ActiveDocV3Section
 
 
 class Navbar(View, Navigable):
@@ -53,6 +54,11 @@ class BaseDevelView(View, Navigable):
         access_view = AccessView(self.browser.root_browser)
         if access_view.is_displayed:
             access_view.access_code(self.access_code)
+
+    @step("DocsView")
+    def settings(self):
+        """Documentation"""
+        self.navbar.documentation_btn.click()
 
     @property
     def is_displayed(self):
@@ -115,3 +121,23 @@ class SignUpView(BaseDevelView):
     def is_displayed(self):
         return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
                self.organization.is_displayed and self.username.is_displayed and self.email.is_displayed
+
+
+class DocsView(BaseDevelView):
+    """View for Documentation page of devel portal"""
+    path_pattern = "/docs"
+    active_docs_section = ActiveDocV3Section()
+
+    def __init__(self, parent, path=None):
+        super().__init__(parent)
+        if path:
+            self.path = path
+
+    # pylint: disable=no-self-use
+    def prerequisite(self):
+        return BaseDevelView
+
+    @property
+    def is_displayed(self):
+        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
+            self.active_docs_section.is_displayed

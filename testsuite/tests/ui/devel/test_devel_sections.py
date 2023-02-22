@@ -39,7 +39,7 @@ def dev_portal_page(login, navigator, request, dev_portal_section, custom_admin_
     page_name = blame(request, "TestPage")
     page_path = blame(request, "/test")
 
-    view.create(page_name, dev_portal_section, page_path, "<h1>Test</h1>")
+    view.create(page_name, "|— " + dev_portal_section, page_path, "<h1>Test</h1>")
     page_id = navigator.browser.url.split("/")[-2]
 
     def cleanup():
