@@ -1,6 +1,5 @@
 """Tests generic HTTP Integration for Zync"""
-import time
-
+import backoff
 import pytest
 from threescale_api.resources import Service
 
@@ -39,22 +38,12 @@ def delete_matcher(app):
 
 
 @pytest.fixture(scope="module")
-def new_application(
-    custom_app_plan, custom_application, service, request, lifecycle_hooks
-):
-    """Custom application fixture than also handles app_plan"""
-
-    def _app(app_name):
-        plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
-        app = custom_application(
-            rawobj.Application(blame(request, app_name), plan),
-            hooks=lifecycle_hooks,
-            autoclean=False,
-        )
-        service.proxy.deploy()
-        return app
-
-    return _app
+def app2(service, custom_application, custom_app_plan, lifecycle_hooks, request):
+    """Extra app used to test behavior on app delete"""
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
+    app = custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks, autoclean=False)
+    service.proxy.deploy()
+    return app
 
 
 @pytest.fixture(scope="module")
@@ -95,11 +84,17 @@ def requests_list(application):
     return [create_update_matcher(application)]
 
 
+@backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=7, jitter=None)
+def resilient_verify_sequence(mockserver, requests_list):
+    """Make sure requests to be verified are found even if delayed"""
+    return mockserver.verify_sequence(requests_list)
+
+
 def test_create(requests_list, mockserver):
     """
     Tests that creating an application generates a request
     """
-    assert mockserver.verify_sequence(requests_list)
+    assert resilient_verify_sequence(mockserver, requests_list)
 
 
 def test_update(requests_list, mockserver, application):
@@ -112,8 +107,7 @@ def test_update(requests_list, mockserver, application):
     requests_list.append(create_update_matcher(application))
 
     # It takes a bit of time for Zync to reconcile
-    time.sleep(2)
-    assert mockserver.verify_sequence(requests_list)
+    assert resilient_verify_sequence(mockserver, requests_list)
 
 
 def test_update_redirect_url(requests_list, mockserver, application):
@@ -127,23 +121,26 @@ def test_update_redirect_url(requests_list, mockserver, application):
     requests_list.append(create_update_matcher(application))
 
     # It takes a bit of time for Zync to reconcile
-    time.sleep(2)
-    assert mockserver.verify_sequence(requests_list)
+    assert resilient_verify_sequence(mockserver, requests_list)
 
 
-def test_delete(requests_list, mockserver, new_application):
+def test_delete(app2, mockserver):
     """
     Tests that deleting application generates a correct request
     """
-    application = new_application("app2")
-    requests_list.append(create_update_matcher(application))
+    seq = [create_update_matcher(app2)]
 
-    application.update({"description": "zuy"})
-    requests_list.append(create_update_matcher(application))
+    # wait till zync does the job, otherwise it looks like it doesn't bother
+    # to do anything for deleted app
+    assert resilient_verify_sequence(mockserver, seq)
 
-    application.delete()
-    requests_list.append(delete_matcher(application))
+    app2.update({"description": "zuy"})
+    seq.append(create_update_matcher(app2))
+
+    assert resilient_verify_sequence(mockserver, seq)
+
+    app2.delete()
+    seq.append(delete_matcher(app2))
 
     # It takes a bit of time for Zync to reconcile
-    time.sleep(2)
-    assert mockserver.verify_sequence(requests_list)
+    assert resilient_verify_sequence(mockserver, seq)
