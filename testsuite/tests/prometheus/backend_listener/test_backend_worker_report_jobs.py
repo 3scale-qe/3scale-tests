@@ -34,14 +34,14 @@ def auth_data(service, service_token, application):
 
 
 @pytest.fixture(scope="module")
-def prometheus_worker_job_count(prometheus, testconfig):
+def prometheus_worker_job_count(prometheus):
     """
-    Given a type of a worker job (ReportJob or NotifyJob), returns the value of that metric
+    Given a type of worker job (ReportJob or NotifyJob), returns the value of that metric
     """
     def _prometheus_worker_job_count(job_type):
-        metric_response_codes = prometheus.get_metric(
-            f"apisonator_worker_job_count{{namespace=\"{testconfig['openshift']['projects']['threescale']['name']}\", "
-            f"type=\"{job_type}\"}}")
+        metric_response_codes = prometheus.get_metrics("apisonator_worker_job_count", {
+                    "type": job_type
+                })
         return int(metric_response_codes[0]['value'][1]) if len(metric_response_codes) > 0 else 0
     return _prometheus_worker_job_count
 

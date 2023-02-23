@@ -10,7 +10,6 @@ def check_availability(prometheus):
     Checks whether is the prometheus configured to run tests in this module.
     """
 
-    if not prometheus.has_metric(
-            "que_workers_total"):
+    if not prometheus.has_metric("que_workers_total"):
         warn_and_skip("The Prometheus is not configured to run this test. The collection"
                       " of basic metrics is not set up. The test has been skipped.")

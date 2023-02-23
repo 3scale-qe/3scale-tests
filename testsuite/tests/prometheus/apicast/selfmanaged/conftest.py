@@ -16,11 +16,10 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module", autouse=True)
-def require_prometheus_operator(openshift):
+def require_prometheus_operator(prometheus):
     """require configured operator for prometheus"""
-    routes = openshift().routes.for_service('prometheus-operated')
-    if len(routes) == 0:
-        warn_and_skip("This test needs prometheus deployed by operator")
+    if not prometheus.operator_based:
+        warn_and_skip("This test needs prometheus deployed by operator or OpenShift user workload monitoring")
 
 
 @pytest.fixture(scope="module")

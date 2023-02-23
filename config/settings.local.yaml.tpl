@@ -36,6 +36,9 @@ development:  # default dynaconf env
   integration:
     service:
       proxy_service: ${FUSE_CAMEL_URL}
+  prometheus:
+    url: "{PROMETHEUS_URL}"
+    token: "{PROMETHEUS_TOKEN}"
   fixtures:
     jaeger:
       config:

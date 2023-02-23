@@ -4,6 +4,7 @@ When an authorization / reporting backend api endpoint is requested,
 the increase of the metric, respective to the endpoint and returned
 status code, is expected in prometheus.
 """
+from typing import Tuple, Dict
 
 import pytest
 import requests
@@ -135,12 +136,12 @@ def auth_request(backend_listener_url):
     return _auth_request
 
 
-def authrep_backend_api_query(request_type):
+def authrep_backend_api_query(request_type) -> Tuple[str, Dict[str, str]]:
     """
-    Returns prometheus backend listener enpoint codes
-    query for given request type
+    Returns prometheus query parts for the apisonator_listener_response_codes metric
+    with the request type passed in the parameters
     """
-    return f"apisonator_listener_response_codes{{request_type=\"{request_type}\"}}"
+    return "apisonator_listener_response_codes", {"request_type": request_type}
 
 
 @pytest.fixture(scope="module")
@@ -174,7 +175,8 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request, prome
 
     count_before = {}
     for request_type in data:
-        count_before[request_type] = prometheus_response_codes_for_metric(authrep_backend_api_query(request_type))
+        key, labels = authrep_backend_api_query(request_type)
+        count_before[request_type] = prometheus_response_codes_for_metric(key, labels)
         method, endpoint, params = data[request_type]
         for _ in range(NUM_OF_REQUESTS):
             response_2xx, response_403 = auth_request(method, endpoint, params)
@@ -189,7 +191,8 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request, prome
     results = {}
 
     for request_type in data:
-        count_after[request_type] = prometheus_response_codes_for_metric(authrep_backend_api_query(request_type))
+        key, labels = authrep_backend_api_query(request_type)
+        count_after[request_type] = prometheus_response_codes_for_metric(key, labels)
         for response_code in ["2xx", "403"]:
             results[request_type + response_code] = \
                 response_code in count_after[request_type] and \

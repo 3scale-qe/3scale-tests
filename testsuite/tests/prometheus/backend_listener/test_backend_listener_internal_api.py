@@ -4,6 +4,7 @@ When an internal backend api endpoint is requested, the increase of the respecti
 metric is expected
 """
 import base64
+from typing import Dict, Tuple
 
 import pytest
 import requests
@@ -85,12 +86,12 @@ def backend_listener_internal_api_endpoint(backend_listener_url, service, applic
     return _backend_listener_internal_api_endpoint
 
 
-def internal_backend_api_query(request_type):
+def internal_backend_api_query(request_type) -> Tuple[str, Dict[str, str]]:
     """
-    Returns prometheus query for the apisonator_listener_internal_api_response_codes metric
+    Returns prometheus query parts for the apisonator_listener_internal_api_response_codes metric
     with the request type passed in the parameters
     """
-    return f"apisonator_listener_internal_api_response_codes{{request_type=\"{request_type}\"}}"
+    return "apisonator_listener_internal_api_response_codes", {"request_type": request_type}
 
 
 @pytest.fixture(scope="module")
@@ -184,7 +185,8 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
 
     count_before = {}
     for request_type in data:
-        count_before[request_type] = prometheus_response_codes_for_metric(internal_backend_api_query(request_type))
+        key, labels = internal_backend_api_query(request_type)
+        count_before[request_type] = prometheus_response_codes_for_metric(key, labels)
         for method, endpoint, response_code in data[request_type]:
             formatted_endpoint = backend_listener_internal_api_endpoint(endpoint)
 
@@ -203,7 +205,8 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
     results = {}
 
     for request_type in data:
-        count_after[request_type] = prometheus_response_codes_for_metric(internal_backend_api_query(request_type))
+        key, labels = internal_backend_api_query(request_type)
+        count_after[request_type] = prometheus_response_codes_for_metric(key, labels)
         for _, _, response_code in data[request_type]:
             # assertion is not used here to collect results for all metrics to better investigate potential errors
             results[request_type+response_code] = \

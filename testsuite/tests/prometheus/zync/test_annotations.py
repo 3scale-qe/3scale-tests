@@ -19,14 +19,15 @@ ANNOTATIONS = [
 ]
 
 
-@pytest.fixture(params=['dc/zync', 'dc/zync-que'])
-def poda(request):
+@pytest.fixture(scope="module", params=['dc/zync', 'dc/zync-que'])
+def pod(request):
     """Return zync pod object."""
-    pod = openshift().deployment(request.param).get_pods().object()
+    pods = openshift().deployment(request.param).get_pods().objects()
+    pod = next(filter(lambda x: x.model.status.phase == "Running", pods))
     return pod
 
 
 @pytest.mark.parametrize("annotation", ANNOTATIONS)
-def test_annotation_zync(annotation, poda):
-    """ Test annotations of zync pod. """
-    assert poda.get_annotation(annotation) is not None
+def test_annotation_zync(annotation, pod):
+    """ Test annotations of zync/zync-que pod. """
+    assert pod.get_annotation(annotation) is not None
