@@ -19,6 +19,7 @@ class WASMExtension:
         self.backend_endpoint = backend_endpoint
         self.base_path = resources.files('testsuite.resources.service_mesh')
         self._ingress_url = None
+        self._ingress_alias_url = None
 
         self.service = service
         self.label = f"{parent_label}-{self.service['id']}"
@@ -51,9 +52,22 @@ class WASMExtension:
             route = self.mesh.routes["istio-ingressgateway"]
             if "tls" in route["spec"]:
                 self._ingress_url = "https://" + route["spec"]["host"]
-
-            self._ingress_url = "http://" + route["spec"]["host"]
+            else:
+                self._ingress_url = "http://" + route["spec"]["host"]
         return self._ingress_url
+
+    @property
+    def ingress_alias_url(self):
+        """Returns alias url dynamically made by service mesh."""
+        if not self._ingress_alias_url:
+            for route in self.mesh.routes:
+                if self.httpbin_name in route["spec"]["host"]:
+                    alias_route = route
+            if "tls" in alias_route["spec"]:
+                self._ingress_alias_url = "https://" + alias_route["spec"]["host"]
+            else:
+                self._ingress_alias_url = "http://" + alias_route["spec"]["host"]
+        return self._ingress_alias_url
 
     def add_mapping_rules(self, rules):
         """Adds mapping rule into the extension
@@ -211,6 +225,37 @@ class WASMExtension:
             self.replace_credentials(credentials)
             return True
         return False
+
+    def replace_authorities(self, authorities, wait=True, overwrite=True):
+        """Replaces previous authorities and deploys new into the extension.
+            :param authorities: An array of strings, each one representing the Authority of a URL to match.
+            These strings do accept glob patterns supporting the *, + and ? matchers.
+            :param wait: Wait for wasm syncing
+            :param overwrite: if False than keep current authorities and just add new ones
+        """
+        ops = []
+        if overwrite:
+            ops.extend([{
+                    "op": "remove",
+                    "path": "/spec/pluginConfig/services/0/authorities"
+                },
+                {
+                    "op": "add",
+                    "path": "/spec/pluginConfig/services/0/authorities",
+                    "value": []
+                }
+            ])
+
+        for authority in authorities:
+            ops.append({
+                "op": "add",
+                "path": "/spec/pluginConfig/services/0/authorities/-",
+                "value": authority
+            })
+
+        self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
+        if wait:
+            self.httpbin.deployment(f"dc/{self.httpbin_name}").rollout()
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""

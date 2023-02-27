@@ -96,6 +96,10 @@ class WASMGateway(AbstractGateway):
         label = f"{self.label}-{service_id}"
         self.httpbin.delete_app(label, "requestauthentications")
 
+    def get_extension(self, service: Service) -> WASMExtension:
+        """Returns extension associated with service"""
+        return self.extensions[service["id"]]
+
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
