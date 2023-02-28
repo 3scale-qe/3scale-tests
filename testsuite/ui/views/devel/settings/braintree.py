@@ -13,7 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 class CustomerForm(View):
     """Billing Address form"""
-    ROOT = "//form[@id='customer_form']"
+    ROOT = ".//div[@id='braintree-form-wrapper']/form"
     first_name = TextInput(id="customer_first_name")
     last_name = TextInput(id="customer_last_name")
     phone = TextInput(id="customer_phone")

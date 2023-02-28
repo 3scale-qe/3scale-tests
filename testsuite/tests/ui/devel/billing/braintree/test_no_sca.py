@@ -15,10 +15,11 @@ def test_no_sca_ui_invoice(setup_card, braintree, create_ui_invoice, create_api_
         - Trigger billing via UI
         - Trigger billing via API
     """
-    setup_card("4111111111111111", False)
+    setup_card("4111111111111111")
 
     invoice = create_ui_invoice()
     braintree.assert_payment(invoice)
 
     invoice = create_api_invoice()
-    braintree.assert_payment(invoice)
+    charged = invoice.charge()
+    braintree.assert_payment(charged)

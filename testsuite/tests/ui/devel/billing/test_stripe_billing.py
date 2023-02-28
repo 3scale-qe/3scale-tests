@@ -51,4 +51,5 @@ def test_stripe(setup_card, cc_number, verify_3ds, stripe, create_ui_invoice, cr
     stripe.assert_payment(invoice)
 
     invoice = create_api_invoice()
-    stripe.assert_payment(invoice)
+    charged = invoice.charge()
+    stripe.assert_payment(charged)

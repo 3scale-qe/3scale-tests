@@ -1,4 +1,6 @@
 """Conftest for Braintree gateway billing tests"""
+from datetime import datetime
+
 import pytest
 
 from testsuite.ui.objects import CreditCard
@@ -17,10 +19,10 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
     """
     Enables Braintree billing gateway.
     """
-    def _braintree(sca):
+    def _braintree(verify_3ds: bool):
         """
         Args:
-            :param sca: enable or disable SCA for the gateway; possible values True or False
+            :param verify_3ds: enable or disable 3DS verification
         """
         custom_admin_login()
         billing = navigator.navigate(BillingSettingsView)
@@ -30,7 +32,7 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
         billing.braintree(testconfig["braintree"]["public_key"],
                           testconfig["braintree"]["merchant_id"],
                           testconfig["braintree"]["private_key"],
-                          sca)
+                          verify_3ds)
 
     return _braintree
 
@@ -41,7 +43,7 @@ def setup_card(account, custom_devel_login, billing_address, navigator):
     def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
         cc_view = navigator.navigate(BraintreeCCView)
-        cc_view.add_cc_details(billing_address, CreditCard(cc_number, 123, 1, 24))
+        cc_view.add_cc_details(billing_address, CreditCard(cc_number, 123, 1, datetime.today().year + 3))
         if verify_3ds:
             cc_view.challenge_form.complete()
         return cc_view

@@ -9,7 +9,7 @@ from threescale_api.errors import ApiClientError
 @pytest.fixture(scope="module", autouse=True)
 def braintree_gateway_sca(braintree_gateway):
     """Ensures Braintree billing gateway with SCA enabled"""
-    braintree_gateway(True)
+    braintree_gateway(verify_3ds=True)
 
 
 def test_successful_with_challenge(setup_card, braintree, create_ui_invoice, create_api_invoice):
@@ -20,7 +20,7 @@ def test_successful_with_challenge(setup_card, braintree, create_ui_invoice, cre
         - Trigger billing via UI
         - Trigger billing via API
     """
-    setup_card("4000000000001091", True)
+    setup_card("4000000000001091", verify_3ds=True)
 
     invoice = create_ui_invoice()
     braintree.assert_payment(invoice)
@@ -52,7 +52,7 @@ def test_unsuccessful_with_challenge(account, setup_card, create_api_invoice):
         - Verify that CC was not added
     """
     account.credit_card_delete()
-    cc_view = setup_card("4000000000001109", True)
+    cc_view = setup_card("4000000000001109", verify_3ds=True)
     assert cc_view.alert() == "An error occurred, please review your CC details or try later."
 
     invoice = create_api_invoice()
