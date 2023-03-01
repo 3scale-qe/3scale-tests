@@ -109,6 +109,7 @@ class Navigator:
         if page.is_displayed:
             if len(self.page_chain) == 1:
                 page.browser.refresh()
+                page.wait_displayed()
             return
         self._backtrace(page.prerequisite(), **kwargs)
 
