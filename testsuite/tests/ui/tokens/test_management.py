@@ -57,7 +57,8 @@ def test_get_service_top_applications(service, token, api_client):
     assert response.status_code == 403
 
 
-@pytest.mark.xfail  # https://issues.redhat.com/browse/THREESCALE-761
+@pytest.mark.xfail
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-761")
 def test_get_invoice_list(account, token, api_client):
     """
     Request to get list of invoices should have status code 200
@@ -68,7 +69,8 @@ def test_get_invoice_list(account, token, api_client):
     assert response.status_code == 403
 
 
-@pytest.mark.xfail  # https://issues.redhat.com/browse/THREESCALE-761
+@pytest.mark.xfail
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-761")
 def test_create_invoice_line_item(invoice, token, api_client, request):
     """
     Request to create line item should have status code 403
