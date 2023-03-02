@@ -235,7 +235,8 @@ class OperatorApicast(OpenshiftApicast):
         Custom deserializer for pickle module
         more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
         """
-        openshift = state["openshift"]
-        apicast = openshift.do_action("get", ["apicast"]).object(APIcast)
-        self.apicast = apicast
-        self._environ = OperatorEnviron(apicast, state["reload"])
+        self.openshift = state["openshift"]
+        result = self.openshift.do_action("get", ["apicast", state["name"], "-o", "yaml"])
+        self.apicast = APIcast(string_to_model=result.out())
+        self.name = state["name"]
+        self._environ = OperatorEnviron(self.apicast, state["reload"])
