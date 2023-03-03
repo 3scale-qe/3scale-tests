@@ -1,9 +1,6 @@
 """Tests that accessing APIcast with token from a different RHSSO realm does not work"""
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-
 from testsuite.rhsso import Token
 from testsuite.utils import blame
 
@@ -50,8 +47,6 @@ def backends_mapping(custom_backend):
     return {"/test": custom_backend("backend")}
 
 
-# It doesn't work on 2.13.1
-@pytest.mark.skipif("TESTED_VERSION < Version('2.12')")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9009")
 def test_wrong_realm_auth(api_client, wrong_realm_token, correct_realm_token):
     """Using auth from a different RHSSO realm should fail"""
