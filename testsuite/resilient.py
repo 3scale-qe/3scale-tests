@@ -54,3 +54,9 @@ def accounts_create(client, params):
             client.accounts.delete(client.accounts.read_by_name(params["name"]).entity_id)
             time.sleep(2)
         raise err
+
+
+@backoff.on_exception(backoff.fibo, ApiClientError, max_tries=8, jitter=None)
+def proxy_update(svc, params):
+    """Proxy update right after service create seems failing sometimes, let's give it bit more tries"""
+    return svc.proxy.update(params=params)
