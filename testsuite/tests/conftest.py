@@ -5,7 +5,6 @@ import inspect
 import logging
 import os
 import signal
-import time
 import warnings
 
 import importlib_resources as resources
@@ -787,9 +786,6 @@ def custom_service(threescale, request, testconfig, logger):
 
             request.addfinalizer(finalizer)
 
-        # Due to asynchronous nature of 3scale the proxy is not always ready immediately,
-        # this is not necessarily bug of 3scale but we need to compensate for it regardless
-        time.sleep(1)
         if backends:
             for path, backend in backends.items():
                 svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
@@ -802,7 +798,7 @@ def custom_service(threescale, request, testconfig, logger):
             for hook in _select_hooks("before_proxy", hooks):
                 proxy_params = hook(svc, proxy_params)
 
-            svc.proxy.update(params=proxy_params)
+            resilient.proxy_update(svc, params=proxy_params)
         svc.proxy.deploy()
 
         for hook in _select_hooks("on_service_create", hooks):
