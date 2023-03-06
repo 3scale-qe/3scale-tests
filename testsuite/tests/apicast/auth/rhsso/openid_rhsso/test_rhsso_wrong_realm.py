@@ -50,7 +50,7 @@ def backends_mapping(custom_backend):
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9009")
 def test_wrong_realm_auth(api_client, wrong_realm_token, correct_realm_token):
     """Using auth from a different RHSSO realm should fail"""
-    client = api_client(disable_retry_status_list={404})
+    client = api_client()
     client.auth = None
 
     response = client.get("/test/get", headers={"Authorization": f'Bearer {correct_realm_token}'})
