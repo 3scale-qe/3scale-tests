@@ -85,6 +85,7 @@ class OTPForm(View):
         """Completes the authentication"""
         self.browser.element(self.challenge_frame.acs_frame.complete_auth).submit()
         self.browser.selenium.switch_to.default_content()
+        self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
 
 class StripeCCView(BaseDevelView):
@@ -96,7 +97,7 @@ class StripeCCView(BaseDevelView):
 
     address_form = View.nested(BillingAddressForm)
     cc_form = View.nested(StripeCCForm)
-    otp_form = View.nested(OTPForm)
+    challenge_form = View.nested(OTPForm)
 
     def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details for the user"""
@@ -108,10 +109,6 @@ class StripeCCView(BaseDevelView):
             self.add_cc_details_btn.click()
         self.cc_form.wait_displayed()
         self.cc_form.add(credit_card, address.zip)
-
-        if credit_card.sca:
-            self.otp_form.complete_auth()
-        self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
     def prerequisite(self):
         return SettingsTabs

@@ -57,9 +57,8 @@ class Braintree:
         merchant_accounts = list(self.gateway.merchant_account.all().merchant_accounts.items)
         return [x for x in merchant_accounts if x.default is True][0].currency_iso_code
 
-    def assert_payment(self, acc_invoices):
+    def assert_payment(self, invoice):
         """Compare 3scale invoice and Braintree transaction"""
-        invoice = acc_invoices[0]
         transaction = self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice['id']))
         currency = transaction.first.currency_iso_code
         cost = float(transaction.first.amount)

@@ -19,4 +19,3 @@ class CreditCard(NamedTuple):
     cvc: int
     exp_month: int
     exp_year: int
-    sca: bool
