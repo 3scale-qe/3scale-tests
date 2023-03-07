@@ -1,6 +1,5 @@
 """Tests wasm authorities filtering"""
 from urllib.parse import urlsplit
-from typing import List
 import pytest
 from testsuite.capabilities import Capability
 from testsuite.gateways.wasm import ServiceMeshHttpClient
@@ -80,7 +79,7 @@ def test_glob_question_mark(custom_extension_and_app, get_client_ingress, get_cl
     """
     extension, app = custom_extension_and_app
 
-    url: str = urlsplit(extension.ingress_url).netloc
+    url = urlsplit(extension.ingress_url).netloc
     url = url.replace(".", "?")
 
     extension.replace_authorities([url])
@@ -98,7 +97,7 @@ def test_glob_star_plus(custom_extension_and_app, get_client_ingress, get_client
     """
     extension, app = custom_extension_and_app
 
-    url: List[str] = urlsplit(extension.ingress_url).netloc.split(".")
+    url = urlsplit(extension.ingress_url).netloc.split(".")
     url[0] = glob
 
     extension.replace_authorities([".".join(url)])
