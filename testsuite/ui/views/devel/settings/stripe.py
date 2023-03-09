@@ -79,7 +79,7 @@ class OTPForm(View):
         class acs_frame(View):  # pylint: disable=invalid-name
             """Nested IFrame that contains OTP elements"""
             FRAME = ".//iframe[@name='acsFrame']"
-            complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-3ds']")
+            complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-verification_3ds']")
 
     def complete_auth(self):
         """Completes the authentication"""

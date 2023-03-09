@@ -39,17 +39,20 @@ def create_ui_invoice(custom_admin_login, navigator, account, line_items, threes
     """
     def _ui_invoice():
         custom_admin_login()
-        old_invoices = threescale.invoices.list_by_account(account)
-        view = navigator.navigate(InvoiceDetailView, account=account)
-        for line_item in line_items:
-            view.add_item(**line_item)
+        account_invoices = threescale.invoices.list_by_account(account)
+        invoice_view = navigator.navigate(InvoiceDetailView, account=account)
 
-        view.issue()
-        invoice = threescale.invoices.list_by_account(account)[0]
-        view.charge(invoice)
+        invoice_view.add_items(line_items)
+        invoice_view.issue()
+        assert invoice_view.notification.is_displayed
+        assert invoice_view.notification.string_in_flash_message("invoice issued."), \
+            "Issuing the invoice through UI failed"
+        assert invoice_view.charge_button.wait_displayed, "Issuing the invoice through UI failed"
+
+        invoice_view.charge()
         new_invoices = threescale.invoices.list_by_account(account)
-        assert len(new_invoices) - len(old_invoices) == 1
-        assert view.state_field.text == "Paid"
+        assert len(new_invoices) - len(account_invoices) == 1
+        assert invoice_view.state_field.text == "Paid"
 
         return new_invoices[0]
 

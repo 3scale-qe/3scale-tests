@@ -1,11 +1,11 @@
 """View representations of Accounts pages"""
 
-from selenium.common.exceptions import NoSuchElementException
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
+from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox, CheckBoxGroup
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
@@ -227,24 +227,25 @@ class InvoiceDetailView(BaseAudienceView):
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
     id_field = Text("#field-friendly_id")
     state_field = Text("#field-state")
+    notification = View.nested(FlashMessage)
 
     # Selector which we can use to check if the charge has finished
     paid_field = Text("//td[@id='field-state' and text()='Paid']")
     add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
     line_item_form = View.nested(LineItemForm)
 
-    def add_item(self, name, quantity, cost, description):
+    def add_items(self, items):
         """Adds item to an invoice"""
         self.add_item_btn.click()
         self.line_item_form.wait_displayed()
-        self.line_item_form.add_item(name, quantity, cost, description)
+        for item in items:
+            self.line_item_form.add_item(**item)
 
     def issue(self):
         """Issues the invoices (OPEN -> PENDING)"""
         self.issue_button.click(handle_alert=True)
-        self.browser.wait_for_element(self.charge_button, timeout=10)
 
-    def charge(self, invoice=None):
+    def charge(self):
         """Charges the invoices (PENDING -> PAID)"""
         # Charge button has two alerts which completely messed up with widgetastic.
         # https://issues.redhat.com/browse/THREESCALE-7276
@@ -252,13 +253,7 @@ class InvoiceDetailView(BaseAudienceView):
         self.browser.handle_double_alert()
 
         # Wait until charge is done
-        try:
-            self.browser.wait_for_element(self.paid_field, timeout=5)
-        except NoSuchElementException as err:
-            if invoice is not None:
-                latest_transaction = invoice.payment_transactions.list()[-1]
-                raise RuntimeError(latest_transaction["message"]) from err
-            raise err
+        self.browser.wait_for_element(self.paid_field, timeout=5)
 
     def prerequisite(self):
         return AccountInvoicesView
