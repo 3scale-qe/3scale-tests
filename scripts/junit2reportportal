@@ -19,8 +19,6 @@ args = aparser.parse_args()
 
 if not args.reportportal:
     sys.exit("You must define reportportal URL")
-if not args.project:
-    sys.exit("You must define reportportal project")
 if not args.token_variable:
     sys.exit("You must define correct token-variable")
 
@@ -46,10 +44,16 @@ with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as azip
 if not args.launch_name:
     try:
         args.launch_name = xml.xpath("//property[@name = 'polarion-testrun-title']/@value")[0]
+        assert args.launch_name
     except Exception:
-        pass
-if not args.launch_name:
-    sys.exit("You must define reportportal launch")
+        sys.exit("You must define reportportal launch")
+
+if not args.project:
+    try:
+        args.project = xml.path("//property[@name = 'project']/@value")[0]
+        assert args.project
+    except Exception:
+        sys.exit("You must define reportportal project")
 
 token = os.environ[args.token_variable]
 reportportal = args.reportportal.rstrip("/")
