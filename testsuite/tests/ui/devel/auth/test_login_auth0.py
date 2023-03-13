@@ -12,7 +12,7 @@ def auth0_integration(request, threescale, testconfig, custom_admin_login, navig
     Due to the fact that once you create sso integration you can't delete it only edit it,
     this workaround is needed to simplify UI test
     """
-    auth = [x for x in threescale.dev_portal_auth_providers.list() if x['kind'] == "auth0" in x]
+    auth = [x for x in threescale.dev_portal_auth_providers.list() if x['kind'] == "auth0"]
     if not auth:
         auth = [threescale.dev_portal_auth_providers.create(
             {"kind": "auth0", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"})]
