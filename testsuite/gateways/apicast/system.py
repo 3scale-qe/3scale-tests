@@ -73,6 +73,7 @@ class SystemApicast(AbstractApicast):
         wait_until(lambda: not api_manager.ready({"apicast-staging"}))()
         # wait until the Apicast is ready
         wait_until(lambda: api_manager.ready({"apicast-staging", "apicast-production"}))()
+
     def set_custom_policy(self, policy):
         """Sets custom policy to the Operator"""
 

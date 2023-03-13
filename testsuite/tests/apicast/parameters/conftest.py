@@ -60,6 +60,7 @@ def gateway_options():
     """Additional options to pass to staging gateway constructor"""
     return {}
 
+
 @pytest.fixture(scope="module")
 def gateway_environment():
     """Returns environment for Template apicast to use, the whole environment will be set in one command."""
