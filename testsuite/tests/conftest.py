@@ -32,7 +32,8 @@ from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, warn_and_skip
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 
-pytest_plugins = ("testsuite.gateway_logs",)
+if weakget(settings)["reporting"]["print_app_logs"] % True:
+    pytest_plugins = ("testsuite.gateway_logs",)
 
 
 @pytest.fixture(scope='session', autouse=True)
