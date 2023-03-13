@@ -240,3 +240,15 @@ class OperatorApicast(OpenshiftApicast):
         self.apicast = APIcast(string_to_model=result.out())
         self.name = state["name"]
         self._environ = OperatorEnviron(self.apicast, state["reload"])
+
+    def set_custom_policy(self, policy):
+        """Sets custom policy to the Operator"""
+        self.apicast.modify_and_apply(lambda apicast:
+                                      apicast.model.spec.setdefault("customPolicies", []).append(policy))
+        self.reload()
+
+    def remove_custom_policy(self):
+        """Removes all custom policies to the Operator"""
+        self.apicast.modify_and_apply(lambda apicast:
+                                      apicast.model.spec.setdefault("customPolicies", []).clear())
+        self.reload()
