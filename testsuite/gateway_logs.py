@@ -4,22 +4,15 @@ import logging
 
 import pytest
 from _pytest.outcomes import Skipped
-from weakget import weakget
 
-from testsuite.config import settings
 from testsuite.gateways.gateways import Capability
 
 log = logging.getLogger(__name__)
-
-PRINT_LOGS = weakget(settings)["reporting"]["print_app_logs"] % True
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_setup(item):
     """Figures out what gateways are in use and when did he test setup started"""
-    if not PRINT_LOGS:
-        return
-
     start_time = datetime.utcnow()
     result = yield
 
@@ -44,9 +37,6 @@ def pytest_runtest_setup(item):
 def pytest_runtest_call(item):
     """Prints setup logs and figures out what gateways are in use and when did the test execution started"""
     # pylint: disable=protected-access
-    if not PRINT_LOGS:
-        return
-
     start_time = datetime.utcnow()
     yield
     _print_logs(item, start_time, "call", "test-run")
@@ -55,9 +45,6 @@ def pytest_runtest_call(item):
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_teardown(item):
     """Collect logs and add them to the output"""
-    if not PRINT_LOGS:
-        return
-
     start_time = datetime.utcnow()
     yield
     _print_logs(item, start_time, "teardown", "teardown")
