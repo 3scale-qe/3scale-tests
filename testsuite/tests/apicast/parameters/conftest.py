@@ -34,11 +34,31 @@ def gateway_kind():
     return SelfManagedApicast
 
 
+# pylint: disable=unused-argument
+@pytest.fixture(scope="module")
+def lifecycle_hooks(request, testconfig, gateway_kind):
+    """
+    Same as in root conftest, needs to be overriden and there needs to be dependency to gateway_kind,
+     otherwise it is not refreshed when it is parametrized
+    """
+
+    defaults = testconfig.get("fixtures", {}).get("lifecycle_hooks", {}).get("defaults")
+    if defaults is not None:
+        return [request.getfixturevalue(i) for i in defaults]
+    return []
+
+
+# pylint: disable=unused-argument
+@pytest.fixture(scope="module")
+def service_settings(request, gateway_kind):
+    """dict of service settings to be used when service created"""
+    return {"name": blame(request, "svc")}
+
+
 @pytest.fixture(scope="module")
 def gateway_options():
     """Additional options to pass to staging gateway constructor"""
     return {}
-
 
 @pytest.fixture(scope="module")
 def gateway_environment():
