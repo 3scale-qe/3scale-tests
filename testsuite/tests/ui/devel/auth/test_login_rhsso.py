@@ -13,7 +13,7 @@ def rhsso_integration(request, threescale, testconfig, custom_admin_login, navig
     Due to the fact that once you create sso integration you can't delete it only edit it,
     this workaround is needed to simplify UI test
     """
-    rhsso = [x for x in threescale.dev_portal_auth_providers.list() if x['kind'] == "keycloak" in x]
+    rhsso = [x for x in threescale.dev_portal_auth_providers.list() if x['kind'] == "keycloak"]
     if not rhsso:
         rhsso = [threescale.dev_portal_auth_providers.create(
             {"kind": "keycloak", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"})]
