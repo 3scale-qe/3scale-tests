@@ -67,7 +67,7 @@ persistence: pipenv check-secrets.yaml
 
 persistence-store persistence-load: export _3SCALE_TESTS_skip_cleanup=true
 persistence-store persistence-load: pipenv check-secrets.yaml
-	$(subst -p no:persistence,,$(PYTEST)) -n4 -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
+	$(subst -p no:persistence,,$(PYTEST)) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
