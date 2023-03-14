@@ -202,7 +202,7 @@ def pytest_metadata(metadata):
         "polarion-response-myteamsname":
             _settings["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None",
         "polarion-lookup-method": "name",
-        "project": "3scale-" + version.replace(".", "")[:4],
+        "project": "3scale-" + str(version).replace(".", "")[:4],
     })
 
     if Capability.OCP4 in CapabilityRegistry():
