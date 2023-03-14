@@ -866,7 +866,7 @@ def requestbin(testconfig, tools):
     """
     Returns an instance of RequestBin.
     """
-    return Mockserver(tools["mockserver"])
+    return Mockserver(tools["mockserver"], testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="session")

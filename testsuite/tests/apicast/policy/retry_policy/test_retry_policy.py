@@ -58,9 +58,9 @@ def client(application, api_client):
 
 
 @pytest.fixture(scope="module")
-def mockserver(base_url):
+def mockserver(base_url, testconfig):
     """Have mockerver to setup failing requests for certain occurrences"""
-    return Mockserver(base_url)
+    return Mockserver(base_url, testconfig["ssl_verify"])
 
 
 @pytest.mark.parametrize("num_of_requests, awaited_response", [
