@@ -10,12 +10,19 @@ from urllib.parse import urlparse
 import pytest
 
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast.template import TemplateApicast
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6193")]
 
 
 ACCESS_LOG_FILE = "access.log"
+
+
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Use TemplateApicast as APICAST_ACCESS_LOG_FILE is not available in Operator"""
+    return TemplateApicast
 
 
 @pytest.fixture(scope="module")

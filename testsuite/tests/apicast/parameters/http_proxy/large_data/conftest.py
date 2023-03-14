@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 import pytest
 
 from testsuite import rawobj
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 
@@ -12,12 +11,6 @@ from testsuite.utils import blame
 def protocol(request):
     """Protocol which is used on http(s) service/proxy/backend"""
     return request.param
-
-
-@pytest.fixture(scope="module")
-def gateway_kind():
-    """Gateway class to use for tests"""
-    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")
