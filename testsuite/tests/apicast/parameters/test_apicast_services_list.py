@@ -6,16 +6,9 @@ import pytest
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
-
-
-@pytest.fixture(scope="module")
-def gateway_kind():
-    """Gateway class to use for tests"""
-    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")

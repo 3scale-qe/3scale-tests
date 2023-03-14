@@ -8,9 +8,16 @@ import pytest
 
 from testsuite.capabilities import Capability
 from testsuite import rawobj
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
+
+
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """Use TemplateApicast as THREESCALE_CONFIG_FILE is not available in Operator"""
+    return TemplateApicast
 
 
 @pytest.fixture(scope="module")

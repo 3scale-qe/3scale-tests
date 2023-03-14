@@ -11,17 +11,10 @@ import pytest
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame, randomize
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
               pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
-
-
-@pytest.fixture(scope="module")
-def gateway_kind():
-    """Gateway class to use for tests"""
-    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")

@@ -3,7 +3,7 @@ from weakget import weakget
 import pytest
 
 from testsuite.gateways import gateway
-from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame, warn_and_skip
 
 
@@ -31,7 +31,7 @@ def staging_gateway(request, gateway_kind, gateway_environment, gateway_options,
 @pytest.fixture(scope="module")
 def gateway_kind():
     """Gateway class to use for tests"""
-    return TemplateApicast
+    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")

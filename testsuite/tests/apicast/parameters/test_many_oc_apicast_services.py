@@ -5,11 +5,18 @@ Then asserts that the gateway has been correctly deployed.
 import pytest
 
 from testsuite.capabilities import Capability
+from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.openshift.client import ServiceTypes
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
               pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6315")]
+
+
+@pytest.fixture(scope="module")
+def gateway_kind():
+    """No idea, why TemplateApicast is used here"""
+    return TemplateApicast
 
 
 @pytest.fixture(scope="module")

@@ -7,7 +7,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
-from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 
 pytestmark = [
     pytest.mark.sandbag,
@@ -15,12 +14,6 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8485"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
 ]
-
-
-@pytest.fixture(scope="module")
-def gateway_kind():
-    """Gateway class to use for tests"""
-    return SelfManagedApicast
 
 
 @pytest.fixture(scope="module")
