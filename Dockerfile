@@ -14,7 +14,7 @@ ADD $cacert /etc/pki/ca-trust/source/anchors
 ADD https://gist.githubusercontent.com/mdujava/c87f687cbb9bbed0144ddc136758292c/raw/7dbb42e02e2b0fe75074efccd7350e3082cc6655/ca.pem /etc/pki/ca-trust/source/anchors
 RUN update-ca-trust
 
-RUN useradd --no-log-init -u 1001 -g root -m default
+RUN useradd --no-log-init -u 1000 -g root -m default
 RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.29/openshift-client-linux.tar.gz | tar xz -C /usr/local/bin
 
 RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
