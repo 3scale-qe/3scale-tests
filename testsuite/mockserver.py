@@ -18,14 +18,15 @@ class Mockserver:
     is randomized per instance to a) make matching bit easier, b) allow
     bit of concurrency.
     """
-    def __init__(self, url):
+    def __init__(self, url, verify=True):
         self._url = url
+        self.verify = verify
         self._webhook = f"/webhook/{generate_tail()}"
         self.url = urljoin(self._url, self._webhook)
 
     def temporary_fail_request(self, num, status=500):
         """Create failing call for num occurences"""
-        response = requests.put(urljoin(self._url, "/mockserver/expectation"), verify=False, data=json.dumps(
+        response = requests.put(urljoin(self._url, "/mockserver/expectation"), verify=self.verify, data=json.dumps(
             {
                 "httpRequest": {"path": f"/fail-request/{num}/{status}"},
                 "times": {"remainingTimes": num, "unlimited": False},
@@ -61,7 +62,8 @@ class Mockserver:
         response = requests.put(
             urljoin(self._url, "/mockserver/retrieve"),
             params={"type": "REQUEST_RESPONSES"},
-            data=json.dumps(matcher))
+            data=json.dumps(matcher),
+            verify=self.verify)
         response.raise_for_status()
         return response
 
@@ -69,7 +71,8 @@ class Mockserver:
         """Verifies that a sequence of requests was received on a Mockserver"""
         response = requests.put(
             urljoin(self._url, "/mockserver/verifySequence"),
-            data=json.dumps({"httpRequests": expected_requests}))
+            data=json.dumps({"httpRequests": expected_requests}),
+            verify=self.verify)
         if response.status_code == 400:
             raise HTTPError("Invalid matcher format", response=response)
         return response.status_code == 202

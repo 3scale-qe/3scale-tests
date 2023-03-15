@@ -47,9 +47,9 @@ def app2(service, custom_application, custom_app_plan, lifecycle_hooks, request)
 
 
 @pytest.fixture(scope="module")
-def mockserver(private_base_url):
+def mockserver(private_base_url, testconfig):
     """Setup generic mockserver"""
-    return Mockserver(private_base_url("mockserver"))
+    return Mockserver(private_base_url("mockserver"), testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="module", autouse=True)
