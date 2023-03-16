@@ -6,7 +6,7 @@ import pytest
     ("4000002500003155", True),
     ("4242424242424242", False),
 ])
-def test_3ds_challenge(setup_card, cc_number, verify_3ds, stripe, create_api_invoice):
+def test_3ds_challenge(custom_card, cc_number, verify_3ds, stripe, invoice):
     """
     Tests basic billing scenario for Stripe gateway:
         - Add CC details for an account
@@ -14,8 +14,7 @@ def test_3ds_challenge(setup_card, cc_number, verify_3ds, stripe, create_api_inv
         - Trigger billing via UI
         - Trigger billing via API
     """
-    setup_card(cc_number, verify_3ds)
+    custom_card(cc_number, verify_3ds)
 
-    invoice = create_api_invoice()
     charged = invoice.charge()
     stripe.assert_payment(charged)

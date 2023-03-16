@@ -6,18 +6,17 @@ import pytest
 from threescale_api.errors import ApiClientError
 
 
-def test_cancel_challenge(setup_card, create_api_invoice):
+def test_cancel_challenge(custom_card, invoice):
     """
-    Test scenario: Cardholder enrolled, authentication successful, and signature verification successful:
+    Test scenario:
         - Add CC details for an account
         - Cancel 3DS challenge
         - Verify that CC was not added
     """
-    cc_view = setup_card("4000000000001091")
+    cc_view = custom_card("4000000000001091")
     cc_view.challenge_form.cancel()
     assert cc_view.alert() == "An error occurred, please review your CC details or try later."
 
-    invoice = create_api_invoice()
     with pytest.raises(ApiClientError) as exc_info:
         invoice.charge()
 

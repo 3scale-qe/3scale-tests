@@ -185,14 +185,17 @@ class AccountInvoicesView(BaseAudienceView):
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
 
-    @step("InvoiceDetailView")
-    def new_invoice(self):
+    def create(self):
         """
         Creates new invoice
         Note: It creates new open invoice, without any form with random ID
         """
         self.create_button.click()
-        next(self.table.rows()).id.click()
+
+    @step("InvoiceDetailView")
+    def edit(self, invoice):
+        """Opens edit view for the invoice"""
+        self.table.row(_row__attr=('id', f'invoice_{invoice.entity_id}')).id.click()
 
     def prerequisite(self):
         return AccountsDetailView
@@ -205,6 +208,7 @@ class AccountInvoicesView(BaseAudienceView):
 
 class LineItemForm(View):
     """Nested view for a Line add form"""
+    path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     ROOT = "//div[@id='colorbox']"
     name_input = TextInput("line_item[name]")
     quantity_input = TextInput("line_item[quantity]")
@@ -223,6 +227,7 @@ class LineItemForm(View):
 
 class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
+    path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     issue_button = Text("//form[contains(@action, 'issue.js')]/button")
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
     id_field = Text("#field-friendly_id")
@@ -233,6 +238,10 @@ class InvoiceDetailView(BaseAudienceView):
     paid_field = Text("//td[@id='field-state' and text()='Paid']")
     add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
     line_item_form = View.nested(LineItemForm)
+
+    def __init__(self, parent, account, invoice):
+        super().__init__(parent, account_id=account.entity_id, invoice_id=invoice.entity_id)
+        self.invoice = invoice
 
     def add_items(self, items):
         """Adds item to an invoice"""
@@ -255,8 +264,21 @@ class InvoiceDetailView(BaseAudienceView):
         # Wait until charge is done
         self.browser.wait_for_element(self.paid_field, timeout=5)
 
+    def assert_issued(self):
+        """Assert that invoice was correctly issued"""
+        assert self.notification.is_displayed, "No notification was displayed after issuing an invoice."
+        assert self.notification.string_in_flash_message("invoice issued."), \
+            "Issuing the invoice through UI failed"
+        assert self.charge_button.wait_displayed, "Issuing the invoice through UI failed"
+
     def prerequisite(self):
         return AccountInvoicesView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.id_field.is_displayed and \
+            (self.issue_button.is_displayed or self.charge_button.wait_displayed) and \
+            self.path in self.browser.url
 
 
 class UsageRulesView(BaseAudienceView):

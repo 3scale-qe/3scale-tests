@@ -38,7 +38,7 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
 
 
 @pytest.fixture(scope="module")
-def setup_card(account, custom_devel_login, billing_address, navigator):
+def custom_card(account, custom_devel_login, billing_address, navigator):
     """Add credit card and billing address for the user in Developer portal"""
     def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
