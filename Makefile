@@ -205,7 +205,6 @@ polish-junit:
 	-rm -f $(resultsdir)/junit-*.xml.gz
 
 reportportal: ## Upload results to reportportal. Appropriate variables for juni2reportportal must be set
-reportportal: export RP_PROJECT ?= 3scale
 reportportal: polish-junit
 	$(RUNSCRIPT)junit2reportportal $(resultsdir)/junit-*.xml
 
