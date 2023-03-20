@@ -55,13 +55,6 @@ def backends_mapping(custom_backend, private_base_url, lifecycle_hooks):
             "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin_go"), hooks=lifecycle_hooks)}
 
 
-@pytest.fixture(scope="module")
-def service(service, policy_settings):
-    """Add policy to the first service"""
-    service.proxy.list().policies.append(policy_settings)
-    return service
-
-
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
 def service2(custom_service, backends_mapping, request, service_proxy_settings, policy_settings, lifecycle_hooks):
