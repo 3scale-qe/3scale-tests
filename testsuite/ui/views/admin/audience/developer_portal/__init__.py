@@ -2,11 +2,121 @@
 from selenium.common.exceptions import NoSuchElementException
 from wait_for import TimedOutError, wait_for
 from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput, Image
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor
+from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor, ThreescaleButtonGroup, ThreescaleCheckBox, \
+    CheckBoxGroup
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton, ThreescaleDeleteButton, ThreescaleCreateButton
+
+
+class CMSNewPageView(BaseAudienceView):
+    """View representation of Developer Portal New Page page"""
+    path_pattern = '/p/admin/cms/pages/new'
+    title = TextInput(id='cms_template_title')
+    section = ThreescaleDropdown(".//*[@id='cms_template_section_input']")
+    path_input = TextInput(id='cms_template_path')
+    code = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
+    submit = ThreescaleSubmitButton()
+
+    def create(self, title, section, path, page_html):
+        """Creates a new dev portal page"""
+        self.title.fill(title)
+        self.section.select_by_text("|— " + section)
+        self.path_input.fill(path)
+        self.code.fill(page_html)
+        self.submit.click()
+
+    def prerequisite(self):
+        return DeveloperPortalContentView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
+            self.section.is_displayed and self.path.is_displayed and self.code.is_displayed and \
+            self.path in self.browser.url
+
+
+class CMSEditPageView(BaseAudienceView):
+    """View representation of Developer Portal Edit Page page"""
+    path_pattern = '/p/admin/cms/pages/{page_id}/edit'
+    publish_button = GenericLocatorWidget(".//button[@title='Save and publish the current draft.']")
+    path_input = TextInput(id="cms_template_path")
+    delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, page_id):
+        super().__init__(parent, page_id=page_id)
+
+    def publish(self):
+        """Publish dev portal page"""
+        self.publish_button.click()
+
+    def get_path(self):
+        """Get path of dev portal page"""
+        return self.path_input.value
+
+    def delete(self):
+        """Delete page of dev portal"""
+        self.delete_button.click()
+
+    def prerequisite(self):
+        return DeveloperPortalContentView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.publish_button.is_displayed and \
+            self.path_input.is_displayed and self.delete_button.is_displayed and self.path in self.browser.url
+
+
+class CMSNewSectionView(BaseAudienceView):
+    """View representation of Developer Portal New Section page"""
+    path_pattern = '/p/admin/cms/sections/new'
+    title = TextInput(id='cms_section_title')
+    public = ThreescaleCheckBox('//input[@id="cms_section_public"]')
+    path_input = TextInput(id='cms_section_partial_path')
+    submit = ThreescaleSubmitButton()
+
+    def create(self, title, path, public=True):
+        """Creates a new section of dev portal"""
+        self.title.fill(title)
+        self.public.check(public)
+        self.path_input.fill(path)
+        self.submit.click()
+
+    def prerequisite(self):
+        return DeveloperPortalContentView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
+            self.public.is_displayed and self.path_input.is_displayed and self.submit.is_displayed and \
+            self.path in self.browser.url
+
+
+class CMSEditSectionView(BaseAudienceView):
+    """View representation of Developer Portal Edit Section page"""
+    path_pattern = '/p/admin/cms/builtin_sections/{section_id}/edit'
+    title = TextInput(id='cms_section_title')
+    public = ThreescaleCheckBox('//input[@id="cms_section_public"]')
+    path_input = TextInput(id='cms_section_partial_path')
+    delete_button = ThreescaleDeleteButton()
+
+    def __init__(self, parent, section_id):
+        super().__init__(parent, section_id=section_id)
+
+    def delete(self):
+        """Delete section of dev portal"""
+        self.delete_button.click()
+
+    def prerequisite(self):
+        return DeveloperPortalContentView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
+            self.public.is_displayed and self.path_input.is_displayed and self.delete_button.is_displayed and \
+            self.path in self.browser.url
 
 
 class DeveloperPortalContentView(BaseAudienceView):
@@ -15,6 +125,27 @@ class DeveloperPortalContentView(BaseAudienceView):
     path_pattern = '/p/admin/cms'
     quick_links = Text("//a[@href='#quick-links']")
     snippets = Text("//a[@href='#tips-and-tricks']")
+    button_group = ThreescaleButtonGroup(locator=".//*[@id='cms-new-content-button']")
+
+    @step("CMSNewPageView")
+    def new_page(self):
+        """Create a new dev portal page"""
+        self.button_group.select("/p/admin/cms/pages/new")
+
+    @step("CMSEditPageView")
+    def edit_page(self, page_id):
+        """Edit a new dev portal page"""
+        self.browser.element(f".//*[@href='/p/admin/cms/pages/{page_id}/edit']").click()
+
+    @step("CMSNewSectionView")
+    def new_section(self):
+        """Create a new dev portal section"""
+        self.button_group.select("/p/admin/cms/sections/new")
+
+    @step("CMSEditSectionView")
+    def edit_section(self, section_id):
+        """Edit a new dev portal section"""
+        self.browser.element(f".//*[@href='/p/admin/cms/sections/{section_id}/edit']").click()
 
     def prerequisite(self):
         return BaseAudienceView
@@ -155,5 +286,52 @@ class SpamProtection(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.no_protection.is_displayed and self.sus_protection.is_displayed \
-               and self.always_protection.is_displayed
+            and self.no_protection.is_displayed and self.sus_protection.is_displayed \
+            and self.always_protection.is_displayed
+
+
+class DeveloperPortalGroupView(BaseAudienceView):
+    """View representation of Groups page"""
+    path_pattern = '/p/admin/cms/groups'
+    table = PatternflyTable(".//table[@class='data']", column_widgets={
+        3: GenericLocatorWidget("./a[contains(@class, 'delete')]")})
+    create_button = GenericLocatorWidget(".//*[@href='/p/admin/cms/groups/new']")
+
+    @step("DeveloperPortalGroupNewView")
+    def create_new_group(self):
+        """Create new group for developer portal"""
+        self.create_button.click()
+
+    def delete_group(self, group_name):
+        """Delete group fro developer portal"""
+        [x for x in self.table.rows() if x.name.text == group_name][0][2].click(handle_alert=True)
+
+    def prerequisite(self):
+        return BaseAudienceView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and \
+            self.path in self.browser.url
+
+
+class DeveloperPortalGroupNewView(BaseAudienceView):
+    """View representation of Create Group page"""
+    path_pattern = '/p/admin/cms/groups/new'
+    name = TextInput(id="cms_group_name")
+    allowed_section = CheckBoxGroup(locator="//*[@id='cms_group_section_ids_input']")
+    submit = ThreescaleSubmitButton()
+
+    def create(self, name, allowed_sections: list):
+        """Creates a new dev portal group"""
+        self.name.fill(name)
+        self.allowed_section.check_by_text(allowed_sections)
+        self.submit.click()
+
+    def prerequisite(self):
+        return DeveloperPortalGroupView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.name.is_displayed and \
+            self.allowed_section.is_displayed and self.path in self.browser.url

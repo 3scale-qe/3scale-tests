@@ -6,7 +6,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox
+from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox, CheckBoxGroup
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
 
@@ -55,6 +55,7 @@ class AccountsDetailView(BaseAudienceView):
     applications_button = Text("//*[contains(@title,'applications')]")
     users_button = Text("//*[contains(@title,'users')]")
     invoices_button = Text("//*[contains(@title,'invoices')]")
+    group_button = Text("//*[contains(@title,'group memberships')]")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -83,6 +84,11 @@ class AccountsDetailView(BaseAudienceView):
     def invoices(self):
         """Open account's users"""
         self.invoices_button.click()
+
+    @step("AccountUserGroupView")
+    def group(self):
+        """Open account's groups"""
+        self.group_button.click()
 
     def prerequisite(self):
         return AccountsView
@@ -275,4 +281,27 @@ class UsageRulesView(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.account_plans_checkbox.is_displayed and \
-               self.path in self.browser.url
+            self.path in self.browser.url
+
+
+class AccountUserGroupView(BaseAudienceView):
+    """View representation of Accounts User page"""
+    path_pattern = '/buyers/accounts/{account_id}/groups'
+    groups = CheckBoxGroup(locator="//*[@id='account_groups_input']")
+    submit = ThreescaleSubmitButton()
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
+
+    def update(self, options: list):
+        """Update account group section"""
+        self.groups.check_by_text(options)
+        self.submit.click()
+
+    def prerequisite(self):
+        return AccountsDetailView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.groups.is_displayed and \
+            self.path in self.browser.url
