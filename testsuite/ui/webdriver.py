@@ -1,5 +1,5 @@
 """Selenium factory for creating  Threescale browser instances to run UI tests. """
-
+import logging
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -10,6 +10,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 from testsuite.ui.exception import WebDriverError
+
+LOGGER = logging.getLogger(__name__)
 
 
 class _Chrome:
@@ -130,6 +132,7 @@ class ThreescaleWebdriver:
         Starts installed webdriver session.
         """
         self.session = self.webdriver.start_session()
+        LOGGER.info('Starting new Browser session: "%s"...', self.session.session_id)
         self.post_init()
         return self.session
 
@@ -145,6 +148,7 @@ class ThreescaleWebdriver:
         :raises: WebDriverError: If problem with browser happens finalization occurs.
         """
         try:
+            LOGGER.info('Quiting current Browser session: "%s"...', self.session.session_id)
             self.session.quit()
         except Exception as exception:
             raise WebDriverError("Problem with browser finalization") from exception
