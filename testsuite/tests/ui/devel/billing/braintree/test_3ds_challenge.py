@@ -6,6 +6,10 @@ import pytest
 from threescale_api.errors import ApiClientError
 
 
+# very special setup needed for braintree
+pytestmark = pytest.mark.sandbag
+
+
 @pytest.fixture(scope="module", autouse=True)
 def braintree_gateway_sca(braintree_gateway):
     """Ensures Braintree billing gateway with SCA enabled"""

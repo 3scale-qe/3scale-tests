@@ -2,6 +2,10 @@
 import pytest
 
 
+# very special setup needed for braintree
+pytestmark = pytest.mark.sandbag
+
+
 @pytest.fixture(scope="module", autouse=True)
 def braintree_gateway_no_sca(braintree_gateway):
     """Ensures Braintree billing gateway with SCA disabled"""
