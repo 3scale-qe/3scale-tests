@@ -7,8 +7,9 @@ from testsuite import rawobj
 from testsuite.mockserver import Mockserver
 from testsuite.utils import blame
 
-
-pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2665")
+pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2665"),
+              pytest.mark.nopersistence,  # Tests relies on new application creation.
+              ]
 
 
 def create_update_matcher(app):
