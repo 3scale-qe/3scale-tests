@@ -13,8 +13,6 @@ import yaml
 from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
-# There is indeed cyclic import but it should be negated by TYPE_CHECKING check
-# pylint: disable=cyclic-import
 from testsuite.openshift.scaler import Scaler
 
 
