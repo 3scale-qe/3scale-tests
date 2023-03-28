@@ -2,17 +2,7 @@
 from testsuite import gateways
 from testsuite.capabilities import CapabilityRegistry, Capability
 from testsuite.configuration import openshift
-
-
-def _rhoam():
-    """Returns True, if the current instance is RHOAM. Detects RHOAM by annotations on APIManager object"""
-    client = openshift()
-    if client.is_operator_deployment:
-        manager = client.api_manager
-        if manager.get_annotation("integreatly-name") or manager.get_annotation("integreatly-namespace"):
-            return True
-
-    return False
+from testsuite.config import settings
 
 
 def gateway_capabilities():
@@ -44,7 +34,7 @@ def scaling():
     """
     Scaling is allowed on all known configurations (so far) except for RHOAM
     """
-    return {Capability.SCALING} if not _rhoam() else {}
+    return {Capability.SCALING} if not settings["threescale"]["deployment_type"] == "rhoam" else {}
 
 
 CapabilityRegistry().register_provider(scaling, {Capability.SCALING})
