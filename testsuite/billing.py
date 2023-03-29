@@ -1,6 +1,8 @@
 """APIs for Stripe and Braintree"""
+import backoff
 import braintree
 import stripe
+from braintree.exceptions.service_unavailable_error import ServiceUnavailableError
 
 from threescale_api.resources import InvoiceState
 
@@ -51,6 +53,10 @@ class Braintree:
             )
         )
 
+    @backoff.on_exception(backoff.fibo, ServiceUnavailableError, max_tries=8, jitter=None)
+    def _transaction_search(self, invoice):
+        return self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice['id']))
+
     # pylint: disable=no-member
     def merchant_currency(self):
         """Return currency code for default merchant account"""
@@ -59,7 +65,7 @@ class Braintree:
 
     def assert_payment(self, invoice):
         """Compare 3scale invoice and Braintree transaction"""
-        transaction = self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice['id']))
+        transaction = self._transaction_search(invoice)
         currency = transaction.first.currency_iso_code
         cost = float(transaction.first.amount)
         assert invoice['state'] == InvoiceState.PAID.value
