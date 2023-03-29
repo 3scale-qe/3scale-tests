@@ -157,17 +157,7 @@ Pipfile.lock: Pipfile
 	pipenv sync --dev
 	touch .make-pipenv-sync-dev .make-pipenv-sync
 
-# this dir is created for compatibility with pipelines that try to collect
-# artifacts and expect this dir in case of html report
-$(resultsdir)/assets:
-	mkdir -p $@
-	touch $@/empty
-
-# a hack to ensure assets/ exists (explained few lines above) all targets that
-# should handle compatibility require pipenv (unfortunately few other targets
-# require pipenv but not assets/ so in rare cases assets/ is created without
-# purpose)
-pipenv: .make-pipenv-sync $(if $(and $(html), $(WORKSPACE)), $(resultsdir)/assets,)
+pipenv: .make-pipenv-sync
 
 pipenv-dev: .make-pipenv-sync-dev
 
