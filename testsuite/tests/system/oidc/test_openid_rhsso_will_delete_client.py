@@ -56,6 +56,7 @@ def check_deleted_client(client_id, rhsso_service_info):
     raise ValueError("Client still exists")
 
 
+@pytest.mark.nopersistence  # Application is deleted during test run
 def test_rhsso_client_delete(application, rhsso_service_info):
     """Test checks if the RHSSO client is deleted when 3scale application is deleted"""
     assert get_rhsso_client(application, rhsso_service_info) is not None
