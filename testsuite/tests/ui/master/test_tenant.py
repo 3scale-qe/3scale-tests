@@ -53,7 +53,7 @@ def test_create_tenant(master_login, ui_tenant, tenant_name, navigator, browser,
 
 
 # pylint: disable=unused-argument
-def test_edit_tenant(master_login, navigator, tenant, master_threescale):
+def test_edit_tenant(master_login, navigator, tenant, master_threescale, request):
     """
     Test:
         - Create tenant via API
@@ -66,11 +66,12 @@ def test_edit_tenant(master_login, navigator, tenant, master_threescale):
     old_name = account.entity_name
     edit = navigator.navigate(TenantEditView, account=account)
 
-    edit.update(org_name="updated_name")
+    updated_name = blame(request, "updated_name")
+    edit.update(org_name=updated_name)
     account = master_threescale.accounts.read(account_id)
 
     assert account.entity_name != old_name
-    assert account.entity_name == "updated_name"
+    assert account.entity_name == updated_name
 
 
 # pylint: disable=unused-argument
