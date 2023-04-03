@@ -1,11 +1,11 @@
 """View representations of Accounts pages"""
 
-from selenium.common.exceptions import NoSuchElementException
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
+from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox, CheckBoxGroup
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
     ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
@@ -185,14 +185,17 @@ class AccountInvoicesView(BaseAudienceView):
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
 
-    @step("InvoiceDetailView")
-    def new_invoice(self):
+    def create(self):
         """
         Creates new invoice
         Note: It creates new open invoice, without any form with random ID
         """
         self.create_button.click()
-        next(self.table.rows()).id.click()
+
+    @step("InvoiceDetailView")
+    def edit(self, invoice):
+        """Opens edit view for the invoice"""
+        self.table.row(_row__attr=('id', f'invoice_{invoice.entity_id}')).id.click()
 
     def prerequisite(self):
         return AccountsDetailView
@@ -205,6 +208,7 @@ class AccountInvoicesView(BaseAudienceView):
 
 class LineItemForm(View):
     """Nested view for a Line add form"""
+    path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     ROOT = "//div[@id='colorbox']"
     name_input = TextInput("line_item[name]")
     quantity_input = TextInput("line_item[quantity]")
@@ -223,28 +227,34 @@ class LineItemForm(View):
 
 class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
+    path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     issue_button = Text("//form[contains(@action, 'issue.js')]/button")
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
     id_field = Text("#field-friendly_id")
     state_field = Text("#field-state")
+    notification = View.nested(FlashMessage)
 
     # Selector which we can use to check if the charge has finished
     paid_field = Text("//td[@id='field-state' and text()='Paid']")
     add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
     line_item_form = View.nested(LineItemForm)
 
-    def add_item(self, name, quantity, cost, description):
+    def __init__(self, parent, account, invoice):
+        super().__init__(parent, account_id=account.entity_id, invoice_id=invoice.entity_id)
+        self.invoice = invoice
+
+    def add_items(self, items):
         """Adds item to an invoice"""
         self.add_item_btn.click()
         self.line_item_form.wait_displayed()
-        self.line_item_form.add_item(name, quantity, cost, description)
+        for item in items:
+            self.line_item_form.add_item(**item)
 
     def issue(self):
         """Issues the invoices (OPEN -> PENDING)"""
         self.issue_button.click(handle_alert=True)
-        self.browser.wait_for_element(self.charge_button, timeout=10)
 
-    def charge(self, invoice=None):
+    def charge(self):
         """Charges the invoices (PENDING -> PAID)"""
         # Charge button has two alerts which completely messed up with widgetastic.
         # https://issues.redhat.com/browse/THREESCALE-7276
@@ -252,16 +262,23 @@ class InvoiceDetailView(BaseAudienceView):
         self.browser.handle_double_alert()
 
         # Wait until charge is done
-        try:
-            self.browser.wait_for_element(self.paid_field, timeout=5)
-        except NoSuchElementException as err:
-            if invoice is not None:
-                latest_transaction = invoice.payment_transactions.list()[-1]
-                raise RuntimeError(latest_transaction["message"]) from err
-            raise err
+        self.browser.wait_for_element(self.paid_field, timeout=5)
+
+    def assert_issued(self):
+        """Assert that invoice was correctly issued"""
+        assert self.notification.is_displayed, "No notification was displayed after issuing an invoice."
+        assert self.notification.string_in_flash_message("invoice issued."), \
+            "Issuing the invoice through UI failed"
+        assert self.charge_button.wait_displayed, "Issuing the invoice through UI failed"
 
     def prerequisite(self):
         return AccountInvoicesView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.id_field.is_displayed and \
+            (self.issue_button.is_displayed or self.charge_button.wait_displayed) and \
+            self.path in self.browser.url
 
 
 class UsageRulesView(BaseAudienceView):

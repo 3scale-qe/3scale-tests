@@ -4,54 +4,51 @@ from threescale_api.resources import InvoiceState
 
 from testsuite import rawobj
 from testsuite.ui.objects import BillingAddress
-from testsuite.ui.views.admin.audience.account import InvoiceDetailView
+from testsuite.ui.views.admin.audience.account import InvoiceDetailView, AccountInvoicesView
 from testsuite.utils import randomize
 
 
-@pytest.fixture
-def line_items():
+@pytest.fixture(scope="module")
+def cost():
+    """A fixture that provides variable cost for the line item, thus the price of the invoice"""
+    return 10
+
+
+@pytest.fixture(scope="module")
+def line_items(cost):
     """List of all items to be added to an invoice"""
-    return [{'name': "test-item", 'description': 'test_item', 'quantity': '1', 'cost': 10}]
+    return [{'name': "test-item", 'description': 'test_item', 'quantity': '1', 'cost': cost}]
 
 
 @pytest.fixture
-def create_api_invoice(account, threescale, line_items):
-    """
-    Creates a new invoice via API.
-    """
-    def _api_invoice():
-        account_invoices = threescale.invoices.list_by_account(account)
-        invoice = threescale.invoices.create({"account_id": account['id']})
-        for line_item in line_items:
-            invoice.line_items.create(line_item)
-        invoice = invoice.state_update(InvoiceState.PENDING)
-        assert len(threescale.invoices.list_by_account(account)) - len(account_invoices) == 1
-        return invoice
-
-    return _api_invoice
+def invoice(account, threescale, line_items):
+    """Creates a new invoice via API."""
+    account_invoices = threescale.invoices.list_by_account(account)
+    invoice = threescale.invoices.create({"account_id": account['id']})
+    for line_item in line_items:
+        invoice.line_items.create(line_item)
+    invoice = invoice.state_update(InvoiceState.PENDING)
+    assert len(threescale.invoices.list_by_account(account)) - len(account_invoices) == 1
+    return invoice
 
 
-@pytest.fixture
-def create_ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
+@pytest.fixture(scope="module")
+def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
     """
     Creates and charges invoice through UI.
     Asserts if a new invoice was created and charged.
     """
     def _ui_invoice():
         custom_admin_login()
-        old_invoices = threescale.invoices.list_by_account(account)
-        view = navigator.navigate(InvoiceDetailView, account=account)
-        for line_item in line_items:
-            view.add_item(**line_item)
+        navigator.navigate(AccountInvoicesView, account=account).create()
+        invoice = threescale.invoices.list_by_account(account)
+        assert len(invoice) == 1, "More than one invoice was created for an Account"
 
-        view.issue()
-        invoice = threescale.invoices.list_by_account(account)[0]
-        view.charge(invoice)
-        new_invoices = threescale.invoices.list_by_account(account)
-        assert len(new_invoices) - len(old_invoices) == 1
-        assert view.state_field.text == "Paid"
-
-        return new_invoices[0]
+        invoice_view = navigator.navigate(InvoiceDetailView, account=account, invoice=invoice[0])
+        invoice_view.add_items(line_items)
+        invoice_view.issue()
+        invoice_view.assert_issued()
+        return invoice_view
 
     return _ui_invoice
 
