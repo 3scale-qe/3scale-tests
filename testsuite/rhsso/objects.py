@@ -7,9 +7,9 @@ from keycloak import KeycloakAdmin, KeycloakOpenID
 class Realm:
     """Helper class for RHSSO realm manipulation"""
     def __init__(self, master: KeycloakAdmin, name) -> None:
-        self.admin = KeycloakAdmin(server_url=master.server_url,
-                                   username=master.username,
-                                   password=master.password,
+        self.admin = KeycloakAdmin(server_url=master.connection.server_url,
+                                   username=master.connection.username,
+                                   password=master.connection.password,
                                    realm_name=name,
                                    user_realm_name="master",
                                    verify=False,
@@ -42,7 +42,7 @@ class Realm:
 
     def oidc_client(self, client_id, client_secret):
         """Create OIDC client for this realm"""
-        return KeycloakOpenID(server_url=self.admin.server_url,
+        return KeycloakOpenID(server_url=self.admin.connection.server_url,
                               client_id=client_id,
                               realm_name=self.name,
                               client_secret_key=client_secret)
