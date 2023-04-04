@@ -4,6 +4,7 @@ When an internal backend api endpoint is requested, the increase of the respecti
 metric is expected
 """
 import base64
+from datetime import timedelta, datetime
 from typing import Dict, Tuple
 
 import pytest
@@ -199,7 +200,8 @@ def test_internal_backend_listener(data, prometheus_response_codes_for_metric,
                     f"actual response_code: {response.status_code}"
 
     # wait to update metrics in prometheus
-    prometheus.wait_on_next_scrape("backend-listener")
+    # for some reason change is not visible right away, wait a little bit more here
+    prometheus.wait_on_next_scrape("backend-listener", datetime.utcnow() + timedelta(seconds=60))
 
     count_after = {}
     results = {}
