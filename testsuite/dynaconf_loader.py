@@ -17,7 +17,6 @@ loader is defined in config/.env file). At same moment this has to be
 overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
-import math
 from pathlib import Path
 import logging
 import os
@@ -100,9 +99,8 @@ def _guess_apicast_operator_version(ocp, settings):
 
 def _apicast_image(ocp):
     """Find source of amp-apicast image"""
-    lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"])
-    lookup = yaml.safe_load(lookup.out())
-    return lookup["spec"]["template"]["spec"]["containers"][0]["image"]
+    lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"], parse_output=True)
+    return lookup.model.spec.template.spec.containers[0].image
 
 
 def _rhsso_password(server_url, token):
@@ -150,6 +148,7 @@ def _apicast_ocp(ocp, settings):
 
 
 def get_routes(ocp):
+    """Returns routes grouped by the service they are for """
     mapping = {}
     for route in ocp.routes:
         mapping.setdefault(route["spec"]["to"]["name"], []).append(route)
@@ -157,6 +156,7 @@ def get_routes(ocp):
     for values in mapping.values():
         values.sort(key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", -1)))
     return mapping
+
 
 # pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
