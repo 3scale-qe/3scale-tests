@@ -17,7 +17,7 @@ loader is defined in config/.env file). At same moment this has to be
 overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
-
+import math
 from pathlib import Path
 import logging
 import os
@@ -26,8 +26,6 @@ import re
 
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
-
-import yaml
 
 from openshift import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
@@ -151,6 +149,15 @@ def _apicast_ocp(ocp, settings):
         token=settings.get("token"))
 
 
+def get_routes(ocp):
+    mapping = {}
+    for route in ocp.routes:
+        mapping.setdefault(route["spec"]["to"]["name"], []).append(route)
+
+    for values in mapping.values():
+        values.sort(key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", -1)))
+    return mapping
+
 # pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
     """Reads and loads in to "settings" a single key or all keys from vault
@@ -176,18 +183,22 @@ def load(obj, env=None, silent=None, key=None):
             token=ocp_setup.get("token"))
 
         apicast_ocp = _apicast_ocp(ocp, obj)
+        routes = get_routes(ocp)
 
-        admin_url = _route2url(ocp.routes.for_service("system-provider")[0])
-        admin_token = ocp.secrets["system-seed"]["ADMIN_ACCESS_TOKEN"].decode("utf-8")
-        master_url = _route2url(ocp.routes.for_service("system-master")[0])
-        master_token = ocp.secrets["system-seed"]["MASTER_ACCESS_TOKEN"].decode("utf-8")
-        devel_url = _route2url(ocp.routes.for_service("system-developer")[0])
+        system_seed = ocp.secrets["system-seed"]
+        backend_internal_api = ocp.secrets["backend-internal-api"]
+
+        admin_url = _route2url(routes["system-provider"][0])
+        admin_token = system_seed["ADMIN_ACCESS_TOKEN"].decode("utf-8")
+        master_url = _route2url(routes["system-master"][0])
+        master_token = system_seed["MASTER_ACCESS_TOKEN"].decode("utf-8")
+        devel_url = _route2url(routes["system-developer"][0])
         superdomain = ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
         try:
-            backend_route = ocp.routes.for_service("backend-listener")[0]
+            backend_route = routes["backend-listener"][0]
         except IndexError:
             # RHOAM changed service name owning the route
-            backend_route = ocp.routes.for_service("backend-listener-proxy")[0]
+            backend_route = routes["backend-listener-proxy"][0]
         catalogsource = "UNKNOWN"
         try:
             catalogsource = ocp.do_action("get", ["catalogsource", "-o=jsonpath={.items[0].spec.image}"]).out().strip()
@@ -212,7 +223,7 @@ def load(obj, env=None, silent=None, key=None):
                         "name": project}},
                 "servers": {
                     "default": {
-                        "server_url": ocp.do_action("whoami", ["--show-server"]).out().strip()}}},
+                        "server_url": ocp.api_url}}},
             "threescale": {
                 "version": _guess_version(ocp, project),
                 "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp, obj),
@@ -220,13 +231,13 @@ def load(obj, env=None, silent=None, key=None):
                 "catalogsource": catalogsource,
                 "admin": {
                     "url": admin_url,
-                    "username": ocp.secrets["system-seed"]["ADMIN_USER"].decode("utf-8"),
-                    "password": ocp.secrets["system-seed"]["ADMIN_PASSWORD"].decode("utf-8"),
+                    "username": system_seed["ADMIN_USER"].decode("utf-8"),
+                    "password": system_seed["ADMIN_PASSWORD"].decode("utf-8"),
                     "token": admin_token},
                 "master": {
                     "url": master_url,
-                    "username": ocp.secrets["system-seed"]["MASTER_USER"].decode("utf-8"),
-                    "password": ocp.secrets["system-seed"]["MASTER_PASSWORD"].decode("utf-8"),
+                    "username": system_seed["MASTER_USER"].decode("utf-8"),
+                    "password": system_seed["MASTER_PASSWORD"].decode("utf-8"),
                     "token": master_token},
                 "devel": {
                     "url": devel_url},
@@ -250,8 +261,8 @@ def load(obj, env=None, silent=None, key=None):
                 },
                 "backend_internal_api": {
                     "route": backend_route,
-                    "username": ocp.secrets["backend-internal-api"]["username"],
-                    "password": ocp.secrets["backend-internal-api"]["password"]
+                    "username": backend_internal_api["username"],
+                    "password": backend_internal_api["password"]
                 }
             },
             "rhsso": {
