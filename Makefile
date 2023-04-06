@@ -91,6 +91,9 @@ ui: pipenv check-secrets.yaml
 toolbox: pipenv check-secrets.yaml
 	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
 
+test-images:
+	$(PYTEST) --images $(flags) testsuite/tests/images
+
 test-in-docker: ## Run test in container with selenium sidecar
 test-in-docker: rand := $(shell cut -d- -f1 /proc/sys/kernel/random/uuid)
 test-in-docker: network := test3scale_$(rand)

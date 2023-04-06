@@ -8,6 +8,7 @@ from contextlib import ExitStack
 from typing import List, Dict, Union, Any, Optional, Callable, Sequence
 
 import openshift as oc
+import yaml
 
 from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
@@ -51,13 +52,14 @@ class OpenShiftClient:
             self.prepare_context(stack)
             return oc.whoami("--show-server=true")
 
+    # pylint: disable=too-many-arguments
     def do_action(self, verb: str, cmd_args: Sequence[Union[str, Sequence[str]]] = None,
-                  auto_raise: bool = True, parse_output: bool = False):
+                  auto_raise: bool = True, parse_output: bool = False, no_namespace: bool = False):
         """Run an oc command."""
         cmd_args = cmd_args or []
         with ExitStack() as stack:
             self.prepare_context(stack)
-            result = oc.invoke(verb, cmd_args, auto_raise=auto_raise)
+            result = oc.invoke(verb, cmd_args, auto_raise=auto_raise, no_namespace=no_namespace)
             if parse_output:
                 return oc.APIObject(string_to_model=result.out())
             return result
@@ -224,6 +226,18 @@ class OpenShiftClient:
 
         return self.select_resource("pods", narrow_function=select_operator)
 
+    def get_apicast_operator(self):
+        """
+        Gets the selector for the apicast operator
+
+        :return: the operator pod
+        """
+        def select_operator(apiobject):
+            return apiobject.get_label("com.redhat.component-name") == "apicast-operator" \
+                or apiobject.get_label("rht.subcomp") == "apicast_operator"
+
+        return self.select_resource("pods", narrow_function=select_operator)
+
     @property
     def apicast_operator_subscription(self):
         """
@@ -330,3 +344,10 @@ class OpenShiftClient:
     def version(self):
         """Openshift Platform server version"""
         return oc.get_server_version()
+
+    @cached_property
+    def arch(self):
+        """Openshift architecture"""
+        lookup = self.do_action("cluster-info", ["dump", "-o", "yaml"], no_namespace=True)
+        cluster_info = list(yaml.safe_load_all(lookup.out()))
+        return cluster_info[0]["items"][0]["metadata"]["labels"]["kubernetes.io/arch"]

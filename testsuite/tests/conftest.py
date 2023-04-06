@@ -1,14 +1,14 @@
 "top-level conftest"
 
-from itertools import chain
 import inspect
 import logging
 import os
 import signal
 import warnings
+from itertools import chain
 
-import importlib_resources as resources
 import backoff
+import importlib_resources as resources
 import openshift as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
@@ -19,18 +19,16 @@ from weakget import weakget
 # pylint: disable=unused-import
 import testsuite.capabilities.providers
 import testsuite.tools
-
 from testsuite import TESTED_VERSION, rawobj, HTTP2, gateways, configuration, resilient
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
-from testsuite.openshift.client import OpenShiftClient
-
-from testsuite.prometheus import PrometheusClient
 from testsuite.httpx import HttpxHook
 from testsuite.mockserver import Mockserver
+from testsuite.openshift.client import OpenShiftClient
+from testsuite.prometheus import PrometheusClient
+from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, warn_and_skip
-from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 
 if weakget(settings)["reporting"]["print_app_logs"] % True:
     pytest_plugins = ("testsuite.gateway_logs",)
@@ -67,6 +65,8 @@ def pytest_addoption(parser):
     parser.addoption(
         "--drop-nopersistence", action="store_true", default=False, help="Skip tests incompatible with persistence "
                                                                          "plugin (default: False)")
+    parser.addoption(
+        "--images", action="store_true", default=False, help="Run also image check tests (default: False)")
 
 
 # there are many branches as there are many options to influence test selection
@@ -86,6 +86,8 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding performance tests")
     if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
         pytest.skip("Excluding UI tests")
+    if "/images/" in item.nodeid and not item.config.getoption("--images"):
+        pytest.skip("Excluding image check tests")
     if item.config.getoption("--drop-sandbag"):
         if "sandbag" in marks or "xfail" in marks:
             pytest.skip("Dropping sandbag")
@@ -934,3 +936,12 @@ def prometheus(testconfig, openshift):
             return prometheus_client
 
     warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")
+
+
+@pytest.fixture(scope="session")
+def images(testconfig):
+    """Load images file"""
+    images = testconfig.get("images")
+    if not images:
+        warn_and_skip("Images not provided.")
+    return images
