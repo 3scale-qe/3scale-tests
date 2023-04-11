@@ -61,13 +61,13 @@ def test_apicast_image(images, staging_gateway):
 @pytest.fixture(scope="module")
 def apicast_operator(staging_gateway):
     """return: Self-managed Apicast operator"""
-    return staging_gateway.openshift.get_apicast_operator().object()
+    return staging_gateway.openshift.apicast_operator
 
 
 @pytest.fixture(scope="module")
 def threescale_operator(openshift):
     """return: 3scale operator"""
-    return openshift().get_operator().object()
+    return openshift().threescale_operator
 
 
 @pytest.mark.parametrize("operator_type", ["threescale_operator", "apicast_operator"])

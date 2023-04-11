@@ -214,52 +214,54 @@ class OpenShiftClient:
         objects = self.do_action("process", [source, opt_args]).out()
         self.create(objects)
 
-    def get_operator(self):
+    @property
+    def threescale_operator(self):
         """
-        Gets the selector for the 3scale operator
+        Gets the 3scale operator
 
-        :return: the operator pod
+        :return: the operator pod APIObject
         """
         def select_operator(apiobject):
             return apiobject.get_label("com.redhat.component-name") == "3scale-operator" \
                 or apiobject.get_label("rht.subcomp") == "3scale_operator"
 
-        return self.select_resource("pods", narrow_function=select_operator)
+        return self.select_resource("pods", narrow_function=select_operator).object()
 
-    def get_apicast_operator(self):
+    @property
+    def apicast_operator(self):
         """
-        Gets the selector for the apicast operator
+        Gets the apicast operator
 
-        :return: the operator pod
+        :return: the operator pod APIObject
         """
         def select_operator(apiobject):
             return apiobject.get_label("com.redhat.component-name") == "apicast-operator" \
                 or apiobject.get_label("rht.subcomp") == "apicast_operator"
 
-        return self.select_resource("pods", narrow_function=select_operator)
+        return self.select_resource("pods", narrow_function=select_operator).object()
 
     @property
     def apicast_operator_subscription(self):
         """
-        Gets the selector for the apicast-operator subscription
+        Gets the apicast-operator subscription
 
-        :return: the subscription
+        :return: the subscription APIObject
         """
 
         def select_operator(subscription):
             return subscription.model.spec.name == "apicast-operator"
 
-        return self.select_resource("subscriptions", narrow_function=select_operator)
+        return self.select_resource("subscriptions", narrow_function=select_operator).object()
 
     @property
     def has_apicast_operator(self):
         """True if apicast operator is found in local namespace or in openshift-operators"""
         try:
-            return self.apicast_operator_subscription.object() is not None
+            return self.apicast_operator_subscription is not None
         except oc.OpenShiftPythonException:
             ocp = OpenShiftClient("openshift-operators", self.server_url, self.token)
             try:
-                return ocp.apicast_operator_subscription.object() is not None
+                return ocp.apicast_operator_subscription is not None
             except oc.OpenShiftPythonException:
                 return False
 

@@ -1,12 +1,13 @@
 """conftest for operator tests"""
 
 import pytest
+from openshift import OpenShiftPythonException
 
 
 @pytest.fixture(scope="session")
 def operator(openshift):
     """Return operator pod object."""
-    pod = openshift().get_operator()
-    if not pod.object_list:
-        pod = openshift(project='openshift-operators').get_operator()
-    return pod.object()
+    try:
+        return openshift().threescale_operator
+    except OpenShiftPythonException:
+        return openshift(project='openshift-operators').threescale_operator
