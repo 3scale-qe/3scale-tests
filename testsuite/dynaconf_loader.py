@@ -74,7 +74,7 @@ def _guess_version(ocp, namespace):
 def _guess_apicast_operator_version(ocp, settings):
     """Attempt to determine version of apicast operator from subscription"""
 
-    if not ocp.has_apicast_operator:
+    if ocp is None:
         return 0
     version = None
     try:
@@ -125,6 +125,24 @@ def _rhsso_password(server_url, token):
                 return None
 
 
+def _threescale_operator_ocp(ocp):
+    if ocp.threescale_operator is not None:
+        return ocp
+    operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
+    if operators.threescale_operator is not None:
+        return operators
+    return None
+
+
+def _apicast_operator_ocp(ocp):
+    if ocp.apicast_operator is not None:
+        return ocp
+    operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
+    if operators.apicast_operator is not None:
+        return operators
+    return None
+
+
 def _apicast_ocp(ocp, settings):
     """apicast operator can live in different namespace and even openshift"""
     settings = weakget(settings)["threescale"]["gateway"]["OperatorApicast"]["openshift"] % {}
@@ -138,8 +156,7 @@ def _apicast_ocp(ocp, settings):
             token=settings.get("token"))
         if maybe_ocp.project_exists:
             return maybe_ocp
-        if ocp.has_apicast_operator:
-            return OpenShiftClient(ocp.project_name, ocp.server_url, ocp.token)
+        return OpenShiftClient(ocp.project_name, ocp.server_url, ocp.token)
 
     return OpenShiftClient(
         project_name=settings.get("project_name"),
@@ -205,6 +222,9 @@ def load(obj, env=None, silent=None, key=None):
             token=ocp_setup.get("token"))
 
         apicast_ocp = _apicast_ocp(ocp, obj)
+        apicast_operator_ocp = _apicast_operator_ocp(apicast_ocp)
+        threescale_operator_ocp = _threescale_operator_ocp(ocp)
+
         routes = get_routes(ocp)
 
         system_seed = ocp.secrets["system-seed"]
@@ -287,6 +307,14 @@ def load(obj, env=None, silent=None, key=None):
                     "username": backend_internal_api["username"],
                     "password": backend_internal_api["password"]
                 }
+            },
+            "operators": {
+                "threescale": {
+                    "openshift": threescale_operator_ocp
+                },
+                "apicast": {
+                    "openshift": apicast_operator_ocp
+                },
             },
             "rhsso": {
                 "password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))

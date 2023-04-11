@@ -35,9 +35,9 @@ LABELS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 
 @pytest.mark.skipif("APICAST_OPERATOR_VERSION >  Version('0.6.0')")  # since threescale 2.12
 @pytest.mark.parametrize("label,expected_value", LABELS_PRE_2_12)
-def test_labels_operator_old(label, expected_value, operator):
+def test_labels_operator_old(label, expected_value, apicast_operator):
     """ Test labels of apicast operator pod. """
-    value = operator.get_label(label)
+    value = apicast_operator.get_label(label)
     assert value is not None
     if expected_value:
         assert value == expected_value
@@ -45,10 +45,10 @@ def test_labels_operator_old(label, expected_value, operator):
 
 @pytest.mark.skipif("APICAST_OPERATOR_VERSION <= Version('0.6.0')")
 @pytest.mark.parametrize("label,expected_value", LABELS_POST_2_12)
-def test_labels_operator_new(label, expected_value, operator, logger):
+def test_labels_operator_new(label, expected_value, apicast_operator, logger):
     """ Test labels of apicast operator pod. """
-    logger.info("%(name)s labels from %(namespace)s: %(labels)s", operator.as_dict()["metadata"])
-    value = operator.get_label(label)
+    logger.info("%(name)s labels from %(namespace)s: %(labels)s", apicast_operator.as_dict()["metadata"])
+    value = apicast_operator.get_label(label)
     assert value is not None
     if expected_value:
         assert value == expected_value
