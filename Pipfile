@@ -30,7 +30,7 @@ requests = "*"
 dynaconf = "*"
 # python_keycloak = "*"
 # Waiting for https://github.com/marcospereirampj/python-keycloak/pull/201 and https://github.com/marcospereirampj/python-keycloak/pull/200
-python-keycloak = "*"
+python-keycloak = ">=2.13"
 backoff = "*"
 websocket_client = "*"
 httpx = {version = "*", extras = ["http2"]}
