@@ -40,7 +40,7 @@ def schema():
 
 
 @pytest.fixture
-def custom_policies(threescale, schema, request, testconfig):
+def custom_policies(threescale, schema):
     """Create custom policies"""
     policies = []
 
@@ -51,12 +51,10 @@ def custom_policies(threescale, schema, request, testconfig):
     policy = threescale.policy_registry.create(params=params2)
     policies.append(policy)
 
-    if not testconfig["skip_cleanup"]:
-        def _cleanup():
-            for policy in policies:
-                threescale.policy_registry.delete(policy["id"])
+    yield
 
-        request.addfinalizer(_cleanup)
+    for policy in policies:
+        threescale.policy_registry.delete(policy["id"])
 
 
 @pytest.fixture(scope="module")

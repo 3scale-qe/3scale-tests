@@ -7,7 +7,6 @@ import string
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite.config import settings
 from testsuite.toolbox import toolbox
 import testsuite.utils
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
@@ -44,9 +43,8 @@ def my_backend_metrics(request, my_backend):
         metric = my_backend.metrics.create(params=params)
         metrics.append(metric)
     yield metrics
-    if not settings["skip_cleanup"]:
-        for met in metrics:
-            met.delete()
+    for met in metrics:
+        met.delete()
 
 
 @pytest.fixture(scope="module")
@@ -65,9 +63,8 @@ def my_backend_methods(request, my_backend):
         method = metr.methods.create(params=params)
         methods.append(method)
     yield methods
-    if not settings["skip_cleanup"]:
-        for met in methods:
-            met.delete()
+    for met in methods:
+        met.delete()
 
 
 @pytest.fixture(scope="module")
@@ -85,9 +82,8 @@ def my_backend_mappings(my_backend, my_backend_metrics):
             mapp = my_backend.mapping_rules.create(params=params)
             mapping_rules.append(mapp)
     yield mapping_rules
-    if not settings["skip_cleanup"]:
-        for mapp in mapping_rules:
-            mapp.delete()
+    for mapp in mapping_rules:
+        mapp.delete()
 
 
 # pylint: disable=too-many-arguments

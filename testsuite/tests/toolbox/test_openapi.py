@@ -90,9 +90,8 @@ def import_oas(threescale_dst1, dest_client, request, oas):
         r'^(Created|Updated) service id: (\d+), name: (.+)$', ret['stdout'], re.MULTILINE)[0]
     service = dest_client.services[int(service_id)]
     yield (ret, service_id, service_name, service)
-    if not settings["skip_cleanup"]:
-        service.delete()
-        toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
+    service.delete()
+    toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
 
 
 @pytest.fixture(scope="module")
@@ -114,11 +113,10 @@ def import_oas_backend(threescale_dst1, dest_client, oas, import_oas):
     backend = dest_client.backends[int(output['id'])]
 
     yield (ret, output, backend)
-    if not settings["skip_cleanup"]:
-        for bus in service.backend_usages.list():
-            bus.delete()
-        backend.delete()
-        toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
+    for bus in service.backend_usages.list():
+        bus.delete()
+    backend.delete()
+    toolbox.run_cmd(f"rm -f {oas['file_name']}", False)
 
 
 @pytest.fixture(scope="module")

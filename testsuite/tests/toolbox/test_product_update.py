@@ -37,18 +37,17 @@ def service_settings(request, product_service):
 
 
 @pytest.fixture(scope="module")
-def service(testconfig, custom_service, my_backends_mapping, service_settings, policy_configs):
+def service(custom_service, my_backends_mapping, service_settings, policy_configs):
     """Service fixture"""
     service = custom_service(service_settings, backends=my_backends_mapping)
     service.proxy.list().policies.append(*policy_configs)
     yield service
-    if not testconfig["skip_cleanup"]:
-        for back_usage in service.backend_usages.list():
-            back_usage.delete()
+    for back_usage in service.backend_usages.list():
+        back_usage.delete()
 
 
 @pytest.fixture(scope="module")
-def my_metrics(service, testconfig):
+def my_metrics(service):
     """Fixture creates metrics for service."""
     proxy = service.proxy.list()
 
@@ -69,9 +68,8 @@ def my_metrics(service, testconfig):
     proxy.deploy()
 
     yield metric1, metric2
-    if not testconfig["skip_cleanup"]:
-        metric1.delete()
-        metric2.delete()
+    metric1.delete()
+    metric2.delete()
 
 
 @pytest.fixture(scope="module")

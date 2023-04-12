@@ -106,10 +106,9 @@ def test_list4():
 def teardown_module(module):
     """Teardown for module - remove all remotes"""
     # pylint: disable=unused-argument
-    if not settings["skip_cleanup"]:
-        ret = toolbox.run_cmd(create_cmd('list'))
-        if ret['stdout'] != EMPTY_LIST:
-            line_reg = re.compile('^([^ ]*)')
-            for remote in ret['stdout'].splitlines():
-                remote_name = line_reg.match(remote).groups()[0]
-                toolbox.run_cmd(create_cmd(f"remove {remote_name}"))
+    ret = toolbox.run_cmd(create_cmd('list'))
+    if ret['stdout'] != EMPTY_LIST:
+        line_reg = re.compile('^([^ ]*)')
+        for remote in ret['stdout'].splitlines():
+            remote_name = line_reg.match(remote).groups()[0]
+            toolbox.run_cmd(create_cmd(f"remove {remote_name}"))

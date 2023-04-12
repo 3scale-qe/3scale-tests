@@ -22,13 +22,12 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
         sso_id = sso.create(sso_type, client, client_secret, realm)
         sso = threescale.admin_portal_auth_providers.read(sso_id)
 
-        if not testconfig["skip_cleanup"]:
-            def _delete():
-                custom_admin_login()
-                sso_edit = navigator.navigate(SSOIntegrationEditView, integration=sso)
-                sso_edit.delete()
+        def _delete():
+            custom_admin_login()
+            sso_edit = navigator.navigate(SSOIntegrationEditView, integration=sso)
+            sso_edit.delete()
 
-            request.addfinalizer(_delete)
+        request.addfinalizer(_delete)
         return sso
 
     return _sso_integration
@@ -56,10 +55,9 @@ def auth0_setup(ui_sso_integration, testconfig, navigator, set_callback_urls, au
 
     yield urls
 
-    if not testconfig["skip_cleanup"]:
-        name = auth0_user["email"].split("@")[0]
-        user = resilient.resource_read_by_name(threescale.provider_account_users, name)
-        user.delete()
+    name = auth0_user["email"].split("@")[0]
+    user = resilient.resource_read_by_name(threescale.provider_account_users, name)
+    user.delete()
 
 
 @pytest.fixture

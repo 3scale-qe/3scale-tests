@@ -12,7 +12,7 @@ pytestmark = pytest.mark.sandbag
 
 
 @pytest.fixture(scope="function")
-def ui_devel_account(request, testconfig, threescale):
+def ui_devel_account(request, threescale):
     """
     Creates a unique username and deletes account associated with it after the test finishes running
     """
@@ -20,9 +20,8 @@ def ui_devel_account(request, testconfig, threescale):
 
     yield user_name
 
-    if not testconfig["skip_cleanup"]:
-        usr = threescale.accounts.read_by_name(user_name)
-        request.addfinalizer(usr.delete)
+    usr = threescale.accounts.read_by_name(user_name)
+    request.addfinalizer(usr.delete)
 
 
 # pylint: disable=unused-argument

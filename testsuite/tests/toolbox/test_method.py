@@ -3,8 +3,6 @@
 import re
 import pytest
 
-from testsuite.config import settings
-
 import testsuite
 from testsuite import rawobj
 from testsuite.utils import blame
@@ -23,8 +21,7 @@ def hits(request, service):
         'unit': 'Hit'}
     method = hits.methods.create(params=params)
     yield hits
-    if not settings["skip_cleanup"]:
-        method.delete()
+    method.delete()
 
 
 @pytest.fixture(scope="module")

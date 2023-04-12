@@ -29,8 +29,7 @@ def import_policies(threescale_src1, policy_file, service):
     assert not ret['stderr']
 
     yield ret['stdout']
-    if not settings["skip_cleanup"]:
-        toolbox.run_cmd('rm -f ' + policy_file, False)
+    toolbox.run_cmd('rm -f ' + policy_file, False)
 
 
 @pytest.fixture(scope="module")

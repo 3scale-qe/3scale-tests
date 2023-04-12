@@ -8,7 +8,7 @@ from testsuite.ui.views.devel import BaseDevelView
 
 
 @pytest.fixture(scope="module")
-def rhsso_integration(request, threescale, testconfig, custom_admin_login, navigator):
+def rhsso_integration(threescale, custom_admin_login, navigator):
     """
     Due to the fact that once you create sso integration you can't delete it only edit it,
     this workaround is needed to simplify UI test
@@ -18,15 +18,11 @@ def rhsso_integration(request, threescale, testconfig, custom_admin_login, navig
         rhsso = [threescale.dev_portal_auth_providers.create(
             {"kind": "keycloak", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"})]
 
-    if not testconfig["skip_cleanup"]:
-        def _delete():
-            custom_admin_login()
-            sso_edit = navigator.navigate(RHSSOIntegrationDetailView, integration=rhsso[0])
-            sso_edit.publish_checkbox.check(False)
+    yield rhsso[0]
 
-        request.addfinalizer(_delete)
-
-    return rhsso[0]
+    custom_admin_login()
+    sso_edit = navigator.navigate(RHSSOIntegrationDetailView, integration=rhsso[0])
+    sso_edit.publish_checkbox.check(False)
 
 
 @pytest.fixture(scope="module", autouse=True)

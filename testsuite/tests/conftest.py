@@ -116,6 +116,33 @@ def pytest_runtest_setup(item):
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
 
 
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_teardown(item, nextitem):
+    """Implement cleanup skipping"""
+    if not settings["skip_cleanup"]:
+        return
+
+    needed = nextitem.listchain() if nextitem else []
+    # public api unknown
+    # pylint: disable=protected-access
+    stack = item.session._setupstate.stack
+
+    def fixtures(finalizers):
+        """Mine fixturedefs from stack of finalizers"""
+        for fin in finalizers:
+            if not fin.__closure__:
+                continue
+            for cell in fin.__closure__:
+                if hasattr(cell.cell_contents, "cached_result"):
+                    yield cell.cell_contents
+
+    for k in list(stack.keys()):
+        if k not in needed:
+            for i in fixtures(stack[k][0]):
+                i.cached_result = None
+            del stack[k]
+
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):  # pylint: disable=unused-argument
     """Add jira link to html report"""
@@ -407,7 +434,7 @@ def custom_account(threescale, request, testconfig):
     """
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = resilient.accounts_create(threescale_client, params=params)
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(acc.delete)
         return acc
 
@@ -440,10 +467,8 @@ def custom_user(request, testconfig):  # pylint: disable=unused-argument
 
     def _custom_user(cus_account, params, autoclean=True):
         usr = cus_account.users.create(params=params)
-        if autoclean and not testconfig["skip_cleanup"]:
-            def finalizer():
-                usr.delete()
-            request.addfinalizer(finalizer)
+        if autoclean:
+            request.addfinalizer(usr.delete)
         return usr
 
     return _custom_user
@@ -473,7 +498,7 @@ def custom_provider_account_user(request, threescale, testconfig):
     """
     def _custom_user(params, autoclean=True):
         user = threescale.provider_account_users.create(params=params)
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(user.delete)
         return user
 
@@ -484,8 +509,7 @@ def custom_provider_account_user(request, threescale, testconfig):
 def staging_gateway(request, testconfig):
     """Staging gateway"""
     gateway = gateways.gateway(staging=True)
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(gateway.destroy)
+    request.addfinalizer(gateway.destroy)
     gateway.create()
 
     return gateway
@@ -517,8 +541,7 @@ def rhsso_service_info(request, testconfig, tools):
                   password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)
 
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(realm.delete)
+    request.addfinalizer(realm.delete)
 
     client = realm.create_client(
         name=blame(request, "client"),
@@ -637,10 +660,10 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
             plans.append(plan)
         return plan
 
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(lambda: [item.delete() for item in plans])
+    yield _custom_app_plan
 
-    return _custom_app_plan
+    for i in plans:
+        i.delete()
 
 
 @pytest.fixture(scope="module")
@@ -673,10 +696,10 @@ def custom_active_doc(threescale, testconfig, request):
             ads.append(acd)
         return acd
 
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(lambda: [item.delete() for item in ads])
+    yield _custom_active_doc
 
-    return _custom_active_doc
+    for i in ads:
+        i.delete()
 
 
 def _select_hooks(hook, hooks):
@@ -711,7 +734,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
 
         app = account.applications.create(params=params)
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             def finalizer():
                 for hook in _select_hooks("on_application_delete", hooks):
                     try:
@@ -761,7 +784,7 @@ def custom_service(threescale, request, testconfig, logger):
 
         svc = threescale_client.services.create(params=params)
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             def finalizer():
                 for hook in _select_hooks("on_service_delete", hooks):
                     try:
@@ -845,7 +868,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
 
         backend = threescale_client.backends.create(params=params)
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             def finalizer():
                 for hook in _select_hooks("on_backend_delete", hooks):
                     try:
@@ -881,7 +904,7 @@ def custom_tenant(testconfig, master_threescale, request):
         tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
         tenant.wait_tenant_ready()
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(tenant.delete)
 
         master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()

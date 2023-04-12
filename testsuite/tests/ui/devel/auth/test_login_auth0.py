@@ -7,7 +7,7 @@ from testsuite.ui.views.devel import SignUpView, BaseDevelView
 
 
 @pytest.fixture(scope="module")
-def auth0_integration(request, threescale, testconfig, custom_admin_login, navigator):
+def auth0_integration(threescale, custom_admin_login, navigator):
     """
     Due to the fact that once you create sso integration you can't delete it only edit it,
     this workaround is needed to simplify UI test
@@ -17,15 +17,11 @@ def auth0_integration(request, threescale, testconfig, custom_admin_login, navig
         auth = [threescale.dev_portal_auth_providers.create(
             {"kind": "auth0", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"})]
 
-    if not testconfig["skip_cleanup"]:
-        def _delete():
-            custom_admin_login()
-            sso_edit = navigator.navigate(Auth0IntegrationDetailView, integration=auth[0])
-            sso_edit.publish_checkbox.check(False)
+    yield auth[0]
 
-        request.addfinalizer(_delete)
-
-    return auth[0]
+    custom_admin_login()
+    sso_edit = navigator.navigate(Auth0IntegrationDetailView, integration=auth[0])
+    sso_edit.publish_checkbox.check(False)
 
 
 @pytest.fixture(scope="module", autouse=True)

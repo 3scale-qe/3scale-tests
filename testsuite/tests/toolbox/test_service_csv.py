@@ -61,8 +61,7 @@ def import_csv(threescale_dst1, copy_string_to_remote):
     assert not ret['stderr']
 
     yield ret['stdout']
-    if not settings["skip_cleanup"]:
-        toolbox.run_cmd('rm -f ' + copy_string_to_remote, False)
+    toolbox.run_cmd('rm -f ' + copy_string_to_remote, False)
 
 
 @pytest.fixture(scope="module")
@@ -73,10 +72,9 @@ def services(import_csv, dest_client):
     for name in services_names:
         services[name] = dest_client.services.read_by(**{'name': name})
     yield services
-    if not settings["skip_cleanup"]:
-        for service in services.values():
-            if service:
-                service.delete()
+    for service in services.values():
+        if service:
+            service.delete()
 
 
 @pytest.fixture(scope="module")
@@ -91,10 +89,9 @@ def metrics(import_csv, services, import_data):
                 service = services[line['service_name']]
         metrics.append(service.metrics.read_by(**{'friendly_name': name}))
     yield metrics
-    if not settings["skip_cleanup"]:
-        for met in metrics:
-            if met:
-                met.delete()
+    for met in metrics:
+        if met:
+            met.delete()
 
 
 @pytest.fixture(scope="module")
@@ -110,10 +107,9 @@ def methods(import_csv, import_data, services):
         hits = service.metrics['hits']
         methods.append(hits.methods.read_by(**{'friendly_name': name}))
     yield methods
-    if not settings["skip_cleanup"]:
-        for meth in methods:
-            if meth:
-                meth.delete()
+    for meth in methods:
+        if meth:
+            meth.delete()
 
 
 @pytest.fixture(scope="module")
@@ -128,11 +124,10 @@ def mapping_rules(import_csv, services):
             maps.append(service.mapping_rules.read_by(**{'pattern': '/anything/' + name}))
         mappings.append(maps)
     yield mappings
-    if not settings["skip_cleanup"]:
-        for mapps in mappings:
-            for mapp in mapps:
-                if mapp:
-                    mapp.delete()
+    for mapps in mappings:
+        for mapp in mapps:
+            if mapp:
+                mapp.delete()
 
 
 def test_services(import_csv, services):

@@ -40,7 +40,7 @@ def account(custom_account, request, account_password):
 
 
 @pytest.fixture(scope="module")
-def custom_account(threescale, request, testconfig):
+def custom_account(threescale, request):
     """ Local module scoped custom_account to utilize custom tenant
 
     Args:
@@ -48,7 +48,7 @@ def custom_account(threescale, request, testconfig):
     """
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = resilient.accounts_create(threescale_client, params=params)
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(acc.delete)
         return acc
 

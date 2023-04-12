@@ -199,7 +199,7 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
         account = resilient.resource_read_by_name(master_threescale.accounts, organisation)
         tenant = master_threescale.tenants.read(account.entity_id)
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(tenant.delete)
 
         if wait:
@@ -230,7 +230,7 @@ def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, req
         backend = navigator.navigate(BackendNewView)
         backend.create(name, system_name, description, endpoint)
         backend = resilient.resource_read_by_name(threescale.backends, system_name)
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(backend.delete)
         return backend
 
@@ -254,7 +254,7 @@ def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, req
         product = navigator.navigate(ProductNewView)
         product.create(name, system_name, description)
         product = resilient.resource_read_by_name(threescale.services, system_name)
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(product.delete)
         return product
 
@@ -281,7 +281,7 @@ def custom_ui_account(custom_admin_login, navigator, threescale, request, testco
         account.create(name, email, password, org_name)
         account = resilient.resource_read_by_name(threescale.accounts, org_name)
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             request.addfinalizer(account.delete)
         return account
 
@@ -311,7 +311,7 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
 
         application.api_client_verify = testconfig["ssl_verify"]
 
-        if autoclean and not testconfig["skip_cleanup"]:
+        if autoclean:
             def delete():
                 application.delete()
 
@@ -503,7 +503,7 @@ def custom_auth0_login(browser, navigator, threescale, request, testconfig):
             user = resilient.resource_read_by_name(threescale.provider_account_users, name)
             user.delete()
 
-        if not testconfig["skip_cleanup"] and autoclean:
+        if autoclean:
             request.addfinalizer(_delete)
 
     return _login
@@ -533,7 +533,7 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhss
             user = resilient.resource_read_by_name(threescale.provider_account_users, rhsso_username)
             user.delete()
 
-        if not testconfig["skip_cleanup"] and rhsso_username:
+        if rhsso_username:
             request.addfinalizer(_delete)
 
     return _login
@@ -582,12 +582,9 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
     name = blame(request, "auth_user")
     user = auth0_client.users.create({"email": f"{name}@anything.invalid", "password": auth0_user_password,
                                       "connection": "Username-Password-Authentication", "email_verified": True})
-    if not testconfig["skip_cleanup"]:
-        def _delete():
-            auth0_client.users.delete(user["user_id"])
+    yield user
 
-        request.addfinalizer(_delete)
-    return user
+    auth0_client.users.delete(user["user_id"])
 
 
 @pytest.fixture(scope='session')

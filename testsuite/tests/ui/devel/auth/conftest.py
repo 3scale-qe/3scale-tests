@@ -9,7 +9,7 @@ from testsuite.ui.views.devel.login import LoginView
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def custom_devel_auth0_login(browser, navigator, provider_account, threescale, testconfig):
+def custom_devel_auth0_login(browser, navigator, provider_account, threescale):
     """
     Login to Developer portal with specific account or credentials
     :param browser: Browser instance
@@ -32,16 +32,15 @@ def custom_devel_auth0_login(browser, navigator, provider_account, threescale, t
 
     yield _login
 
-    if not testconfig["skip_cleanup"]:
-        for email in cleanup:
-            name = email.split("@")[0]
-            account = [x for x in threescale.accounts.list() if x.users.list()[0]['username'] == name][0]
-            account.delete()
+    for email in cleanup:
+        name = email.split("@")[0]
+        account = [x for x in threescale.accounts.list() if x.users.list()[0]['username'] == name][0]
+        account.delete()
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def custom_devel_rhsso_login(browser, navigator, provider_account, threescale, testconfig):
+def custom_devel_rhsso_login(browser, navigator, provider_account, threescale):
     """
     Login to Developer portal with specific account or credentials
     :param browser: Browser instance
@@ -65,7 +64,6 @@ def custom_devel_rhsso_login(browser, navigator, provider_account, threescale, t
 
     yield _login
 
-    if not testconfig["skip_cleanup"]:
-        for username in cleanup:
-            account = [x for x in threescale.accounts.list() if x.users.list()[0]['username'] == username][0]
-            account.delete()
+    for username in cleanup:
+        account = [x for x in threescale.accounts.list() if x.users.list()[0]['username'] == username][0]
+        account.delete()

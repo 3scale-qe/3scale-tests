@@ -3,8 +3,6 @@
 import re
 import pytest
 
-from testsuite.config import settings
-
 import testsuite
 from testsuite import rawobj
 from testsuite.utils import blame
@@ -24,8 +22,7 @@ def metric_obj(request, service):
         'unit': 'Hit'}
     metric = service.metrics.create(params=params)
     yield service
-    if not settings["skip_cleanup"]:
-        metric.delete()
+    metric.delete()
 
 
 @pytest.fixture(scope="module")

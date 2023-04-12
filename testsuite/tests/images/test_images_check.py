@@ -35,11 +35,10 @@ def test_deployment_image(images, openshift, image, image_stream, deployment_con
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request, testconfig):
+def staging_gateway(request):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=OperatorApicast, staging=True, name=blame(request, "gw"))
-    if not testconfig["skip_cleanup"]:
-        request.addfinalizer(gw.destroy)
+    request.addfinalizer(gw.destroy)
     gw.create()
     return gw
 
