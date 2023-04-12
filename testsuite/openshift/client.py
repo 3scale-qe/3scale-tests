@@ -13,8 +13,6 @@ import yaml
 from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
-# There is indeed cyclic import but it should be negated by TYPE_CHECKING check
-# pylint: disable=cyclic-import
 from testsuite.openshift.scaler import Scaler
 
 
@@ -45,7 +43,7 @@ class OpenShiftClient:
             stack.enter_context(oc.token(self.token))
         stack.enter_context(oc.project(self.project_name))
 
-    @property
+    @cached_property
     def api_url(self):
         """Returns real API url"""
         with ExitStack() as stack:
@@ -64,7 +62,7 @@ class OpenShiftClient:
                 return oc.APIObject(string_to_model=result.out())
             return result
 
-    @property
+    @cached_property
     def project_exists(self):
         """Returns True if the project exists"""
         try:
@@ -73,7 +71,7 @@ class OpenShiftClient:
         except oc.OpenShiftPythonException:
             return False
 
-    @property
+    @cached_property
     def is_operator_deployment(self):
         """
         True, if the said namespace contains at least one APIManager resource
@@ -94,25 +92,25 @@ class OpenShiftClient:
             self.prepare_context(stack)
             return oc.selector("apimanager").objects(cls=APIManager)[0]
 
-    @property
+    @cached_property
     def secrets(self):
         """Dict-like access to secrets"""
 
         return Secrets(self)
 
-    @property
+    @cached_property
     def routes(self):
         """Interface to access OpenShift routes"""
 
         return Routes(self)
 
-    @property
+    @cached_property
     def config_maps(self):
         """Dict-like access to config maps"""
 
         return ConfigMaps(self)
 
-    @property
+    @cached_property
     def scaler(self):
         """Scaling interface for both template and operator deployments"""
 
@@ -251,7 +249,7 @@ class OpenShiftClient:
 
         return self.select_resource("subscriptions", narrow_function=select_operator)
 
-    @property
+    @cached_property
     def has_apicast_operator(self):
         """True if apicast operator is found in local namespace or in openshift-operators"""
         try:
