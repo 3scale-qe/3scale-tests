@@ -8,6 +8,14 @@ import pytest
 from websocket import WebSocketBadStatusException, create_connection
 
 from testsuite import rawobj
+from testsuite.utils import warn_and_skip
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_rhoam(testconfig):
+    """Websockets do not work on RHOAM because HTTP2 is used internally on OSD"""
+    if testconfig["threecale"]["deployment_type="] == "rhoam":
+        warn_and_skip("Websockets do not work on RHOAM because HTTP2 is used internally on OSD")
 
 
 @pytest.fixture(scope="module")
