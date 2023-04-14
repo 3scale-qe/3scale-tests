@@ -3,6 +3,7 @@ import pytest
 
 # pylint: disable=unused-argument
 from testsuite import TESTED_VERSION
+from testsuite.config import settings
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.audience.billing import BillingView
@@ -62,4 +63,8 @@ def test_3scale_version_in_ui(login, navigator):
     """
     dashboard = navigator.open(DashboardView)
     assert dashboard.threescale_version.is_displayed
-    assert dashboard.threescale_version.text == f'Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -'
+    if settings["threescale"]["deployment_type"] == 'rhoam':
+        assert dashboard.threescale_version.text == 'Version RHOAM -'
+    else:
+        assert dashboard.threescale_version.text \
+               == f'Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -'

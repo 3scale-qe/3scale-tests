@@ -22,6 +22,7 @@ import logging
 import os
 import os.path
 import re
+import enum
 
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
@@ -31,6 +32,13 @@ from testsuite.openshift.client import OpenShiftClient
 
 identifier = "threescale"  # pylint: disable=invalid-name
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+class Deployments(enum.Enum):
+    """Types of deployments"""
+    ON_PREM = 'on_prem'
+    SAAS = 'saas'
+    RHOAM = 'rhoam'
 
 
 def _route2url(route):
@@ -158,6 +166,22 @@ def get_routes(ocp):
     return mapping
 
 
+def _is_rhoam(client):
+    """Returns True, if the current instance is RHOAM. Detects RHOAM by annotations on APIManager object"""
+    if client.is_operator_deployment:
+        manager = client.api_manager
+        if manager.get_annotation("integreatly-name") or manager.get_annotation("integreatly-namespace"):
+            return True
+    return False
+
+
+def _deployment_type(client) -> Deployments:
+    """Returns type of 3scale deployment"""
+    if _is_rhoam(client):
+        return Deployments.RHOAM
+    return Deployments.ON_PREM
+
+
 # pylint: disable=unused-argument,too-many-locals
 def load(obj, env=None, silent=None, key=None):
     """Reads and loads in to "settings" a single key or all keys from vault
@@ -241,6 +265,7 @@ def load(obj, env=None, silent=None, key=None):
                     "token": master_token},
                 "devel": {
                     "url": devel_url},
+                "deployment_type": _deployment_type(ocp),
                 "gateway": {
                     "default": {
                         "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
