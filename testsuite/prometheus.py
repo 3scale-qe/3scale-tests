@@ -153,9 +153,9 @@ class PrometheusClient:
         if last_scrape:
             if after < last_scrape:
                 return
-            num = ceil((after - last_scrape).total_seconds() / PROMETHEUS_REFRESH)
+            num = ceil((after - last_scrape).total_seconds() / scrape_interval)
 
-            till = last_scrape + timedelta(seconds=PROMETHEUS_REFRESH * num + 2)
+            till = last_scrape + timedelta(seconds=scrape_interval * num + 2)
 
         wait_time = (till - datetime.utcnow()).seconds
         log.info("Waiting %ss for prometheus scrape", wait_time)
