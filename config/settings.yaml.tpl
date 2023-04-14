@@ -68,12 +68,22 @@ default:
         webdriver: "" #chrome , firefox or edge(edge with remote drivers)
         remote_url: "" #URL and port to remote selenium instance e.g. http://127.0.0.1:4444
     tools:
-      # tools is a fixture to provide testenv services like echo_api, jaeger and services that are needed for testing
-      # each service is identified by a key, for compatibility reasons some keys are predefined as they have been
-      # user in threescale:services:backends of this config. OpenshiftProject implementation inroduced route based
-      # keys and some special key to add extra information. so 'httpbin+https' returns https:// url based on route
-      # to httpbin. There is also logic to define openshift service url e.g. 'httpbin+svc:8888'
-      # returns 'httpbin.{tools-namespace}.svc:8888
+      # tools is a fixture to provide testenv services like echo_api, jaeger
+      # and services that are needed for testing each service is identified by
+      # a key, for compatibility reasons some keys are predefined as they have
+      # been user in threescale:services:backends of this config, furthermore
+      # the tools read from config are searched there as well. OpenshiftProject
+      # implementation inroduced route based keys and some special key to add
+      # extra information. so 'httpbin+https' returns https:// url based on
+      # route to httpbin. There is also logic to define openshift service url
+      # e.g. 'httpbin+svc:8888' returns 'httpbin.{tools-namespace}.svc:8888
+      # This logic makes the computation on its own and such option does not
+      # have to be defined in the config. However can be in this config as
+      # well. In that case, obviously the value has to be defined explicitly.
+      # Such key with '+' and ':' can not be defined as env variable therefore
+      # if `httpbin+svc:8888` is not found also `httpbin_plus_svc_port_8888` is
+      # searched, this latter key can be used also in the config, however it
+      # should not be, this is just for env.
       sources: [ Rhoam, OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
       namespace: tools # openshift namespace/project where the testenv tools are deployed
     private_base_url:

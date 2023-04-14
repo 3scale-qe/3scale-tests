@@ -85,7 +85,18 @@ class Settings:
     def __getitem__(self, name):
         if name == "no-ssl-sso":
             return settings["rhsso"]["url"]
-        return settings["threescale"]["service"]["backends"][name]
+        try:
+            return settings["threescale"]["service"]["backends"][name]
+        except KeyError as err:
+            if "+" in name or ":" in name:
+                # env variable name can't contain '+' or ':', though keep the option
+                # to pass the value via env
+                name = name.replace("+", "_plus_").replace(":", "_port_")
+                try:
+                    return settings["threescale"]["service"]["backends"][name]
+                except KeyError:  # pylint: disable=raise-missing-from
+                    raise err
+            raise err
 
 
 class Rhoam(OpenshiftProject):
