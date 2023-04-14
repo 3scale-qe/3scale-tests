@@ -132,12 +132,28 @@ def wait_interval_hour(max_min, min_min=0):
         time.sleep(sleep_time)
 
 
-def warn_and_skip(message):
+def _warn_and_skip(message, action):
+    """switch/case for warn_and_skip"""
+    if action != "quiet":
+        warnings.warn(message)
+    if action in ("skip", "quiet"):
+        pytest.skip(message)
+    else:
+        pytest.fail(message)
+
+
+def warn_and_skip(message, action="warn"):
     """
     Prints warning and skips the test
     """
-    warnings.warn(message)
-    pytest.skip(message)
+    rules = settings.get("warn_and_skip", {})
+    current = os.environ["PYTEST_CURRENT_TEST"]
+
+    for key in sorted(rules.keys(), key=len, reverse=True):
+        if current.startswith(key):
+            _warn_and_skip(message, rules[key])
+            return
+    _warn_and_skip(message, action)
 
 
 def custom_policy() -> dict:
