@@ -144,17 +144,6 @@ def data():
              ("GET", "/services/INVALID_ID", "404"),
              ("POST", "/services/", "4xx"),
              ],
-            }
-
-
-@pytest.fixture(scope="module")
-def data_xfail():
-    """
-    https://issues.redhat.com/browse/THREESCALE-6453
-    Metrics and endpoints that are currently not propagated to prometheus
-    Can be included in data after the issue is solved
-    """
-    return {
         "stats":
             [("GET", "/services/{SERVICE_ID}/stats/", "404")],
         # no mapping in source to 2xx endpoint
