@@ -181,6 +181,29 @@ and extra care is required when combining marks on one test. For example
 selections based on the arguments, e.g. `pytest.mark.flaky` is safe to combine
 with anything, it just doesn't have to be reasonable for every case.
 
+### Behavior of warn_and_skip
+
+Some tests and/or fixture use `warn_and_skip` function to skip the test in case
+of missing preconditions. There is a mechanism to control behavior of
+`warn_and_skip`. By default `warn_and_skip` prints warning with given message
+and also skips the test(s) with same message. If `warn_and_skip:` section is
+defined in settings, this is used to modify default behavior. Possible options
+are 'quiet', 'warn', 'fail'. The option 'warn' is identical to default, the
+option 'quiet' skips the test(s) but doesn't print warning and the option
+'fail' makes the test(s) fail entirely. This is helpful if some tests shouldn't
+be overlooked. The settings could look like this:
+
+```
+  warn_and_skip:
+    testsuite/tests/prometheus: quiet
+    testsuite/tests/apicast/parameters: fail
+```
+
+This does not provide adjustement on level of particular tests. In theory it
+does, however if `warn_and_skip` is used in fixture, then all the tests within
+the scope of the fixture behave like first test. E.g. `prometheus` fixture is
+session scoped, therefore all prometheus test will share same setting.
+
 ### pytest Arguments
 
 The arguments to pytest can be passed as `flags=` variable:

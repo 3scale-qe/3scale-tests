@@ -78,6 +78,16 @@ default:
       namespace: tools # openshift namespace/project where the testenv tools are deployed
     private_base_url:
       default: echo_api # tool name to be used by default for backend
+  warn_and_skip:
+    # section to control how warn_and_skip should behave for particular tests
+    # works just for tests and fixture that use warn_and_skip
+    # doesn't provide granularity on test level, if used in fixtures, affects
+    # all the tests from same scope of the fixture.
+    # Best match is chosen
+    # possible values: quiet, warn, fail; default: warn
+    testsuite: warn
+    testsuite/tests/prometheus: quiet
+    testsuite/tests/apicast/parameters: fail
 
 
 # dynaconf uses development environment by default
