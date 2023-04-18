@@ -86,7 +86,7 @@ def _guess_apicast_operator_version(ocp, settings):
         return 0
     version = None
     try:
-        version = ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
+        version = ocp.apicast_operator_subscription.model.status.installedCSV.split(".v")[1]
         version = version.split("-")[0]
         Version(version)
     except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
@@ -94,7 +94,7 @@ def _guess_apicast_operator_version(ocp, settings):
         try:
             _ocp = _apicast_ocp(ocp, settings)
             _ocp.project_name = "openshift-operators"
-            version = _ocp.apicast_operator_subscription.object().model.status.installedCSV.split(".v")[1]
+            version = _ocp.apicast_operator_subscription.model.status.installedCSV.split(".v")[1]
             version = version.split("-")[0]
             Version(version)
         except (ValueError, IndexError, OpenShiftPythonException, InvalidVersion):
