@@ -162,7 +162,7 @@ def get_routes(ocp):
         mapping.setdefault(route["spec"]["to"]["name"], []).append(route)
 
     for values in mapping.values():
-        values.sort(key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", -1)))
+        values.sort(key=lambda x: float(x["metadata"].get("labels", {}).get("3scale.net/tenant_id", -1)))
     return mapping
 
 
