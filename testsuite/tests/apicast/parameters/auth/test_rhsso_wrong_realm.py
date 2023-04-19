@@ -1,6 +1,7 @@
 """Tests that accessing APIcast with token from a different RHSSO realm does not work"""
 import pytest
 
+from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.rhsso import Token, OIDCClientAuthHook
@@ -14,7 +15,10 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
-@pytest.fixture(scope="module", params=[SystemApicast, SelfManagedApicast])
+@pytest.fixture(scope="module", params=[
+    SystemApicast,
+    pytest.param(SelfManagedApicast, marks=pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT))
+])
 def gateway_kind(request):
     """Gateway class to use for tests"""
     return request.param
