@@ -22,7 +22,6 @@ import logging
 import os
 import os.path
 import re
-import enum
 
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
@@ -32,13 +31,6 @@ from testsuite.openshift.client import OpenShiftClient
 
 identifier = "threescale"  # pylint: disable=invalid-name
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-
-class Deployments(enum.Enum):
-    """Types of deployments"""
-    ON_PREM = 'on_prem'
-    SAAS = 'saas'
-    RHOAM = 'rhoam'
 
 
 def _route2url(route):
@@ -175,11 +167,17 @@ def _is_rhoam(client):
     return False
 
 
-def _deployment_type(client) -> Deployments:
-    """Returns type of 3scale deployment"""
+def _deployment_type(client) -> str:
+    """Returns type of 3scale deployment
+
+    These are possible (self-explanatory) values:
+     - on_prem
+     - rhoam
+     - saas
+    """
     if _is_rhoam(client):
-        return Deployments.RHOAM
-    return Deployments.ON_PREM
+        return "rhoam"
+    return "on_prem"
 
 
 # pylint: disable=unused-argument,too-many-locals
