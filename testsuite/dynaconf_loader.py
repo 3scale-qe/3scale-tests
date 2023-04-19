@@ -220,7 +220,7 @@ def load(obj, env=None, silent=None, key=None):
         superdomain = ocp.config_maps["system-environment"]["THREESCALE_SUPERDOMAIN"]
         try:
             backend_route = routes["backend-listener"][0]
-        except IndexError:
+        except (IndexError, KeyError):
             # RHOAM changed service name owning the route
             backend_route = routes["backend-listener-proxy"][0]
         catalogsource = "UNKNOWN"
