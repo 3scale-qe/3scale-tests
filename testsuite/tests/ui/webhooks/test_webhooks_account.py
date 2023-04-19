@@ -11,8 +11,9 @@ from testsuite.ui.views.admin.audience.account_plan import NewAccountPlanView, A
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=unused-argument
+
 @pytest.fixture(scope="module", autouse=True)
 def setup(navigator, custom_admin_login, requestbin, request, threescale):
     """
@@ -24,7 +25,6 @@ def setup(navigator, custom_admin_login, requestbin, request, threescale):
     request.addfinalizer(threescale.webhooks.clear)
 
 
-# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
 def account_plans(navigator, custom_admin_login):
     """
@@ -35,8 +35,7 @@ def account_plans(navigator, custom_admin_login):
     usage.account_plans()
 
 
-# pylint: disable=unused-argument
-def test_account_created(requestbin, login, ui_account):
+def test_account_created(requestbin, ui_account):
     """
     Test:
         - Create account
@@ -52,8 +51,7 @@ def test_account_created(requestbin, login, ui_account):
     assert name == ui_account.entity_name
 
 
-# pylint: disable=too-many-arguments, unused-argument
-def test_account_updated(ui_account, login, navigator, request, requestbin, threescale):
+def test_account_updated(ui_account, navigator, request, requestbin, threescale):
     """
     Test:
         - Update account
@@ -73,10 +71,11 @@ def test_account_updated(ui_account, login, navigator, request, requestbin, thre
     assert name == ui_account.entity_name
 
 
-# pylint: disable=too-many-arguments, too-many-locals, unused-argument
+# pylint: disable=too-many-locals
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9214")
-def test_account_plan_changed(account, threescale, login, navigator, requestbin, request, account_plans):
+@pytest.mark.usefixtures("account_plans")
+def test_account_plan_changed(account, navigator, requestbin, request, threescale):
     """
     Test:
         - Allow account plans
@@ -102,8 +101,7 @@ def test_account_plan_changed(account, threescale, login, navigator, requestbin,
     assert name == account.entity_name
 
 
-# pylint: disable=unused-argument
-def test_account_deleted(custom_account, requestbin, login, navigator, request):
+def test_account_deleted(custom_account, requestbin, navigator, request):
     """
     Test:
         - Delete account

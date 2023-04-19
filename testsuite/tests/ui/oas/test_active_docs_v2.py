@@ -17,8 +17,8 @@ def application(service, custom_application, custom_app_plan, lifecycle_hooks, r
     return app
 
 
-# pylint: disable=unused-argument
-def test_active_docs_v2_generate_endpoints(login, navigator, service, request):
+@pytest.mark.usefixtures("login")
+def test_active_docs_v2_generate_endpoints(navigator, service, request):
     """
     Test:
         - Create service via API

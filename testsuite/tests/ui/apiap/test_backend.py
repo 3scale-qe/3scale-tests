@@ -2,8 +2,10 @@
 import pytest
 
 from testsuite import resilient
-from testsuite.utils import blame
 from testsuite.ui.views.admin.backend.backend import BackendEditView
+from testsuite.utils import blame
+
+pytestmark = pytest.mark.usefixtures("login")
 
 
 def test_create_backend(custom_ui_backend, request):
@@ -24,8 +26,7 @@ def test_create_backend(custom_ui_backend, request):
     assert backend["private_endpoint"] == "https://anything.invalid:443"
 
 
-# pylint: disable=unused-argument
-def test_edit_backend(login, navigator, custom_backend, threescale):
+def test_edit_backend(navigator, custom_backend, threescale):
     """
     Test:
         - Create backend via API
@@ -45,8 +46,7 @@ def test_edit_backend(login, navigator, custom_backend, threescale):
     assert backend["private_endpoint"] == "https://updated_endpoint:443"
 
 
-# pylint: disable=unused-argument
-def test_delete_backend(login, navigator, threescale, custom_backend):
+def test_delete_backend(navigator, threescale, custom_backend):
     """
     Test:
         - Create backend via API without autoclean
@@ -62,7 +62,7 @@ def test_delete_backend(login, navigator, threescale, custom_backend):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3571")
-def test_delete_used_backend(service, login, navigator, threescale):
+def test_delete_used_backend(service, navigator, threescale):
     """
     Test:
         - Create service with backend via API

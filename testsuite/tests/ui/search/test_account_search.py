@@ -7,7 +7,8 @@ from testsuite import rawobj
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.utils import blame
 
-pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5486")
+pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5486"),
+              pytest.mark.usefixtures("login")]
 
 
 @pytest.fixture(scope="module")
@@ -22,9 +23,8 @@ def ui_application(service, custom_app_plan, custom_ui_application, request):
     return _ui_application
 
 
-# pylint: disable=unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6205")
-def test_search_account(login, navigator, custom_ui_account, ui_application, request):
+def test_search_account(navigator, custom_ui_account, ui_application, request):
     """
     Preparation:
         - Create custom account
@@ -54,6 +54,7 @@ def custom_account(custom_account, request):
     """
     Parametrized custom Account
     """
+
     def _custom(name):
         custom_account({
             "org_name": name,
@@ -65,8 +66,7 @@ def custom_account(custom_account, request):
     return _custom
 
 
-# pylint: disable=unused-argument
-def test_search_multiple_accounts(login, navigator, custom_account, request):
+def test_search_multiple_accounts(navigator, custom_account, request):
     """
     Preparation:
         - Create 4 custom account
@@ -93,7 +93,7 @@ def test_search_multiple_accounts(login, navigator, custom_account, request):
     assert accounts.table.row().state.text == "Approved"
 
 
-def test_search_non_existing_value(request, login, navigator, custom_account):
+def test_search_non_existing_value(request, navigator, custom_account):
     """
     Preparation:
         - Create custom account
@@ -115,10 +115,9 @@ def test_search_non_existing_value(request, login, navigator, custom_account):
     assert next(accounts.table.rows())[0].text == "No results."
 
 
-# pylint: disable=unused-argument
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8468")
-def test_search_short_keyword(login, navigator, custom_account, request):
+def test_search_short_keyword(navigator, custom_account, request):
     """
     Preparation:
         - Create custom account with short keyword (less than 3 characters)

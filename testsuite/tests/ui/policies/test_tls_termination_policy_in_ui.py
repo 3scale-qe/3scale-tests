@@ -4,11 +4,9 @@
 
 import pytest
 import requests
-
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
@@ -23,7 +21,9 @@ from testsuite.tests.apicast.policy.tls.conftest import require_openshift, stagi
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
+    pytest.mark.usefixtures("login"),
+    pytest.mark.usefixtures("policy_application")]
 
 
 @pytest.fixture(scope="function")
@@ -73,13 +73,12 @@ def embedded_certs(certificate):
     return _setup
 
 
-# pylint: disable=too-many-arguments, disable=unused-argument
+# pylint: disable=too-many-arguments
 @pytest.mark.parametrize("cert_type_setup", [
     pytest.param("local_certs", id="Local certificates", marks=pytest.mark.required_capabilities(Capability.OCP3)),
     pytest.param("embedded_certs", id="Embedded certificates"),
 ])
-def test_tls_terminology_policy_via_ui(request, policy_service, policy_application, browser, login, navigator,
-                                       cert_type_setup, client, valid_authority):
+def test_tls_terminology_policy_via_ui(request, policy_service, navigator, cert_type_setup, client, valid_authority):
     """
     Test:
         - Create service via API
@@ -107,8 +106,7 @@ def test_tls_terminology_policy_via_ui(request, policy_service, policy_applicati
         client.get("/get")
 
 
-# pylint: disable=too-many-arguments, disable=unused-argument
-def test_tls_terminology_policy_content(browser, login, navigator, policy_service, api_client, policy_application):
+def test_tls_terminology_policy_content(navigator, policy_service):
     """
     Test:
         - Create service via API

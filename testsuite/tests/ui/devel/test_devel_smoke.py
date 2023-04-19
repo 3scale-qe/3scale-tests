@@ -15,9 +15,9 @@ def provider_account(provider_account):
     provider_account.update({"site_access_code": access_code})
 
 
-# pylint: disable=unused-argument
 @pytest.mark.smoke
-def test_devel_from_admin(login, navigator, browser):
+@pytest.mark.usefixtures("login")
+def test_devel_from_admin(navigator, browser):
     """Tests if developer portal is accessible via navigation menu (Developer portal > Visit Portal)"""
     audience = navigator.navigate(BaseAudienceView)
     with browser.new_tab(audience.visit_portal):
@@ -27,9 +27,9 @@ def test_devel_from_admin(login, navigator, browser):
         assert view.is_displayed
 
 
-# pylint: disable=unused-argument
 @pytest.mark.smoke
-def test_devel_login(devel_login, browser):
+@pytest.mark.usefixtures("devel_login")
+def test_devel_login(browser):
     """Tests simple developer portal login"""
     assert BaseDevelView(browser).is_displayed
 

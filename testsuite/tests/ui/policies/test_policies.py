@@ -1,10 +1,13 @@
 """Rewrite of spec/ui_specs/policies_spec.rb"""
-from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, Policies
+import pytest
+
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
+from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, Policies
+
+pytestmark = pytest.mark.usefixtures("login")
 
 
-# pylint: disable=unused-argument
-def test_add_policy(login, navigator, policy_service, api_client):
+def test_add_policy(navigator, policy_service):
     """
     Test:
         - Create service via API
@@ -24,8 +27,7 @@ def test_add_policy(login, navigator, policy_service, api_client):
     assert not configuration_page.configuration.staging_promote_btn.is_enabled
 
 
-# pylint: disable=unused-argument
-def test_remove_policy(login, navigator, policy_service, api_client):
+def test_remove_policy(navigator, policy_service):
     """
     Test:
         - Create service via API
@@ -44,8 +46,7 @@ def test_remove_policy(login, navigator, policy_service, api_client):
     assert not policies_page.policy_section.has_item(Policies.ECHO.value)
 
 
-# pylint: disable=unused-argument, disable=too-many-arguments
-def test_apply_and_remove_policy(login, navigator, policy_service, api_client, policy_application):
+def test_apply_and_remove_policy(navigator, policy_service, api_client, policy_application):
     """
         Test:
             - Create service via API
@@ -81,8 +82,7 @@ def test_apply_and_remove_policy(login, navigator, policy_service, api_client, p
     assert response.status_code == 200
 
 
-# pylint: disable=too-many-arguments, disable=unused-argument
-def test_move_policy(login, navigator, policy_service, api_client, policy_application):
+def test_move_policy(navigator, policy_service, api_client, policy_application):
     """
     Test:
         - Create service via API
@@ -120,8 +120,7 @@ def test_move_policy(login, navigator, policy_service, api_client, policy_applic
     assert response.status_code == 333
 
 
-# pylint: disable=unused-argument
-def test_edit_policy_widgets(login, navigator, policy_service, api_client, policy_application):
+def test_edit_policy_widgets(navigator, policy_service, api_client, policy_application):
     """
     Test:
         - Create service via API

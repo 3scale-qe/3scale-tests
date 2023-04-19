@@ -6,11 +6,12 @@ import pytest
 from testsuite.ui.views.admin.product import ProductsView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=unused-argument
+
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8562")
-def test_search_product(login, navigator, request, custom_ui_product):
+def test_search_product(navigator, request, custom_ui_product):
     """
     Preparation:
         - Create custom product
@@ -29,8 +30,7 @@ def test_search_product(login, navigator, request, custom_ui_product):
         assert products.table.row()[1].text == sys_name
 
 
-# pylint: disable=unused-argument
-def test_search_multiple_products(login, navigator, custom_service, request):
+def test_search_multiple_products(navigator, custom_service, request):
     """
     Preparation:
         - Create 4 custom products
@@ -52,7 +52,7 @@ def test_search_multiple_products(login, navigator, custom_service, request):
     assert products.table.row()[0].text == f"{name}_name2"
 
 
-def test_search_non_existing_value(request, login, navigator, custom_service):
+def test_search_non_existing_value(request, navigator, custom_service):
     """
     Preparation:
         - Create custom product

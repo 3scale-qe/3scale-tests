@@ -1,5 +1,4 @@
 """Test for field definitions issue"""
-# pylint: disable=unused-argument
 import pytest
 from widgetastic.widget import TextInput
 
@@ -7,8 +6,8 @@ from testsuite.ui.views.admin.audience.account_user import AccountUserEditView, 
 from testsuite.ui.views.admin.audience.fields_definitions import FieldsDefinitionsCreateView
 
 
-@pytest.fixture
-def fields_definitions(login, navigator, threescale):
+@pytest.fixture(autouse=True)
+def fields_definitions(navigator, threescale):
     """Create custom field definition"""
     page = navigator.navigate(FieldsDefinitionsCreateView)
     page.create_definition("custom_field", "Contact Name")
@@ -18,8 +17,9 @@ def fields_definitions(login, navigator, threescale):
 
 
 @pytest.mark.xfail
+@pytest.mark.usefixtures("login")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7955")
-def test_field_definitions(fields_definitions, account, navigator, browser):
+def test_field_definitions(account, navigator, browser):
     """
     Preparation:
         - Create custom field definition

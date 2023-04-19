@@ -8,9 +8,9 @@ from testsuite.ui.views.admin.product.integration.configuration import ProductCo
 from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
 
 
-# pylint: disable=unused-argument
+@pytest.mark.usefixtures("login")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6468")
-def test_config_version(login, service, navigator, threescale,  browser, ):
+def test_config_version(service, navigator):
     """
     Test:
         - Navigates to Product Settings view

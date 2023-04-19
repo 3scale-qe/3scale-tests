@@ -8,7 +8,11 @@ from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, Successfu
 from testsuite.utils import blame
 
 # requires special setup, internet access
-pytestmark = pytest.mark.sandbag
+pytestmark = [
+    pytest.mark.sandbag,
+    pytest.mark.usefixtures("login"),
+    pytest.mark.usefixtures("spam_protection_setup")
+]
 
 
 @pytest.fixture(scope="function")
@@ -25,9 +29,8 @@ def ui_devel_account(request, testconfig, threescale):
         request.addfinalizer(usr.delete)
 
 
-# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def spam_protection_setup(login, navigator):
+def spam_protection_setup(navigator):
     """
     Opens the developer portal and passes in the access code.
     """
@@ -54,7 +57,7 @@ def params(request):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6695")
-def test_devel_recaptcha_sing_up(spam_protection_setup, provider_account, ui_devel_account, navigator):
+def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
     """
     Test
         - Navigates and fills up the Sign Up page on developer portal
@@ -80,7 +83,7 @@ def test_devel_recaptcha_sing_up(spam_protection_setup, provider_account, ui_dev
     assert login_success.is_displayed
 
 
-def test_devel_forgot_password_recaptcha(spam_protection_setup, custom_account, navigator, params):
+def test_devel_forgot_password_recaptcha(custom_account, navigator, params):
     """
     Test
         - Navigates and fills up the Lost password page on developer portal

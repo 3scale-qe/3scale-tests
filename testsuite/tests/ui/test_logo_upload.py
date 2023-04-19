@@ -6,10 +6,10 @@ import importlib_resources as resources
 from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalLogoView
 
 
-# pylint: disable=unused-argument
 @pytest.mark.sandbag  # doesn't work on RHOAM
 @pytest.mark.parametrize("file_name", ["rh-3scale.png", "3scale_logo.png"])
-def test_logo_upload(login, navigator, file_name):
+@pytest.mark.usefixtures("login")
+def test_logo_upload(navigator, file_name):
     """
         A test that checks if it possible to upload different types of logos (png, gif)
         - Upload logo

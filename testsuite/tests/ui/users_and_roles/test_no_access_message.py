@@ -13,8 +13,8 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6321")]
 
 
-# pylint: disable=unused-argument
-def test_no_access_message(login, custom_admin_login, navigator, provider_account_user, browser):
+@pytest.mark.usefixtures("login")
+def test_no_access_message(custom_admin_login, navigator, provider_account_user, browser):
     """
     Test:
         - Navigate to Support Emails view

@@ -1,4 +1,5 @@
 "UI conftest"
+# pylint: disable=too-many-arguments, unused-argument
 
 import io
 import logging
@@ -167,7 +168,6 @@ def devel_login(account, custom_devel_login):
     return custom_devel_login(account=account)
 
 
-# pylint: disable=unused-argument, too-many-arguments
 @pytest.fixture(scope="module")
 def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, master_threescale, browser):
     """Parametrized custom Tenant created via UI"""
@@ -203,7 +203,8 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
 
         tenant = navigator.navigate(TenantNewView)
 
-        tenant.create(username=username, email=email+"@anything.invalid", password=password, organization=organisation)
+        tenant.create(username=username, email=email + "@anything.invalid", password=password,
+                      organization=organisation)
 
         account = resilient.resource_read_by_name(master_threescale.accounts, organisation)
         tenant = master_threescale.tenants.read(account.entity_id)
@@ -226,7 +227,6 @@ def ui_tenant(custom_ui_tenant, request):
     return custom_ui_tenant(username=name, email=name, password="12345678", organisation=name)
 
 
-# pylint: disable=unused-argument, too-many-arguments
 @pytest.fixture(scope="module")
 def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, request, private_base_url):
     """Parametrized custom Backend created via UI"""
@@ -253,7 +253,6 @@ def ui_backend(custom_ui_backend, request):
     return custom_ui_backend(name, name)
 
 
-# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
 def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, request):
     """Parametrized custom Product created via UI"""
@@ -277,7 +276,6 @@ def ui_product(custom_ui_product, request):
     return custom_ui_product(name, name)
 
 
-# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
 def custom_ui_account(custom_admin_login, navigator, threescale, request, testconfig):
     """

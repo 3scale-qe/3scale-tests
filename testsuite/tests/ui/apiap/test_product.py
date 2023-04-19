@@ -9,6 +9,8 @@ from testsuite.ui.views.admin.product.integration.backends import ProductBackend
 from testsuite import rawobj, resilient
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
+
 
 @pytest.fixture(scope="module")
 def product(request, custom_service):
@@ -48,8 +50,7 @@ def test_create_product(custom_ui_product, request):
     assert product["description"] == "description"
 
 
-# pylint: disable=unused-argument
-def test_edit_product(login, navigator, service, threescale):
+def test_edit_product(navigator, service, threescale):
     """
     Test:
         - Create service via API
@@ -65,8 +66,7 @@ def test_edit_product(login, navigator, service, threescale):
     assert product["description"] == "updated_description"
 
 
-# pylint: disable=unused-argument
-def test_delete_product(login, navigator, threescale, product):
+def test_delete_product(navigator, threescale, product):
     """
     Test:
         - Create product via API without autoclean
@@ -91,7 +91,7 @@ def test_create_service_without_backend(ui_product):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3336")
-def test_out_of_date_config(service, login, navigator, browser):
+def test_out_of_date_config(service, navigator):
     """
     Test:
         - Create product via API
@@ -104,7 +104,7 @@ def test_out_of_date_config(service, login, navigator, browser):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3576")
-def test_update_proxy_url(service, login, navigator, threescale):
+def test_update_proxy_url(service, navigator, threescale):
     """
     Test:
         - Create product via API
@@ -120,7 +120,7 @@ def test_update_proxy_url(service, login, navigator, threescale):
     assert proxy["endpoint"] == "https://production.anything.invalid:443"
 
 
-def test_assign_backend_to_product(login, navigator, ui_backend, ui_product, threescale):
+def test_assign_backend_to_product(navigator, ui_backend, ui_product, threescale):
     """
     Test:
         - Create product via UI
@@ -140,7 +140,7 @@ def test_assign_backend_to_product(login, navigator, ui_backend, ui_product, thr
     assert backend_mapping["backend_id"] == ui_backend.entity_id
 
 
-def test_remove_backend_from_product(service, login, navigator, threescale):
+def test_remove_backend_from_product(service, navigator, threescale):
     """
     Test:
         - Create product with backend via API
@@ -157,7 +157,7 @@ def test_remove_backend_from_product(service, login, navigator, threescale):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3640")
-def test_proxy_settings(service, navigator, login):
+def test_proxy_settings(service, navigator):
     """
     Test:
         - Navigate to Product settings view
@@ -184,7 +184,8 @@ def test_proxy_settings(service, navigator, login):
 
 # pylint: disable=too-many-arguments
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3373")
-def test_metrics_hierarchies(service, navigator, login, threescale, browser, application):
+@pytest.mark.usefixtures("application")
+def test_metrics_hierarchies(service, navigator, threescale, browser):
     """
     Test:
         - Create product and application via API

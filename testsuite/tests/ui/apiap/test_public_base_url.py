@@ -12,8 +12,8 @@ pytestmark = [
 ]
 
 
-# pylint: disable=unused-argument
-def test_public_base_url(login, navigator, service, browser):
+@pytest.mark.usefixtures("login")
+def test_public_base_url(navigator, service, browser):
     """
     Test:
         - navigate to Product settings page

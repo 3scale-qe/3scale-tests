@@ -17,9 +17,9 @@ def invalid_access_token():
     return "invalid token", "403"
 
 
-# pylint: disable=unused-argument
 @pytest.mark.parametrize("access_token", ["valid_access_token", "invalid_access_token"])
-def test_invalid_token(request, login, navigator, access_token):
+@pytest.mark.usefixtures("login")
+def test_invalid_token(request, navigator, access_token):
     """
     Send request via API docs `Authentication Providers Admin Portal List` endpoint
     should return status code 200 for valid access token and 403 for invalid one.
