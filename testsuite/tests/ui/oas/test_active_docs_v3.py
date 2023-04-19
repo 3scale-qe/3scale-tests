@@ -6,7 +6,6 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.ui.views.admin.audience.developer_portal import ActiveDocsNewView
 from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView
 from testsuite.utils import blame
 
@@ -54,33 +53,6 @@ def oas3_spec():
     json_spec['paths']['/pets']['get']['parameters'].append(user_key)
     oas_spec = json.dumps(json_spec)
     return oas_spec
-
-
-@pytest.fixture(scope="module")
-def prod_client(prod_client):
-    """
-    Production client so tests can send request to service production endpoint
-    """
-    client = prod_client()
-    response = client.get('/get')
-    assert response.status_code == 200
-    return client
-
-
-# pylint: disable=unused-argument
-@pytest.fixture(scope='module')
-def ui_active_doc(login, request, navigator, service, oas3_spec):
-    """Active doc. bound to service created via UI"""
-    name = blame(request, "active_doc_v3")
-    system_name = blame(request, "system_name")
-    edit = navigator.navigate(ActiveDocsNewView)
-    edit.create_spec(name=name,
-                     sys_name=system_name,
-                     description="Active docs V3",
-                     service=service,
-                     oas_spec=oas3_spec,
-                     publish_option=True)
-    return service.active_docs.list()[0]
 
 
 # pylint: disable=unused-argument, too-many-arguments

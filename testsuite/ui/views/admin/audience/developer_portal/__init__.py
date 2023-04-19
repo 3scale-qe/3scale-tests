@@ -17,15 +17,24 @@ class CMSNewPageView(BaseAudienceView):
     title = TextInput(id='cms_template_title')
     section = ThreescaleDropdown(".//*[@id='cms_template_section_input']")
     path_input = TextInput(id='cms_template_path')
+    layout_select = ThreescaleDropdown("//*[@id='cms_template_layout_id']")
     code = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
+    advanced_options = GenericLocatorWidget(".//*[normalize-space(.)='Advanced options']")
+    liquid_check_box = GenericLocatorWidget(locator=".//input[@id='cms_template_liquid_enabled']")
     submit = ThreescaleSubmitButton()
 
-    def create(self, title, section, path, page_html):
+    # pylint: disable=too-many-arguments
+    def create(self, title, section, path, page_html, layout=None, liquid_enabled=False):
         """Creates a new dev portal page"""
         self.title.fill(title)
-        self.section.select_by_text("|— " + section)
+        self.section.select_by_text(section)
         self.path_input.fill(path)
         self.code.fill(page_html)
+        if layout:
+            self.layout_select.select_by_text(layout)
+        if liquid_enabled:
+            self.advanced_options.click()
+            self.liquid_check_box.click()
         self.submit.click()
 
     def prerequisite(self):
@@ -44,6 +53,7 @@ class CMSEditPageView(BaseAudienceView):
     publish_button = GenericLocatorWidget(".//button[@title='Save and publish the current draft.']")
     path_input = TextInput(id="cms_template_path")
     delete_button = ThreescaleDeleteButton()
+    code = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
 
     def __init__(self, parent, page_id):
         super().__init__(parent, page_id=page_id)
@@ -153,7 +163,7 @@ class DeveloperPortalContentView(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.quick_links.is_displayed and \
-               self.snippets.is_displayed and self.path in self.browser.url
+            self.snippets.is_displayed and self.path in self.browser.url
 
 
 class DeveloperPortalLogoView(BaseAudienceView):
@@ -179,7 +189,7 @@ class DeveloperPortalLogoView(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.file_input.is_displayed and \
-               self.upload_button.is_displayed and self.path in self.browser.url
+            self.upload_button.is_displayed and self.path in self.browser.url
 
 
 class ActiveDocsView(BaseAudienceView):
@@ -198,7 +208,7 @@ class ActiveDocsView(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.create_new_spec_link.is_displayed and \
-               self.path in self.browser.url
+            self.path in self.browser.url
 
 
 class ActiveDocsNewView(BaseAudienceView):
@@ -245,7 +255,7 @@ class ActiveDocsNewView(BaseAudienceView):
     @property
     def is_displayed(self):
         return BaseAudienceView.is_displayed.fget(self) and self.create_spec_btn.is_displayed and \
-               self.sys_name_field.is_displayed and self.path in self.browser.url
+            self.sys_name_field.is_displayed and self.path in self.browser.url
 
 
 class SpamProtection(BaseAudienceView):
