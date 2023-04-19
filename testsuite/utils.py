@@ -136,7 +136,7 @@ def _warn_and_skip(message, action):
     """switch/case for warn_and_skip"""
     if action != "quiet":
         warnings.warn(message)
-    if action in ("skip", "quiet"):
+    if action in ("warn", "quiet"):
         pytest.skip(message)
     else:
         pytest.fail(message)
