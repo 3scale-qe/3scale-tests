@@ -8,7 +8,7 @@ from testsuite.utils import blame
 
 
 # pylint: disable=too-many-arguments
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 async def many_services(request, custom_service, service_proxy_settings, lifecycle_hooks, custom_backend):
     """Creation of 500+ services"""
     backend_mapping = {"/": custom_backend("backend")}
