@@ -9,11 +9,6 @@ from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
 from testsuite.utils import warn_and_skip
 
 
-pytestmark = [
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762"),
-]
-
-
 @pytest.fixture(scope="module", autouse=True)
 def require_braintree_patch(openshift):
     """Braintree requires patched deployment"""

@@ -2,6 +2,11 @@
 import pytest
 
 
+pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762"),
+]
+
+
 @pytest.fixture(scope="module", autouse=True)
 def braintree_gateway_3ds_disabled(braintree_gateway):
     """Ensures Braintree billing gateway with 3D Secure verification disabled"""
