@@ -6,12 +6,20 @@ import pytest
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
+from testsuite.utils import warn_and_skip
 
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762"),
-    pytest.mark.sandbag,  # requires patched deployment
 ]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def require_braintree_patch(openshift):
+    """Braintree requires patched deployment"""
+    ocp = openshift()
+    if "payments.yml" not in ocp.config_maps["system"]:
+        warn_and_skip("Braintree requires patched deployment. No payments.yml in system configmap", "fail")
 
 
 @pytest.fixture(scope="module")
