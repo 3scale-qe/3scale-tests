@@ -346,6 +346,16 @@ class ThreescaleSelect(Select):
     BUTTON_LOCATOR = "./div/button"
 
 
+class APIDocsSelect(Select):
+    """Specific select for 3scale API doc page"""
+
+    def item_select(self, item):
+        # This is for opening the menu because the locator matches all buttons and Select doesn't work
+        element = self.browser.element("//button[@aria-label='Options menu']")
+        element.click()
+        super().item_select(item)
+
+
 class DivBasedEditor(TextInput):
     """Widget of Div Based editor used to load Active doc specification"""
 
