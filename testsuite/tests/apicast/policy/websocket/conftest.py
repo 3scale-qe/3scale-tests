@@ -14,7 +14,7 @@ from testsuite.utils import warn_and_skip
 @pytest.fixture(scope="module", autouse=True)
 def skip_rhoam(testconfig):
     """Websockets do not work on RHOAM because HTTP2 is used internally on OSD"""
-    if testconfig["threescale"]["deployment_type="] == "rhoam":
+    if testconfig["threescale"]["deployment_type"] == "rhoam":
         warn_and_skip("Websockets do not work on RHOAM because HTTP2 is used internally on OSD")
 
 
