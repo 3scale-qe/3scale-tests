@@ -13,6 +13,8 @@ def service(login, navigator, threescale, testconfig, request):
     view.discover()
 
     service = resilient.resource_read_by_name(threescale.services, "tools-go-httpbin")
+    assert service, "Service wasn't created"
+
     if not testconfig["skip_cleanup"]:
         backend_id = service.backend_usages.list()[0]['backend_id']
         backend = threescale.backends.get(backend_id)
