@@ -349,7 +349,7 @@ class ThreescaleSelect(Select):
 class DivBasedEditor(TextInput):
     """Widget of Div Based editor used to load Active doc specification"""
 
-    def fill(self, value):
+    def fill(self, value, sensitive=False):
         """Fill value to Div Based Editor"""
         self.browser.click(self)
         self.browser.send_keys_to_focused_element(value)

@@ -7,14 +7,13 @@ from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
 from testsuite.ui.views.devel import BaseDevelView, SignUpView
+from testsuite.ui.views.common.login import LoginForm
 
 
 class LoginView(BaseDevelView):
     """Login View for Devel portal"""
     path_pattern = '/login'
-    username_field = TextInput(id='session_username')
-    password_field = TextInput(id='session_password')
-    sign_in_btn = ThreescaleSubmitButton()
+    login_widget = View.nested(LoginForm)
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
     flash_message = View.nested(FlashMessage)
@@ -22,9 +21,7 @@ class LoginView(BaseDevelView):
 
     def do_login(self, name, password):
         """Perform login"""
-        self.username_field.fill(name)
-        self.password_field.fill(password)
-        self.sign_in_btn.click()
+        self.login_widget.do_login(name, password)
 
     def do_auth0_login(self, email, password):
         """
@@ -54,8 +51,8 @@ class LoginView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return self.path_pattern in self.browser.url and self.username_field.is_displayed and \
-               self.password_field.is_displayed and self.sign_in_btn.is_displayed
+        return self.path_pattern in self.browser.url and self.login_widget.username_field.is_displayed and \
+               self.login_widget.password_field.is_displayed and self.login_widget.submit.is_displayed
 
 
 class ReCaptcha(View):
