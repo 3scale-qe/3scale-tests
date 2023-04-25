@@ -10,6 +10,7 @@ import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
+from selenium.common import InvalidSessionIdException
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
@@ -51,9 +52,10 @@ def browser(webdriver, request, metadata):
     Args:
         :param webdriver: Selenium driver configuration
         :param request: Finalizer for session cleanup
+        :param metadata: Test session metadata
         :return browser: Browser instance
     """
-    browser = ThreeScaleBrowser(selenium=webdriver.start_session())
+    browser = ThreeScaleBrowser(webdriver=webdriver)
     request.addfinalizer(webdriver.finalize)
     caps = webdriver.webdriver.webdriver.caps
     metadata["Browser"] = f"{caps['browserName']} {caps['browserVersion']}"
@@ -77,14 +79,18 @@ def custom_admin_login(navigator, browser):
     Returns parametrized Login fixture for Admin portal.
     To remove cookies and previous login session (from Admin portal), set `fresh` flag to True.
     :param navigator: Navigator Instance
+    :param browser: Browser instance
     :return: Login to Admin portal with custom credentials
     """
 
+    @backoff.on_exception(backoff.constant, InvalidSessionIdException, max_tries=2, jitter=None,
+                          on_backoff=lambda _: browser.restart_session())
     def _login(name=None, password=None, fresh=None):
         url = settings["threescale"]["admin"]["url"]
         name = name or settings["threescale"]["admin"]["username"]
         password = password or settings["threescale"]["admin"]["password"]
         page = navigator.open(LoginView, url=url)
+
         if fresh:
             browser.selenium.delete_all_cookies()
             browser.selenium.refresh()
@@ -130,6 +136,8 @@ def custom_devel_login(navigator, provider_account, account_password, browser):
     :return: Login to Developer portal with custom credentials (account or name-password pair)
     """
 
+    @backoff.on_exception(backoff.constant, InvalidSessionIdException, max_tries=2, jitter=None,
+                          on_backoff=lambda _: browser.restart_session())
     def _login(account=None, name=None, password=None, fresh=None):
         url = settings["threescale"]["devel"]["url"]
         name = name or account['org_name']
