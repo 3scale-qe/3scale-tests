@@ -1,9 +1,9 @@
 "UI conftest"
 
 import io
+import logging
 import math
 import os
-import traceback
 from datetime import datetime
 
 import backoff
@@ -33,6 +33,9 @@ from testsuite.ui.views.master.audience.tenant import TenantNewView, TenantDetai
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
@@ -136,8 +139,6 @@ def custom_devel_login(navigator, provider_account, account_password, browser):
     :return: Login to Developer portal with custom credentials (account or name-password pair)
     """
 
-    @backoff.on_exception(backoff.constant, InvalidSessionIdException, max_tries=2, jitter=None,
-                          on_backoff=lambda _: browser.restart_session())
     def _login(account=None, name=None, password=None, fresh=None):
         url = settings["threescale"]["devel"]["url"]
         name = name or account['org_name']
@@ -400,10 +401,12 @@ def pytest_exception_interact(node, call, report):
     if report.failed or hasattr(report, "wasxfail"):
         browser = node.funcargs.get("browser")
         if not browser:
+            LOGGER.info("Screenshot was not created. Browser was None. ")
             return
 
+        dir_path = get_resultsdir_path(node)
         try:
-            filepath = fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            filepath = fullpage_screenshot(driver=browser.selenium, file_path=dir_path)
             extra = getattr(report, "extra", [])
             extra.append(pytest_html.extras.image(filepath))
             report.extra = extra
@@ -411,9 +414,13 @@ def pytest_exception_interact(node, call, report):
             global html_report  # pylint: disable=global-statement,invalid-name
             html_report = node.config.getoption("--html")
 
-        # pylint: disable=broad-except
-        except Exception:
-            traceback.print_exc()
+        except InvalidSessionIdException:
+            LOGGER.info(
+                "Can't create a screenshot. Browser session %s is already closed.",
+                browser.webdriver.session.session_id,
+            )
+            if len(os.listdir(dir_path)) == 0:
+                os.removedirs(dir_path)
 
 
 def get_resultsdir_path(node):
