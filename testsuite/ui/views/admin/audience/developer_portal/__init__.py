@@ -7,7 +7,7 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor, ThreescaleButtonGroup, ThreescaleCheckBox, \
-    CheckBoxGroup
+    CheckBoxGroup, APIDocsSelect
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton, ThreescaleDeleteButton, ThreescaleCreateButton
 
 
@@ -218,9 +218,9 @@ class ActiveDocsNewView(BaseAudienceView):
     skip_swagger_validation_checkbox = GenericLocatorWidget("#api_docs_service_skip_swagger_validations")
     name_field = TextInput(id="api_docs_service_name")
     sys_name_field = TextInput(id="api_docs_service_system_name")
-    publish_checkbox = GenericLocatorWidget("#api_docs_service_published")
+    publish_checkbox = GenericLocatorWidget("//input[@id='api_docs_service_published_input']")
     description_field = TextInput(id="api_docs_service_description")
-    service_selector = ThreescaleDropdown("//*[@id='api_docs_service_service_id']")
+    service_selector = APIDocsSelect()
     json_spec = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
 
     # pylint: disable=too-many-arguments
@@ -239,7 +239,7 @@ class ActiveDocsNewView(BaseAudienceView):
         self.name_field.fill(name)
         self.sys_name_field.fill(sys_name)
         self.description_field.fill(description)
-        self.service_selector.select_by_value(service.entity_id)
+        self.service_selector.item_select(service.entity["name"])
         self.json_spec.fill(oas_spec)
 
         if publish_option:
