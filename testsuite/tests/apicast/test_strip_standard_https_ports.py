@@ -7,11 +7,18 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2235")]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_saas(testconfig):
+    """Gateway logs missing on SaaS"""
+    if testconfig["threescale"]["deployment_type"] == "saas":
+        warn_and_skip("Gateway logs missing on SaaS")
 
 
 @pytest.fixture(scope="module", params=["mockserver+svc:1080",
