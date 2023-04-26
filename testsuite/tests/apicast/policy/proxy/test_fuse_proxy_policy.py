@@ -8,6 +8,14 @@ import pytest
 
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
+from testsuite.utils import warn_and_skip
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_saas(testconfig):
+    """No fuse integration on SaaS"""
+    if testconfig["threescale"]["deployment_type"] == "saas":
+        warn_and_skip("No fuse integration on SaaS")
 
 
 @pytest.fixture(scope="module")
