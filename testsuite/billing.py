@@ -2,6 +2,7 @@
 import backoff
 import braintree
 import stripe
+from braintree.exceptions.request_timeout_error import RequestTimeoutError
 from braintree.exceptions.service_unavailable_error import ServiceUnavailableError
 
 from threescale_api.resources import InvoiceState
@@ -53,7 +54,7 @@ class Braintree:
             )
         )
 
-    @backoff.on_exception(backoff.fibo, ServiceUnavailableError, max_tries=8, jitter=None)
+    @backoff.on_exception(backoff.fibo, (ServiceUnavailableError, RequestTimeoutError), max_tries=8, jitter=None)
     def _transaction_search(self, invoice):
         return self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice['id']))
 
