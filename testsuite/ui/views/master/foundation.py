@@ -19,7 +19,7 @@ class BaseMasterView(View, Navigable):
     explorer_menu = Text("//div[@id='api_selector']//a[@title='Context Selector']/span")
     threescale_menu_logo = GenericLocatorWidget('//*[@id="user_widget"]/a/div')
     support_link = Text("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
-    user_session = GenericLocatorWidget("//a[@href='#session-menu']")
+    user_session = GenericLocatorWidget("//a[@title='Session']")
     user_logout_link = Text("//a[@href='/p/logout']")
     threescale_version = Text("//*[contains(@class,'powered-by-3scale')]/span")
 
