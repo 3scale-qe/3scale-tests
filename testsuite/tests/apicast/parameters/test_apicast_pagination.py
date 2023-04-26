@@ -21,7 +21,7 @@ async def many_services(request, custom_service, service_proxy_settings, lifecyc
     )
 
 
-@pytest.mark.sandbag
+@pytest.mark.disruptive  # this generates high load on 3scale with impact on other tests
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8373")
 @pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 @pytest.mark.usefixtures("staging_gateway")
