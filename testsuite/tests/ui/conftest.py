@@ -1,15 +1,16 @@
 "UI conftest"
 
 import io
+import logging
 import math
 import os
-import traceback
 from datetime import datetime
 
 import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
+from selenium.common import InvalidSessionIdException
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
@@ -34,6 +35,9 @@ from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 @pytest.fixture(scope="session")
 def webdriver():
     """Creates instance of Web Driver with configuration"""
@@ -51,9 +55,10 @@ def browser(webdriver, request, metadata):
     Args:
         :param webdriver: Selenium driver configuration
         :param request: Finalizer for session cleanup
+        :param metadata: Test session metadata
         :return browser: Browser instance
     """
-    browser = ThreeScaleBrowser(selenium=webdriver.start_session())
+    browser = ThreeScaleBrowser(webdriver=webdriver)
     request.addfinalizer(webdriver.finalize)
     caps = webdriver.webdriver.webdriver.caps
     metadata["Browser"] = f"{caps['browserName']} {caps['browserVersion']}"
@@ -77,14 +82,18 @@ def custom_admin_login(navigator, browser):
     Returns parametrized Login fixture for Admin portal.
     To remove cookies and previous login session (from Admin portal), set `fresh` flag to True.
     :param navigator: Navigator Instance
+    :param browser: Browser instance
     :return: Login to Admin portal with custom credentials
     """
 
+    @backoff.on_exception(backoff.constant, InvalidSessionIdException, max_tries=2, jitter=None,
+                          on_backoff=lambda _: browser.restart_session())
     def _login(name=None, password=None, fresh=None):
         url = settings["threescale"]["admin"]["url"]
         name = name or settings["threescale"]["admin"]["username"]
         password = password or settings["threescale"]["admin"]["password"]
         page = navigator.open(LoginView, url=url)
+
         if fresh:
             browser.selenium.delete_all_cookies()
             browser.selenium.refresh()
@@ -392,10 +401,12 @@ def pytest_exception_interact(node, call, report):
     if report.failed or hasattr(report, "wasxfail"):
         browser = node.funcargs.get("browser")
         if not browser:
+            LOGGER.info("Screenshot was not created. Browser was None. ")
             return
 
+        dir_path = get_resultsdir_path(node)
         try:
-            filepath = fullpage_screenshot(driver=browser.selenium, file_path=get_resultsdir_path(node))
+            filepath = fullpage_screenshot(driver=browser.selenium, file_path=dir_path)
             extra = getattr(report, "extra", [])
             extra.append(pytest_html.extras.image(filepath))
             report.extra = extra
@@ -403,9 +414,13 @@ def pytest_exception_interact(node, call, report):
             global html_report  # pylint: disable=global-statement,invalid-name
             html_report = node.config.getoption("--html")
 
-        # pylint: disable=broad-except
-        except Exception:
-            traceback.print_exc()
+        except InvalidSessionIdException:
+            LOGGER.info(
+                "Can't create a screenshot. Browser session %s is already closed.",
+                browser.webdriver.session.session_id,
+            )
+            if len(os.listdir(dir_path)) == 0:
+                os.removedirs(dir_path)
 
 
 def get_resultsdir_path(node):

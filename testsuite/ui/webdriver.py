@@ -2,14 +2,13 @@
 import logging
 
 from selenium import webdriver
+from selenium.common import WebDriverException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-
-from testsuite.ui.exception import WebDriverError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -150,5 +149,6 @@ class ThreescaleWebdriver:
         try:
             LOGGER.info('Quiting current Browser session: "%s"...', self.session.session_id)
             self.session.quit()
-        except Exception as exception:
-            raise WebDriverError("Problem with browser finalization") from exception
+        except WebDriverException as exception:
+            LOGGER.info("Problem with browser finalization occurred")
+            LOGGER.exception(exception)

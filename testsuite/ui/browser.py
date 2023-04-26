@@ -1,11 +1,11 @@
 """Plug-in for Widgetastic browser with 3scale specific environment settings"""
+
 from contextlib import contextmanager
 from time import sleep
 from urllib import parse
 import backoff
 
 from selenium.common.exceptions import NoSuchElementException
-
 from widgetastic.browser import Browser, DefaultPlugin
 
 
@@ -65,21 +65,26 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
 class ThreeScaleBrowser(Browser):
     """Wrapper around :class:`widgetastic.browser.Browser`"""
 
-    def __init__(self, selenium, session=None, extra_objects=None):
+    def __init__(self, webdriver, session=None, extra_objects=None):
         """Pass webdriver instance, session and other extra objects (if any).
-
-        :param selenium: :class:`selenium.WebDriver`
-            instance.
+        :param webdriver: :class:`ThreescaleWebdriver` instance.
         :param session: :class:`threescale.session.Session` instance.
         :param extra_objects: any extra objects you want to include.
         """
         extra_objects = extra_objects or {}
         extra_objects.update({'session': session})
+        selenium = webdriver.start_session()
         super().__init__(
             selenium,
             plugin_class=ThreescaleBrowserPlugin,
             extra_objects=extra_objects)
         self.window_handle = selenium.current_window_handle
+        self.webdriver = webdriver
+
+    def restart_session(self):
+        """Restarts browser. Existing webdriver is used"""
+        self.webdriver.finalize()
+        self.selenium = self.webdriver.start_session()
 
     def set_path(self, path):
         """Change path for the current browser.url"""
