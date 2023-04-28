@@ -814,7 +814,7 @@ def custom_service(threescale, request, testconfig, logger):
     return _custom_service
 
 
-@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=8, jitter=None)
+@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=14, jitter=None)
 def _backend_delete(backend):
     """reliable backend delete"""
 
