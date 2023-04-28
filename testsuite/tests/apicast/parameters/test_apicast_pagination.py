@@ -9,12 +9,19 @@ from testsuite.utils import blame
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(autouse=True)
-async def many_services(request, custom_service, service_proxy_settings, lifecycle_hooks, custom_backend):
+async def many_services(request, event_loop, custom_service, service_proxy_settings, lifecycle_hooks, custom_backend):
     """Creation of 500+ services"""
     backend_mapping = {"/": custom_backend("backend")}
 
     def _create_services():
-        custom_service({"name": blame(request, "svc")}, service_proxy_settings, backend_mapping, hooks=lifecycle_hooks)
+        params = {"name": blame(request, "svc")}
+        custom_service(params, service_proxy_settings, backend_mapping, autoclean=False, hooks=lifecycle_hooks)
+
+    request.addfinalizer(
+        lambda: event_loop.run_until_complete(
+            asyncio.gather(*(asyncio.to_thread(finalizer) for finalizer in custom_service.orphan_finalizers))
+        )
+    )
 
     return await asyncio.gather(
         *(asyncio.to_thread(_create_services) for _ in range(505))
