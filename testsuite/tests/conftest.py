@@ -4,6 +4,7 @@ import inspect
 import logging
 import os
 import signal
+import threading
 import warnings
 from itertools import chain
 
@@ -750,68 +751,83 @@ def custom_service(threescale, request, testconfig, logger):
         :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used
         :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook"""
 
-    # pylint: disable=too-many-arguments
-    def _custom_service(params, proxy_params=None, backends=None, autoclean=True,
-                        hooks=None, annotate=True, threescale_client=threescale):
-        params = params.copy()
-        for hook in _select_hooks("before_service", hooks):
-            params = hook(params)
+    class _CustomService:
+        """Object representing original _create_service interface with access to finalizers that are not autocleaned"""
+        def __init__(self):
+            self.orphan_finalizers = []
+            self._autoclean = True
+            self._lock = threading.Lock()
 
-        if annotate:
-            params["description"] = blame_desc(request, params.get("description"))
+        # pylint: disable=too-many-arguments
+        def _custom_service(self, params, proxy_params=None, backends=None, autoclean=True,
+                            hooks=None, annotate=True, threescale_client=threescale):
+            params = params.copy()
+            for hook in _select_hooks("before_service", hooks):
+                params = hook(params)
 
-        svc = threescale_client.services.create(params=params)
+            if annotate:
+                params["description"] = blame_desc(request, params.get("description"))
 
-        if autoclean and not testconfig["skip_cleanup"]:
-            def finalizer():
-                for hook in _select_hooks("on_service_delete", hooks):
+            svc = threescale_client.services.create(params=params)
+
+            self._autoclean = autoclean
+            if not testconfig["skip_cleanup"]:
+                def finalizer():
+                    for hook in _select_hooks("on_service_delete", hooks):
+                        try:
+                            hook(svc)
+                        except Exception:  # pylint: disable=broad-except
+                            pass
+
+                    implicit = []
+                    if not backends and proxy_params:  # implicit backend created
+                        bindings = svc.backend_usages.list()
+                        bindings = [svc.threescale_client.backends[i["backend_id"]] for i in bindings]
+                        implicit = [
+                            i for i in bindings
+                            if i["name"] == f"{svc['name']} Backend"
+                            and i["description"] == f"Backend of {svc['name']}"]
+
+                    svc.delete()
+
                     try:
-                        hook(svc)
-                    except Exception:  # pylint: disable=broad-except
-                        pass
+                        if len(implicit) == 1:
+                            _backend_delete(implicit[0])
+                        else:
+                            logger.debug("Unexpected count of candidates for implicit backend: %s", str(implicit))
+                    except Exception as err:  # pylint: disable=broad-except
+                        logger.debug("An error occurred during attempt to delete implicit backend: %s", str(err))
 
-                implicit = []
-                if not backends and proxy_params:  # implicit backend created
-                    bindings = svc.backend_usages.list()
-                    bindings = [svc.threescale_client.backends[i["backend_id"]] for i in bindings]
-                    implicit = [
-                        i for i in bindings
-                        if i["name"] == f"{svc['name']} Backend"
-                        and i["description"] == f"Backend of {svc['name']}"]
-
-                svc.delete()
-
-                try:
-                    if len(implicit) == 1:
-                        _backend_delete(implicit[0])
+                with self._lock:
+                    if autoclean:
+                        request.addfinalizer(finalizer)
                     else:
-                        logger.debug("Unexpected count of candidates for implicit backend: %s", str(implicit))
-                except Exception as err:  # pylint: disable=broad-except
-                    logger.debug("An error occurred during attempt to delete implicit backend: %s", str(err))
+                        self.orphan_finalizers.append(finalizer)
 
-            request.addfinalizer(finalizer)
+            if backends:
+                for path, backend in backends.items():
+                    svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
+                proxy_params = {}
+                for hook in _select_hooks("before_proxy", hooks):
+                    proxy_params = hook(svc, proxy_params)
 
-        if backends:
-            for path, backend in backends.items():
-                svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
-            proxy_params = {}
-            for hook in _select_hooks("before_proxy", hooks):
-                proxy_params = hook(svc, proxy_params)
+                svc.proxy.list().update(params=proxy_params)
+            elif proxy_params:
+                for hook in _select_hooks("before_proxy", hooks):
+                    proxy_params = hook(svc, proxy_params)
 
-            svc.proxy.list().update(params=proxy_params)
-        elif proxy_params:
-            for hook in _select_hooks("before_proxy", hooks):
-                proxy_params = hook(svc, proxy_params)
+                resilient.proxy_update(svc, params=proxy_params)
+            svc.proxy.deploy()
 
-            resilient.proxy_update(svc, params=proxy_params)
-        svc.proxy.deploy()
+            for hook in _select_hooks("on_service_create", hooks):
+                hook(svc)
 
-        for hook in _select_hooks("on_service_create", hooks):
-            hook(svc)
+            return svc
 
-        return svc
+        def __call__(self, *args, **kwargs):
+            return self._custom_service(*args, **kwargs)
 
-    return _custom_service
+    return _CustomService()
 
 
 @backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=14, jitter=None)
