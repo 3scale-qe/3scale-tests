@@ -2,6 +2,7 @@
 This module contains wrapper for the Mailhog API
 """
 
+from datetime import datetime, timedelta, timezone
 import json
 
 import pytest
@@ -9,6 +10,12 @@ import requests
 from openshift import OpenShiftPythonException
 from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient  # pylint: disable=unused-import
+
+
+def _age_gt(msg, age):
+    """Compare whether message is older than given timedelta"""
+    fmt = "%a, %d %b %Y %H:%M:%S %z"
+    return datetime.now(timezone.utc) - datetime.strptime(msg["Content"]["Headers"]["Date"][0], fmt) > age
 
 
 class MailhogClient:
@@ -70,6 +77,62 @@ class MailhogClient:
         # can not parse it, this replacements fixes it
         return json.loads(
             response.content.decode('utf8').replace('\\\\"', '\\"'))
+
+    def __iter__(self):
+        """Iterator handles paging gracefully.
+
+        It doesn't fetch all the messages, does it in chunks.
+        Safes memory and time, fetches just as much as necessary.
+        """
+        def generator():
+            offset = 0
+            total = 1
+            while offset < total:
+                messages = self.messages(offset, 100)
+                offset += messages["count"]
+                total = messages["total"]
+                for i in messages["items"]:
+                    yield i
+
+        return iter(generator())
+
+    def select(self, key, count=-1, stop=None):
+        """Generator to select messages based on key function
+
+        key takes one argument, current message and should return True o
+        False. If True message is selected to the collection and yielded back.
+
+        Args:
+            :param key: a function key(message) -> bool: if True included in return
+            :param count: Stop after count matches
+            :param stop: a function stop(message) -> bool: if True then stop iteration
+        """
+
+        match_count = 0
+        for i in iter(self):
+            if 0 <= count <= match_count:
+                return
+            if stop and stop(i):
+                return
+            if key(i):
+                match_count += 1
+                yield i
+
+    def find_by_subject(self, subject, count=-1, max_age=timedelta(hours=1)):
+        """Return messages of given subject
+
+        Search is limited to messages of max age 1 hour by default
+        """
+        stop = None if max_age is None else lambda m: _age_gt(m, max_age)
+        return list(self.select(lambda m: subject == m["Content"]["Headers"]["Subject"], count, stop))
+
+    def find_by_content(self, content, count=-1, max_age=timedelta(hours=1)):
+        """Return messages that contain given content.
+
+        Search is limited to messages of max age 1 hour by default
+        """
+        stop = None if max_age is None else lambda m: _age_gt(m, max_age)
+        return list(self.select(lambda m: content in m["Content"]["Headers"]["Body"], count, stop))
 
     def delete(self, mail_id=None):
         """Deletes emails from the mailhog. If id is None all emails are deleted"""
