@@ -41,7 +41,7 @@ def _whoami():
         return str(os.getuid())
 
 
-def blame(request: 'FixtureRequest', name: str, tail: int = 3) -> str:
+def blame(request: 'FixtureRequest', name: str, tail: int = 5) -> str:
     """Create 'scoped' name within given test
 
     This returns unique name for 3scale object(s) to avoid conflicts
