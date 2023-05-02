@@ -1,7 +1,6 @@
 """Rewrite of spec/ui_specs/dashboard_spec.rb"""
 import pytest
 
-# pylint: disable=unused-argument
 from testsuite import TESTED_VERSION
 from testsuite.config import settings
 from testsuite.ui.views.admin.audience.account import AccountsView
@@ -15,8 +14,10 @@ from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.admin.product import ProductsView
 from testsuite.ui.views.admin.product.product import ProductNewView
 
+pytestmark = pytest.mark.usefixtures("login")
 
-def test_dashboard_is_loaded_correctly(login, navigator):
+
+def test_dashboard_is_loaded_correctly(navigator):
     """
     Test:
         - Navigates to Dashboard
@@ -27,8 +28,6 @@ def test_dashboard_is_loaded_correctly(login, navigator):
     assert dashboard.is_displayed
 
 
-# pylint: disable=unused-argument
-# pylint: disable=too-many-arguments
 @pytest.mark.parametrize("link, nested, view", [("create_product_button", "products", ProductNewView),
                                                 ("create_backend_button", "backends", BackendNewView),
                                                 ("explore_all_products", None, ProductsView),
@@ -38,7 +37,7 @@ def test_dashboard_is_loaded_correctly(login, navigator):
                                                 ("billing_link", None, BillingView),
                                                 ("develop_portal_link", None, DeveloperPortalContentView),
                                                 ("message_link", None, MessagesView)])
-def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
+def test_audience_navigation_bar(navigator, browser, link, nested, view):
     """
     Test:
         - Navigates to Dashboard
@@ -55,7 +54,7 @@ def test_audience_navigation_bar(login, navigator, browser, link, nested, view):
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6209")
 @pytest.mark.skipif_devrelease
-def test_3scale_version_in_ui(login, navigator):
+def test_3scale_version_in_ui(navigator):
     """
     Test:
         - Navigate to Dashboard

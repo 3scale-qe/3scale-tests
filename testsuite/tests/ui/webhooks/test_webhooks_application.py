@@ -11,10 +11,11 @@ from testsuite.ui.views.admin.audience.application import ApplicationEditView, A
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=too-many-arguments, disable=unused-argument
+
 @pytest.fixture(scope="module", autouse=True)
-def setup(browser, navigator, custom_admin_login, requestbin, request, threescale):
+def setup(navigator, custom_admin_login, requestbin, request, threescale):
     """
     Configure webhooks and create requestbin.
     :return: name of specific requestbin
@@ -39,8 +40,7 @@ def custom_app(service, custom_app_plan, custom_application, lifecycle_hooks, re
     return _custom_app
 
 
-# pylint: disable=too-many-arguments, disable=unused-argument
-def test_application_created(login, navigator, requestbin, ui_application):
+def test_application_created(requestbin, ui_application):
     """
     Test:
         - Create application
@@ -56,8 +56,7 @@ def test_application_created(login, navigator, requestbin, ui_application):
     assert acc_id == str(ui_application.parent.entity_id)
 
 
-# pylint: disable=unused-argument
-def test_application_updated(custom_app, navigator, login, requestbin, service):
+def test_application_updated(custom_app, navigator, requestbin, service):
     """
     Test:
         - Update application
@@ -78,8 +77,7 @@ def test_application_updated(custom_app, navigator, login, requestbin, service):
     assert decs == "updated_description"
 
 
-# pylint: disable=unused-argument
-def test_application_suspended(custom_app, navigator, login, requestbin, service):
+def test_application_suspended(custom_app, navigator, requestbin, service):
     """
     Test:
         - Suspend application
@@ -99,9 +97,8 @@ def test_application_suspended(custom_app, navigator, login, requestbin, service
     assert state == "suspended"
 
 
-# pylint: disable=too-many-arguments, too-many-locals, unused-argument
-def test_application_plan_changed(custom_app_plan, request, login, navigator, service, custom_app, account,
-                                  requestbin):
+# pylint: disable=too-many-arguments, too-many-locals,
+def test_application_plan_changed(custom_app_plan, request, navigator, service, custom_app, requestbin):
     """
     Test:
         - Change application plan
@@ -126,8 +123,7 @@ def test_application_plan_changed(custom_app_plan, request, login, navigator, se
     assert plan_name == app_plan["name"]
 
 
-# pylint: disable=unused-argument
-def test_user_key_updated(custom_app, navigator, login, requestbin, account, service):
+def test_user_key_updated(custom_app, navigator, requestbin, account, service):
     """
     Test:
         - Create custom application
@@ -151,8 +147,7 @@ def test_user_key_updated(custom_app, navigator, login, requestbin, account, ser
     assert user_key == application["user_key"]
 
 
-# pylint: disable=unused-argument
-def test_application_deleted(custom_app, navigator, login, requestbin, service):
+def test_application_deleted(custom_app, navigator, requestbin, service):
     """
     Test:
         - Create application

@@ -115,8 +115,7 @@ credentials from secret file will be used.
     fixture scope, if not set default scope (module) will be applied
   
 ######Notice :
-* UI tests which using login fixture need to add `#pylint: disable=unused-argument` (login is called by 
-fixture inicialization)
+* UI tests which using login fixture should use decorator @pytest.mark.usefixtures("login")
   
 See example
     

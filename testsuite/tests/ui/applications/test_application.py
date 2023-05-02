@@ -1,8 +1,11 @@
 """Rewrite of spec/ui_specs/create_application_spec.rb"""
+import pytest
 
 from testsuite import rawobj
 from testsuite.ui.views.admin.audience.application import ApplicationEditView
 from testsuite.utils import blame
+
+pytestmark = pytest.mark.usefixtures("login")
 
 
 # pylint: disable=too-many-arguments
@@ -30,8 +33,7 @@ def test_application_create(service, custom_app_plan, custom_ui_application, acc
     assert response.status_code == 200
 
 
-# pylint: disable=unused-argument
-def test_application_update(login, application, account, service, navigator):
+def test_application_update(application, account, service, navigator):
     """
     Preparation:
         - Create custom application plan

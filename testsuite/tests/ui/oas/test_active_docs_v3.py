@@ -9,6 +9,8 @@ from testsuite import rawobj
 from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
+
 
 @pytest.fixture(scope="module")
 def service_settings2(request):
@@ -55,9 +57,9 @@ def oas3_spec():
     return oas_spec
 
 
-# pylint: disable=unused-argument, too-many-arguments
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1460")
-def test_active_docs_v3_generate_endpoints(login, navigator, ui_active_doc, service, prod_client, application):
+@pytest.mark.usefixtures("prod_client")
+def test_active_docs_v3_generate_endpoints(navigator, ui_active_doc, service, application):
     """
     Test:
         - Create service via API
@@ -75,7 +77,8 @@ def test_active_docs_v3_generate_endpoints(login, navigator, ui_active_doc, serv
     assert preview_page.oas3.active_docs_section.get_response_code() == '200'
 
 
-def test_active_docs_server(login, navigator, service, active_doc, browser):
+@pytest.mark.usefixtures("active_doc")
+def test_active_docs_server(navigator, service, browser):
     """
     Test:
         - Create service via API
@@ -95,7 +98,8 @@ def test_active_docs_server(login, navigator, service, active_doc, browser):
     assert preview_page.oas3.server.read() == service.proxy.list()['endpoint']
 
 
-def test_active_docs_delete(login, navigator, service2, active_doc2):
+@pytest.mark.usefixtures("active_doc2")
+def test_active_docs_delete(navigator, service2):
     """
     Test:
         - Create service via API

@@ -1,10 +1,12 @@
 """Rewrite of spec/ui_specs/autocomplete_spec.rb"""
+import pytest
+
 from testsuite import rawobj
 from testsuite.ui.views.admin.settings.api_docs import APIDocsView
 
 
-# pylint: disable=unused-argument
-def test_autocomplete(login, navigator, service, testconfig):
+@pytest.mark.usefixtures("login")
+def test_autocomplete(navigator, service, testconfig):
     """
         A test that checks whether autocomplete works as expected on API Docs
 

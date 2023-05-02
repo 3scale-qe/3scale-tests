@@ -12,6 +12,8 @@ from testsuite.ui.utils import assert_displayed_in_new_tab
 from testsuite.ui.views.master.audience.tenant import TenantDetailView, TenantEditView, TenantsView
 from testsuite.ui.views.devel import LandingView
 
+pytestmark = pytest.mark.usefixtures("master_login")
+
 
 @pytest.fixture(scope="module")
 def tenant_name(request):
@@ -31,8 +33,7 @@ def tenant(custom_tenant):
     return custom_tenant()
 
 
-# pylint: disable=too-many-arguments, unused-argument
-def test_create_tenant(master_login, ui_tenant, tenant_name, navigator, browser, master_threescale):
+def test_create_tenant(ui_tenant, tenant_name, navigator, browser, master_threescale):
     """
     Test:
         - Creates tenant via UI
@@ -52,8 +53,7 @@ def test_create_tenant(master_login, ui_tenant, tenant_name, navigator, browser,
     assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, DashboardView)
 
 
-# pylint: disable=unused-argument
-def test_edit_tenant(master_login, navigator, tenant, master_threescale, request):
+def test_edit_tenant(navigator, tenant, master_threescale, request):
     """
     Test:
         - Create tenant via API
@@ -74,8 +74,7 @@ def test_edit_tenant(master_login, navigator, tenant, master_threescale, request
     assert account.entity_name == updated_name
 
 
-# pylint: disable=unused-argument
-def test_delete_tenant(master_login, navigator, master_threescale, custom_tenant, browser):
+def test_delete_tenant(navigator, master_threescale, custom_tenant, browser):
     """
     Test:
         - Create tenant via API without auto-clean
@@ -99,8 +98,7 @@ def test_delete_tenant(master_login, navigator, master_threescale, custom_tenant
     assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, NotFoundView)
 
 
-# pylint: disable=unused-argument
-def test_resume_tenant(master_login, navigator, master_threescale, tenant, browser):
+def test_resume_tenant(navigator, master_threescale, tenant, browser):
     """
     Test:
         - Create and Delete tenant via API
@@ -124,7 +122,7 @@ def test_resume_tenant(master_login, navigator, master_threescale, tenant, brows
     assert_displayed_in_new_tab(browser, detail_view.open_admin_domain, LoginView)
 
 
-def test_impersonate_tenant(master_login, navigator, master_threescale, tenant, browser):
+def test_impersonate_tenant(navigator, master_threescale, tenant, browser):
     """
     Test check impersonation functionality:
         - create tenant

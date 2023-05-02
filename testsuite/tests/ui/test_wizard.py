@@ -3,14 +3,17 @@ Rewrite: ./spec/ui_specs/wizard_spec.rb
 """
 from urllib.parse import urlparse
 
+import pytest
+
 from testsuite.ui.views.admin.wizard import WizardIntroView, \
     WizardBackendApiView, WizardRequestView, WizardEditApiView, \
     WizardResponseView, WizardOutroView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint:disable=unused-argument
-def test_wizard_correct_request(navigator, login, request, private_base_url):
+
+def test_wizard_correct_request(navigator, request, private_base_url):
     """
         Test:
         - Fill wizard with correct data
@@ -41,8 +44,7 @@ def test_wizard_correct_request(navigator, login, request, private_base_url):
     assert outro_view.is_displayed
 
 
-# pylint:disable=unused-argument
-def test_wizard_bad_request(navigator, login, request, private_base_url):
+def test_wizard_bad_request(navigator, request, private_base_url):
     """
         Test:
         - Fill wizard with wrong data
@@ -68,8 +70,7 @@ def test_wizard_bad_request(navigator, login, request, private_base_url):
     assert response_view.page_title.text == 'Congratulations, you are running on 3scale :-)'
 
 
-# pylint:disable=unused-argument
-def test_wizard_set_default_backend_url(navigator, login, browser):
+def test_wizard_set_default_backend_url(navigator):
     """
         Test:
         - Set predefined url to backend  by 3scale
@@ -81,8 +82,7 @@ def test_wizard_set_default_backend_url(navigator, login, browser):
     assert add_backend_page.base_url_field.value == "https://echo-api.3scale.net"
 
 
-# pylint:disable=unused-argument
-def test_wizard_link_to_product(navigator, login, request, browser, private_base_url):
+def test_wizard_link_to_product(navigator, request, browser, private_base_url):
     """
         Test:
         - Fill wizard with correct data

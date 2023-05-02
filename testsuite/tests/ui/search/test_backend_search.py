@@ -6,11 +6,12 @@ import pytest
 from testsuite.ui.views.admin.backend import BackendsView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=unused-argument
+
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8562")
-def test_search_backend(login, navigator, request, custom_ui_backend):
+def test_search_backend(navigator, request, custom_ui_backend):
     """
     Preparation:
         - Create custom backend
@@ -29,8 +30,7 @@ def test_search_backend(login, navigator, request, custom_ui_backend):
         assert backends.table.row()[1].text == sys_name
 
 
-# pylint: disable=unused-argument
-def test_search_multiple_backends(login, navigator, custom_backend, request):
+def test_search_multiple_backends(navigator, custom_backend, request):
     """
     Preparation:
         - Create 4 custom backends
@@ -52,7 +52,7 @@ def test_search_multiple_backends(login, navigator, custom_backend, request):
     assert backends.table.row()[0].text == f"{name}_name2"
 
 
-def test_search_non_existing_value(request, login, navigator, custom_backend):
+def test_search_non_existing_value(request, navigator, custom_backend):
     """
     Preparation:
         - Create custom backend

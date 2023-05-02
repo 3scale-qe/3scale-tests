@@ -11,10 +11,11 @@ from testsuite import resilient
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=too-many-arguments, disable=unused-argument
+
 @pytest.fixture(scope="module", autouse=True)
-def setup(browser, navigator, custom_admin_login, requestbin, request, threescale):
+def setup(navigator, custom_admin_login, requestbin, request, threescale):
     """
     Configure webhooks and create requestbin.
     :return: name of specific requestbin
@@ -25,7 +26,7 @@ def setup(browser, navigator, custom_admin_login, requestbin, request, threescal
     request.addfinalizer(threescale.webhooks.clear)
 
 
-def test_user_key_create_delete(login, service, application, requestbin, navigator):
+def test_user_key_create_delete(service, application, requestbin, navigator):
     """
     Test:
         - Change service auth to application key
@@ -54,7 +55,7 @@ def test_user_key_create_delete(login, service, application, requestbin, navigat
     assert webhook is not None
 
 
-def test_user_key_regenerate(login, service, application, account, requestbin, navigator):
+def test_user_key_regenerate(service, application, account, requestbin, navigator):
     """
     Test:
         - Change service auth to user key

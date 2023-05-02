@@ -2,10 +2,12 @@
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import rawobj
-from testsuite.utils import blame
-from testsuite.ui.views.admin.product.application import ApplicationPlansView
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj
+from testsuite.ui.views.admin.product.application import ApplicationPlansView
+from testsuite.utils import blame
+
+pytestmark = pytest.mark.usefixtures("login")
 
 
 def test_app_plan_create(custom_ui_app_plan, request, service):
@@ -21,10 +23,9 @@ def test_app_plan_create(custom_ui_app_plan, request, service):
     assert plan['name'] == name
 
 
-# pylint: disable=unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-825")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-def test_default_app_plan_change(request, login, service, custom_app_plan, navigator):
+def test_default_app_plan_change(request, service, custom_app_plan, navigator):
     """
     Test of default application plan change:
         - assert the change button is disabled
@@ -53,7 +54,7 @@ def test_default_app_plan_change(request, login, service, custom_app_plan, navig
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8979")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-def test_unset_default_app_plan(request, login, service, custom_app_plan, navigator):
+def test_unset_default_app_plan(request, service, custom_app_plan, navigator):
     """
     Test unset default application plan:
         - change the default application plan and assert if confirmation notice is received

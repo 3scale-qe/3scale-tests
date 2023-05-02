@@ -12,10 +12,11 @@ from testsuite.ui.views.admin.audience.account_user import AccountUserEditView
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 
+pytestmark = pytest.mark.usefixtures("login")
 
-# pylint: disable=too-many-arguments, disable=unused-argument
+
 @pytest.fixture(scope="module", autouse=True)
-def setup(browser, navigator, custom_admin_login, requestbin, request, threescale):
+def setup(navigator, custom_admin_login, requestbin, request, threescale):
     """
     Configure webhooks and create requestbin.
     :return: name of specific requestbin
@@ -26,10 +27,9 @@ def setup(browser, navigator, custom_admin_login, requestbin, request, threescal
     request.addfinalizer(threescale.webhooks.clear)
 
 
-# pylint: disable=too-many-arguments, unused-argument
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6716")
 @pytest.mark.xfail
-def test_user_create(ui_account, login, navigator, requestbin, threescale):
+def test_user_create(ui_account, requestbin):
     """
     Test:
         - Create account (upon creation of account user is created as well)
@@ -49,8 +49,7 @@ def test_user_create(ui_account, login, navigator, requestbin, threescale):
     assert email == user["email"]
 
 
-# pylint: disable=too-many-arguments
-def test_user_update(login, navigator, requestbin, threescale, account, request):
+def test_user_update(navigator, requestbin, account, request):
     """
      Test:
         - Update user
@@ -75,8 +74,7 @@ def test_user_update(login, navigator, requestbin, threescale, account, request)
     assert email == user["email"]
 
 
-# pylint: disable=too-many-arguments
-def test_user_delete(login, navigator, requestbin, threescale, custom_account, request):
+def test_user_delete(navigator, requestbin, custom_account, request):
     """
     Test:
         - Delete account (upon deletion of account user is deleted as well)

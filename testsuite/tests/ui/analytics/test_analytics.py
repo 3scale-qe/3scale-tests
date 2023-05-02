@@ -38,8 +38,8 @@ def backend_valid(custom_backend):
     return backend
 
 
-# pylint: disable=unused-argument, too-many-arguments
-def test_analytics(login, navigator, service, api_client, backend_anything, backend_valid):
+@pytest.mark.usefixtures("login")
+def test_analytics(navigator, service, api_client, backend_anything, backend_valid):
     """
     Test:
         - makes request to `/valid` endpoint

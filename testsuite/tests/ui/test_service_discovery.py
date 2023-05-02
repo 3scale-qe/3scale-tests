@@ -5,9 +5,8 @@ from testsuite import resilient
 from testsuite.ui.views.admin.product.product import ProductNewView
 
 
-# pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def service(login, navigator, threescale, testconfig, request):
+def service(navigator, threescale, testconfig, request):
     """Discover service in OpenShift"""
     view = navigator.navigate(ProductNewView)
     view.discover()
@@ -26,6 +25,7 @@ def service(login, navigator, threescale, testconfig, request):
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8867")
 @pytest.mark.flaky  # Due to attached issue this test will successfully pass only once in 5 minutes
 @pytest.mark.sandbag  # Doesn't work on RHOAM
+@pytest.mark.usefixtures("login")
 def test_service_discovery(api_client):
     """Test that discovered service can be used"""
     response = api_client().get("/get")

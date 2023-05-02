@@ -10,12 +10,11 @@ from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalGr
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 
-
-# pylint: disable=unused-argument
+pytestmark = pytest.mark.usefixtures("login")
 
 
 @pytest.fixture(scope="module")
-def dev_portal_section(login, navigator, request, custom_admin_login):
+def dev_portal_section(navigator, request, custom_admin_login):
     """Creates a new section in developer portal"""
     view = navigator.navigate(CMSNewSectionView)
     section_name = blame(request, "TestSection")
@@ -33,7 +32,7 @@ def dev_portal_section(login, navigator, request, custom_admin_login):
 
 
 @pytest.fixture(scope="module", autouse=True)
-def dev_portal_page(login, navigator, request, dev_portal_section, custom_admin_login):
+def dev_portal_page(navigator, request, dev_portal_section, custom_admin_login):
     """Creates a new page in developer portal and assign it to section"""
     view = navigator.navigate(CMSNewPageView)
     page_name = blame(request, "TestPage")
