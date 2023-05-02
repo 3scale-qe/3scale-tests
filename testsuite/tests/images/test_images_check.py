@@ -58,19 +58,7 @@ def test_apicast_image(images, staging_gateway):
     assert digest == expected_image["manifest_digest"]
 
 
-@pytest.fixture(scope="module")
-def apicast_operator(staging_gateway):
-    """return: Self-managed Apicast operator"""
-    return staging_gateway.openshift.apicast_operator
-
-
-@pytest.fixture(scope="module")
-def threescale_operator(openshift):
-    """return: 3scale operator"""
-    return openshift().threescale_operator
-
-
-@pytest.mark.parametrize("operator_type", ["threescale_operator", "apicast_operator"])
+@pytest.mark.parametrize("operator_type", ["operator", "apicast_operator"])
 def test_operator_image(images, operator_type, request):
     """
     Test:

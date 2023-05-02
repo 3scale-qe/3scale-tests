@@ -962,3 +962,21 @@ def images(testconfig):
     if not images:
         warn_and_skip("Images not provided.")
     return images
+
+
+@pytest.fixture(scope="session")
+def operator(testconfig):
+    """Return threescale operator pod object."""
+    ocp = weakget(testconfig)["operators"]["threescale"]["openshift"] % None
+    if ocp is None:
+        warn_and_skip("Threescale operator was not found anywhere")
+    return ocp.threescale_operator
+
+
+@pytest.fixture(scope="session")
+def apicast_operator(testconfig):
+    """Return apicast operator pod object."""
+    ocp = weakget(testconfig)["operators"]["apicast"]["openshift"] % None
+    if ocp is None:
+        warn_and_skip("APIcast operator was not found anywhere")
+    return ocp.apicast_operator

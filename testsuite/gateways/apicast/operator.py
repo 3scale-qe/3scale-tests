@@ -3,6 +3,9 @@ import re
 import time
 from typing import Dict, Callable, Pattern, Any, Match, Union
 
+from weakget import weakget
+
+from testsuite import settings
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.crd.apicast import APIcast
@@ -128,7 +131,7 @@ class OperatorApicast(OpenshiftApicast):
     def fits(openshift: OpenShiftClient):
         return Capability.OCP4 in CapabilityRegistry() \
                 and openshift.project_exists \
-                and openshift.has_apicast_operator
+                and weakget(settings)["operators"]["apicast"]["openshift"] % False
 
     @property
     def deployment(self):
