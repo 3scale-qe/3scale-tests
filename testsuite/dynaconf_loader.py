@@ -126,21 +126,29 @@ def _rhsso_password(server_url, token):
 
 
 def _threescale_operator_ocp(ocp):
-    if ocp.threescale_operator is not None:
+    try:
+        ocp.threescale_operator  # pylint: disable=pointless-statement
         return ocp
-    operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
-    if operators.threescale_operator is not None:
-        return operators
-    return None
+    except OpenShiftPythonException:
+        try:
+            operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
+            operators.threescale_operator  # pylint: disable=pointless-statement
+            return operators
+        except OpenShiftPythonException:
+            return None
 
 
 def _apicast_operator_ocp(ocp):
-    if ocp.apicast_operator is not None:
+    try:
+        ocp.apicast_operator  # pylint: disable=pointless-statement
         return ocp
-    operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
-    if operators.apicast_operator is not None:
-        return operators
-    return None
+    except OpenShiftPythonException:
+        try:
+            operators = OpenShiftClient("openshift-operators", ocp.server_url, ocp.token)
+            operators.apicast_operator  # pylint: disable=pointless-statement
+            return operators
+        except OpenShiftPythonException:
+            return None
 
 
 def _apicast_ocp(ocp, settings):
