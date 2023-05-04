@@ -30,6 +30,7 @@ from testsuite.prometheus import PrometheusClient
 from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, warn_and_skip
+from testsuite.mailhog import MailhogClient
 
 if weakget(settings)["reporting"]["print_app_logs"] % True:
     pytest_plugins = ("testsuite.gateway_logs",)
@@ -980,3 +981,15 @@ def apicast_operator(testconfig):
     if ocp is None:
         warn_and_skip("APIcast operator was not found anywhere")
     return ocp.apicast_operator
+
+
+@pytest.fixture(scope="module")
+def mailhog_client(openshift, tools, testconfig):
+    """Creates mailhog client with url set to the
+     route of the 'mailhog' app in the openshift"""
+    mailhog = MailhogClient(openshift(), fallback=weakget(tools)["mailhog"] % None)
+
+    yield mailhog
+
+    if not testconfig["skip_cleanup"]:
+        mailhog.delete_searched_messages()

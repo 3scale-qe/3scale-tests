@@ -17,7 +17,7 @@ from testsuite.utils import blame
 
 @pytest.fixture(scope="module")
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
-    "application bound to the account and service with specific description that don't break yaml parsing"
+    """Application bound to the account and service with specific description that don't break yaml parsing"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
     app = custom_application(
         rawobj.Application(blame(request, "app"), plan, "Api signup"), hooks=lifecycle_hooks,
@@ -28,7 +28,7 @@ def application(service, custom_application, custom_app_plan, lifecycle_hooks, r
 
 @pytest.fixture(scope="module")
 def mail_template(account, application, testconfig) -> dict:
-    """loads the mail templates and substitutes the variables"""
+    """Loads the mail templates and substitutes the variables"""
     dirname = os.path.dirname(__file__)
     with open(f"{dirname}/mail_templates.yml", encoding="utf8") as stream:
         account_email_domain = [i["email"] for i in account.users.list() if i["role"] == "admin"][0].split("@", 1)[1]
@@ -72,7 +72,6 @@ def message_match(tpl, key, text):
 
 
 # requires mailhog *AND* special deployment with preconfigured smtp secret
-# pylint: disable=unused-argument
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=10, jitter=None)
 @pytest.mark.sandbag
 def test_emails_after_account_creation(mailhog_client, mail_template):
@@ -81,24 +80,17 @@ def test_emails_after_account_creation(mailhog_client, mail_template):
     """
     tpl = mail_template  # safe few letters
 
-    messages = mailhog_client.messages(limit=-1)["items"]
-    assert messages, "Mailhog inbox is empty"
-
-    messages = [m for m in messages if message_match(tpl, "Headers", headers(m).get("X-SMTPAPI", "DO NOT MATCH"))]
+    messages = [m for m in mailhog_client.all_messages()
+                if message_match(tpl, "Headers", headers(m).get("X-SMTPAPI", "DO NOT MATCH"))]
     assert messages, f"Didn't find assumed X-SMTPAPI: {tpl['Headers']}"
 
-    messages = [m for m in messages if headers(m, filter_keys=tpl["equal_templates"].keys()) == tpl["equal_templates"]]
+    messages = [m for m in mailhog_client.all_messages()
+                if headers(m, filter_keys=tpl["equal_templates"].keys()) == tpl["equal_templates"]]
     assert messages, f"Didn't find any email sent to expected account identified by {tpl['equal_templates']}"
 
     messages = [m for m in messages if message_match(tpl, "Body", body(m))]
-    assert len(messages) == 3
+    # adding messages to garbage collector
+    for msg in messages:
+        mailhog_client.append_to_searched_messages(msg)
 
-    # Yeah! Cleanup in the test. This shouldn't be here because it won't clean
-    # in case of failure. A reason to have it here is the fact that this
-    # version of test doesn't contain separate function to filter tested
-    # message (probably the author was lazy), also separate function scoped can
-    # be dangerous due to backoff/flakiness. On the other hand it isn't that
-    # "devastating" if messages are not cleaned as the mailhog receives too
-    # many other emails and it is flooded anyway. However better implementation
-    # with cleanup in fixture is highly desirable.
-    mailhog_client.delete([m["ID"] for m in messages])
+    assert len(messages) == 3
