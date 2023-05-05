@@ -17,7 +17,6 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6193"),
 ]
 
-
 ACCESS_LOG_FILE = "access.log"
 
 
@@ -87,10 +86,12 @@ def assert_apicast_host_match(apicast_url, content, hits):
 
 def test_access_log_lines_match_requests_hits(make_requests, read_log):
     """Logs appended to access log file match number of requests made against gateway."""
+    _, lines_before = read_log(ACCESS_LOG_FILE)
+
     url = make_requests(3)
 
     content, lines = read_log(ACCESS_LOG_FILE)
 
-    assert lines == 3
+    assert lines == lines_before + 3
 
-    assert_apicast_host_match(apicast_host(url), content, 3)
+    assert_apicast_host_match(apicast_host(url), content, lines_before + 3)

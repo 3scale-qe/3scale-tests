@@ -33,15 +33,18 @@ def service_names(request):
 
 
 @pytest.fixture(scope="module")
-def create_services(openshift, request, delete_services, service_names):
+def create_services(openshift, request, delete_services, service_names, testconfig):
     """
     Creates services defined by the values from service_names.
     """
     openshift = openshift()
-    request.addfinalizer(delete_services)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(delete_services)
 
     for name in service_names:
         openshift.create_service(name, ServiceTypes.CLUSTER_IP, 8080, 8080)
+
+    return service_names
 
 
 @pytest.fixture(scope="module")

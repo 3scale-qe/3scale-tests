@@ -52,10 +52,11 @@ def setup(lifecycle_hooks):
 
 
 @pytest.fixture(scope="module")
-def production_gateway(request):
+def production_gateway(request, testconfig):
     """Deploy template APIcast gateway."""
     gw = gateway(kind=TemplateApicast, staging=False, name=blame(request, "production"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     gw.environ["APICAST_SERVICES_FILTER_BY_URL"] = ".*.doesnt.exist"
