@@ -74,7 +74,7 @@ def message_match(tpl, key, text):
 # requires mailhog *AND* special deployment with preconfigured smtp secret
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=10, jitter=None)
 @pytest.mark.sandbag
-def test_emails_after_account_creation(mailhog_client, mail_template):
+def test_emails_content_after_account_creation(mailhog_client, mail_template):
     """
     Checks that the total number of matching emails is three.
     """
@@ -89,8 +89,15 @@ def test_emails_after_account_creation(mailhog_client, mail_template):
     assert messages, f"Didn't find any email sent to expected account identified by {tpl['equal_templates']}"
 
     messages = [m for m in messages if message_match(tpl, "Body", body(m))]
-    # adding messages to garbage collector
-    for msg in messages:
-        mailhog_client.append_to_searched_messages(msg)
-
     assert len(messages) == 3
+
+
+@pytest.mark.sandbag
+def test_emails_subjects_after_account_creation(mailhog_client, application):
+    """Test check that all(3) messages after creating account, application and subscribing to app were sent"""
+    mailhog_client.assert_message_received(
+        subject=f"{application['org_name']} has subscribed to your service {application['service_name']}")
+    mailhog_client.assert_message_received(
+        subject=f"{application['org_name']} from {application['org_name']} signed up")
+    mailhog_client.assert_message_received(
+        subject=f"{application['name']} created on {application['service_name']}")
