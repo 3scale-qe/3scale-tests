@@ -22,7 +22,7 @@ from testsuite.tests.apicast.policy.tls.conftest import require_openshift, stagi
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
-    pytest.mark.usefixtures("login", "policy_application")]
+    pytest.mark.usefixtures("login")]
 
 
 @pytest.fixture(scope="function")
@@ -77,7 +77,8 @@ def embedded_certs(certificate):
     pytest.param("local_certs", id="Local certificates", marks=pytest.mark.required_capabilities(Capability.OCP3)),
     pytest.param("embedded_certs", id="Embedded certificates"),
 ])
-def test_tls_terminology_policy_via_ui(request, policy_service, navigator, cert_type_setup, client, valid_authority):
+def test_tls_terminology_policy_via_ui(request, policy_service, navigator, cert_type_setup, client, valid_authority,
+                                       policy_application):
     """
     Test:
         - Create service via API
