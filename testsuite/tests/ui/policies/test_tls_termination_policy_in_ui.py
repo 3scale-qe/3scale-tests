@@ -22,8 +22,7 @@ from testsuite.tests.apicast.policy.tls.conftest import require_openshift, stagi
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
-    pytest.mark.usefixtures("login"),
-    pytest.mark.usefixtures("policy_application")]
+    pytest.mark.usefixtures("login", "policy_application")]
 
 
 @pytest.fixture(scope="function")
