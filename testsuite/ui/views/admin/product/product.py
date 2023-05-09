@@ -11,15 +11,17 @@ from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdat
 
 class ProductNewView(BaseAdminView):
     """View representation of New Product page"""
+
     path_pattern = "/apiconfig/services/new"
     product_radio = RadioGroup('//*[@id="new_service_source"]')
-    product = ConditionalSwitchableView(reference='product_radio')
+    product = ConditionalSwitchableView(reference="product_radio")
     create_button = ThreescaleCreateButton()
 
     # pylint: disable=undefined-variable
     @product.register(condition=lambda product_radio: product_radio == "source_manual")
     class CreateProduct(View):
         """View for creation of new product"""
+
         name = TextInput(id="service_name")
         system_name = TextInput(id="service_system_name")
         description = TextInput(id="service_description")
@@ -32,6 +34,7 @@ class ProductNewView(BaseAdminView):
     @product.register(condition=lambda product_radio: product_radio == "source_discover")
     class ImportProduct(View):
         """View for import of new product"""
+
         loading = GenericLocatorWidget('//*[contains(@class, "fa-spin")]')
         namespace = ThreescaleDropdown('//*[@id="service_namespace"]/..')
         name = ThreescaleDropdown('//*[@id="service_name"]/..')
@@ -49,7 +52,7 @@ class ProductNewView(BaseAdminView):
 
     def discover(self):
         """Import product from OpenShift"""
-        self.product_radio.select('source_discover')
+        self.product_radio.select("source_discover")
         self.product.wait_displayed()
         self.create_button.click()
 
@@ -58,12 +61,12 @@ class ProductNewView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.product.is_displayed
+        return BaseAdminView.is_displayed.fget(self) and self.path in self.browser.url and self.product.is_displayed
 
 
 class ProductDetailView(BaseProductView):
     """View representation of Product detail page (Overview page)"""
+
     path_pattern = "/apiconfig/services/{product_id}"
     edit_button = Text(locator="//*[@id='content']/section/div/a")
 
@@ -77,12 +80,14 @@ class ProductDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.edit_button.is_displayed
+        return (
+            BaseProductView.is_displayed.fget(self) and self.path in self.browser.url and self.edit_button.is_displayed
+        )
 
 
 class ProductEditView(BaseProductView):
     """View representation of Edit Product page"""
+
     path_pattern = "/apiconfig/services/{product_id}/edit"
     name = TextInput(id="service_name")
     description = TextInput(id="service_description")
@@ -107,5 +112,9 @@ class ProductEditView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.name.is_displayed and self.description.is_displayed
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.name.is_displayed
+            and self.description.is_displayed
+        )

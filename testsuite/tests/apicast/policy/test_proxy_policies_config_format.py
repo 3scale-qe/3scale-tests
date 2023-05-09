@@ -15,11 +15,9 @@ pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1059
 @pytest.fixture
 def policy():
     """Returns valid policy."""
-    return rawobj.PolicyConfig("headers", {
-        "response": [{"op": "set",
-                      "header": "X-FOO",
-                      "value_type": "plain",
-                      "value": "Bar"}]})
+    return rawobj.PolicyConfig(
+        "headers", {"response": [{"op": "set", "header": "X-FOO", "value_type": "plain", "value": "Bar"}]}
+    )
 
 
 @pytest.fixture

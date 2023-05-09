@@ -26,7 +26,9 @@ def invalid_authority(request, manager) -> Certificate:
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request,):
+def staging_gateway(
+    request,
+):
     """Standard gateway, copied from root conftest."""
     gateway = gateways.gateway(staging=True)
     request.addfinalizer(gateway.destroy)
@@ -40,10 +42,15 @@ def policy_settings(certificate):
     """Embedded upstream mTLS policy"""
     embedded_cert = embedded(certificate.certificate, "tls.crt", "pkix-cert")
     embedded_key = embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    return rawobj.PolicyConfig("upstream_mtls", {"certificate_type": "embedded",
-                                                 "certificate_key_type": "embedded",
-                                                 "certificate": embedded_cert,
-                                                 "certificate_key": embedded_key})
+    return rawobj.PolicyConfig(
+        "upstream_mtls",
+        {
+            "certificate_type": "embedded",
+            "certificate_key_type": "embedded",
+            "certificate": embedded_cert,
+            "certificate_key": embedded_key,
+        },
+    )
 
 
 def test_mtls_request(api_client, authority_and_code):

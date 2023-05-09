@@ -8,14 +8,16 @@ import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6705")]
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6705"),
+]
 
 
 @pytest.fixture
 def failing_chain(on_failed_policy) -> tuple:
     """returns a policy chain that fails the execution
-       made by a non-existent policy and on_failed policy"""
+    made by a non-existent policy and on_failed policy"""
     return (rawobj.PolicyConfig("invalid_policy", {}), on_failed_policy)
 
 
@@ -49,11 +51,14 @@ def status_code(chain_name, on_failed_configuration) -> int:
     return on_failed_configuration.get("error_status_code", 503)
 
 
-@backoff.on_predicate(backoff.fibo,
-                      lambda response: response.headers.get("server") not in ("openresty", "envoy"),
-                      max_tries=8, jitter=None)
+@backoff.on_predicate(
+    backoff.fibo,
+    lambda response: response.headers.get("server") not in ("openresty", "envoy"),
+    max_tries=8,
+    jitter=None,
+)
 def make_request(api_client):
-    """Make request to the product and retry if the response isn't from APIcast """
+    """Make request to the product and retry if the response isn't from APIcast"""
     return api_client.get("/")
 
 

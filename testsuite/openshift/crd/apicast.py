@@ -20,19 +20,12 @@ class APIcast(APIObject):
         model = {
             "apiVersion": "apps.3scale.net/v1alpha1",
             "kind": "APIcast",
-            "metadata": {
-                "name": name,
-                "namespace": openshift.project_name
-            },
-            "spec": {
-                "adminPortalCredentialsRef": {
-                    "name": name
-                }
-            }
+            "metadata": {"name": name, "namespace": openshift.project_name},
+            "spec": {"adminPortalCredentialsRef": {"name": name}},
         }
         if labels is not None:
             # Mypy incorrectly infers type of model as Collection[str]
-            model["metadata"]["labels"] = labels    # type: ignore
+            model["metadata"]["labels"] = labels  # type: ignore
 
         # Ensure that the object is created with the correct execution context
         context = Context()

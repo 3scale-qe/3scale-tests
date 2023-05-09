@@ -19,9 +19,15 @@ pytestmark = [
 METRICS = [
     # TODO: test for this metrics after finding trigger for nginx error
     # "nginx_error_log",
-    "nginx_http_connections", "nginx_metric_errors_total", "openresty_shdict_capacity",
-    "openresty_shdict_free_space", "threescale_backend_calls", "upstream_status",
-    "apicast_status", "worker_process", "content_caching",
+    "nginx_http_connections",
+    "nginx_metric_errors_total",
+    "openresty_shdict_capacity",
+    "openresty_shdict_free_space",
+    "threescale_backend_calls",
+    "upstream_status",
+    "apicast_status",
+    "worker_process",
+    "content_caching",
 ]
 
 METRICS_HISTOGRAM = ["total_response_time_seconds", "upstream_response_time_seconds"]
@@ -47,7 +53,7 @@ def test_metrics_from_target_must_contains_apicast_metrics(expected_metric, metr
 def test_metrics_from_target_must_contains_apicast_metrics_histogram(expected_metric, metrics):
     """Metrics must contain expected apicast metrics defined in METRICS."""
     for suffix in ["_bucket", "_sum", "_count"]:
-        assert expected_metric+suffix in metrics
+        assert expected_metric + suffix in metrics
 
 
 # there is certain delay before all appears in Prometheus
@@ -68,9 +74,10 @@ def apicast_status_metrics(prometheus, container):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5417")
-@pytest.mark.parametrize(("client", "container"), [("api_client", "apicast-staging"),
-                                                   ("prod_client", "apicast-production")
-                                                   ], )
+@pytest.mark.parametrize(
+    ("client", "container"),
+    [("api_client", "apicast-staging"), ("prod_client", "apicast-production")],
+)
 def test_apicast_status_metrics(request, client, container, prometheus):
     """Test apicast_status metric.
 

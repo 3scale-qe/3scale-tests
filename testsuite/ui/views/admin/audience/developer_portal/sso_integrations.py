@@ -10,6 +10,7 @@ from testsuite.ui.widgets.buttons import ThreescaleEditButton, ThreescaleUpdateB
 
 class SSOIntegrationsView(BaseAudienceView):
     """View representation of SSO Integrations page for developer portal"""
+
     path_pattern = "/p/admin/authentication_providers"
     table = PatternflyTable("//table[@class='data']")
 
@@ -33,6 +34,7 @@ class SSOIntegrationsView(BaseAudienceView):
 
 class RHSSOIntegrationDetailView(BaseAudienceView):
     """View representation of RHSSO Integration page"""
+
     path_pattern = "/p/admin/authentication_providers/{integration_id}"
     edit_button = ThreescaleEditButton()
     publish_checkbox = ThreescaleCheckBox("//*[@id='authentication_provider_published']")
@@ -59,12 +61,17 @@ class RHSSOIntegrationDetailView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.edit_button.is_displayed and self.publish_checkbox.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.edit_button.is_displayed
+            and self.publish_checkbox.is_displayed
+        )
 
 
 class RHSSOIntegrationEditView(BaseAudienceView):
     """View representation of edit RHSSO Integration page"""
+
     path_pattern = "/p/admin/authentication_providers/{integration_id}/edit"
     client_id = TextInput(id="authentication_provider_client_id")
     client_secret = TextInput(id="authentication_provider_client_secret")
@@ -86,12 +93,17 @@ class RHSSOIntegrationEditView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.client_id.is_displayed and self.client_secret.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.client_id.is_displayed
+            and self.client_secret.is_displayed
+        )
 
 
 class Auth0IntegrationDetailView(BaseAudienceView):
     """View representation of Auth0 Integration page"""
+
     path_pattern = "/p/admin/authentication_providers/{integration_id}"
     edit_button = ThreescaleEditButton()
     publish_checkbox = ThreescaleCheckBox("//*[@id='authentication_provider_published']")
@@ -118,12 +130,17 @@ class Auth0IntegrationDetailView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.edit_button.is_displayed and self.publish_checkbox.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.edit_button.is_displayed
+            and self.publish_checkbox.is_displayed
+        )
 
 
 class Auth0IntegrationEditView(BaseAudienceView):
     """View representation of edit Auth0 Integration page"""
+
     path_pattern = "/p/admin/authentication_providers/{integration_id}/edit"
     client_id = TextInput(id="authentication_provider_client_id")
     client_secret = TextInput(id="authentication_provider_client_secret")
@@ -145,5 +162,9 @@ class Auth0IntegrationEditView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.client_id.is_displayed and self.client_secret.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.client_id.is_displayed
+            and self.client_secret.is_displayed
+        )

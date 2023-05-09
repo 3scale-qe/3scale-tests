@@ -54,11 +54,9 @@ def service2_mapping():
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings,
-             service2_mapping):
+def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, service2_mapping):
     """Create second service and mapping rule."""
-    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings,
-                              hooks=lifecycle_hooks)
+    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings, hooks=lifecycle_hooks)
 
     metric = service2.metrics.list()[0]
     proxy = service2.proxy.list()

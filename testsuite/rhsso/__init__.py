@@ -74,6 +74,7 @@ class RHSSOServiceConfiguration:
         @backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8, jitter=None)
         def _app_client():
             return self.realm.admin.get_client_id(application["client_id"])
+
         client = _app_client()
         if not allow_null:
             assert client is not None, "Zync didnt create RHSSO client in time, try restarting it"
@@ -114,23 +115,27 @@ class RHSSOServiceConfiguration:
         Custom serializer for pickle module
         more info here: https://docs.python.org/3/library/pickle.html#object.__getstate__
         """
-        return {"client": self.client.client_id,
-                "realm": self.realm.name,
-                "rhsso": {"url": self.rhsso.server_url,
-                          "username": self.rhsso.master.username,
-                          "password": self.rhsso.master.password},
-                "user": self.user,
-                "username": self.username,
-                "password": self.password}
+        return {
+            "client": self.client.client_id,
+            "realm": self.realm.name,
+            "rhsso": {
+                "url": self.rhsso.server_url,
+                "username": self.rhsso.master.username,
+                "password": self.rhsso.master.password,
+            },
+            "user": self.user,
+            "username": self.username,
+            "password": self.password,
+        }
 
     def __setstate__(self, state):
         """
         Custom deserializer for pickle module
         more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
         """
-        self.rhsso = RHSSO(server_url=state["rhsso"]["url"],
-                           username=state["rhsso"]["username"],
-                           password=state["rhsso"]["password"])
+        self.rhsso = RHSSO(
+            server_url=state["rhsso"]["url"], username=state["rhsso"]["username"], password=state["rhsso"]["password"]
+        )
         self.realm = Realm(self.rhsso.master, state["realm"])
         self.user = state["user"]
         self.client = Client(self.realm, state["client"])
@@ -157,7 +162,7 @@ class OIDCClientAuth(BaseClientAuth):
         credentials = {"access_token": access_token}
 
         if self.location == "authorization":
-            request.headers.update({'Authorization': 'Bearer ' + access_token})
+            request.headers.update({"Authorization": "Bearer " + access_token})
         elif self.location == "headers":
             request.prepare_headers(credentials)
         elif self.location == "query":
@@ -175,9 +180,7 @@ class OIDCClientAuthHook:
         self.credentials_location = credentials_location
         self.oidc_configuration = oidc_configuration
         if self.oidc_configuration is None:
-            self.oidc_configuration = {
-                "standard_flow_enabled": False,
-                "direct_access_grants_enabled": True}
+            self.oidc_configuration = {"standard_flow_enabled": False, "direct_access_grants_enabled": True}
 
     # pylint: disable=no-self-use
     def before_service(self, service_params: dict) -> dict:
@@ -191,7 +194,8 @@ class OIDCClientAuthHook:
         proxy_params.update(
             credentials_location=self.credentials_location,
             oidc_issuer_endpoint=self.rhsso_service_info.authorization_url(),
-            oidc_issuer_type="keycloak")
+            oidc_issuer_type="keycloak",
+        )
         return proxy_params
 
     # pylint: disable=no-self-use
@@ -206,8 +210,10 @@ class OIDCClientAuthHook:
         # pylint: disable=protected-access
         if application._client_factory is HttpClient:
             application.register_auth(
-                Service.AUTH_OIDC, OIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
+                Service.AUTH_OIDC, OIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location)
+            )
         else:
             application.register_auth(
                 Service.AUTH_OIDC,
-                HttpxOidcClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
+                HttpxOidcClientAuth.partial(self.rhsso_service_info, location=self.credentials_location),
+            )

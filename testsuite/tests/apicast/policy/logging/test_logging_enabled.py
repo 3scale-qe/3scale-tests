@@ -14,9 +14,7 @@ def policy_settings():
     """
     Sets the logging policy to enable logging
     """
-    return rawobj.PolicyConfig("logging", {
-        "enable_access_logs": True
-    })
+    return rawobj.PolicyConfig("logging", {"enable_access_logs": True})
 
 
 def test_logging(api_client, staging_gateway):

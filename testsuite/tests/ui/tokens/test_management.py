@@ -31,7 +31,7 @@ def test_read_service(token, api_client):
     Request to get list of services should have status code 200
     """
 
-    response = api_client("GET", '/admin/api/services', token)
+    response = api_client("GET", "/admin/api/services", token)
     assert response.status_code == 200
 
 
@@ -41,8 +41,12 @@ def test_create_account_user(account, token, api_client, request, permission):
     """
 
     name = blame(request, "acc")
-    params = {"account_id": account.entity_id, "username": name, "email": f"{name}@anything.invalid",
-              "password": "123456"}
+    params = {
+        "account_id": account.entity_id,
+        "username": name,
+        "email": f"{name}@anything.invalid",
+        "password": "123456",
+    }
     response = api_client("POST", f"/admin/api/accounts/{account.entity_id}/users", token, params)
     assert response.status_code == permission[1]
 
@@ -77,7 +81,7 @@ def test_create_invoice_line_item(invoice, token, api_client, request):
     """
 
     name = blame(request, "item")
-    params = {"invoice_id": invoice.entity_id, "name": name, "description": "description", "quantity": '1', "cost": 1}
+    params = {"invoice_id": invoice.entity_id, "name": name, "description": "description", "quantity": "1", "cost": 1}
     response = api_client("POST", f"/api/invoices/{invoice.entity_id}/line_items", token, json=params)
     assert response.status_code == 403
 
@@ -108,7 +112,7 @@ def test_create_provider_account(request, token, api_client, permission, threesc
     params = {"username": username, "email": f"{username}@example.com", "password": "account_password"}
     response = api_client("POST", "/admin/api/users", token, params)
     if permission[0]:
-        request.addfinalizer(lambda: threescale.provider_account_users.delete(response.json()['user']['id']))
+        request.addfinalizer(lambda: threescale.provider_account_users.delete(response.json()["user"]["id"]))
     assert response.status_code == permission[1]
 
 
@@ -119,6 +123,5 @@ def test_create_app_key(token, api_client, account, application, permission):
     account_id = account.entity_id
     application_id = application.entity_id
     params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
-    response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token,
-                          params)
+    response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token, params)
     assert response.status_code == permission[1]

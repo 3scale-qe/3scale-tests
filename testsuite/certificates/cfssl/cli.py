@@ -17,18 +17,17 @@ class CFSSLProviderCLI(KeyProvider, SigningProvider):
         super().__init__()
         self.binary = binary
 
-    def _execute_command(self,
-                         command: str,
-                         *args: str,
-                         stdin: Optional[str] = None):
+    def _execute_command(self, command: str, *args: str, stdin: Optional[str] = None):
         args = (self.binary, command, *args)
         try:
-            response = subprocess.run(args,
-                                      stderr=subprocess.PIPE,
-                                      stdout=subprocess.PIPE,
-                                      input=stdin,
-                                      universal_newlines=bool(stdin),
-                                      check=False)
+            response = subprocess.run(
+                args,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                input=stdin,
+                universal_newlines=bool(stdin),
+                check=False,
+            )
             if response.returncode != 0:
                 raise CFSSLException(f"CFSSL command {args} returned non-zero response code, error {response.stderr}")
             return json.loads(response.stdout)
@@ -38,11 +37,10 @@ class CFSSLProviderCLI(KeyProvider, SigningProvider):
                 raise AttributeError("CFSSL binary does not exist") from exception
             raise exception
 
-    def generate_key(self, common_name: str, names: Optional[List[Dict[str, str]]] = None,
-                     hosts: Optional[List[str]] = None) -> UnsignedKey:
-        data: Dict[str, Any] = {
-            "CN": common_name
-        }
+    def generate_key(
+        self, common_name: str, names: Optional[List[Dict[str, str]]] = None, hosts: Optional[List[str]] = None
+    ) -> UnsignedKey:
+        data: Dict[str, Any] = {"CN": common_name}
         if names:
             data["names"] = names
         if hosts:
@@ -55,7 +53,7 @@ class CFSSLProviderCLI(KeyProvider, SigningProvider):
         args = [
             f"-ca={certificate_authority.files['certificate']}",
             f"-ca-key={certificate_authority.files['key']}",
-            f"-config={resources.files('testsuite.resources.tls').joinpath('intermediate_config.json')}"
+            f"-config={resources.files('testsuite.resources.tls').joinpath('intermediate_config.json')}",
         ]
         result = self._execute_command("sign", *args, "-", stdin=key.csr)
         return Certificate(key=key.key, certificate=result["cert"])
@@ -68,14 +66,10 @@ class CFSSLProviderCLI(KeyProvider, SigningProvider):
         result = self._execute_command("sign", *args, "-", stdin=key.csr)
         return Certificate(key=key.key, certificate=result["cert"])
 
-    def generate_ca(self, common_name: str,
-                    names: List[Dict[str, str]],
-                    hosts: List[str]) -> Tuple[Certificate, UnsignedKey]:
-        data = {
-            "CN": common_name,
-            "names": names,
-            "hosts": hosts
-        }
+    def generate_ca(
+        self, common_name: str, names: List[Dict[str, str]], hosts: List[str]
+    ) -> Tuple[Certificate, UnsignedKey]:
+        data = {"CN": common_name, "names": names, "hosts": hosts}
 
         result = self._execute_command("genkey", "-initca", "-", stdin=json.dumps(data))
         key = UnsignedKey(key=result["key"], csr=result["csr"])

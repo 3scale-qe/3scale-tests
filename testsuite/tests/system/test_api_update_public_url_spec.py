@@ -19,7 +19,7 @@ def proxy_update(service, testconfig, request):
     superdomain = testconfig["threescale"]["superdomain"]
     params = {
         "endpoint": f"https://{prefix}-2-production.{superdomain}:443",
-        "sandbox_endpoint": f"https://{prefix}-2-staging.{superdomain}:443"
+        "sandbox_endpoint": f"https://{prefix}-2-staging.{superdomain}:443",
     }
 
     service.proxy.list().update(params)
@@ -32,7 +32,7 @@ def test_api_client(api_client):
     """
     Test request has to pass and return HTTP 200 for staging client
     """
-    response = api_client().get('/get')
+    response = api_client().get("/get")
     assert response.status_code == 200
 
 
@@ -42,7 +42,7 @@ def test_prod_client(prod_client):
     """
     Test request has to pass and return HTTP 200 for prod. client.
     """
-    response = prod_client().get('/get')
+    response = prod_client().get("/get")
     assert response.status_code == 200
 
 
@@ -51,5 +51,5 @@ def test_proxy_update(service, proxy_update):
     Tests checks if the updated endpoints match.
     """
     proxy = service.proxy.list()
-    assert proxy['endpoint'] == proxy_update['endpoint']
-    assert proxy['sandbox_endpoint'] == proxy_update['sandbox_endpoint']
+    assert proxy["endpoint"] == proxy_update["endpoint"]
+    assert proxy["sandbox_endpoint"] == proxy_update["sandbox_endpoint"]

@@ -7,9 +7,11 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5753"),
-              pytest.mark.required_capabilities(Capability.SCALING)]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5753"),
+    pytest.mark.required_capabilities(Capability.SCALING),
+]
 BATCH_REPORT_SECONDS = 150
 
 
@@ -19,8 +21,9 @@ def service(service):
     Adds policies to service RESILIENT mode.
     Sets the frequency of batch reports that APIcast sends to the 3Scale backend. (Default is 10)
     """
-    batcher = rawobj.PolicyConfig("3scale_batcher",
-                                  {"batch_report_seconds": BATCH_REPORT_SECONDS, "auths_ttl": BATCH_REPORT_SECONDS})
+    batcher = rawobj.PolicyConfig(
+        "3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS, "auths_ttl": BATCH_REPORT_SECONDS}
+    )
     caching = rawobj.PolicyConfig("caching", {"caching_type": "resilient"})
     service.proxy.list().policies.insert(0, batcher, caching)
     return service

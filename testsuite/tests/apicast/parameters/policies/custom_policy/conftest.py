@@ -8,11 +8,17 @@ from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.utils import blame, custom_policy
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param(SystemApicast, marks=pytest.mark.disruptive, id="3scale operator"),
-    pytest.param(OperatorApicast, marks=pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT),
-                 id="APIcast operator")
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(SystemApicast, marks=pytest.mark.disruptive, id="3scale operator"),
+        pytest.param(
+            OperatorApicast,
+            marks=pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT),
+            id="APIcast operator",
+        ),
+    ],
+)
 def gateway_kind(request):
     """Gateway class to use for tests"""
     return request.param

@@ -13,35 +13,34 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.utils import blame, randomize
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+]
 
 
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment):
     """Enable caching on gateway"""
-    gateway_environment.update({"APICAST_CACHE_STATUS_CODES": "200",
-                                "APICAST_CACHE_MAX_TIME": "30s"})
+    gateway_environment.update({"APICAST_CACHE_STATUS_CODES": "200", "APICAST_CACHE_MAX_TIME": "30s"})
     return gateway_environment
 
 
 @pytest.fixture(scope="module")
 def policy_settings():
     """content caching policy configuration"""
-    return rawobj.PolicyConfig("content_caching", {
-        "rules": [{
-            "cache": True,
-            "header": "X-Cache-Status",
-            "condition": {
-                "combine_op": "and",
-                "operations": [{
-                    "left": "ooo",
-                    "op": "==",
-                    "right": "ooo"
-                }]
-            }
-        }]
-    })
+    return rawobj.PolicyConfig(
+        "content_caching",
+        {
+            "rules": [
+                {
+                    "cache": True,
+                    "header": "X-Cache-Status",
+                    "condition": {"combine_op": "and", "operations": [{"left": "ooo", "op": "==", "right": "ooo"}]},
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")
@@ -51,16 +50,19 @@ def backends_mapping(custom_backend, private_base_url, lifecycle_hooks):
         - path to Backend 1: "/echo-api"
         - path to Backend 2: "/httpbin"
     """
-    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api"), hooks=lifecycle_hooks),
-            "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin_go"), hooks=lifecycle_hooks)}
+    return {
+        "/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api"), hooks=lifecycle_hooks),
+        "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin_go"), hooks=lifecycle_hooks),
+    }
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
 def service2(custom_service, backends_mapping, request, service_proxy_settings, policy_settings, lifecycle_hooks):
     """Second service"""
-    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
-                             hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
     service.proxy.list().policies.append(policy_settings)
     return service
 
@@ -98,7 +100,7 @@ def test_wont_cache(client, private_base_url):
     """Test that redirected request (302 status code) will not be cached"""
     origin_localhost = {"origin": "localhost"}
 
-    payload = {'url': f'{private_base_url("echo_api")}/uuid'}
+    payload = {"url": f'{private_base_url("echo_api")}/uuid'}
     response = client.get("/httpbin/redirect-to", params=payload, headers=origin_localhost)
     # First request was redirected
     assert response.history[0].status_code == 302
@@ -115,7 +117,7 @@ def test_wont_cache(client, private_base_url):
     echoed_request2 = EchoedRequest.create(response)
 
     # body wasn't cached
-    assert echoed_request.json['uuid'] != echoed_request2.json['uuid']
+    assert echoed_request.json["uuid"] != echoed_request2.json["uuid"]
 
 
 def test_will_cache(client, client2):
@@ -135,7 +137,7 @@ def test_will_cache(client, client2):
     echoed_request_cached = EchoedRequest.create(response)
 
     # body was cached
-    assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']
+    assert echoed_request.json["uuid"] == echoed_request_cached.json["uuid"]
 
     # another service wont hit the cache with the same request
     response = client2.get("/echo-api/uuid", headers=origin_localhost)
@@ -143,7 +145,7 @@ def test_will_cache(client, client2):
     assert response.headers.get("X-Cache-Status") != "HIT"
 
     echoed_request_not_cached = EchoedRequest.create(response)
-    assert echoed_request.json['uuid'] != echoed_request_not_cached.json['uuid']
+    assert echoed_request.json["uuid"] != echoed_request_not_cached.json["uuid"]
 
     # Timeout is set to 30, so this should be safe
     time.sleep(40)
@@ -154,4 +156,4 @@ def test_will_cache(client, client2):
     assert response.headers.get("X-Cache-Status") == "EXPIRED"
     echoed_request_new = EchoedRequest.create(response)
 
-    assert echoed_request.json['uuid'] != echoed_request_new.json['uuid']
+    assert echoed_request.json["uuid"] != echoed_request_new.json["uuid"]

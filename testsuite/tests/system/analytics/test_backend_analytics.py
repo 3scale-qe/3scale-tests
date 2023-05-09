@@ -9,7 +9,8 @@ from testsuite import resilient
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3159")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3159"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -55,8 +56,7 @@ def test_analytics(application, api_client, backend):
     backend_metric = backend.metrics.list()[0]
 
     analytics = application.threescale_client.analytics
-    prev_hits_backed = analytics.list_by_backend(backend.entity_id,
-                                                 metric_name=backend_metric.entity_name)["total"]
+    prev_hits_backed = analytics.list_by_backend(backend.entity_id, metric_name=backend_metric.entity_name)["total"]
 
     client = api_client()
     num_requests = 5
@@ -70,6 +70,7 @@ def test_analytics(application, api_client, backend):
         backend.entity_id,
         backend_metric.entity_name,
         "total",
-        prev_hits_backed+num_requests)
+        prev_hits_backed + num_requests,
+    )
 
     assert hits_backed == prev_hits_backed + num_requests

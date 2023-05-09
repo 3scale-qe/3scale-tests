@@ -15,8 +15,8 @@ def test_account_will_receive_email(mailhog_client, threescale, account):
     """
     test_message_body = f"body_test_account_will_receive_email+{account.entity['org_name']}"
 
-    threescale.threescale_client.accounts.send_message(entity_id=account.entity_id,
-                                                       subject=f"test message+{account.entity['org_name']}",
-                                                       body=test_message_body)
+    threescale.threescale_client.accounts.send_message(
+        entity_id=account.entity_id, subject=f"test message+{account.entity['org_name']}", body=test_message_body
+    )
 
     mailhog_client.assert_message_received(content=test_message_body)

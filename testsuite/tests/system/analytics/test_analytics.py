@@ -49,7 +49,8 @@ def test_hits_service(application, api_client, app2):
         assert client2.get("/get").status_code == 200
 
     metrics_service = resilient.analytics_list_by_service(
-        app2.threescale_client, app2["service_id"], "hits", "total", requests_app+requests_app2)
+        app2.threescale_client, app2["service_id"], "hits", "total", requests_app + requests_app2
+    )
     assert metrics_service == prev_service_hits + requests_app + requests_app2
 
     metrics_app = analytics.list_by_application(application, metric_name="hits")["total"]

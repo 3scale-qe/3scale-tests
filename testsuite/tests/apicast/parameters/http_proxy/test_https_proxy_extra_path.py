@@ -36,9 +36,9 @@ def gateway_environment(gateway_environment, testconfig, tools):
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
     https_proxy = testconfig["proxy"]["https"]
 
-    gateway_environment.update({"HTTPS_PROXY": https_proxy,
-                                "NO_PROXY":
-                                    f"backend-listener,system-master,system-provider,{rhsso_url}"})
+    gateway_environment.update(
+        {"HTTPS_PROXY": https_proxy, "NO_PROXY": f"backend-listener,system-master,system-provider,{rhsso_url}"}
+    )
     return gateway_environment
 
 

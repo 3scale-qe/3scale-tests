@@ -30,9 +30,7 @@ def authority_a(request, manager, valid_authority):
     Intermediate authority_a
     valid_authority -> authority_a
     """
-    authority = manager.get_or_create_ca("authority_a",
-                                         hosts=["*.com"],
-                                         certificate_authority=valid_authority)
+    authority = manager.get_or_create_ca("authority_a", hosts=["*.com"], certificate_authority=valid_authority)
     request.addfinalizer(authority.delete_files)
     return authority
 
@@ -43,9 +41,7 @@ def authority_b(request, manager, authority_a):
     Intermediate authority_a
     valid_authority -> authority_a -> authority_b
     """
-    authority = manager.get_or_create_ca("authority_b",
-                                         hosts=["*.com"],
-                                         certificate_authority=authority_a)
+    authority = manager.get_or_create_ca("authority_b", hosts=["*.com"], certificate_authority=authority_a)
     request.addfinalizer(authority.delete_files)
     return authority
 
@@ -95,13 +91,16 @@ def chain_len1(chainify, certificate_1, valid_authority):
     return chainify(certificate_1, valid_authority)
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param((1, "valid_authority", "chain_len1", 200), id="Length 1 - Depth 1"),
-    pytest.param((1, "authority_a", "chain_len2", 400), id="Length 2 - Depth 1"),
-    pytest.param((2, "authority_a", "chain_len2", 200), id="Length 2 - Depth 2"),
-    pytest.param((2, "authority_b", "chain_len3", 400), id="Length 3 - Depth 2"),
-    pytest.param((3, "authority_b", "chain_len3", 200), id="Length 3 - Depth 2"),
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param((1, "valid_authority", "chain_len1", 200), id="Length 1 - Depth 1"),
+        pytest.param((1, "authority_a", "chain_len2", 400), id="Length 2 - Depth 1"),
+        pytest.param((2, "authority_a", "chain_len2", 200), id="Length 2 - Depth 2"),
+        pytest.param((2, "authority_b", "chain_len3", 400), id="Length 3 - Depth 2"),
+        pytest.param((3, "authority_b", "chain_len3", 200), id="Length 3 - Depth 2"),
+    ],
+)
 def certificates_and_code(request, staging_gateway):
     """
     Sets up gateway to the specify depth and returns configuration for service and test

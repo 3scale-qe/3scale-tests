@@ -6,11 +6,12 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.utils import random_string
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +45,7 @@ def test_policy_limit_passing(api_client):
     # requests/urllib3 doesn't retry post(); need get() to wait until all is up
     client.get("/get")
 
-    response = client.post('/post', data=data)
+    response = client.post("/post", data=data)
     assert response.status_code == 200
 
 

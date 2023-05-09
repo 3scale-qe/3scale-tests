@@ -24,10 +24,11 @@ def authority(url):
 
 class HyperfoilUtils:
     """
-        Setup class for hyperfoil test.
-        Also wrapper of Hyperfoil-python-client.
+    Setup class for hyperfoil test.
+    Also wrapper of Hyperfoil-python-client.
     """
-    message_1kb = resources.files('testsuite.resources.performance.files').joinpath('message_1kb.txt')
+
+    message_1kb = resources.files("testsuite.resources.performance.files").joinpath("message_1kb.txt")
 
     def __init__(self, hyperfoil_client, template_filename):
         self.hyperfoil_client = hyperfoil_client
@@ -41,7 +42,7 @@ class HyperfoilUtils:
     def add_hosts(self, services, shared_connections: int, **kwargs):
         """Adds hosts of all applications to the benchmark"""
         for svc in services:
-            url = svc.proxy.list()['endpoint']
+            url = svc.proxy.list()["endpoint"]
             self.benchmark.add_host(url, shared_connections, **kwargs)
 
     def add_host(self, url: str, shared_connections: int, **kwargs):
@@ -52,7 +53,7 @@ class HyperfoilUtils:
     def add_file(self, path):
         """Adds file to the benchmark"""
         filename = os.path.basename(path)
-        self.factory.file(filename, open(path, 'r', encoding="utf8"))
+        self.factory.file(filename, open(path, "r", encoding="utf8"))
 
     def generate_random_file(self, filename: str, size: int):
         """Generates and adds file with such filename and size to the benchmark"""
@@ -72,9 +73,9 @@ class HyperfoilUtils:
         """
         rows = []
         for application in applications:
-            url = authority(application.service.proxy.list()['endpoint'])
-            auth_user_key = application.service.proxy.list()['auth_user_key']
-            user_key = application['user_key']
+            url = authority(application.service.proxy.list()["endpoint"])
+            auth_user_key = application.service.proxy.list()["auth_user_key"]
+            user_key = application["user_key"]
             rows.append([url, auth_user_key, user_key])
         self.factory.csv_data(filename, rows)
 
@@ -87,7 +88,7 @@ class HyperfoilUtils:
         """
         rows = []
         for application in applications:
-            url = authority(application.service.proxy.list()['endpoint'])
+            url = authority(application.service.proxy.list()["endpoint"])
             app_id = application["application_id"]
             app_key = application.keys.list()["keys"][0]["key"]["value"]
             rows.append([url, app_id, app_key])
@@ -103,7 +104,7 @@ class HyperfoilUtils:
         """
         rows = []
         for application in applications:
-            url = authority(application.service.proxy.list()['endpoint'])
+            url = authority(application.service.proxy.list()["endpoint"])
             token = rhsso_service_info.access_token(application)
             rows.append([url, token])
         self.factory.csv_data(filename, rows)
@@ -119,11 +120,17 @@ class HyperfoilUtils:
         """
         rows = []
         token_url = urlparse(rhsso_service_info.token_url())
-        token_port = 80 if token_url.scheme == 'http' else 443
+        token_port = 80 if token_url.scheme == "http" else 443
         for application in applications:
-            url = authority(application.service.proxy.list()['endpoint'])
-            rows.append([url, f"{token_url.hostname}:{token_port}", token_url.path,
-                         rhsso_service_info.body_for_token_creation(application, use_service_accounts)])
+            url = authority(application.service.proxy.list()["endpoint"])
+            rows.append(
+                [
+                    url,
+                    f"{token_url.hostname}:{token_port}",
+                    token_url.path,
+                    rhsso_service_info.body_for_token_creation(application, use_service_accounts),
+                ]
+            )
         self.factory.csv_data(filename, rows)
 
     def update_benchmark(self, benchmark):

@@ -25,12 +25,15 @@ def gateway_environment(gateway_environment, testconfig, tools):
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
     proxy_endpoint = testconfig["proxy"]
 
-    gateway_environment.update({"HTTP_PROXY": proxy_endpoint['http'],
-                                "HTTPS_PROXY": proxy_endpoint['https'],
-                                "NO_PROXY":
-                                    f"backend-listener,system-master,system-provider,{rhsso_url}",
-                                "APICAST_CONFIGURATION_LOADER": "boot",
-                                "APICAST_CONFIGURATION_CACHE": 1000})
+    gateway_environment.update(
+        {
+            "HTTP_PROXY": proxy_endpoint["http"],
+            "HTTPS_PROXY": proxy_endpoint["https"],
+            "NO_PROXY": f"backend-listener,system-master,system-provider,{rhsso_url}",
+            "APICAST_CONFIGURATION_LOADER": "boot",
+            "APICAST_CONFIGURATION_CACHE": 1000,
+        }
+    )
     return gateway_environment
 
 
@@ -38,11 +41,12 @@ def gateway_environment(gateway_environment, testconfig, tools):
 @pytest.fixture(scope="module")
 def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks, request, staging_gateway):
     """
-        Creates service and adds mapping for POST method with path /
-        We need to create the service here because there will be 2 services created and they cannot have the same name
+    Creates service and adds mapping for POST method with path /
+    We need to create the service here because there will be 2 services created and they cannot have the same name
     """
-    service = custom_service({"name": blame(request, "svc")},
-                             service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
     metric = service.metrics.list()[0]
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/", "POST"))
     service.proxy.deploy()

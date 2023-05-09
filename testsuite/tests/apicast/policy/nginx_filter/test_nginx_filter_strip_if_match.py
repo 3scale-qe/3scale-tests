@@ -13,12 +13,11 @@ from testsuite.echoed_request import EchoedRequest
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704"),
-    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
 ]
 
 
-@pytest.fixture(scope="module",
-                params=[True, False])
+@pytest.fixture(scope="module", params=[True, False])
 def append_header(request):
     """
     Whether to append the filtered header to upstream or to retain it
@@ -34,11 +33,9 @@ def service(service, append_header):
     """
     proxy = service.proxy.list()
 
-    proxy.policies.insert(0, rawobj.PolicyConfig("nginx_filters",
-                                                 {"headers": [
-                                                     {"name": "If-Match",
-                                                      "append": append_header
-                                                      }]}))
+    proxy.policies.insert(
+        0, rawobj.PolicyConfig("nginx_filters", {"headers": [{"name": "If-Match", "append": append_header}]})
+    )
     return service
 
 

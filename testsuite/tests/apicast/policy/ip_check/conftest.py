@@ -11,6 +11,6 @@ def ip4_addresses(private_base_url):
     for container based deplyoment
     """
 
-    response = requests.get(private_base_url('httpbin_nossl').rstrip("/") + '/ip')
+    response = requests.get(private_base_url("httpbin_nossl").rstrip("/") + "/ip")
 
     return response.json()["origin"].split(",")

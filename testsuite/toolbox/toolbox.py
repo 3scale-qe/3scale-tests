@@ -13,14 +13,14 @@ from testsuite.config import settings
 
 def get_toolbox_cmd(cmd_in):
     """Creates template for Toolbox command according configuration options"""
-    if not bool(settings['ssl_verify']):
+    if not bool(settings["ssl_verify"]):
         cmd_in = f"-k {cmd_in}"
 
-    if settings['toolbox']['cmd'] == 'rpm':
+    if settings["toolbox"]["cmd"] == "rpm":
         return f"3scale {cmd_in}"
-    if settings['toolbox']['cmd'] == 'gem':
+    if settings["toolbox"]["cmd"] == "gem":
         return f"scl enable {settings['toolbox']['ruby_version']} '3scale {cmd_in}'"
-    if settings['toolbox']['cmd'] == 'podman' or settings['toolbox']['cmd'] == 'docker':
+    if settings["toolbox"]["cmd"] == "podman" or settings["toolbox"]["cmd"] == "docker":
         ret = f"{settings['toolbox']['cmd']} run --interactive --rm --privileged=true "
         ret += f"--mount type=bind,src={settings['toolbox']['podman_cert_dir']},"
         ret += f"target={settings['toolbox']['podman_cert_dir']} "
@@ -33,6 +33,7 @@ def get_toolbox_cmd(cmd_in):
 
 class LocalChannel:
     """paramiko interface to local command execution, implementation of Channel"""
+
     def __init__(self, stream, returncode):
         self.stream = stream
         self.returncode = returncode
@@ -49,6 +50,7 @@ class LocalChannel:
 
 class LocalClient:
     """paramiko interface to local command execution"""
+
     @staticmethod
     def exec_command(command):
         """Runs the command locally"""
@@ -81,9 +83,11 @@ def ssh_client():
     client = paramiko.client.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
     client.load_system_host_keys()
-    client.connect(settings['toolbox']['machine_ip'],
-                   username=settings['toolbox']['ssh_user'],
-                   password=settings['toolbox']['ssh_passwd'])
+    client.connect(
+        settings["toolbox"]["machine_ip"],
+        username=settings["toolbox"]["ssh_user"],
+        password=settings["toolbox"]["ssh_passwd"],
+    )
     return client
 
 
@@ -114,11 +118,11 @@ def run_cmd(cmd_input, scale_cmd=True):
             errno = stdout.channel.recv_exit_status()
             assert errno == 0
         except AssertionError as exc:
-            error = f'Errno: {str(errno)}, stderr: {stderrstr}, stdout: {stdoutstr}'
+            error = f"Errno: {str(errno)}, stderr: {stderrstr}, stdout: {stdoutstr}"
             logging.error(error)
             raise exc
 
-        ret_value.append({'stdout': stdoutstr, 'stderr': stderrstr})
+        ret_value.append({"stdout": stdoutstr, "stderr": stderrstr})
 
         logging.debug("Output of Toolbox command: stdout: %s; stderr: %s", stdoutstr, stderrstr)
     client.close()
@@ -156,8 +160,14 @@ def cmp_ents(ent1, ent2, attrlist):
         try:
             assert ent1[attr] == ent2[attr]
         except AssertionError as error:
-            logging.error("key:%s, ent1:%s, ent2:%s, error:%s, attrlist:%s",
-                          str(attr), str(ent1), str(ent2), str(error), str(attrlist))
+            logging.error(
+                "key:%s, ent1:%s, ent2:%s, error:%s, attrlist:%s",
+                str(attr),
+                str(ent1),
+                str(ent2),
+                str(error),
+                str(attrlist),
+            )
             raise error
 
 
@@ -170,7 +180,7 @@ def find_and_cmp(list1, list2, cmp_function, id_attr=None, cmp_length=True):
     @param [Function] Function for comparing two entities
     @param [String] Entity ID
     """
-    id_attr = id_attr or ['system_name']
+    id_attr = id_attr or ["system_name"]
     if cmp_length:
         assert len(list1) == len(list2)
     queue = []
@@ -231,19 +241,16 @@ def cmp_limits(ap1, ap2, cmp_length=True):
     @param [Object] Second list of app. plan
     @param [Bool] Should we compare lists' length
     """
-    def _cmp_func(metr1, metr2):
-        find_and_cmp(ap1.limits(metr1).list(),
-                     ap2.limits(metr2).list(),
-                     lambda lim1, lim2:
-                     cmp_ents(lim1.entity, lim2.entity, set(lim1.entity.keys()) - constants.LIMITS_CMP_ATTR),
-                     ['period'])
 
-    find_and_cmp(
-        ap1.service.metrics.list(),
-        ap2.service.metrics.list(),
-        _cmp_func,
-        ['friendly_name'],
-        cmp_length)
+    def _cmp_func(metr1, metr2):
+        find_and_cmp(
+            ap1.limits(metr1).list(),
+            ap2.limits(metr2).list(),
+            lambda lim1, lim2: cmp_ents(lim1.entity, lim2.entity, set(lim1.entity.keys()) - constants.LIMITS_CMP_ATTR),
+            ["period"],
+        )
+
+    find_and_cmp(ap1.service.metrics.list(), ap2.service.metrics.list(), _cmp_func, ["friendly_name"], cmp_length)
 
 
 def cmp_pricing_rules(ap1, ap2, cmp_length=True):
@@ -254,21 +261,18 @@ def cmp_pricing_rules(ap1, ap2, cmp_length=True):
     @param [Object] Second list of app. plan
     @param [Bool] Should we compare lists' length
     """
-    def _cmp_func(metr1, metr2):
-        find_and_cmp(ap1.pricing_rules(metr1).list(),
-                     ap2.pricing_rules(metr2).list(),
-                     lambda pric1, pric2:
-                     cmp_ents(pric1.entity,
-                              pric2.entity,
-                              set(pric1.entity.keys()) - constants.PRICING_RULES_CMP_ATTRS),
-                     ['min', 'max'])
 
-    find_and_cmp(
-        ap1.service.metrics.list(),
-        ap2.service.metrics.list(),
-        _cmp_func,
-        ['friendly_name'],
-        cmp_length)
+    def _cmp_func(metr1, metr2):
+        find_and_cmp(
+            ap1.pricing_rules(metr1).list(),
+            ap2.pricing_rules(metr2).list(),
+            lambda pric1, pric2: cmp_ents(
+                pric1.entity, pric2.entity, set(pric1.entity.keys()) - constants.PRICING_RULES_CMP_ATTRS
+            ),
+            ["min", "max"],
+        )
+
+    find_and_cmp(ap1.service.metrics.list(), ap2.service.metrics.list(), _cmp_func, ["friendly_name"], cmp_length)
 
 
 def cmp_proxies(proxy1, proxy2, product_service):
@@ -285,24 +289,24 @@ def cmp_proxies(proxy1, proxy2, product_service):
     assert not jsondiff.diff(proxy1.policies_registry.list(), proxy2.policies_registry.list())
 
     # do not check 'production' because proxies are not promoted in src and dst
-    for env in ['sandbox']:
-        last_config1 = proxy1.configs.latest(env)['content']
-        last_config2 = proxy2.configs.latest(env)['content']
+    for env in ["sandbox"]:
+        last_config1 = proxy1.configs.latest(env)["content"]
+        last_config2 = proxy2.configs.latest(env)["content"]
         assert len(last_config1.keys()) == len(last_config2.keys())
         cmp_ents(last_config1, last_config2, set(last_config1.keys()) - constants.PROXY_CONFIG_CONTENT_CMP_ATTRS)
 
-        last_proxy1 = last_config1['proxy']
-        last_proxy2 = last_config2['proxy']
+        last_proxy1 = last_config1["proxy"]
+        last_proxy2 = last_config2["proxy"]
         assert len(last_proxy1.keys()) == len(last_proxy2.keys())
         cmp_attrs = set(last_proxy1.keys()) - constants.PROXY_CONFIG_CONTENT_PROXY_CMP_ATTRS
-        if product_service == 'service':
-            cmp_attrs.remove('api_backend')
+        if product_service == "service":
+            cmp_attrs.remove("api_backend")
         cmp_ents(last_proxy1, last_proxy2, cmp_attrs)
 
         # first item is policy inserted by system for backend routing
-        if product_service == 'product':
-            assert not jsondiff.diff(last_proxy1['policy_chain'][1:], last_proxy2['policy_chain'][1:])
-        for rule1, rule2 in zip(last_proxy1['proxy_rules'], last_proxy1['proxy_rules']):
+        if product_service == "product":
+            assert not jsondiff.diff(last_proxy1["policy_chain"][1:], last_proxy2["policy_chain"][1:])
+        for rule1, rule2 in zip(last_proxy1["proxy_rules"], last_proxy1["proxy_rules"]):
             assert len(rule1.keys()) == len(rule2.keys())
             cmp_ents(rule1, rule2, set(rule1.keys()) - constants.PROXY_RULES_CMP_ATTRS)
 
@@ -336,7 +340,7 @@ def cmp_metrics(ent1, ent2, cmp_length=True):
         cmp_ents(metr1.entity, metr2.entity, set(metr1.keys()) - constants.METRIC_CMP_ATTRS)
         cmp_methods(metr1, metr2, cmp_length)
 
-    find_and_cmp(metrs1, metrs2, _cmp_func, ['friendly_name'], cmp_length)
+    find_and_cmp(metrs1, metrs2, _cmp_func, ["friendly_name"], cmp_length)
 
 
 def cmp_methods(metr1, metr2, cmp_length=True):
@@ -352,6 +356,7 @@ def cmp_methods(metr1, metr2, cmp_length=True):
 
     def _cmp_func(meth1, meth2):
         cmp_ents(meth1.entity, meth2.entity, set(meth1.keys()) - constants.METRIC_METHOD_CMP_ATTRS)
+
     find_and_cmp(methods1, methods2, _cmp_func, cmp_length=cmp_length)
 
 
@@ -368,7 +373,8 @@ def cmp_mappings(ent1, ent2, cmp_length=True):
 
     def _cmp_func(map1, map2):
         cmp_ents(map1.entity, map2.entity, set(map1.keys()) - constants.MAPPING_CMP_ATTRS)
-    find_and_cmp(maps1, maps2, _cmp_func, ['pattern'], cmp_length)
+
+    find_and_cmp(maps1, maps2, _cmp_func, ["pattern"], cmp_length)
 
 
 def cmp_active_docs(svc1, svc2, cmp_length=True):
@@ -384,6 +390,7 @@ def cmp_active_docs(svc1, svc2, cmp_length=True):
 
     def _cmp_func(adc1, adc2):
         cmp_ents(adc1.entity, adc2.entity, set(adc1.keys()) - constants.ACTIVEDOCS_CMP_ATTRS)
+
     find_and_cmp(acs1, acs2, _cmp_func, cmp_length=cmp_length)
 
 
@@ -400,12 +407,13 @@ def cmp_backend_usages(svc1, svc2, cmp_length=True):
 
     def _cmp_func(bus1, bus2):
         cmp_ents(bus1.entity, bus2.entity, set(bus1.keys()) - constants.BACKEND_USAGES_CMP_ATTRS)
-        assert bus1['service_id'] == svc1['id']
-        assert bus2['service_id'] == svc2['id']
-        back1 = svc1.threescale_client.backends.read(bus1['backend_id'])
-        back2 = svc2.threescale_client.backends.read(bus2['backend_id'])
+        assert bus1["service_id"] == svc1["id"]
+        assert bus2["service_id"] == svc2["id"]
+        back1 = svc1.threescale_client.backends.read(bus1["backend_id"])
+        back2 = svc2.threescale_client.backends.read(bus2["backend_id"])
         cmp_backends(back1, back2, cmp_length)
-    find_and_cmp(buses1, buses2, _cmp_func, ['path'])
+
+    find_and_cmp(buses1, buses2, _cmp_func, ["path"])
 
 
 def check_object(obj_ent, not_check_list, vals):
@@ -417,7 +425,12 @@ def check_object(obj_ent, not_check_list, vals):
         for key, val in check_list:
             assert obj_ent[key] == val
     except AssertionError as error:
-        logging.error("object:%s, error:%s, check_keys:%s, obj.keys:%s, vals:%s",
-                      str(obj_ent), str(error), str(list(check_keys)),
-                      str(list(obj_ent.keys())), str(vals))
+        logging.error(
+            "object:%s, error:%s, check_keys:%s, obj.keys:%s, vals:%s",
+            str(obj_ent),
+            str(error),
+            str(list(check_keys)),
+            str(list(obj_ent.keys())),
+            str(vals),
+        )
         raise error

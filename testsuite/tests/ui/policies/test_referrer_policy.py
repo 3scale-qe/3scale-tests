@@ -10,7 +10,7 @@ from testsuite.ui.views.admin.product.application import UsageRulesView
 
 @pytest.fixture(scope="module", autouse=True)
 def referrer_policy_setup(custom_admin_login, navigator, service, application):
-    """Setup service with referer policy with 'localhost' and 'localdomain' domains allowed """
+    """Setup service with referer policy with 'localhost' and 'localdomain' domains allowed"""
     custom_admin_login()
     policies_page = navigator.navigate(ProductPoliciesView, product=service)
     policies_page.add_policy(Policies.THREESCALE_REFERRER.value)
@@ -18,8 +18,7 @@ def referrer_policy_setup(custom_admin_login, navigator, service, application):
     usage_rules_page = navigator.navigate(UsageRulesView, product=service)
     usage_rules_page.referrer_filtering_checkbox.click()
     usage_rules_page.update_usage_rules()
-    application_page = navigator.navigate(ApplicationDetailView, product=service,
-                                          application=application)
+    application_page = navigator.navigate(ApplicationDetailView, product=service, application=application)
     application_page.add_referer_filter("localhost")
     application_page.add_referer_filter("localdomain")
     configuration_page = navigator.navigate(ProductConfigurationView, product=service)
@@ -29,9 +28,10 @@ def referrer_policy_setup(custom_admin_login, navigator, service, application):
 @pytest.fixture()
 def make_request(api_client, application):
     """Make request with additional referer header values"""
+
     def prepare_request(domain=None):
         headers = {"Referer": domain}
-        return api_client(app=application).get('/get', headers=headers)
+        return api_client(app=application).get("/get", headers=headers)
 
     return prepare_request
 

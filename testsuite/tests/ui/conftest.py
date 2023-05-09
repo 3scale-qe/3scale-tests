@@ -42,11 +42,13 @@ LOGGER = logging.getLogger(__name__)
 @pytest.fixture(scope="session")
 def webdriver():
     """Creates instance of Web Driver with configuration"""
-    return ThreescaleWebdriver(source=settings["fixtures"]["ui"]["browser"]["source"],
-                               driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
-                               ssl_verify=settings["ssl_verify"],
-                               remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
-                               binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"])
+    return ThreescaleWebdriver(
+        source=settings["fixtures"]["ui"]["browser"]["source"],
+        driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
+        ssl_verify=settings["ssl_verify"],
+        remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
+        binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"],
+    )
 
 
 @pytest.fixture(scope="module")
@@ -69,9 +71,9 @@ def browser(webdriver, request, metadata):
 @pytest.fixture(scope="module")
 def navigator(browser):
     """
-        Navigator for 3scale UI pages/Views
-        :param browser: browser based on UI settings
-        :return: Navigator instance
+    Navigator for 3scale UI pages/Views
+    :param browser: browser based on UI settings
+    :return: Navigator instance
     """
     navigator = Navigator(browser)
     return navigator
@@ -87,8 +89,13 @@ def custom_admin_login(navigator, browser):
     :return: Login to Admin portal with custom credentials
     """
 
-    @backoff.on_exception(backoff.constant, InvalidSessionIdException, max_tries=2, jitter=None,
-                          on_backoff=lambda _: browser.restart_session())
+    @backoff.on_exception(
+        backoff.constant,
+        InvalidSessionIdException,
+        max_tries=2,
+        jitter=None,
+        on_backoff=lambda _: browser.restart_session(),
+    )
     def _login(name=None, password=None, fresh=None):
         url = settings["threescale"]["admin"]["url"]
         name = name or settings["threescale"]["admin"]["username"]
@@ -142,14 +149,12 @@ def custom_devel_login(navigator, provider_account, account_password, browser):
 
     def _login(account=None, name=None, password=None, fresh=None):
         url = settings["threescale"]["devel"]["url"]
-        name = name or account['org_name']
+        name = name or account["org_name"]
         password = password or account_password
         if fresh:
             browser.selenium.delete_all_cookies()
             browser.selenium.refresh()
-        page = navigator.open(DeveloperLoginView,
-                              url=url,
-                              access_code=provider_account['site_access_code'])
+        page = navigator.open(DeveloperLoginView, url=url, access_code=provider_account["site_access_code"])
         if page.is_displayed:
             page.do_login(name, password)
 
@@ -172,8 +177,14 @@ def devel_login(account, custom_devel_login):
 def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, master_threescale, browser):
     """Parametrized custom Tenant created via UI"""
 
-    @backoff.on_predicate(backoff.constant, lambda ready: not ready, interval=6, max_tries=5, jitter=None,
-                          on_backoff=lambda _: browser.selenium.refresh())
+    @backoff.on_predicate(
+        backoff.constant,
+        lambda ready: not ready,
+        interval=6,
+        max_tries=5,
+        jitter=None,
+        on_backoff=lambda _: browser.selenium.refresh(),
+    )
     def _wait_displayed_with_refresh(func):
         """Runs function and expects True. If False is returned, backoff and browser refresh happens."""
         return func()
@@ -185,26 +196,25 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
         """
         tenant = navigator.navigate(TenantDetailView, account=tenant)
         with browser.new_tab(tenant.impersonate):
+            assert _wait_displayed_with_refresh(lambda: DashboardView.is_displayed)
             assert _wait_displayed_with_refresh(
-                lambda: DashboardView.is_displayed)
+                lambda: navigator.navigate(AccountsView).table.row()[0].text != "No results."
+            )
             assert _wait_displayed_with_refresh(
-                lambda: navigator.navigate(AccountsView).table.row()[0].text != 'No results.')
+                lambda: navigator.navigate(ApplicationsView).table.row()[0].text != "No results."
+            )
             assert _wait_displayed_with_refresh(
-                lambda: navigator.navigate(ApplicationsView).table.row()[0].text != 'No results.')
-            assert _wait_displayed_with_refresh(
-                lambda: navigator.navigate(ProductsView).table.row()[0].text != 'No results.')
+                lambda: navigator.navigate(ProductsView).table.row()[0].text != "No results."
+            )
 
-    def _custom_ui_tenant(username: str = "",
-                          email: str = "",
-                          password: str = "",
-                          organisation: str = "",
-                          autoclean=True,
-                          wait=True):
-
+    def _custom_ui_tenant(
+        username: str = "", email: str = "", password: str = "", organisation: str = "", autoclean=True, wait=True
+    ):
         tenant = navigator.navigate(TenantNewView)
 
-        tenant.create(username=username, email=email + "@anything.invalid", password=password,
-                      organization=organisation)
+        tenant.create(
+            username=username, email=email + "@anything.invalid", password=password, organization=organisation
+        )
 
         account = resilient.resource_read_by_name(master_threescale.accounts, organisation)
         tenant = master_threescale.tenants.read(account.entity_id)
@@ -309,8 +319,9 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
     :return: params for custom application
     """
 
-    def _custom_ui_application(name: str, description: str, plan: ApplicationPlan, account: Account, service: Service,
-                               autoclean=True):
+    def _custom_ui_application(
+        name: str, description: str, plan: ApplicationPlan, account: Account, service: Service, autoclean=True
+    ):
         custom_admin_login()
         app = navigator.navigate(ApplicationNewView, account=account)
         app.create(name, description, plan, service)
@@ -319,6 +330,7 @@ def custom_ui_application(custom_app_plan, custom_admin_login, navigator, reques
         application.api_client_verify = testconfig["ssl_verify"]
 
         if autoclean and not testconfig["skip_cleanup"]:
+
             def delete():
                 application.delete()
 
@@ -384,17 +396,17 @@ def pytest_html_results_table_html(report, data):
 
 def pytest_exception_interact(node, call, report):
     """
-        Method that is being invoked, when a test fails (hook)
+     Method that is being invoked, when a test fails (hook)
 
-        From py-test documentation:
-            "Called when an exception was raised which can potentially be interactively handled."
+     From py-test documentation:
+         "Called when an exception was raised which can potentially be interactively handled."
 
-        For more information about this method, please see:
-            https://docs.pytest.org/en/stable/_modules/_pytest/hookspec.html#pytest_exception_interact
+     For more information about this method, please see:
+         https://docs.pytest.org/en/stable/_modules/_pytest/hookspec.html#pytest_exception_interact
 
-       :param node: info about the called test. What test was called, when it was called, which session etc.
-       :param call: in depth summary of what exception was thrown
-       :param report: generated summary of the test output
+    :param node: info about the called test. What test was called, when it was called, which session etc.
+    :param call: in depth summary of what exception was thrown
+    :param report: generated summary of the test output
     """
     if report.failed or hasattr(report, "wasxfail"):
         browser = node.funcargs.get("browser")
@@ -423,14 +435,14 @@ def pytest_exception_interact(node, call, report):
 
 def get_resultsdir_path(node):
     """
-        Method that gives you the path where you should store screenshots. It also creates the dirs on the road.
+    Method that gives you the path where you should store screenshots. It also creates the dirs on the road.
     """
 
-    xml = node.config.getoption('--junitxml')
+    xml = node.config.getoption("--junitxml")
     # path to "3scape-py-testsuite" folder
-    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../..')
+    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../..")
     resultsdir = os.environ.get("resultsdir", no_argument_dir)
-    failed_test_name = node.nodeid.replace('/', '.').replace('.py::', '.')
+    failed_test_name = node.nodeid.replace("/", ".").replace(".py::", ".")
 
     if not xml:
         path = f"{resultsdir}/attachments/ui/{failed_test_name}/"
@@ -453,9 +465,9 @@ def get_resultsdir_path(node):
 
 def fullpage_screenshot(driver, file_path):
     """
-        A full-page screenshot function. It scroll the website and screenshots it.
-        - Creates multiple files
-        - Screenshots are made only vertically (on Y axis)
+    A full-page screenshot function. It scroll the website and screenshots it.
+    - Creates multiple files
+    - Screenshots are made only vertically (on Y axis)
     """
     # Removal of the height: 100% style, that disables scroll.
     driver.execute_script("document.body.style.height = 'unset'")
@@ -469,8 +481,8 @@ def fullpage_screenshot(driver, file_path):
     width, height = screenshot.size
     del screenshot
 
-    scaling_constant = (float(height) / float(viewport_height))
-    stitched_image = Image.new('RGB', (width, int(total_height * scaling_constant)))
+    scaling_constant = float(height) / float(viewport_height)
+    stitched_image = Image.new("RGB", (width, int(total_height * scaling_constant)))
     part = 0
 
     for scroll in range(0, total_height, viewport_height):
@@ -487,7 +499,7 @@ def fullpage_screenshot(driver, file_path):
         del screenshot
         part += 1
 
-    date = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    date = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
     fullpath = f"{file_path}/{date}.png"
     stitched_image.save(fullpath)
     return fullpath
@@ -567,7 +579,7 @@ def set_callback_urls(auth0_client):
     """
     cleanup = []
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x['callbacks'], max_tries=8, jitter=None)
+    @backoff.on_predicate(backoff.fibo, lambda x: not x["callbacks"], max_tries=8, jitter=None)
     def _get_auth_client(client_id):
         return auth0_client.clients.get(client_id)
 
@@ -593,9 +605,16 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
     Create Auth0 user via Auth0 API
     """
     name = blame(request, "auth_user")
-    user = auth0_client.users.create({"email": f"{name}@anything.invalid", "password": auth0_user_password,
-                                      "connection": "Username-Password-Authentication", "email_verified": True})
+    user = auth0_client.users.create(
+        {
+            "email": f"{name}@anything.invalid",
+            "password": auth0_user_password,
+            "connection": "Username-Password-Authentication",
+            "email_verified": True,
+        }
+    )
     if not testconfig["skip_cleanup"]:
+
         def _delete():
             auth0_client.users.delete(user["user_id"])
 
@@ -603,17 +622,17 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
     return user
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def stripe():
     """Stripe API"""
     return Stripe(settings["stripe"]["api_key"])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def braintree():
     """Braintree API"""
     braintree_credentials = settings["braintree"]
-    merchant_id = braintree_credentials['merchant_id']
-    public_key = braintree_credentials['public_key']
-    private_key = braintree_credentials['private_key']
+    merchant_id = braintree_credentials["merchant_id"]
+    public_key = braintree_credentials["public_key"]
+    private_key = braintree_credentials["private_key"]
     return Braintree(merchant_id, public_key, private_key)

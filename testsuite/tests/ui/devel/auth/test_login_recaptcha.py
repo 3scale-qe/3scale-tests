@@ -3,16 +3,11 @@ import pytest
 
 from testsuite import settings, rawobj
 from testsuite.ui.views.admin.audience.developer_portal import SpamProtection
-from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, SuccessfulAccountCreationView, \
-    ForgotPasswordView
+from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, SuccessfulAccountCreationView, ForgotPasswordView
 from testsuite.utils import blame
 
 # requires special setup, internet access
-pytestmark = [
-    pytest.mark.sandbag,
-    pytest.mark.usefixtures("login"),
-    pytest.mark.usefixtures("spam_protection_setup")
-]
+pytestmark = [pytest.mark.sandbag, pytest.mark.usefixtures("login"), pytest.mark.usefixtures("spam_protection_setup")]
 
 
 @pytest.fixture(scope="function")
@@ -65,8 +60,9 @@ def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
         - Checks the checkbox
         - Submits the form and checks that the success website appears
     """
-    signup_view = navigator.open(BasicSignUpView, url=settings["threescale"]["devel"]["url"],
-                                 access_code=provider_account['site_access_code'])
+    signup_view = navigator.open(
+        BasicSignUpView, url=settings["threescale"]["devel"]["url"], access_code=provider_account["site_access_code"]
+    )
 
     username = ui_devel_account
     email = f"{username}@anything.invalid"

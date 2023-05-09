@@ -10,8 +10,11 @@ from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY,
-                                                Capability.CUSTOM_ENVIRONMENT)]
+pytestmark = [
+    pytest.mark.required_capabilities(
+        Capability.STANDARD_GATEWAY, Capability.PRODUCTION_GATEWAY, Capability.CUSTOM_ENVIRONMENT
+    )
+]
 
 
 @pytest.fixture(scope="module")
@@ -55,14 +58,17 @@ def service2_mapping():
 @pytest.fixture(scope="module")
 def gateway_environment(gateway_environment):
     """Setup ENV variables for apicast"""
-    gateway_environment.update({"APICAST_SERVICES_FILTER_BY_URL": ".*",
-                                "APICAST_PATH_ROUTING": "true",
-                                "APICAST_PATH_ROUTING_ONLY": "true",
-                                "APICAST_CONFIGURATION_CACHE": "-1",
-                                "APICAST_MANAGEMENT_API": "debug",
-                                "APICAST_LOG_LEVEL": "debug",
-                                "APICAST_OIDC_LOG_LEVEL": "debug"
-                                })
+    gateway_environment.update(
+        {
+            "APICAST_SERVICES_FILTER_BY_URL": ".*",
+            "APICAST_PATH_ROUTING": "true",
+            "APICAST_PATH_ROUTING_ONLY": "true",
+            "APICAST_CONFIGURATION_CACHE": "-1",
+            "APICAST_MANAGEMENT_API": "debug",
+            "APICAST_LOG_LEVEL": "debug",
+            "APICAST_OIDC_LOG_LEVEL": "debug",
+        }
+    )
     return gateway_environment
 
 

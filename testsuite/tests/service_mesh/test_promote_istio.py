@@ -4,8 +4,10 @@ Tests that services with istio integration are automatically promoted to product
 import backoff
 import pytest
 
-pytestmark = [pytest.mark.required_capabilities(),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7424")]
+pytestmark = [
+    pytest.mark.required_capabilities(),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7424"),
+]
 
 
 @backoff.on_predicate(backoff.fibo, lambda configs: len(configs) > 0, max_tries=8, jitter=None)

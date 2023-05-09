@@ -11,7 +11,8 @@ from testsuite.tests.apicast.policy.tls import embedded
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -28,9 +29,9 @@ def intermediate_authority(request, manager, valid_authority):
     Intermediate_authority
     valid_authority -> intermediate_authority
     """
-    authority = manager.get_or_create_ca("intermediate_authority",
-                                         hosts=["*.com"],
-                                         certificate_authority=valid_authority)
+    authority = manager.get_or_create_ca(
+        "intermediate_authority", hosts=["*.com"], certificate_authority=valid_authority
+    )
     request.addfinalizer(authority.delete_files)
     return authority
 
@@ -59,10 +60,15 @@ def policy_settings(chained_certificate):
     """
     embedded_cert = embedded(chained_certificate.certificate, "tls.crt", "pkix-cert")
     embedded_key = embedded(chained_certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    return rawobj.PolicyConfig("upstream_mtls", {"certificate_type": "embedded",
-                                                 "certificate_key_type": "embedded",
-                                                 "certificate": embedded_cert,
-                                                 "certificate_key": embedded_key})
+    return rawobj.PolicyConfig(
+        "upstream_mtls",
+        {
+            "certificate_type": "embedded",
+            "certificate_key_type": "embedded",
+            "certificate": embedded_cert,
+            "certificate_key": embedded_key,
+        },
+    )
 
 
 def test_mtls_chained_request(api_client):

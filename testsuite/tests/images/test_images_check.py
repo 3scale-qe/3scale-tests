@@ -10,11 +10,14 @@ pytestmark = pytest.mark.nopersistence
 
 @pytest.mark.parametrize(
     ("image", "image_stream", "deployment_configs"),
-    [("threescale_system", "amp-system", ["system-app"]),
-     ("threescale_backend", "amp-backend", ["backend-worker"]),
-     ("threescale_zync", "amp-zync", ["zync"]),
-     ("threescale_memcached", "system-memcached", ["system-memcache"]),
-     ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"])])
+    [
+        ("threescale_system", "amp-system", ["system-app"]),
+        ("threescale_backend", "amp-backend", ["backend-worker"]),
+        ("threescale_zync", "amp-zync", ["zync"]),
+        ("threescale_memcached", "system-memcached", ["system-memcache"]),
+        ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
+    ],
+)
 def test_deployment_image(images, openshift, image, image_stream, deployment_configs):
     """
     Test:
@@ -52,8 +55,9 @@ def test_apicast_image(images, staging_gateway):
         - assert that expected and deployed images are the same
     """
     expected_image = images["apicast"]
-    lookup = staging_gateway.openshift.do_action("get", [staging_gateway.deployment.resource, "-o", "yaml"],
-                                                 parse_output=True)
+    lookup = staging_gateway.openshift.do_action(
+        "get", [staging_gateway.deployment.resource, "-o", "yaml"], parse_output=True
+    )
     digest = lookup.model.spec.template.spec.containers[0].image.split(":")[-1]
     assert digest == expected_image["manifest_digest"]
 

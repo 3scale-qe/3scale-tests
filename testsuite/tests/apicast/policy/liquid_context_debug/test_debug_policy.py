@@ -29,17 +29,16 @@ def test_debug_policy(api_client, access_token, service):
     client = api_client()
     client.auth = None
 
-    response = client.get('/get', params={'access_token': access_token})
+    response = client.get("/get", params={"access_token": access_token})
     assert response.status_code == 200
 
     jrequest = response.json()
-    parsed_url = urlparse(service.proxy.list()['sandbox_endpoint'])
+    parsed_url = urlparse(service.proxy.list()["sandbox_endpoint"])
 
     assert jrequest["uri"] == "/get"
     assert jrequest["host"] == parsed_url.hostname
     assert jrequest["http_method"] == "GET"
-    assert jrequest["current"]["original_request"]["current"]["query"] ==\
-        "access_token=" + access_token
+    assert jrequest["current"]["original_request"]["current"]["query"] == "access_token=" + access_token
 
     assert "headers" in jrequest
     assert "remote_addr" in jrequest

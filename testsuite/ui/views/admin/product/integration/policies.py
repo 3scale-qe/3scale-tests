@@ -13,6 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleSubmi
 
 class Policies(enum.Enum):
     """Policies enum"""
+
     THREESCALE_APICAST = "3scale APIcast"
     ECHO = "Echo"
     THREESCALE_REFERRER = "3scale Referrer"
@@ -21,6 +22,7 @@ class Policies(enum.Enum):
 
 class EchoPolicyView(View):
     """Echo policy section content as nested view in ProductPoliciesView"""
+
     status_code_input = TextInput(id="root_status")
     exit_mode_input = TextInput(id="root_exit")
     update_policy_btn = ThreescaleSubmitButton()
@@ -41,6 +43,7 @@ class TlsTerminationPolicyView(View):
     Local certificates should be uploaded from testing machine
     Embedded certificates should be already present and mounted in APIcast
     """
+
     NAME = "TLS Termination"
     remove_policy_btn = Button("//*[contains(@class, 'PolicyConfiguration-remove')]")
     add_cert_btn = Button(locator=".//button[contains(@class, 'btn-add')]")
@@ -74,6 +77,7 @@ class TlsTerminationPolicyView(View):
 
 class URLRewritePolicyView(View):
     """URL Rewrite policy section content as nested view in ProductPoliciesView"""
+
     add_command_btn = Button(locator=".//fieldset[contains(@id, 'root_commands')]//button")
     add_query_args_btn = Button(locator=".//fieldset[contains(@id, 'root_query_args_commands')]//button")
     regex_input = TextInput(id="root_commands_0_regex")
@@ -98,6 +102,7 @@ class URLRewritePolicyView(View):
 
 class ProductPoliciesView(BaseProductView):
     """View representation of Product's Policies page"""
+
     path_pattern = "/apiconfig/services/{product_id}/policies/edit"
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
@@ -122,5 +127,8 @@ class ProductPoliciesView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.policy_section.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.policy_section.is_displayed
+            and self.path in self.browser.url
+        )

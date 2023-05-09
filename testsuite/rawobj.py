@@ -14,11 +14,7 @@ def PolicyConfig(name: str, configuration: dict, version: str = "builtin", enabl
         :param version: Version of policy; default: 'builtin'
         :param enabled: Whether policy should be enabled; default: True
         :param configuration: a dict with configuration or particular policy"""
-    return {
-        "name": name,
-        "version": version,
-        "enabled": enabled,
-        "configuration": configuration}
+    return {"name": name, "version": version, "enabled": enabled, "configuration": configuration}
 
 
 # pylint: disable=unused-argument
@@ -59,8 +55,7 @@ def Method(system_name: str, friendly_name: str = None, unit: str = "hit"):
 
 
 # pylint: disable=unused-argument
-def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1,
-            last: str = "false"):
+def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1, last: str = "false"):
     """Builder of parameters to create Mapping
     Args:
         :param metric: Metric to be mapped
@@ -75,8 +70,12 @@ def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: i
     return locals()
 
 
-def Application(name: str, application_plan: 'resources.ApplicationPlan',
-                description: str = None, account: 'resources.Account' = None) -> dict:
+def Application(
+    name: str,
+    application_plan: "resources.ApplicationPlan",
+    description: str = None,
+    account: "resources.Account" = None,
+) -> dict:
     """builder of params to create an application
     Args:
         :param name: name of the application
@@ -86,10 +85,7 @@ def Application(name: str, application_plan: 'resources.ApplicationPlan',
     if description is None:
         description = f"application {name}"
 
-    obj = {
-        "name": name,
-        "plan_id": application_plan["id"],
-        "description": description}
+    obj = {"name": name, "plan_id": application_plan["id"], "description": description}
 
     if account is not None:
         obj["account_id"] = account["id"]
@@ -97,9 +93,13 @@ def Application(name: str, application_plan: 'resources.ApplicationPlan',
     return obj
 
 
-def ApplicationPlan(name: str,
-                    approval_required: bool = False, state_event: str = "publish",
-                    service: 'resources.Service' = None, setup_fee=0) -> dict:
+def ApplicationPlan(
+    name: str,
+    approval_required: bool = False,
+    state_event: str = "publish",
+    service: "resources.Service" = None,
+    setup_fee=0,
+) -> dict:
     """builder of params to create an application plan
     Args:
         :param name: name of the plan
@@ -107,11 +107,7 @@ def ApplicationPlan(name: str,
         :approval_required: Is explicit manual approval needed? Default: False
         :state_event: initial state of the plan; default: 'publish'
         :param setup_fee: option for paid plan; default: 0"""
-    obj = {
-        "name": name,
-        "approval_required": approval_required,
-        "state_event": state_event,
-        "setup_fee": setup_fee}
+    obj = {"name": name, "approval_required": approval_required, "state_event": state_event, "setup_fee": setup_fee}
 
     if service is not None:
         obj["service_id"] = service["id"]
@@ -125,11 +121,8 @@ def AccessToken(name: str, permission: str, scopes: List[str]):
         :param name: the name of the access token
         :param permission: "ro" or "rw"
         :param scopes: array of scopes for new access token
-        """
-    obj = {
-        "name": name,
-        "permission": permission,
-        "scopes": scopes}
+    """
+    obj = {"name": name, "permission": permission, "scopes": scopes}
 
     return obj
 
@@ -139,16 +132,21 @@ def CustomTennant(username: str):
     Args:
         :param username: the username of the tenant
         :param password: the password of the tenant
-        """
+    """
     org_name = username  # pylint: disable=possibly-unused-variable
     email = "anything@invalid.invalid"  # pylint: disable=possibly-unused-variable
     return locals()
 
 
 # pylint: disable=too-many-arguments
-def ActiveDoc(name: str, body: str, description: str = '',
-              service: Optional["resources.Service"] = None, published: bool = True,
-              skip_swagger_validations: bool = False) -> dict:
+def ActiveDoc(
+    name: str,
+    body: str,
+    description: str = "",
+    service: Optional["resources.Service"] = None,
+    published: bool = True,
+    skip_swagger_validations: bool = False,
+) -> dict:
     """
     builder of params to create an active doc.
     Args:
@@ -160,11 +158,11 @@ def ActiveDoc(name: str, body: str, description: str = '',
         :param skip_swagger_validations: should skip validation?
     """
     obj = {
-        'name': name,
-        'body': body,
-        'description': description,
-        'published': published,
-        'skip_swagger_validations': skip_swagger_validations,
+        "name": name,
+        "body": body,
+        "description": description,
+        "published": published,
+        "skip_swagger_validations": skip_swagger_validations,
     }
 
     if service is not None:
@@ -181,9 +179,10 @@ def Account(org_name: str, monthly_billing_enabled: bool, monthly_charging_enabl
         :param monthly_charging_enabled: Is monthly charging enabled?
     """
     tmp = {
-            "org_name": org_name,
-            "monthly_billing_enabled": monthly_billing_enabled,
-            "monthly_charging_enabled": monthly_charging_enabled}
+        "org_name": org_name,
+        "monthly_billing_enabled": monthly_billing_enabled,
+        "monthly_charging_enabled": monthly_charging_enabled,
+    }
 
     return {k: v for k, v in tmp.items() if v is not None}
 
@@ -195,10 +194,7 @@ def AccountUser(username: str, email: str, password: str) -> dict:
         :param email: email
         :param password: password
     """
-    obj = {
-        "username": username,
-        "email": email,
-        "password": password}
+    obj = {"username": username, "email": email, "password": password}
 
     return obj
 
@@ -209,9 +205,7 @@ def ApiDocParams(token: str, params: dict = None) -> dict:
         :param token: access_token
         :param params: dict of params defined in api endpoint
     """
-    obj = {
-        "access_token": token
-    }
+    obj = {"access_token": token}
     if params:
         obj.update(params)
 

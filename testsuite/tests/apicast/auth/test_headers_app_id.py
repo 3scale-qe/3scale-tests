@@ -32,7 +32,7 @@ def test_auth_headers_app_id(application, api_client):
     Then request made with appropriate auth has to pass as expected"""
 
     app_id = application.authobj().credentials["app_id"]
-    response = api_client().get('/get')
+    response = api_client().get("/get")
 
     assert response.status_code == 200
     assert response.request.headers["app_id"] == app_id

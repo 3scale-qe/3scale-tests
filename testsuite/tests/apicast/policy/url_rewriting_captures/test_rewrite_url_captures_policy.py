@@ -12,16 +12,15 @@ def policy_settings():
     """
     Set policy settings
     """
-    return rawobj.PolicyConfig("rewrite_url_captures", {
-        "transformations": [
-            {
-                "match_rule": "/{var_1}/{var_2}",
-                "template": "/{var_2}?my_arg={var_1}"
-            },
-            {
-                "match_rule": "/{var_1}/{var_2}",
-                "template": "/my_arg={var_2}?my_arg2={var_1}"
-            }]})
+    return rawobj.PolicyConfig(
+        "rewrite_url_captures",
+        {
+            "transformations": [
+                {"match_rule": "/{var_1}/{var_2}", "template": "/{var_2}?my_arg={var_1}"},
+                {"match_rule": "/{var_1}/{var_2}", "template": "/my_arg={var_2}?my_arg2={var_1}"},
+            ]
+        },
+    )
 
 
 def test_rewrite_url_captures(api_client):

@@ -43,8 +43,7 @@ def service(service):
 
 def create_mapping_rule(proxy, metric: dict, pattern: str, last: str = "false"):
     """Creates a mapping rule"""
-    proxy.mapping_rules.create(
-        rawobj.Mapping(metric, pattern=pattern, http_method="GET", last=last))
+    proxy.mapping_rules.create(rawobj.Mapping(metric, pattern=pattern, http_method="GET", last=last))
 
 
 def test_mapping_rules_matching_order(api_client, application):
@@ -66,14 +65,12 @@ def test_mapping_rules_matching_order(api_client, application):
     response_twice = client.get("/anything/foo/123")
     assert response_twice.status_code == 200
 
-    metric_twice = analytics.list_by_service(application["service_id"],
-                                             metric_name="metric_twice")["total"]
+    metric_twice = analytics.list_by_service(application["service_id"], metric_name="metric_twice")["total"]
     assert metric_twice == prev_metrics_twice + 2
 
     response_once = client.get("/anything/bar/123")
     assert response_once.status_code == 200
 
     analytics = application.threescale_client.analytics
-    metric_once = analytics.list_by_service(application["service_id"],
-                                            metric_name="metric_once")["total"]
+    metric_once = analytics.list_by_service(application["service_id"], metric_name="metric_once")["total"]
     assert metric_once == prev_metrics_once + 1

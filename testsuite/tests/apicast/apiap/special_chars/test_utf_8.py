@@ -10,17 +10,19 @@ import pytest
 
 from testsuite.echoed_request import EchoedRequest
 
-SPECIAL_CHARS = "`‚ƒ„…†‡ˆ‰Š‹Œ\x8dŽ\x8f\x90‘’“”•–—˜™š›œ\x9džŸ ¡¢£¤¥¦§¨©ª«¬\xad®¯°±²³´µ¶·¸¹º»¼½¾¿" \
-                "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+SPECIAL_CHARS = (
+    "`‚ƒ„…†‡ˆ‰Š‹Œ\x8dŽ\x8f\x90‘’“”•–—˜™š›œ\x9džŸ ¡¢£¤¥¦§¨©ª«¬\xad®¯°±²³´µ¶·¸¹º»¼½¾¿"
+    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def utf_8_special_chars():
     """Chars that have different encoding than windows-1252"""
     chars = [quote(char, encoding="utf-8") for char in SPECIAL_CHARS]
 
     # speed up of the test, we will create one long path with 10 chars joined together
-    return [''.join(chars[i:i + 10]) for i in range(0, len(chars), 10)]
+    return ["".join(chars[i : i + 10]) for i in range(0, len(chars), 10)]
 
 
 @pytest.mark.sandbag  # requires go-httpbin

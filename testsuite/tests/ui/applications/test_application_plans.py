@@ -20,7 +20,7 @@ def test_app_plan_create(custom_ui_app_plan, request, service):
 
     plan = custom_ui_app_plan(name, service)
     assert plan
-    assert plan['name'] == name
+    assert plan["name"] == name
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-825")

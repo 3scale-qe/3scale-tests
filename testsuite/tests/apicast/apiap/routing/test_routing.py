@@ -14,16 +14,16 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.2')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4937")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4937"),
+]
 
 
 @pytest_cases.fixture
 def service(backends_mapping, service_proxy_settings, custom_service, request, lifecycle_hooks):
     """Service configured with all backends that are connected via each path from paths"""
-    return custom_service({"name": blame(request, "svc")},
-                          service_proxy_settings,
-                          backends_mapping,
-                          hooks=lifecycle_hooks)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
 
 @pytest_cases.fixture
@@ -64,12 +64,20 @@ def client(staging_gateway, application):
     return application.api_client()
 
 
-@pytest_cases.parametrize("append_slash", [
-    pytest.param(True, id="2.10_legacy", marks=[pytest.mark.skipif("TESTED_VERSION >= Version('2.11')")]),
-    pytest.param(False, id="",
-                 marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7146"),
-                        pytest.mark.skipif("TESTED_VERSION < Version('2.11')")]),
-])
+@pytest_cases.parametrize(
+    "append_slash",
+    [
+        pytest.param(True, id="2.10_legacy", marks=[pytest.mark.skipif("TESTED_VERSION >= Version('2.11')")]),
+        pytest.param(
+            False,
+            id="",
+            marks=[
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7146"),
+                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+            ],
+        ),
+    ],
+)
 def test(client, paths, append_slash):
     """
     Test that  for each path from paths, the request will be routed to correct backend.

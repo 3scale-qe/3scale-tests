@@ -10,7 +10,7 @@ from testsuite.ui.views.devel import BaseDevelView, AccessView, LandingView
 def provider_account(provider_account):
     """Fixture returns Provider account.
     If `site_access_code` was changed in tests, it is restored to its original value"""
-    access_code = provider_account['site_access_code']
+    access_code = provider_account["site_access_code"]
     yield provider_account
     provider_account.update({"site_access_code": access_code})
 

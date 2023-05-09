@@ -19,8 +19,9 @@ def limit(application):
     proxy = service.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/anything/exceeded"))
 
-    limit = service.app_plans.list()[0].limits(metric).create({
-        "metric_id": metric["id"], "period": "minute", "value": 1})
+    limit = (
+        service.app_plans.list()[0].limits(metric).create({"metric_id": metric["id"], "period": "minute", "value": 1})
+    )
 
     proxy.deploy()
 

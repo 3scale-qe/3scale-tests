@@ -57,14 +57,14 @@ def service2(service_proxy_settings, custom_service, request):
 
 
 @pytest_cases.fixture
-@parametrize_with_cases('case_data', cases=config_cases)
+@parametrize_with_cases("case_data", cases=config_cases)
 def config(case_data, service, service2):
     """Configuration for rate limit policy"""
     policy_config, apply_rate_limit, scope = case_data
     service.proxy.list().policies.append(policy_config)
     service2.proxy.list().policies.append(policy_config)
     # When scope=service we want 2 application for same service
-    if scope == 'service':
+    if scope == "service":
         return apply_rate_limit, service
     # when scope=global we want 1 application for each service
     return apply_rate_limit, service2
@@ -82,7 +82,7 @@ def application2(config, custom_app_plan, custom_application, lifecycle_hooks, r
 async def client(application):
     """api client for application"""
     async with application.api_client() as client:
-        client.timeout = httpx.Timeout(TOTAL_REQUESTS*2)
+        client.timeout = httpx.Timeout(TOTAL_REQUESTS * 2)
         yield client
 
 
@@ -90,7 +90,7 @@ async def client(application):
 async def client2(application2):
     """api client for application2"""
     async with application2.api_client() as client:
-        client.timeout = httpx.Timeout(TOTAL_REQUESTS*2)
+        client.timeout = httpx.Timeout(TOTAL_REQUESTS * 2)
         yield client
 
 

@@ -2,8 +2,10 @@
 
 import pytest
 
-from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import RHSSOIntegrationEditView, \
-    RHSSOIntegrationDetailView
+from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import (
+    RHSSOIntegrationEditView,
+    RHSSOIntegrationDetailView,
+)
 from testsuite.ui.views.devel import BaseDevelView
 
 
@@ -13,12 +15,16 @@ def rhsso_integration(request, threescale, testconfig, custom_admin_login, navig
     Due to the fact that once you create sso integration you can't delete it only edit it,
     this workaround is needed to simplify UI test
     """
-    rhsso = [x for x in threescale.dev_portal_auth_providers.list() if x['kind'] == "keycloak"]
+    rhsso = [x for x in threescale.dev_portal_auth_providers.list() if x["kind"] == "keycloak"]
     if not rhsso:
-        rhsso = [threescale.dev_portal_auth_providers.create(
-            {"kind": "keycloak", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"})]
+        rhsso = [
+            threescale.dev_portal_auth_providers.create(
+                {"kind": "keycloak", "client_id": "tmp", "client_secret": "tmp", "site": "https://anything.invalid"}
+            )
+        ]
 
     if not testconfig["skip_cleanup"]:
+
         def _delete():
             custom_admin_login()
             sso_edit = navigator.navigate(RHSSOIntegrationDetailView, integration=rhsso[0])

@@ -9,7 +9,8 @@ from testsuite import rawobj
 pytestmark = [
     pytest.mark.nopersistence,
     pytest.mark.required_capabilities(),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2752")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2752"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -22,8 +23,7 @@ def application(application):
     proxy = service.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/anything/exceeded"))
 
-    service.app_plans.list()[0].limits(metric).create({
-        "metric_id": metric["id"], "period": "day", "value": 1})
+    service.app_plans.list()[0].limits(metric).create({"metric_id": metric["id"], "period": "day", "value": 1})
 
     proxy.deploy()
 

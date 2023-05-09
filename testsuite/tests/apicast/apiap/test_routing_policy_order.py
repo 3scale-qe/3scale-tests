@@ -24,8 +24,9 @@ def backends_mapping(custom_backend, private_base_url):
 def service(service, private_base_url):
     """Add upstream policy"""
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": private_base_url("echo_api"), "regex": "/httpbin"}]}))
+    proxy.policies.insert(
+        0, rawobj.PolicyConfig("upstream", {"rules": [{"url": private_base_url("echo_api"), "regex": "/httpbin"}]})
+    )
 
     return service
 

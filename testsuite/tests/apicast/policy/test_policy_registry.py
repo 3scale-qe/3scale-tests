@@ -30,13 +30,14 @@ def schema():
                         "type": "object",
                         "properties": {
                             "value1": {"type": "string", "description": "Value1"},
-                            "value2": {"type": "string", "description": "Value2"}
+                            "value2": {"type": "string", "description": "Value2"},
                         },
-                        "required": ["value1"]
-                    }
+                        "required": ["value1"],
+                    },
                 }
-            }
-        }}
+            },
+        },
+    }
 
 
 @pytest.fixture
@@ -52,6 +53,7 @@ def custom_policies(threescale, schema, request, testconfig):
     policies.append(policy)
 
     if not testconfig["skip_cleanup"]:
+
         def _cleanup():
             for policy in policies:
                 threescale.policy_registry.delete(policy["id"])
@@ -62,9 +64,15 @@ def custom_policies(threescale, schema, request, testconfig):
 @pytest.fixture(scope="module")
 def policy_settings():
     """Add policy_registry policy with custom configuration"""
-    return rawobj.PolicyConfig("policy_registry", {
-        "property1": {"value1": {"type": "string", "description": "Value1"},
-                      "value2": {"type": "string", "description": "Value2"}}})
+    return rawobj.PolicyConfig(
+        "policy_registry",
+        {
+            "property1": {
+                "value1": {"type": "string", "description": "Value1"},
+                "value2": {"type": "string", "description": "Value2"},
+            }
+        },
+    )
 
 
 # pylint: disable=unused-argument

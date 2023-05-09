@@ -23,8 +23,7 @@ def application(service, app_plan, custom_application, request, lifecycle_hooks)
     """
     proxy = service.proxy.list()
 
-    application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan),
-                                     hooks=lifecycle_hooks)
+    application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan), hooks=lifecycle_hooks)
 
     proxy.deploy()
 

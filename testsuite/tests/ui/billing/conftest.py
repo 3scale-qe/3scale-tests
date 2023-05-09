@@ -17,14 +17,14 @@ def cost():
 @pytest.fixture(scope="module")
 def line_items(cost):
     """List of all items to be added to an invoice"""
-    return [{'name': "test-item", 'description': 'test_item', 'quantity': '1', 'cost': cost}]
+    return [{"name": "test-item", "description": "test_item", "quantity": "1", "cost": cost}]
 
 
 @pytest.fixture
 def invoice(account, threescale, line_items):
     """Creates a new invoice via API."""
     account_invoices = threescale.invoices.list_by_account(account)
-    invoice = threescale.invoices.create({"account_id": account['id']})
+    invoice = threescale.invoices.create({"account_id": account["id"]})
     for line_item in line_items:
         invoice.line_items.create(line_item)
     invoice = invoice.state_update(InvoiceState.PENDING)
@@ -38,6 +38,7 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
     Creates and charges invoice through UI.
     Asserts if a new invoice was created and charged.
     """
+
     def _ui_invoice():
         custom_admin_login()
         navigator.navigate(AccountInvoicesView, account=account).create()

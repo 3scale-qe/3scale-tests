@@ -51,12 +51,12 @@ def test_user_create(ui_account, requestbin):
 
 def test_user_update(navigator, requestbin, account, request):
     """
-     Test:
-        - Update user
-        - Get webhook response for updated
-        - Assert that webhook response is not None
-        - Assert that response xml body contains right username
-        - Assert that response xml body contains right email
+    Test:
+       - Update user
+       - Get webhook response for updated
+       - Assert that webhook response is not None
+       - Assert that response xml body contains right username
+       - Assert that response xml body contains right email
     """
     user = account.users.list()[0]
     user_edit = navigator.navigate(AccountUserEditView, account=account, user=user)

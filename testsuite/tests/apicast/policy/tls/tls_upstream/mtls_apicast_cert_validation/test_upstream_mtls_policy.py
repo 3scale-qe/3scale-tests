@@ -24,10 +24,15 @@ def embedded_policy_settings(certificate):
     """Sets up the embedded upstream mTLS policy"""
     embedded_cert = embedded(certificate.certificate, "tls.crt", "pkix-cert")
     embedded_key = embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    return rawobj.PolicyConfig("upstream_mtls", {"certificate_type": "embedded",
-                                                 "certificate_key_type": "embedded",
-                                                 "certificate": embedded_cert,
-                                                 "certificate_key": embedded_key})
+    return rawobj.PolicyConfig(
+        "upstream_mtls",
+        {
+            "certificate_type": "embedded",
+            "certificate_key_type": "embedded",
+            "certificate": embedded_cert,
+            "certificate_key": embedded_key,
+        },
+    )
 
 
 @pytest.fixture(scope="module")
@@ -35,16 +40,24 @@ def path_policy_settings(request, certificate, mount_certificate_secret):
     """Sets up upstream mTLS policy with local certificates"""
     path = f'/var/run/secrets/{blame(request, "mtls")}'
     mount_certificate_secret(path, certificate)
-    return rawobj.PolicyConfig("upstream_mtls", {"certificate_type": "path",
-                                                 "certificate_key_type": "path",
-                                                 "certificate": f"{path}/tls.crt",
-                                                 "certificate_key": f"{path}/tls.key"})
+    return rawobj.PolicyConfig(
+        "upstream_mtls",
+        {
+            "certificate_type": "path",
+            "certificate_key_type": "path",
+            "certificate": f"{path}/tls.crt",
+            "certificate_key": f"{path}/tls.key",
+        },
+    )
 
 
-@pytest.fixture(scope="module", params=(
+@pytest.fixture(
+    scope="module",
+    params=(
         pytest.param("embedded_policy_settings", id="Embedded"),
-        pytest.param("path_policy_settings", id="Path", marks=pytest.mark.required_capabilities(Capability.OCP3))
-))
+        pytest.param("path_policy_settings", id="Path", marks=pytest.mark.required_capabilities(Capability.OCP3)),
+    ),
+)
 def policy_settings(request):
     """Paramterized policy settings for upstream mTLS policy"""
     return request.getfixturevalue(request.param)

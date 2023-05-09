@@ -19,16 +19,16 @@ def policy_settings():
     Customize the access logs format and sets the logging condition to log
     only 200 responses
     """
-    return rawobj.PolicyConfig("logging", {
-        "condition": {
-            "operations": [{
-                "op": "==",
-                "match": "{{status}}",
-                "match_type": "liquid",
-                "value": "200"}],
-            "combine_op": "and"},
-        "custom_logging": LOG_MESSAGE
-        })
+    return rawobj.PolicyConfig(
+        "logging",
+        {
+            "condition": {
+                "operations": [{"op": "==", "match": "{{status}}", "match_type": "liquid", "value": "200"}],
+                "combine_op": "and",
+            },
+            "custom_logging": LOG_MESSAGE,
+        },
+    )
 
 
 def test_logging(api_client, staging_gateway):

@@ -32,7 +32,8 @@ Gateway = TypeVar("Gateway", bound=AbstractGateway)
 
 
 def new_gateway(
-        kinds: dict, settings_, kind: Union[Type[Gateway], str] = None, staging: bool = True, **kwargs) -> Gateway:
+    kinds: dict, settings_, kind: Union[Type[Gateway], str] = None, staging: bool = True, **kwargs
+) -> Gateway:
     """Low-level function to initialize gateway of given type. Not to be used directly.
 
     Settings priority:

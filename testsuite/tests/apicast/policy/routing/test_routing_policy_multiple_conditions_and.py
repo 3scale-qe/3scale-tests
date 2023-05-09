@@ -15,14 +15,22 @@ def service(service, private_base_url):
     test_header1 = {"op": "==", "value": "route", "match": "header", "header_name": "Test1"}
     test_header2 = {"op": "matches", "value": "test", "match": "header", "header_name": "Test2"}
     proxy = service.proxy.list()
-    proxy.policies.insert(0, {
-        "name": "routing",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "rules": [{"url": private_base_url("echo_api") + "/route",
-                       "condition": {"combine_op": "and", "operations": [test_header1, test_header2]},
-                       }]}})
+    proxy.policies.insert(
+        0,
+        {
+            "name": "routing",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {
+                "rules": [
+                    {
+                        "url": private_base_url("echo_api") + "/route",
+                        "condition": {"combine_op": "and", "operations": [test_header1, test_header2]},
+                    }
+                ]
+            },
+        },
+    )
 
     return service
 

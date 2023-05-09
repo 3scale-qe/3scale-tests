@@ -60,7 +60,7 @@ def check_deleted_client(client_id, rhsso_service_info):
 def test_rhsso_client_delete(application, rhsso_service_info):
     """Test checks if the RHSSO client is deleted when 3scale application is deleted"""
     assert get_rhsso_client(application, rhsso_service_info) is not None
-    client_id = application['client_id']
+    client_id = application["client_id"]
     application.delete()
 
     assert check_deleted_client(client_id, rhsso_service_info)

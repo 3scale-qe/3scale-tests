@@ -26,21 +26,20 @@ class _Chrome:
 
     def install(self):
         """Installs the web driver"""
-        if self.source == 'local':
+        if self.source == "local":
             self.binary_path = ChromeDriverManager().install()
 
     def start_session(self):
         """Initializes and starts web browser"""
-        if self.source == 'remote':
-            self.webdriver = webdriver.Remote(command_executor=self.remote_url + '/wd/hub',
-                                              options=self.options)
-        elif self.source in ('local', 'binary'):
-            self.webdriver = webdriver.Chrome(service=ChromeService(executable_path=self.binary_path),
-                                              options=self.options)
+        if self.source == "remote":
+            self.webdriver = webdriver.Remote(command_executor=self.remote_url + "/wd/hub", options=self.options)
+        elif self.source in ("local", "binary"):
+            self.webdriver = webdriver.Chrome(
+                service=ChromeService(executable_path=self.binary_path), options=self.options
+            )
         else:
             raise ValueError(
-                '"{}" source is not supported. Please use one of {}'
-                .format(self.source, ('local', 'binary', 'remote'))
+                '"{}" source is not supported. Please use one of {}'.format(self.source, ("local", "binary", "remote"))
             )
 
         return self.webdriver
@@ -60,21 +59,20 @@ class _Firefox:
 
     def install(self):
         """Installs the web driver"""
-        if self.source == 'local':
+        if self.source == "local":
             self.binary_path = GeckoDriverManager().install()
 
     def start_session(self):
         """Initializes and starts web browser"""
-        if self.source == 'remote':
-            self.webdriver = webdriver.Remote(command_executor=self.remote_url + '/wd/hub',
-                                              options=self.options)
-        elif self.source in ('local', 'binary'):
-            self.webdriver = webdriver.Firefox(service=FirefoxService(executable_path=self.binary_path),
-                                               options=self.options)
+        if self.source == "remote":
+            self.webdriver = webdriver.Remote(command_executor=self.remote_url + "/wd/hub", options=self.options)
+        elif self.source in ("local", "binary"):
+            self.webdriver = webdriver.Firefox(
+                service=FirefoxService(executable_path=self.binary_path), options=self.options
+            )
         else:
             raise ValueError(
-                '"{}" source is not supported. Please use one of {}'
-                .format(self.source, ('local', 'binary', 'remote'))
+                '"{}" source is not supported. Please use one of {}'.format(self.source, ("local", "binary", "remote"))
             )
 
         return self.webdriver
@@ -109,20 +107,19 @@ class ThreescaleWebdriver:
         """
         self.driver = driver
         self.source = source
-        self.remote_url = remote_url or 'http://127.0.0.1:4444'
+        self.remote_url = remote_url or "http://127.0.0.1:4444"
         self.binary_path = binary_path
         self.webdriver = None
         self.session = None
         accept_insecure_certs = not ssl_verify
 
-        if self.driver == 'chrome':
+        if self.driver == "chrome":
             self.webdriver = _Chrome(source, accept_insecure_certs, remote_url, binary_path)
-        elif self.driver == 'firefox':
+        elif self.driver == "firefox":
             self.webdriver = _Firefox(source, accept_insecure_certs, remote_url, binary_path)
         else:
             raise ValueError(
-                '"{}" webdriver is not supported. Please use one of {}'
-                .format(self.driver, ('chrome', 'firefox'))
+                '"{}" webdriver is not supported. Please use one of {}'.format(self.driver, ("chrome", "firefox"))
             )
         self.webdriver.install()
 

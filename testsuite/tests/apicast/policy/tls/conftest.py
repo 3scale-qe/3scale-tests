@@ -37,8 +37,7 @@ def superdomain(testconfig):
 def server_authority(request, superdomain, manager):
     """CA Authority to be used in the gateway"""
     wildcard_domain = "*." + superdomain
-    authority = manager.get_or_create_ca("server-ca",
-                                         hosts=[wildcard_domain])
+    authority = manager.get_or_create_ca("server-ca", hosts=[wildcard_domain])
     request.addfinalizer(authority.delete_files)
     return authority
 
@@ -51,7 +50,7 @@ def staging_gateway(request, server_authority, superdomain, manager, gateway_opt
         "name": blame(request, "tls-gw"),
         "manager": manager,
         "server_authority": server_authority,
-        "superdomain": superdomain
+        "superdomain": superdomain,
     }
     kwargs.update(gateway_options)
     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
@@ -71,10 +70,7 @@ def create_cert(request, superdomain, manager):
     host = "*." + superdomain
 
     def _create(name: str, certificate_authority: Certificate) -> Certificate:
-        cert = manager.get_or_create(name,
-                                     common_name=host,
-                                     hosts=[host],
-                                     certificate_authority=certificate_authority)
+        cert = manager.get_or_create(name, common_name=host, hosts=[host], certificate_authority=certificate_authority)
 
         request.addfinalizer(cert.delete_files)
         return cert
@@ -89,8 +85,7 @@ def chainify(request):
     def _chain(certificate: Certificate, *authorities: Certificate) -> Certificate:
         entire_chain = [certificate]
         entire_chain.extend(authorities)
-        chain = Certificate(certificate="".join(cert.certificate for cert in entire_chain),
-                            key=certificate.key)
+        chain = Certificate(certificate="".join(cert.certificate for cert in entire_chain), key=certificate.key)
         request.addfinalizer(chain.delete_files)
         return chain
 
@@ -143,11 +138,11 @@ def mount_certificate_secret(request, staging_gateway):
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service(request, backends_mapping, custom_service,
-            service_proxy_settings, lifecycle_hooks, policy_settings):
+def service(request, backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks, policy_settings):
     """Preconfigured service, which is created for each policy settings, which are often parametrized in this module"""
-    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
-                             hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
     if policy_settings:
         service.proxy.list().policies.append(policy_settings)
     return service

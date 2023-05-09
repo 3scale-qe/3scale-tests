@@ -30,11 +30,11 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
     def request_traced():
         """Let's retry as the tracing might be 'lazy'"""
         traces = jaeger.traces(jaeger_service_name, "/")
-        for trace in traces['data']:
-            for span in trace['spans']:
-                if span['operationName'] == '/':
-                    for tag in span['tags']:
-                        if tag['key'] == "http.url" and endpoint in tag['value']:
+        for trace in traces["data"]:
+            for span in trace["spans"]:
+                if span["operationName"] == "/":
+                    for tag in span["tags"]:
+                        if tag["key"] == "http.url" and endpoint in tag["value"]:
                             return True
         return False
 
@@ -42,15 +42,15 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
 
     traces = jaeger.traces(jaeger_service_name, "/")
     url_and_uri = True
-    for trace in traces['data']:
-        for span in trace['spans']:
-            if span['operationName'] == '/':
+    for trace in traces["data"]:
+        for span in trace["spans"]:
+            if span["operationName"] == "/":
                 http_url = False
                 original_request_uri = False
-                for tag in span['tags']:
-                    if tag['key'] == "http.url":
+                for tag in span["tags"]:
+                    if tag["key"] == "http.url":
                         http_url = True
-                    if tag['key'] == "original_request_uri":
+                    if tag["key"] == "original_request_uri":
                         original_request_uri = True
                 url_and_uri = url_and_uri and http_url and original_request_uri
     assert url_and_uri

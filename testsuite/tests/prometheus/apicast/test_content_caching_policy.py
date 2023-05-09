@@ -12,35 +12,36 @@ from testsuite.prometheus import get_metrics_keys
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5439"),
-    ]
+]
 
 
 @pytest.fixture(scope="module")
 def service(service):
     """Configurate content_caching policy"""
-    service.proxy.list().policies.append(rawobj.PolicyConfig("content_caching", {
-        "rules": [{
-            "cache": True,
-            "header": "X-Cache-Status",
-            "condition": {
-                "combine_op": "and",
-                "operations": [{
-                    "left": "oo",
-                    "op": "==",
-                    "right": "oo"
-                }]
-            }
-        }]
-    }))
+    service.proxy.list().policies.append(
+        rawobj.PolicyConfig(
+            "content_caching",
+            {
+                "rules": [
+                    {
+                        "cache": True,
+                        "header": "X-Cache-Status",
+                        "condition": {"combine_op": "and", "operations": [{"left": "oo", "op": "==", "right": "oo"}]},
+                    }
+                ]
+            },
+        )
+    )
     service.proxy.deploy()
     return service
 
 
 @pytest.mark.disruptive
-@pytest.mark.parametrize(("client", "apicast"), [("api_client", "apicast-staging"),
-                                                 ("prod_client", "apicast-production")
-                                                 ],
-                         ids=["Staging Apicast", "Production Apicast"])
+@pytest.mark.parametrize(
+    ("client", "apicast"),
+    [("api_client", "apicast-staging"), ("prod_client", "apicast-production")],
+    ids=["Staging Apicast", "Production Apicast"],
+)
 def test_content_caching(request, prometheus, client, apicast):
     """
     Test if cache works correctly and if prometheus contains content_caching metric.
@@ -80,7 +81,7 @@ def test_content_caching(request, prometheus, client, apicast):
 
     counts_after = extract_caching(prometheus, "content_caching", apicast)
 
-    assert int(counts_after['HIT']) == int(counts_before['HIT']) + 1
+    assert int(counts_after["HIT"]) == int(counts_before["HIT"]) + 1
 
 
 def extract_caching(prometheus, query, apicast):
@@ -89,8 +90,7 @@ def extract_caching(prometheus, query, apicast):
     codes and counts associated with the response code
     """
     metric_response_codes = prometheus.get_metrics(query, {"container": apicast})
-    key_value_map = {'EXPIRED': 0, 'HIT': 0, 'MISS': 0}
+    key_value_map = {"EXPIRED": 0, "HIT": 0, "MISS": 0}
     for response_code_metric in metric_response_codes:
-        key_value_map[response_code_metric['metric']['status']] \
-            = response_code_metric['value'][1]
+        key_value_map[response_code_metric["metric"]["status"]] = response_code_metric["value"][1]
     return key_value_map

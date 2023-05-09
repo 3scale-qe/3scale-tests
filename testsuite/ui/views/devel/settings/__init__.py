@@ -7,6 +7,7 @@ from testsuite.ui.views.devel import BaseDevelView, Navbar
 
 class SettingsTabs(View, Navigable):
     """Account settings in Devel portal"""
+
     ROOT = "//ul[contains(@class, 'nav-tabs')]"
     details_tab = Text("//a[@href='/admin/account']")
     users_tab = Text("//a[@href='/admin/account/users']")
@@ -35,13 +36,18 @@ class SettingsTabs(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.details_tab.is_displayed and self.users_tab.is_displayed \
-                and self.invitations_tab.is_displayed and self.invoices_tab.is_displayed
+        return (
+            self.details_tab.is_displayed
+            and self.users_tab.is_displayed
+            and self.invitations_tab.is_displayed
+            and self.invoices_tab.is_displayed
+        )
 
 
 class InvoicesView(BaseDevelView):
     """List of all invoices for an account"""
-    path_pattern = '/admin/account/invoices'
+
+    path_pattern = "/admin/account/invoices"
     tabs = View.nested(SettingsTabs)
 
     def prerequisite(self):

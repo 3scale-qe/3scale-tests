@@ -7,10 +7,12 @@ affect the response code of the other policy.
 
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6255")]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6255"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -19,14 +21,10 @@ def service(service):
     Service configured with payload_limits policy after the statuscode_overwrite policy
     """
     service.proxy.list().policies.append(
-        rawobj.PolicyConfig("statuscode_overwrite",
-                            {"http_statuses": [
-                                {"upstream": 413,
-                                 "apicast": 414
-                                 }]}))
+        rawobj.PolicyConfig("statuscode_overwrite", {"http_statuses": [{"upstream": 413, "apicast": 414}]})
+    )
 
-    service.proxy.list().policies.append(
-        rawobj.PolicyConfig("payload_limits", {"response": 100}))
+    service.proxy.list().policies.append(rawobj.PolicyConfig("payload_limits", {"response": 100}))
 
     return service
 

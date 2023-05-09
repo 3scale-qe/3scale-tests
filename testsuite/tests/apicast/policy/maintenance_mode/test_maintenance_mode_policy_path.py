@@ -11,13 +11,14 @@ import pytest_cases
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION, rawobj # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.tests.apicast.policy.maintenance_mode import config_cases_path
 
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6552")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6552"),
+]
 
 
 @pytest_cases.fixture
@@ -34,9 +35,9 @@ def test_maintenance_mode_policy(config, application):
     api_client = application.api_client()
     status_code_test, status_code_get, message = config
 
-    request = api_client.get('/test')
+    request = api_client.get("/test")
     assert request.status_code == status_code_test
     assert request.text == message
 
-    request = api_client.get('/get')
+    request = api_client.get("/get")
     assert request.status_code == status_code_get

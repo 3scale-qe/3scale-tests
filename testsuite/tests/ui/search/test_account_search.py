@@ -7,8 +7,7 @@ from testsuite import rawobj
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5486"),
-              pytest.mark.usefixtures("login")]
+pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5486"), pytest.mark.usefixtures("login")]
 
 
 @pytest.fixture(scope="module")
@@ -56,12 +55,14 @@ def custom_account(custom_account, request):
     """
 
     def _custom(name):
-        custom_account({
-            "org_name": name,
-            "username": blame(request, "username"),
-            "email": f"{blame(request, 'email')}@anything.invalid",
-            "password": "123456",
-        })
+        custom_account(
+            {
+                "org_name": name,
+                "username": blame(request, "username"),
+                "email": f"{blame(request, 'email')}@anything.invalid",
+                "password": "123456",
+            }
+        )
 
     return _custom
 

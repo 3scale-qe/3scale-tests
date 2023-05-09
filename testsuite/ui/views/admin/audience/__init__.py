@@ -6,8 +6,9 @@ from testsuite.ui.widgets import NavigationMenu
 
 class BaseAudienceView(BaseAdminView):
     """Parent View for Audience Views."""
-    NAV_ITEMS = ['Accounts', 'Applications', 'Billing', 'Developer Portal', 'Messages']
-    nav = NavigationMenu(id='mainmenu')
+
+    NAV_ITEMS = ["Accounts", "Applications", "Billing", "Developer Portal", "Messages"]
+    nav = NavigationMenu(id="mainmenu")
 
     def visit_portal(self):
         """

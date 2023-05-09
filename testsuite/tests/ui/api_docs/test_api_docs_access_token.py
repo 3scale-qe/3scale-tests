@@ -27,7 +27,7 @@ def test_invalid_token(request, navigator, access_token):
     api_docs = navigator.navigate(APIDocsView)
     token = request.getfixturevalue(access_token)[0]
     code = request.getfixturevalue(access_token)[1]
-    status_code = api_docs\
-        .endpoint("Authentication Providers Admin Portal List")\
-        .send_request(rawobj.ApiDocParams(token))
+    status_code = api_docs.endpoint("Authentication Providers Admin Portal List").send_request(
+        rawobj.ApiDocParams(token)
+    )
     assert status_code == code

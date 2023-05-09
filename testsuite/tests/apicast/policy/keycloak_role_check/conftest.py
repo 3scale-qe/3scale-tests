@@ -97,7 +97,7 @@ def prod_client(application, production_gateway):
     Prepares application and service for production use and creates new production client
     :return Api client for application
     """
-    version = application.service.proxy.list().configs.latest()['version']
+    version = application.service.proxy.list().configs.latest()["version"]
     application.service.proxy.list().promote(version=version)
     production_gateway.reload()
 

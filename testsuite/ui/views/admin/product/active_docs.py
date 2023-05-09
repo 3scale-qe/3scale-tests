@@ -10,7 +10,8 @@ from testsuite.ui.navigation import step
 
 class ActiveDocsView(BaseProductView):
     """View representation of Active Docs list page"""
-    path_pattern = '/apiconfig/services/{product_id}/api_docs'
+
+    path_pattern = "/apiconfig/services/{product_id}/api_docs"
     active_docs_table = PatternflyTable(locator="//*[@id='content']/table")
 
     @step("ActiveDocsDetailView")
@@ -23,13 +24,17 @@ class ActiveDocsView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.active_docs_table.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.active_docs_table.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class ActiveDocsDetailView(BaseProductView):
     """View representation of Active Docs Detail page"""
-    path_pattern = '/apiconfig/services/{product_id}/api_docs/{active_doc_id}/preview'
+
+    path_pattern = "/apiconfig/services/{product_id}/api_docs/{active_doc_id}/preview"
     delete_btn = ThreescaleDeleteButton()
     edit_btn = ThreescaleEditButton()
 
@@ -40,6 +45,7 @@ class ActiveDocsDetailView(BaseProductView):
     # pylint: disable=invalid-name
     class oas2(View):
         """OAS version 2 section"""
+
         expand_operations_link = Text(locator="//*[contains(@class, 'expandResource')]")
         collapse_operations_link = Text(locator="//*[contains(@class, 'collapseResource')]")
         active_docs_section = ActiveDocV2Section()
@@ -57,6 +63,7 @@ class ActiveDocsDetailView(BaseProductView):
     # pylint: disable=invalid-name
     class oas3(View):
         """OAS version 3 section"""
+
         active_docs_section = ActiveDocV3Section()
         server = Text("//label[@for='servers']/select/option")
 
@@ -75,5 +82,9 @@ class ActiveDocsDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.edit_btn.is_displayed and \
-               self.delete_btn.is_displayed and self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.edit_btn.is_displayed
+            and self.delete_btn.is_displayed
+            and self.path in self.browser.url
+        )

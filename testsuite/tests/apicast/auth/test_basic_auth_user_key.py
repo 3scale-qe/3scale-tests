@@ -31,10 +31,10 @@ def test_should_accept_user_key_passed_by_basic_auth(application, api_client):
     """
     key = list(application.authobj().credentials.values())[0]
 
-    response = api_client().get('/get')
+    response = api_client().get("/get")
 
     assert response.status_code == 200
-    assert response.request.headers["Authorization"] == basic_auth_string(key, '')
+    assert response.request.headers["Authorization"] == basic_auth_string(key, "")
 
 
 def test_basic_auth_app_id_403_with_query(application, api_client):

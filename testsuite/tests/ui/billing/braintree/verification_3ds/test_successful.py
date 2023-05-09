@@ -5,12 +5,14 @@ https://developer.paypal.com/braintree/docs/guides/3d-secure/testing-go-live
 import pytest
 
 
-@pytest.mark.parametrize("cc_number,verify_3ds", [
-    ("4000000000001091", True),
-    ("4000000000001000", False),
-], ids=[
-    "with challenge", "no-challenge"
-])
+@pytest.mark.parametrize(
+    "cc_number,verify_3ds",
+    [
+        ("4000000000001091", True),
+        ("4000000000001000", False),
+    ],
+    ids=["with challenge", "no-challenge"],
+)
 def test_successful(custom_card, braintree, cc_number, verify_3ds, invoice):
     """
     Tests basic billing scenario with 3DS integration for Braintree gateway:

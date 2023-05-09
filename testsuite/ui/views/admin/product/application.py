@@ -11,10 +11,9 @@ from testsuite.ui.views.common.foundation import FlashMessage
 
 class ApplicationPlansView(BaseProductView):
     """View representation of Application plans page"""
+
     path_pattern = "/apiconfig/services/{product_id}/application_plans"
-    table = PatternflyTable(".//*[@aria-label='Plans Table']", column_widgets={
-        "Name": Text("./a")
-    })
+    table = PatternflyTable(".//*[@aria-label='Plans Table']", column_widgets={"Name": Text("./a")})
     create_button = ThreescaleCreateButton()
     change_plan_button = ThreescaleSubmitButton()
     default_plan_select = Select()
@@ -46,12 +45,12 @@ class ApplicationPlansView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.table.is_displayed
+        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url and self.table.is_displayed
 
 
 class ApplicationPlanDetailView(BaseProductView):
     """View representation of Application plan detail page"""
+
     path_pattern = "/apiconfig/application_plans/{application_plan_id}/edit"
     product_level = PatternflyTable(".//*[@id='metrics']")
 
@@ -63,12 +62,16 @@ class ApplicationPlanDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.product_level.is_displayed \
-               and self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.product_level.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class UsageRulesView(BaseProductView):
     """View representation of Product's application usage rules page"""
+
     path_pattern = "/apiconfig/services/{product_id}/usage_rules"
     referrer_filtering_checkbox = GenericLocatorWidget("#service_referrer_filters_required")
     update_btn = ThreescaleUpdateButton()
@@ -82,12 +85,14 @@ class UsageRulesView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.update_btn.is_displayed \
-               and self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self) and self.update_btn.is_displayed and self.path in self.browser.url
+        )
 
 
 class ApplicationPlanNewView(BaseProductView):
     """View representation of New Application Plan page"""
+
     path_pattern = "/apiconfig/services/{product_id}/application_plans/new"
     name = TextInput(id="application_plan_name")
     system_name = TextInput(id="application_plan_system_name")
@@ -104,5 +109,10 @@ class ApplicationPlanNewView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.create_button.is_displayed and self.name.is_displayed \
-               and self.system_name.is_displayed and self.path in self.browser.url
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.create_button.is_displayed
+            and self.name.is_displayed
+            and self.system_name.is_displayed
+            and self.path in self.browser.url
+        )

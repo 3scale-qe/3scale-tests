@@ -13,7 +13,8 @@ from testsuite.utils import blame
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5207"),
-    pytest.mark.disruptive]
+    pytest.mark.disruptive,
+]
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -6,8 +6,9 @@ from testsuite.ui.widgets import NavigationMenu
 
 class BaseMasterAudienceView(BaseMasterView):
     """Parent View for Audience Views."""
-    NAV_ITEMS = ['Accounts', 'Applications', 'Messages']
-    nav = NavigationMenu(id='mainmenu')
+
+    NAV_ITEMS = ["Accounts", "Applications", "Messages"]
+    nav = NavigationMenu(id="mainmenu")
 
     @step("@href")
     def step(self, href, **kwargs):
@@ -24,6 +25,6 @@ class BaseMasterAudienceView(BaseMasterView):
 
     @property
     def is_displayed(self):
-        return BaseMasterView.is_displayed.fget(self) \
-               and self.nav.is_displayed \
-               and self.nav.nav_links() == self.NAV_ITEMS
+        return (
+            BaseMasterView.is_displayed.fget(self) and self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS
+        )

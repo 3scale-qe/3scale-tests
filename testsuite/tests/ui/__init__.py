@@ -9,6 +9,7 @@ class Sessions:
     In a form:
         (username, password, url) : cookie_dict
     """
+
     def __init__(self):
         super().__init__()
         self.sessions = {}

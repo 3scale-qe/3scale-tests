@@ -16,11 +16,7 @@ LOG_MESSAGE = randomize("custom_and_unique_access_log")
 @pytest.fixture(scope="module")
 def policy_settings():
     """Customize the access logs format"""
-    return rawobj.PolicyConfig("logging", {
-        "condition": {
-            "combine_op": "and"},
-        "custom_logging": LOG_MESSAGE
-        })
+    return rawobj.PolicyConfig("logging", {"condition": {"combine_op": "and"}, "custom_logging": LOG_MESSAGE})
 
 
 def test_logging(api_client, staging_gateway):

@@ -21,9 +21,15 @@ def endpoints_and_methods():
     First value in the tuple is the mapped endpoint, the second value
     is the mapped http method
     """
-    return {("/ip", "GET"), ("/anything", "POST"), ("/delete", "DELETE"),
-            ("/put", "PUT"), ("/patch", "PATCH"), ("/anything", "HEAD"),
-            ("/anything", "OPTIONS")}
+    return {
+        ("/ip", "GET"),
+        ("/anything", "POST"),
+        ("/delete", "DELETE"),
+        ("/put", "PUT"),
+        ("/patch", "PATCH"),
+        ("/anything", "HEAD"),
+        ("/anything", "OPTIONS"),
+    }
 
 
 @pytest.fixture(scope="module")
@@ -40,9 +46,7 @@ def service(service, endpoints_and_methods):
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
 
     for url, method in endpoints_and_methods:
-        proxy.mapping_rules.create(
-            rawobj.Mapping(metric, pattern=url,
-                           http_method=method))
+        proxy.mapping_rules.create(rawobj.Mapping(metric, pattern=url, http_method=method))
 
     proxy.deploy()
 
@@ -80,11 +84,10 @@ def test_mapping(client, endpoints_and_methods):
     """
 
     for url, method in endpoints_and_methods:
-        response = client.request(method=method,
-                                  path=url)
-        assert response.status_code == 200, \
-            f"Unexpected status {response.status_code} from {method} request" \
-            f" to {url} endpoint"
+        response = client.request(method=method, path=url)
+        assert response.status_code == 200, (
+            f"Unexpected status {response.status_code} from {method} request" f" to {url} endpoint"
+        )
 
     response = client.post("/anything/nonsense/foo")
     assert response.status_code == 200

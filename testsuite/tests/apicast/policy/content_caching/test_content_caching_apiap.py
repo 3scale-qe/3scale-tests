@@ -14,20 +14,18 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 @pytest.fixture(scope="module")
 def policy_settings():
     "config of cors policy"
-    return rawobj.PolicyConfig("content_caching", {
-        "rules": [{
-            "cache": True,
-            "header": "X-Cache-Status",
-            "condition": {
-                "combine_op": "and",
-                "operations": [{
-                    "left": "oo",
-                    "op": "==",
-                    "right": "oo"
-                }]
-            }
-        }]
-    })
+    return rawobj.PolicyConfig(
+        "content_caching",
+        {
+            "rules": [
+                {
+                    "cache": True,
+                    "header": "X-Cache-Status",
+                    "condition": {"combine_op": "and", "operations": [{"left": "oo", "op": "==", "right": "oo"}]},
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")
@@ -37,16 +35,19 @@ def backends_mapping(custom_backend, private_base_url):
         - path to Backend 1: "/echo-api"
         - path to Backend 2: "/httpbin"
     """
-    return {"/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api")),
-            "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin"))}
+    return {
+        "/echo-api": custom_backend("backend_one", endpoint=private_base_url("echo_api")),
+        "/httpbin": custom_backend("backend_two", endpoint=private_base_url("httpbin")),
+    }
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
 def service2(backends_mapping, custom_service, service_proxy_settings, policy_settings, lifecycle_hooks, request):
     """Second service to test with"""
-    svc = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
-                         hooks=lifecycle_hooks)
+    svc = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
     svc.proxy.list().policies.append(policy_settings)
     return svc
 
@@ -80,7 +81,7 @@ def client2(application2, api_client):
     return client
 
 
-@pytest.mark.parametrize('client_param', ('client', 'client2'), ids=["First service", "Second service"])
+@pytest.mark.parametrize("client_param", ("client", "client2"), ids=["First service", "Second service"])
 def test_caching_working_correctly(request, client_param):
     """
     Test that cache on works correctly with APIAP
@@ -121,7 +122,7 @@ def test_other_service_cache(client, client2):
     echoed_request2 = EchoedRequest.create(response)
 
     # Body of each response should be different
-    assert echoed_request.json['uuid'] != echoed_request2.json['uuid']
+    assert echoed_request.json["uuid"] != echoed_request2.json["uuid"]
 
     # Request to first service should be still cached
     response = client.get("/echo-api/uuid", headers=origin_localhost)

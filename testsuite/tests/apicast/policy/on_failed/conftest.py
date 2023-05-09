@@ -31,8 +31,9 @@ def service_settings(request) -> dict:
 
 # pylint: disable=too-many-arguments, too-many-instance-attributes
 @pytest.fixture
-def service(policy_settings, backends_mapping, custom_service, service_settings,
-            service_proxy_settings, lifecycle_hooks) -> dict:
+def service(
+    policy_settings, backends_mapping, custom_service, service_settings, service_proxy_settings, lifecycle_hooks
+) -> dict:
     "Preconfigured service with backend defined existing over whole testsing session"
     svc = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
     svc.proxy.list().policies.append(policy_settings)
@@ -40,8 +41,7 @@ def service(policy_settings, backends_mapping, custom_service, service_settings,
 
 
 @pytest.fixture
-def application(service, custom_application, custom_app_plan,
-                lifecycle_hooks, request) -> dict:
+def application(service, custom_application, custom_app_plan, lifecycle_hooks, request) -> dict:
     "application bound to the account and service existing over whole testing session"
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
     app = custom_application(rawobj.Application(blame(request, "app"), plan), hooks=lifecycle_hooks)

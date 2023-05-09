@@ -35,13 +35,10 @@ def application_silver(application, custom_app_plan, custom_application, request
 
     proxy = service.proxy.list()
 
-    plan_silver = custom_app_plan(
-        rawobj.ApplicationPlan(blame(request, "silver")), service)
-    plan_silver.limits(metric).create({
-        "metric_id": metric["id"], "period": "minute", "value": 10})
+    plan_silver = custom_app_plan(rawobj.ApplicationPlan(blame(request, "silver")), service)
+    plan_silver.limits(metric).create({"metric_id": metric["id"], "period": "minute", "value": 10})
 
-    application = custom_application(
-        rawobj.Application(blame(request, "silver_app"), plan_silver))
+    application = custom_application(rawobj.Application(blame(request, "silver_app"), plan_silver))
 
     proxy.deploy()
 
@@ -89,15 +86,13 @@ def assert_limit_works(client, limit):
     """
     for i in range(limit + 1):
         response = client.get("/")
-        assert response.status_code == 200, f"Response of the request " \
-                                            f"number {i} should be 200"
+        assert response.status_code == 200, f"Response of the request " f"number {i} should be 200"
         # wait for 0.125 as the original ruby tests waits after making request
         time.sleep(0.125)
 
     for i in range(2):
         response = client.get("/")
-        assert response.status_code == 429, f"Response of the request {limit + 1 + i} " \
-                                            f"should be 429"
+        assert response.status_code == 429, f"Response of the request {limit + 1 + i} " f"should be 429"
         # wait for 0.125 as the original ruby tests waits after making request
         time.sleep(0.125)
 
@@ -110,8 +105,7 @@ def test_limit_exceeded(silver_client, gold_client):
     denied
     """
     for i in range(15):
-        assert gold_client.get("/").status_code == 200, f"Response of the request " \
-                                                        f"number {i} should be 200"
+        assert gold_client.get("/").status_code == 200, f"Response of the request " f"number {i} should be 200"
         # wait for 0.125 as the original ruby tests waits after making request
         time.sleep(0.125)
 

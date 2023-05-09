@@ -24,21 +24,22 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6139")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6139"),
+]
 
 
 @pytest.fixture(scope="module", autouse=True)
 def setup(lifecycle_hooks):
     """Setup fixture which adds FakeOIDC lifecycle hook"""
+
     class FakeOIDC:
         """Fake oidc class which updates services to oidc config with example.com:81 url"""
+
         # pylint: disable=unused-argument
         @staticmethod
         def before_proxy(service: Service, proxy_params: dict):
             """Update proxy params"""
-            proxy_params.update(
-                oidc_issuer_endpoint="http://example.com:81",
-                oidc_issuer_type="keycloak")
+            proxy_params.update(oidc_issuer_endpoint="http://example.com:81", oidc_issuer_type="keycloak")
             return proxy_params
 
         @staticmethod

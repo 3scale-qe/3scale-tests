@@ -11,7 +11,8 @@ from testsuite.utils import blame, warn_and_skip
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2235")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2235"),
+]
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -21,17 +22,15 @@ def skip_saas(testconfig):
         warn_and_skip("Gateway logs missing on SaaS")
 
 
-@pytest.fixture(scope="module", params=["mockserver+svc:1080",
-                                        "httpbin",
-                                        "httpbin_nossl"])
+@pytest.fixture(scope="module", params=["mockserver+svc:1080", "httpbin", "httpbin_nossl"])
 def private_base_url_and_expected_port(private_base_url, request):
     """
     Returns the upstream api url to be used, along with the port that is
     expected
     """
     url = private_base_url(request.param)
-    port = url.split(":")[2].replace('/', '')
-    return url, port if port not in {'80', '443'} else None
+    port = url.split(":")[2].replace("/", "")
+    return url, port if port not in {"80", "443"} else None
 
 
 @pytest.fixture(scope="module")
@@ -66,7 +65,7 @@ def test_strip_ports(api_client, private_base_url_and_expected_port):
 
     echoed_request = EchoedRequest.create(response)
 
-    url_split = echoed_request.headers['host'].split(":")
+    url_split = echoed_request.headers["host"].split(":")
 
     expected_port = private_base_url_and_expected_port[1]
 

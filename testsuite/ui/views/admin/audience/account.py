@@ -7,18 +7,22 @@ from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox, CheckBoxGroup
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
-    ThreescaleEditButton, ThreescaleSubmitButton, ThreescaleSearchButton
+from testsuite.ui.widgets.buttons import (
+    ThreescaleUpdateButton,
+    ThreescaleDeleteButton,
+    ThreescaleEditButton,
+    ThreescaleSubmitButton,
+    ThreescaleSearchButton,
+)
 
 
 class AccountsView(BaseAudienceView):
     """View representation of Accounts Listing page"""
+
     # TODO search will be separated into the AudienceTable Widget later.
-    path_pattern = '/buyers/accounts'
+    path_pattern = "/buyers/accounts"
     new_account = Text("//a[@href='/buyers/accounts/new']")
-    table = AudienceTable("//*[@id='buyer_accounts']", column_widgets={
-        'Group/Org.': Text('./a')
-    })
+    table = AudienceTable("//*[@id='buyer_accounts']", column_widgets={"Group/Org.": Text("./a")})
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
 
@@ -35,20 +39,25 @@ class AccountsView(BaseAudienceView):
     @step("AccountsDetailView")
     def detail(self, account):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=('id', f'account_{account.entity_id}')).grouporg.widget.click()
+        self.table.row(_row__attr=("id", f"account_{account.entity_id}")).grouporg.widget.click()
 
     def prerequisite(self):
         return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.new_account.is_displayed and \
-               self.table.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.new_account.is_displayed
+            and self.table.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class AccountsDetailView(BaseAudienceView):
     """View representation of Account detail page"""
-    path_pattern = '/buyers/accounts/{account_id}'
+
+    path_pattern = "/buyers/accounts/{account_id}"
     edit_button = ThreescaleEditButton()
     plan_dropdown = ThreescaleDropdown("//*[@id='account_contract_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
@@ -95,17 +104,22 @@ class AccountsDetailView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.edit_button.is_displayed and self.applications_button.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.edit_button.is_displayed
+            and self.applications_button.is_displayed
+        )
 
 
 class AccountNewView(BaseAudienceView):
     """View representation of New Account page"""
-    path_pattern = '/buyers/accounts/new'
-    username = TextInput(id='account_user_username')
-    email = TextInput(id='account_user_email')
-    password = TextInput(id='account_user_password')
-    organization = TextInput(id='account_org_name')
+
+    path_pattern = "/buyers/accounts/new"
+    username = TextInput(id="account_user_username")
+    email = TextInput(id="account_user_email")
+    password = TextInput(id="account_user_password")
+    organization = TextInput(id="account_org_name")
     create_button = ThreescaleSubmitButton()
 
     def create(self, username: str, email: str, password: str, organization: str):
@@ -121,13 +135,18 @@ class AccountNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.username.is_displayed and self.email.is_displayed \
-               and self.organization.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.username.is_displayed
+            and self.email.is_displayed
+            and self.organization.is_displayed
+        )
 
 
 class AccountEditView(BaseAudienceView):
     """View representation of Edit Account page"""
+
     path_pattern = "/buyers/accounts/{account_id}/edit"
     org_name = TextInput(id="account_org_name")
     update_button = ThreescaleUpdateButton()
@@ -150,12 +169,17 @@ class AccountEditView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.org_name.is_displayed \
-               and self.org_name.is_displayed and self.update_button.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.org_name.is_displayed
+            and self.org_name.is_displayed
+            and self.update_button.is_displayed
+        )
 
 
 class AccountApplicationsView(BaseAudienceView):
     """View representation of Account's Applications page"""
+
     path_pattern = "/buyers/accounts/{account_id}/applications"
     create_button = Text("//*[contains(@href,'/applications/new')]")
 
@@ -172,12 +196,16 @@ class AccountApplicationsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.create_button.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.create_button.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class AccountInvoicesView(BaseAudienceView):
     """View representation of Account's Applications page"""
+
     path_pattern = "/buyers/accounts/{account_id}/invoices"
     create_button = Text(".action.new")
     table = PatternflyTable(".data")
@@ -195,19 +223,23 @@ class AccountInvoicesView(BaseAudienceView):
     @step("InvoiceDetailView")
     def edit(self, invoice):
         """Opens edit view for the invoice"""
-        self.table.row(_row__attr=('id', f'invoice_{invoice.entity_id}')).id.click()
+        self.table.row(_row__attr=("id", f"invoice_{invoice.entity_id}")).id.click()
 
     def prerequisite(self):
         return AccountsDetailView
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.create_button.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.create_button.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class LineItemForm(View):
     """Nested view for a Line add form"""
+
     path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     ROOT = "//div[@id='colorbox']"
     name_input = TextInput("line_item[name]")
@@ -227,6 +259,7 @@ class LineItemForm(View):
 
 class InvoiceDetailView(BaseAudienceView):
     """Invoice Detail page"""
+
     path_pattern = "/buyers/accounts/{account_id}/invoices/{invoice_id}"
     issue_button = Text("//form[contains(@action, 'issue.js')]/button")
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
@@ -267,8 +300,7 @@ class InvoiceDetailView(BaseAudienceView):
     def assert_issued(self):
         """Assert that invoice was correctly issued"""
         assert self.notification.is_displayed, "No notification was displayed after issuing an invoice."
-        assert self.notification.string_in_flash_message("invoice issued."), \
-            "Issuing the invoice through UI failed"
+        assert self.notification.string_in_flash_message("invoice issued."), "Issuing the invoice through UI failed"
         assert self.charge_button.wait_displayed, "Issuing the invoice through UI failed"
 
     def prerequisite(self):
@@ -276,13 +308,17 @@ class InvoiceDetailView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.id_field.is_displayed and \
-            (self.issue_button.is_displayed or self.charge_button.wait_displayed) and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.id_field.is_displayed
+            and (self.issue_button.is_displayed or self.charge_button.wait_displayed)
+            and self.path in self.browser.url
+        )
 
 
 class UsageRulesView(BaseAudienceView):
     """View representation of Account's Usage Rules page"""
+
     path_pattern = "/site/usage_rules/edit"
     account_plans_checkbox = ThreescaleCheckBox(locator="//input[@id='settings_account_plans_ui_visible']")
     update_button = ThreescaleUpdateButton()
@@ -297,13 +333,17 @@ class UsageRulesView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.account_plans_checkbox.is_displayed and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.account_plans_checkbox.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class AccountUserGroupView(BaseAudienceView):
     """View representation of Accounts User page"""
-    path_pattern = '/buyers/accounts/{account_id}/groups'
+
+    path_pattern = "/buyers/accounts/{account_id}/groups"
     groups = CheckBoxGroup(locator="//*[@id='account_groups_input']")
     submit = ThreescaleSubmitButton()
 
@@ -320,5 +360,4 @@ class AccountUserGroupView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.groups.is_displayed and \
-            self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.groups.is_displayed and self.path in self.browser.url

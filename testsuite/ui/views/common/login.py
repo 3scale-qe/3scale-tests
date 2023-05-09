@@ -6,11 +6,12 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 class LoginForm(View):
     """
-        Basic login functionality in login page
+    Basic login functionality in login page
     """
-    username_field = TextInput(id='session_username')
+
+    username_field = TextInput(id="session_username")
     username_label = Text('//input[@id="session_username"]/preceding-sibling::label')
-    password_field = TextInput(id='session_password')
+    password_field = TextInput(id="session_password")
     password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
     submit = ThreescaleSubmitButton()
 
@@ -31,5 +32,10 @@ class LoginForm(View):
 
     @property
     def is_displayed(self):
-        return self.username_field.is_displayed and self.password_field.is_displayed and self.submit.is_displayed and \
-               'Email or Username' in self.username_label.text and 'Password' in self.password_label.text
+        return (
+            self.username_field.is_displayed
+            and self.password_field.is_displayed
+            and self.submit.is_displayed
+            and "Email or Username" in self.username_label.text
+            and "Password" in self.password_label.text
+        )

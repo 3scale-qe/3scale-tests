@@ -15,8 +15,17 @@ class TemplateApicast(OpenshiftApicast):
     """Template-based APIcast Gateway."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient, template, name, image,
-                 portal_endpoint, generate_name=False, path_routing=False):
+    def __init__(
+        self,
+        staging: bool,
+        openshift: OpenShiftClient,
+        template,
+        name,
+        image,
+        portal_endpoint,
+        generate_name=False,
+        path_routing=False,
+    ):
         super().__init__(staging, openshift, name, generate_name, path_routing)
         self._image = image
         self._portal_endpoint = portal_endpoint
@@ -28,12 +37,12 @@ class TemplateApicast(OpenshiftApicast):
         self.template_parameters = {
             "APICAST_NAME": self.deployment.name,
             "AMP_APICAST_IMAGE": self._image,
-            "CONFIGURATION_URL_SECRET": f"{self.deployment.name}-secret"}
+            "CONFIGURATION_URL_SECRET": f"{self.deployment.name}-secret",
+        }
         if self.staging:
-            self.template_parameters.update({
-                "CONFIGURATION_LOADER": "lazy",
-                "DEPLOYMENT_ENVIRONMENT": "staging",
-                "CONFIGURATION_CACHE": 0})
+            self.template_parameters.update(
+                {"CONFIGURATION_LOADER": "lazy", "DEPLOYMENT_ENVIRONMENT": "staging", "CONFIGURATION_CACHE": 0}
+            )
 
     @staticmethod
     def fits(openshift: OpenShiftClient):  # pylint: disable=unused-argument
@@ -42,15 +51,16 @@ class TemplateApicast(OpenshiftApicast):
     def _create_configuration_url_secret(self):
         self.openshift.secrets.create(
             name=self.template_parameters["CONFIGURATION_URL_SECRET"],
-            string_data={
-                "password": self._portal_endpoint
-            },
-            secret_type=SecretTypes.BASIC_AUTH
+            string_data={"password": self._portal_endpoint},
+            secret_type=SecretTypes.BASIC_AUTH,
         )
 
     def create(self):
-        LOGGER.debug('Deploying new template-based apicast "%s". Template params: "%s"',
-                     self.deployment, self.template_parameters)
+        LOGGER.debug(
+            'Deploying new template-based apicast "%s". Template params: "%s"',
+            self.deployment,
+            self.template_parameters,
+        )
 
         self._create_configuration_url_secret()
 
@@ -79,23 +89,27 @@ class TemplateApicast(OpenshiftApicast):
         self.deployment.add_volume("tls-secret", mount_path, secret_name)
 
         LOGGER.debug('Patching https port into service "%s"...', self.deployment)
-        self.openshift.patch("service", self.deployment.name,
-                             [{
-                                 "op": "add",
-                                 "path": "/spec/ports/-",
-                                 "value": {
-                                     "name": "httpsproxy",
-                                     "port": https_port,
-                                     "protocol": "TCP"
-                                 }
-                             }], patch_type="json")
+        self.openshift.patch(
+            "service",
+            self.deployment.name,
+            [
+                {
+                    "op": "add",
+                    "path": "/spec/ports/-",
+                    "value": {"name": "httpsproxy", "port": https_port, "protocol": "TCP"},
+                }
+            ],
+            patch_type="json",
+        )
 
         LOGGER.debug('Adding envs to deployment "%s"...', self.deployment)
-        self.environ.set_many({
-            "APICAST_HTTPS_PORT": https_port,
-            "APICAST_HTTPS_CERTIFICATE": f"{mount_path}/tls.crt",
-            "APICAST_HTTPS_CERTIFICATE_KEY": f"{mount_path}/tls.key",
-        })
+        self.environ.set_many(
+            {
+                "APICAST_HTTPS_PORT": https_port,
+                "APICAST_HTTPS_CERTIFICATE": f"{mount_path}/tls.crt",
+                "APICAST_HTTPS_CERTIFICATE_KEY": f"{mount_path}/tls.key",
+            }
+        )
 
     def connect_jaeger(self, jaeger):
         """
@@ -108,8 +122,6 @@ class TemplateApicast(OpenshiftApicast):
         config_map_name = f"{self.name}-jaeger"
         self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, self.name))
         self._to_delete.append(("configmap", config_map_name))
-        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/",
-                                   configmap_name=config_map_name)
-        self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
-                               "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
+        self.environ.set_many({"OPENTRACING_TRACER": "jaeger", "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
         return self.name

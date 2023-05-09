@@ -26,11 +26,12 @@ def auth_data(service, service_token, application):
     Returns authentication data to be sent with the report
     transaction request
     """
-    return {"service_token": service_token,
-            "service_id": service.entity_id,
-            "transactions[0][usage][hits]": "1",
-            "transactions[0][user_key]": application.authobj().credentials["user_key"]
-            }
+    return {
+        "service_token": service_token,
+        "service_id": service.entity_id,
+        "transactions[0][usage][hits]": "1",
+        "transactions[0][user_key]": application.authobj().credentials["user_key"],
+    }
 
 
 @pytest.fixture(scope="module")
@@ -38,11 +39,11 @@ def prometheus_worker_job_count(prometheus):
     """
     Given a type of worker job (ReportJob or NotifyJob), returns the value of that metric
     """
+
     def _prometheus_worker_job_count(job_type):
-        metric_response_codes = prometheus.get_metrics("apisonator_worker_job_count", {
-                    "type": job_type
-                })
-        return int(metric_response_codes[0]['value'][1]) if len(metric_response_codes) > 0 else 0
+        metric_response_codes = prometheus.get_metrics("apisonator_worker_job_count", {"type": job_type})
+        return int(metric_response_codes[0]["value"][1]) if len(metric_response_codes) > 0 else 0
+
     return _prometheus_worker_job_count
 
 

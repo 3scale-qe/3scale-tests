@@ -9,11 +9,10 @@ from testsuite.ui.widgets import NavigationMenu
 
 class BackendsView(BaseAdminView):
     """View representation of Backend Listing page"""
+
     path_pattern = "p/admin/backend_apis"
     create_backend_button = Text("//a[@href='/p/admin/backend_apis/new']")
-    table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={
-        "Name": Text("./a")
-    })
+    table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={"Name": Text("./a")})
     search_bar = TextInput(locator="//input[@type='search']")
     search_button = GenericLocatorWidget("//button[contains(@aria-label,'search')]")
 
@@ -37,8 +36,12 @@ class BackendsView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed and self.path in self.browser.url \
-               and self.create_backend_button.is_displayed and self.table.is_displayed
+        return (
+            BaseAdminView.is_displayed
+            and self.path in self.browser.url
+            and self.create_backend_button.is_displayed
+            and self.table.is_displayed
+        )
 
 
 class BaseBackendView(BaseAdminView):
@@ -47,8 +50,9 @@ class BaseBackendView(BaseAdminView):
     displayed Backend (this applies for all Views that inherits from BaseBackendView).
     This value is verified in `is_displayed` method.
     """
-    NAV_ITEMS = ['Overview', 'Analytics', 'Methods and Metrics', 'Mapping Rules']
-    nav = NavigationMenu(id='mainmenu')
+
+    NAV_ITEMS = ["Overview", "Analytics", "Methods and Metrics", "Mapping Rules"]
+    nav = NavigationMenu(id="mainmenu")
 
     def __init__(self, parent, backend, **kwargs):
         super().__init__(parent, backend_id=backend.entity_id, **kwargs)
@@ -69,5 +73,8 @@ class BaseBackendView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS \
-               and self.nav.nav_resource() == self.backend['name']
+        return (
+            self.nav.is_displayed
+            and self.nav.nav_links() == self.NAV_ITEMS
+            and self.nav.nav_resource() == self.backend["name"]
+        )

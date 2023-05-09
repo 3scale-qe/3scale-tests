@@ -12,6 +12,7 @@ class ContainerizedApicast(AbstractApicast):
     """
     Gateway intended for use with RHEL based APIcast deployed in containerized environments
     """
+
     CAPABILITIES = {Capability.APICAST}
     HAS_PRODUCTION = False
 
@@ -20,18 +21,18 @@ class ContainerizedApicast(AbstractApicast):
         self.staging = staging
 
     def before_service(self, service_params: Dict) -> Dict:
-        service_params.update({
-            "deployment_option": "self_managed"
-        })
+        service_params.update({"deployment_option": "self_managed"})
         return service_params
 
     def before_proxy(self, service: Service, proxy_params: Dict) -> Dict:
         name = service.entity_id
         if self.staging:
             name = f"stage-{name}"
-        proxy_params.update({
-            "sandbox_endpoint": self.endpoint % name,
-        })
+        proxy_params.update(
+            {
+                "sandbox_endpoint": self.endpoint % name,
+            }
+        )
         return proxy_params
 
     def reload(self):

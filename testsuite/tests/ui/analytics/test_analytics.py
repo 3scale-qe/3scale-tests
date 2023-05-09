@@ -9,9 +9,9 @@ from testsuite.ui.views.admin.product.analytics import ProductTrafficView
 @pytest.fixture(scope="module")
 def backends_mapping(backend_anything, backend_valid):
     """
-     Create 2 backend usages backends:
-        - path to Backend 1: "/anything"
-        - path to Backend 2: "/valid"
+    Create 2 backend usages backends:
+       - path to Backend 1: "/anything"
+       - path to Backend 2: "/valid"
     """
     return {"/anything": backend_anything, "/valid": backend_valid}
 
@@ -54,7 +54,7 @@ def test_analytics(navigator, service, api_client, backend_anything, backend_val
 
     traffic = navigator.navigate(ProductTrafficView, product=service)
 
-    traffic.select_metric('hits')
+    traffic.select_metric("hits")
     assert traffic.read_metric() == 1
 
     api_client.get("/anything/anything")
@@ -66,15 +66,15 @@ def test_analytics(navigator, service, api_client, backend_anything, backend_val
     traffic.select_metric(f'hits.{service.backend_usages.list()[1]["backend_id"]}')
     assert traffic.read_metric() == 1
 
-    traffic.select_metric('hits')
+    traffic.select_metric("hits")
     assert traffic.read_metric() == 5
 
     traffic = navigator.navigate(BackendTrafficView, backend=backend_anything)
 
-    traffic.select_metric(f'hits.{backend_anything.entity_id}')
+    traffic.select_metric(f"hits.{backend_anything.entity_id}")
     assert traffic.read_metric() == 1
 
     traffic = navigator.navigate(BackendTrafficView, backend=backend_valid)
 
-    traffic.select_metric(f'hits.{backend_valid.entity_id}')
+    traffic.select_metric(f"hits.{backend_valid.entity_id}")
     assert traffic.read_metric() == 1

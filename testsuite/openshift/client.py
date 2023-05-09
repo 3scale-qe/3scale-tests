@@ -28,6 +28,7 @@ class ServiceTypes(enum.Enum):
 class OpenShiftClient:
     """OpenShiftClient is an interface to the official OpenShift python
     client."""
+
     # pylint: disable=too-many-public-methods
 
     def __init__(self, project_name: str, server_url: str = None, token: str = None):
@@ -51,8 +52,14 @@ class OpenShiftClient:
             return oc.whoami("--show-server=true")
 
     # pylint: disable=too-many-arguments
-    def do_action(self, verb: str, cmd_args: Sequence[Union[str, Sequence[str]]] = None,
-                  auto_raise: bool = True, parse_output: bool = False, no_namespace: bool = False):
+    def do_action(
+        self,
+        verb: str,
+        cmd_args: Sequence[Union[str, Sequence[str]]] = None,
+        auto_raise: bool = True,
+        parse_output: bool = False,
+        no_namespace: bool = False,
+    ):
         """Run an oc command."""
         cmd_args = cmd_args or []
         with ExitStack() as stack:
@@ -176,7 +183,7 @@ class OpenShiftClient:
         Args:
             :param resources: Types of resources to be deleted, defaults to "all"
             :param app: Application to be deleted
-            """
+        """
         resources = resources or "all"
         self.do_action("delete", [resources, "-l", f"app={app}", "--ignore-not-found"])
 
@@ -191,10 +198,10 @@ class OpenShiftClient:
 
         if params:
             opt_args.extend([f"--param={n}={v}" for n, v in params.items()])
-        processed_tmpl = json.loads(self.do_action('process', opt_args).actions().pop().out)
+        processed_tmpl = json.loads(self.do_action("process", opt_args).actions().pop().out)
 
         for resource in processed_tmpl["items"]:
-            self.delete(resource['kind'], resource['metadata']['name'])
+            self.delete(resource["kind"], resource["metadata"]["name"])
 
     def new_app(self, source, params: Dict[str, str] = None):
         """Create application based on source code.
@@ -219,9 +226,12 @@ class OpenShiftClient:
 
         :return: the operator pod APIObject
         """
+
         def select_operator(apiobject):
-            return apiobject.get_label("com.redhat.component-name") == "3scale-operator" \
+            return (
+                apiobject.get_label("com.redhat.component-name") == "3scale-operator"
                 or apiobject.get_label("rht.subcomp") == "3scale_operator"
+            )
 
         return self.select_resource("pods", narrow_function=select_operator).object()
 
@@ -232,9 +242,12 @@ class OpenShiftClient:
 
         :return: the operator pod APIObject
         """
+
         def select_operator(apiobject):
-            return apiobject.get_label("com.redhat.component-name") == "apicast-operator" \
+            return (
+                apiobject.get_label("com.redhat.component-name") == "apicast-operator"
                 or apiobject.get_label("rht.subcomp") == "apicast_operator"
+            )
 
         return self.select_resource("pods", narrow_function=select_operator).object()
 
@@ -263,10 +276,12 @@ class OpenShiftClient:
             except oc.OpenShiftPythonException:
                 return False
 
-    def select_resource(self,
-                        resource: str,
-                        labels: Optional[Dict[str, str]] = None,
-                        narrow_function: Optional[Callable[[oc.APIObject], bool]] = None):
+    def select_resource(
+        self,
+        resource: str,
+        labels: Optional[Dict[str, str]] = None,
+        narrow_function: Optional[Callable[[oc.APIObject], bool]] = None,
+    ):
         """
         Returns pods, that is filtered with narrow function
         :param resource: Resource to search

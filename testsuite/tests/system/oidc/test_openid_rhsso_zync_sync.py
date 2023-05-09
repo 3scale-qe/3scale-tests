@@ -32,13 +32,13 @@ def get_rhsso_client(application, rhsso_service_info):
 
 def test_rhsso_zync_sync(application, rhsso_service_info):
     """Test checks if the RHSSO client is created with correct fields such as:
-        - name
-        - client id
-        - client secret
+    - name
+    - client id
+    - client secret
     """
     rhsso_client, secrets = get_rhsso_client(application, rhsso_service_info)
     assert rhsso_client is not None
 
-    assert rhsso_client["name"] == application['name']
-    assert rhsso_client["clientId"] == application['client_id']
-    assert secrets["value"] == application['client_secret']
+    assert rhsso_client["name"] == application["name"]
+    assert rhsso_client["clientId"] == application["client_id"]
+    assert secrets["value"] == application["client_secret"]

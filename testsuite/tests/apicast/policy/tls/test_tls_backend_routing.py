@@ -11,17 +11,24 @@ from testsuite.tests.apicast.policy.tls import embedded
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8007"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.12')")
+    pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
 ]
 
 
 @pytest.fixture(scope="module")
 def policy_settings(certificate):
     """Sets up the embedded TLS termination policy"""
-    return rawobj.PolicyConfig("tls", {"certificates": [{
-        "certificate": embedded(certificate.certificate, "tls.crt", "pkix-cert"),
-        "certificate_key": embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    }]})
+    return rawobj.PolicyConfig(
+        "tls",
+        {
+            "certificates": [
+                {
+                    "certificate": embedded(certificate.certificate, "tls.crt", "pkix-cert"),
+                    "certificate_key": embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey"),
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")
@@ -30,8 +37,10 @@ def backends_mapping(custom_backend, private_base_url):
     Creates four echo-api backends with the private paths being the keys in
     the dict
     """
-    return {"/bar": custom_backend("backend1", endpoint=f"{private_base_url('echo_api')}/backend1"),
-            "/foo/boo": custom_backend("backend2", endpoint=f"{private_base_url('echo_api')}/backend2")}
+    return {
+        "/bar": custom_backend("backend1", endpoint=f"{private_base_url('echo_api')}/backend1"),
+        "/foo/boo": custom_backend("backend2", endpoint=f"{private_base_url('echo_api')}/backend2"),
+    }
 
 
 @pytest.fixture(scope="module")
@@ -58,8 +67,8 @@ def test_tls_backend_routing(client):
         response = client.get("/bar")
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
-        assert echoed_request.json['path'] == '/backend1'
+        assert echoed_request.json["path"] == "/backend1"
         response = client.get("/foo/boo")
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
-        assert echoed_request.json['path'] == '/backend2'
+        assert echoed_request.json["path"] == "/backend2"

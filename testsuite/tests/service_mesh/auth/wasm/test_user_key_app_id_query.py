@@ -11,10 +11,10 @@ from testsuite.capabilities import Capability
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param(Service.AUTH_USER_KEY, id="user-key"),
-    pytest.param(Service.AUTH_APP_ID_KEY, id="app-id")
-])
+@pytest.fixture(
+    scope="module",
+    params=[pytest.param(Service.AUTH_USER_KEY, id="user-key"), pytest.param(Service.AUTH_APP_ID_KEY, id="app-id")],
+)
 def service_settings(request, service_settings):
     """Set auth mode to user key and app-id"""
     service_settings.update(backend_version=request.param)
@@ -52,7 +52,7 @@ def test_request_with_auth(api_client, credentials_location, service_proxy_setti
 
 @pytest.mark.parametrize("credentials_location", ["params", "headers"])
 def test_request_with_wrong_auth(api_client, invalid_auth, credentials_location):
-    """Check wrong credentials passed in query (params) or headers, should fail with 403 """
+    """Check wrong credentials passed in query (params) or headers, should fail with 403"""
     # pylint: disable=protected-access
     client = api_client()
     client.auth = None

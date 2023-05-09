@@ -34,10 +34,13 @@ def test_auth_client_id(rhsso_setup, api_client, service, credentials_location, 
     Then request made with appropriate Basic auth made has to pass as expected
     """
     claim, status_code = jwt_claim
-    service.proxy.update(params={
-        "credentials_location": credentials_location,
-        "jwt_claim_with_client_id_type": "liquid",
-        "jwt_claim_with_client_id": "{{ %s }}" % claim})
+    service.proxy.update(
+        params={
+            "credentials_location": credentials_location,
+            "jwt_claim_with_client_id_type": "liquid",
+            "jwt_claim_with_client_id": "{{ %s }}" % claim,
+        }
+    )
 
     service.proxy.deploy()
     assert service["backend_version"] == Service.AUTH_OIDC

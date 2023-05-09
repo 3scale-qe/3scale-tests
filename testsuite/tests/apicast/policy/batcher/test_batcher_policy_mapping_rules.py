@@ -12,7 +12,8 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 pytestmark = [
     pytest.mark.nopersistence,
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5513")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5513"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -24,7 +25,7 @@ def policy_settings():
 @pytest.fixture(scope="module")
 def service(service):
     """
-        Add the mapping rules
+    Add the mapping rules
     """
     proxy = service.proxy.list()
 
@@ -33,14 +34,14 @@ def service(service):
     # delete implicit '/' rule
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
 
-    proxy.mapping_rules.create(rawobj.Mapping(metric, pattern='/get'))
+    proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/get"))
 
     proxy.deploy()
 
     return service
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def client(api_client):
     """We are testing path that doesn't match mapping rule so we need to disable retry"""
     assert api_client().get("/get").status_code == 200

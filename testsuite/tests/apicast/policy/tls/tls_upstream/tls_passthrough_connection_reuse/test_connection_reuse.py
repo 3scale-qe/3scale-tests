@@ -14,7 +14,7 @@ from testsuite.echoed_request import EchoedRequest
 pytestmark = [
     pytest.mark.nopersistence,
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6849")
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6849"),
 ]
 
 
@@ -53,4 +53,4 @@ def test_connection_reuse(api_client, mapping_rules):
     info_orig = EchoedRequest.create(response_orig)
     info_new = EchoedRequest.create(response_new)
 
-    assert info_orig.json['tls']['ServerName'] != info_new.json['tls']['ServerName']
+    assert info_orig.json["tls"]["ServerName"] != info_new.json["tls"]["ServerName"]

@@ -25,13 +25,22 @@ def policy_settings():
     """
     Set the headers policy to add a header containing information from the JWT object
     """
-    liquid_header = "{% if jwt.typ== \'Bearer\' %}{{ jwt.exp }};{{ jwt.iat }};{{ jwt.iss }};" \
-                    "{{ jwt.aud }};{{ jwt.typ }};{{ jwt.azp }}{% else %}invalid{% endif %}"
+    liquid_header = (
+        "{% if jwt.typ== 'Bearer' %}{{ jwt.exp }};{{ jwt.iat }};{{ jwt.iss }};"
+        "{{ jwt.aud }};{{ jwt.typ }};{{ jwt.azp }}{% else %}invalid{% endif %}"
+    )
 
-    return rawobj.PolicyConfig("headers", {
-        "response": [{"op": "set", "header": "X-RESPONSE-CUSTOM-JWT", "value": liquid_header, "value_type": "liquid"}],
-        "request": [{"op": "set", "header": "X-REQUEST-CUSTOM-JWT", "value": liquid_header, "value_type": "liquid"}],
-    })
+    return rawobj.PolicyConfig(
+        "headers",
+        {
+            "response": [
+                {"op": "set", "header": "X-RESPONSE-CUSTOM-JWT", "value": liquid_header, "value_type": "liquid"}
+            ],
+            "request": [
+                {"op": "set", "header": "X-REQUEST-CUSTOM-JWT", "value": liquid_header, "value_type": "liquid"}
+            ],
+        },
+    )
 
 
 def test_headers_policy_extra_headers(api_client, rhsso_service_info, application):
@@ -46,7 +55,7 @@ def test_headers_policy_extra_headers(api_client, rhsso_service_info, applicatio
 
     # Auth session needs to be None when we are testing access_token
     client.auth = None
-    response = client.get("/get", params={'access_token': token})
+    response = client.get("/get", params={"access_token": token})
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)

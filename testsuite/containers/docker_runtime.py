@@ -8,7 +8,8 @@ from testsuite.containers.container_runtime import Container, ContainerRuntime, 
 
 
 class DockerRuntime(ContainerRuntime):
-    """ Docker implementation of ContainerRuntime """
+    """Docker implementation of ContainerRuntime"""
+
     def __init__(self, uri: str):
         super().__init__()
         self._client = DockerClient(base_url=uri, version="auto", tls=False)
@@ -36,7 +37,7 @@ class DockerRuntime(ContainerRuntime):
             entrypoint=container_config.entrypoint,
             detach=container_config.detach,
             ports=container_config.ports,
-            volumes=container_config.volumes
+            volumes=container_config.volumes,
         )
 
         return Container(container.id, started=True)

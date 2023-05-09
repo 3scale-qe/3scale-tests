@@ -11,9 +11,9 @@ from testsuite.utils import blame
 @pytest.fixture(scope="module")
 def application(application, service):
     "Application with default_credentials policy configured to use user_key"
-    service.proxy.list().policies.insert(0, rawobj.PolicyConfig("default_credentials", {
-        "auth_type": "user_key",
-        "user_key": application["user_key"]}))
+    service.proxy.list().policies.insert(
+        0, rawobj.PolicyConfig("default_credentials", {"auth_type": "user_key", "user_key": application["user_key"]})
+    )
 
     return application
 
@@ -31,10 +31,17 @@ def application_app_id_key(custom_application, custom_app_plan, service_app_id_k
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "CustAPlan")), service_app_id_key)
     app = custom_application(rawobj.Application(blame(request, "CustApp"), plan))
 
-    service_app_id_key.proxy.list().policies.insert(0, rawobj.PolicyConfig("default_credentials", {
-        "auth_type": "app_id_and_app_key",
-        "app_id": app["application_id"],
-        "app_key": app.keys.list()["keys"][0]["key"]["value"]}))
+    service_app_id_key.proxy.list().policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "default_credentials",
+            {
+                "auth_type": "app_id_and_app_key",
+                "app_id": app["application_id"],
+                "app_key": app.keys.list()["keys"][0]["key"]["value"],
+            },
+        ),
+    )
 
     return app
 

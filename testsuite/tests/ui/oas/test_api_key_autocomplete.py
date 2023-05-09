@@ -2,8 +2,7 @@
 import importlib_resources as resources
 import pytest
 
-from testsuite.ui.views.admin.audience.developer_portal import CMSEditPageView, \
-    CMSNewPageView
+from testsuite.ui.views.admin.audience.developer_portal import CMSEditPageView, CMSNewPageView
 from testsuite.ui.views.devel import DocsView
 from testsuite.utils import blame
 
@@ -44,8 +43,14 @@ def api_doc_page(login, navigator, ui_active_doc, request, custom_admin_login):
     page_name = blame(request, "CustomDocumentation")
     page_path = blame(request, "apidocs")
 
-    view.create(page_name, ". Root", page_path, PAGE_CONTENT.replace("{name}", ui_active_doc["system_name"]),
-                layout="Main layout", liquid_enabled=True)
+    view.create(
+        page_name,
+        ". Root",
+        page_path,
+        PAGE_CONTENT.replace("{name}", ui_active_doc["system_name"]),
+        layout="Main layout",
+        liquid_enabled=True,
+    )
     page_id = navigator.browser.url.split("/")[-2]
 
     def cleanup():
@@ -62,8 +67,9 @@ def api_doc_page(login, navigator, ui_active_doc, request, custom_admin_login):
 
 
 # pylint: disable=too-many-arguments, unused-argument
-def test_api_key_autocomplete(prod_client, ui_active_doc, custom_devel_login, application, account, navigator,
-                              service, api_doc_page):
+def test_api_key_autocomplete(
+    prod_client, ui_active_doc, custom_devel_login, application, account, navigator, service, api_doc_page
+):
     """
     Setup:
         - Create OAS3 Active doc with API key
@@ -75,5 +81,5 @@ def test_api_key_autocomplete(prod_client, ui_active_doc, custom_devel_login, ap
     custom_devel_login(account)
     view = navigator.open(DocsView, path=api_doc_page)
     key = f"{application.entity_name} - {service['name']}"
-    view.active_docs_section.try_it_out("GET", '/', key)
-    assert view.active_docs_section.get_response_code() == '200'
+    view.active_docs_section.try_it_out("GET", "/", key)
+    assert view.active_docs_section.get_response_code() == "200"

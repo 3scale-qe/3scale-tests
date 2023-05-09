@@ -48,26 +48,27 @@ def test_remove_policy(navigator, policy_service):
 
 def test_apply_and_remove_policy(navigator, policy_service, api_client, policy_application):
     """
-        Test:
-            - Create service via API
-            - Navigate to Policies page and add Echo policy via UI
-            - Assert that policy was added and is applied
-            - Remove Echo policy from policy chain
-            - Assert that policy was removed
-            - Assert that api call works without policy
-        """
+    Test:
+        - Create service via API
+        - Navigate to Policies page and add Echo policy via UI
+        - Assert that policy was added and is applied
+        - Remove Echo policy from policy chain
+        - Assert that policy was removed
+        - Assert that api call works without policy
+    """
     policies_page = navigator.navigate(ProductPoliciesView, product=policy_service)
     policies_page.add_policy(Policies.ECHO.value)
     assert policies_page.policy_section.has_item(Policies.ECHO.value)
     policies_page.policy_section.edit_policy(Policies.ECHO.value)
     policies_page.echo_policy_view.edit_echo_policy(status_code=333)
-    policies_page.policy_section.drag_and_drop_policy(source=Policies.ECHO.value,
-                                                      destination=Policies.THREESCALE_APICAST.value)
+    policies_page.policy_section.drag_and_drop_policy(
+        source=Policies.ECHO.value, destination=Policies.THREESCALE_APICAST.value
+    )
     policies_page.update_policy_chain_button.click()
 
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
     configuration_page.configuration.staging_promote_btn.click()
-    response = api_client(app=policy_application).get('/anything')
+    response = api_client(app=policy_application).get("/anything")
     assert response.status_code == 333
 
     policies_page = navigator.navigate(ProductPoliciesView, product=policy_service)
@@ -78,7 +79,7 @@ def test_apply_and_remove_policy(navigator, policy_service, api_client, policy_a
 
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
     configuration_page.configuration.staging_promote_btn.click()
-    response = api_client(app=policy_application).get('/anything')
+    response = api_client(app=policy_application).get("/anything")
     assert response.status_code == 200
 
 
@@ -104,19 +105,20 @@ def test_move_policy(navigator, policy_service, api_client, policy_application):
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
     assert configuration_page.configuration.staging_promote_btn.is_enabled
     configuration_page.configuration.staging_promote_btn.click()
-    response = api_client(app=policy_application).get('/anything')
+    response = api_client(app=policy_application).get("/anything")
     assert response.status_code == 200
 
     policies_page = navigator.navigate(ProductPoliciesView, product=policy_service)
-    policies_page.policy_section.drag_and_drop_policy(source=Policies.ECHO.value,
-                                                      destination=Policies.THREESCALE_APICAST.value)
+    policies_page.policy_section.drag_and_drop_policy(
+        source=Policies.ECHO.value, destination=Policies.THREESCALE_APICAST.value
+    )
     assert policies_page.policy_section.first_policy == Policies.ECHO.value
     policies_page.update_policy_chain_button.click()
     assert policies_page.outdated_config.is_displayed
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
     configuration_page.configuration.staging_promote_btn.click()
 
-    response = api_client(app=policy_application).get('/anything')
+    response = api_client(app=policy_application).get("/anything")
     assert response.status_code == 333
 
 
@@ -152,5 +154,5 @@ def test_edit_policy_widgets(navigator, policy_service, api_client, policy_appli
     assert url_rewriting_policy["configuration"]["commands"][0]["replace"] == "get"
     assert url_rewriting_policy["configuration"]["commands"][0]["op"] == "gsub"
 
-    response = api_client(app=policy_application).get('/hello')
+    response = api_client(app=policy_application).get("/hello")
     assert response.json()["path"] == "/get"

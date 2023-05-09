@@ -9,7 +9,8 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 pytestmark = [
     pytest.mark.disruptive,
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +47,7 @@ def client(api_client, service):
     3. Create session without retry for session
     """
 
-    assert api_client().get('/get').status_code == 200
+    assert api_client().get("/get").status_code == 200
 
     proxy = service.proxy.list()
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
@@ -100,16 +101,13 @@ def get_analytics(application, backend_slash, backend_anything, setup):
     analytics = application.threescale_client.analytics
 
     hits = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
-    hits_slash = analytics.list_by_backend(backend_slash.entity_id,
-                                           metric_name=slash_metric.entity_name)["total"]
-    hits_loud_method = analytics.list_by_backend(backend_slash.entity_id,
-                                                 metric_name=loud_method.entity_name)["total"]
-    hits_low_method = analytics.list_by_backend(backend_slash.entity_id,
-                                                metric_name=low_method.entity_name)["total"]
-    hits_anything = analytics.list_by_backend(backend_anything.entity_id,
-                                              metric_name=anything_metric.entity_name)["total"]
-    hits_anything_test = analytics.list_by_backend(backend_anything.entity_id,
-                                                   metric_name=test.entity_name)["total"]
+    hits_slash = analytics.list_by_backend(backend_slash.entity_id, metric_name=slash_metric.entity_name)["total"]
+    hits_loud_method = analytics.list_by_backend(backend_slash.entity_id, metric_name=loud_method.entity_name)["total"]
+    hits_low_method = analytics.list_by_backend(backend_slash.entity_id, metric_name=low_method.entity_name)["total"]
+    hits_anything = analytics.list_by_backend(backend_anything.entity_id, metric_name=anything_metric.entity_name)[
+        "total"
+    ]
+    hits_anything_test = analytics.list_by_backend(backend_anything.entity_id, metric_name=test.entity_name)["total"]
 
     return hits, hits_slash, hits_loud_method, hits_low_method, hits_anything, hits_anything_test
 
@@ -147,7 +145,8 @@ def case3(service, setup, backend_anything):
     """
     _, _, _, _, test = setup
     backend_anything.mapping_rules.create(
-        {"http_method": "GET", "pattern": "/anything/test", "metric_id": test["id"], "delta": 1})
+        {"http_method": "GET", "pattern": "/anything/test", "metric_id": test["id"], "delta": 1}
+    )
     service.proxy.deploy()
     return "/anything/test", 404, [0, 0, 0, 0, 0, 0]
 
@@ -185,14 +184,25 @@ def test_metrics_with_routing_policy(request, client, setup, application, backen
 
     path, status_code, metrics = case
 
-    (hits_before, hits_slash_before, hits_loud_method_before, hits_low_method_before, hits_anything_before,
-     hits_anything_test_before) = get_analytics(application, backend_slash, backend_anything, setup)
+    (
+        hits_before,
+        hits_slash_before,
+        hits_loud_method_before,
+        hits_low_method_before,
+        hits_anything_before,
+        hits_anything_test_before,
+    ) = get_analytics(application, backend_slash, backend_anything, setup)
 
     request = client.get(path)
 
-    (hits_after, hits_slash_after, hits_loud_method_after, hits_low_method_after,
-     hits_anything_after, hits_anything_test_after) = get_analytics(application, backend_slash, backend_anything,
-                                                                    setup)
+    (
+        hits_after,
+        hits_slash_after,
+        hits_loud_method_after,
+        hits_low_method_after,
+        hits_anything_after,
+        hits_anything_test_after,
+    ) = get_analytics(application, backend_slash, backend_anything, setup)
 
     assert request.status_code == status_code
     assert hits_before + metrics[0] == hits_after

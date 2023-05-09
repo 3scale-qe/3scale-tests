@@ -15,8 +15,7 @@ from testsuite.capabilities import Capability
 from testsuite.utils import randomize
 from .conftest import token
 
-pytestmark = [pytest.mark.disruptive,
-              pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
+pytestmark = [pytest.mark.disruptive, pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
 @pytest_cases.fixture
@@ -26,8 +25,11 @@ def client_scope(application, client_role):
     """
 
     def _client_scope(list_type: str):
-        return {"client_roles": [{"name": client_role(randomize(f"client-role-{list_type}")),
-                                  "client": application["client_id"]}]}
+        return {
+            "client_roles": [
+                {"name": client_role(randomize(f"client-role-{list_type}")), "client": application["client_id"]}
+            ]
+        }
 
     return _client_scope
 
@@ -86,19 +88,19 @@ def test_combined(rhsso_service_info, application, config, create_users, prod_cl
     user_with_role, user_without_role = create_users
     user_key_with_role = token(application, rhsso_service_info, user_with_role["username"])
     user_key_without_role = token(application, rhsso_service_info, user_without_role["username"])
-    request = prod_client.get("/anything/whitelist", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get("/anything/whitelist", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == 200
-    request = prod_client.get("/anything/whitelist", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get("/anything/whitelist", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == 403
-    request = prod_client.get("/anything/both", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get("/anything/both", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == 403
-    request = prod_client.get("/anything/both", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get("/anything/both", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == 403
-    request = prod_client.get("/anything/blacklist", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get("/anything/blacklist", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == 403
-    request = prod_client.get("/anything/blacklist", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get("/anything/blacklist", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == 403
-    request = prod_client.get("/get", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get("/get", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == 403
-    request = prod_client.get("/get", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get("/get", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == 403

@@ -41,17 +41,18 @@ class AbstractApicast(AbstractGateway, ABC):
 class OpenshiftApicast(AbstractApicast, ABC):
     """Super-class for selfmanaged apicast deployed to openshift"""
 
-    CAPABILITIES = {Capability.APICAST,
-                    Capability.CUSTOM_ENVIRONMENT,
-                    Capability.PRODUCTION_GATEWAY,
-                    Capability.LOGS,
-                    Capability.JAEGER}
+    CAPABILITIES = {
+        Capability.APICAST,
+        Capability.CUSTOM_ENVIRONMENT,
+        Capability.PRODUCTION_GATEWAY,
+        Capability.LOGS,
+        Capability.JAEGER,
+    }
     HAS_PRODUCTION = True
     PRIORITY = 100
 
     # pylint: disable=too-many-arguments
-    def __init__(
-            self, staging: bool, openshift: OpenShiftClient, name, generate_name=False, path_routing=False):
+    def __init__(self, staging: bool, openshift: OpenShiftClient, name, generate_name=False, path_routing=False):
         self.staging = staging
         self.secure = True
         self.path_routing = path_routing
@@ -161,12 +162,8 @@ class OpenshiftApicast(AbstractApicast, ABC):
 
     def set_image(self, image):
         """Sets specific image to the deployment config and redeploys it"""
-        self.deployment.patch([
-                {
-                    "op": "replace",
-                    "path": "/spec/template/spec/containers/0/image",
-                    "value": image
-                }
-            ], patch_type="json")
+        self.deployment.patch(
+            [{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": image}], patch_type="json"
+        )
         # pylint: disable=protected-access
         self.deployment.wait_for()

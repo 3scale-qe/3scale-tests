@@ -13,15 +13,21 @@ from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704"),
+]
 
 
-@pytest.fixture(scope="module", params=[(None, 412),
-                                        pytest.param((True, 200), marks=[
-                                            pytest.mark.xfail,
-                                            pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7514")]),
-                                        (False, 200)
-                                        ])
+@pytest.fixture(
+    scope="module",
+    params=[
+        (None, 412),
+        pytest.param(
+            (True, 200),
+            marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7514")],
+        ),
+        (False, 200),
+    ],
+)
 def append_settings_and_expected_response(request):
     """
     Parametrization of the policy setting.
@@ -55,30 +61,28 @@ def service(service, append_settings_and_expected_response):
     append, _ = append_settings_and_expected_response
 
     proxy = service.proxy.list()
-    proxy.policies.insert(1, rawobj.PolicyConfig("content_caching", {
-        "rules": [{
-            "cache": True,
-            "header": "X-Cache-Status",
-            "condition": {
-                "combine_op": "and",
-                "operations": [{
-                    "left": "oo",
-                    "op": "==",
-                    "right": "oo"
-                }]
-            }
-        }]
-    }))
+    proxy.policies.insert(
+        1,
+        rawobj.PolicyConfig(
+            "content_caching",
+            {
+                "rules": [
+                    {
+                        "cache": True,
+                        "header": "X-Cache-Status",
+                        "condition": {"combine_op": "and", "operations": [{"left": "oo", "op": "==", "right": "oo"}]},
+                    }
+                ]
+            },
+        ),
+    )
 
-    proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": "http://echo", "regex": "/"}]}))
+    proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {"rules": [{"url": "http://echo", "regex": "/"}]}))
 
     if append is not None:
-        proxy.policies.insert(2, rawobj.PolicyConfig("nginx_filters",
-                                                     {"headers": [{
-                                                         "name": "If-Match",
-                                                         "append": append
-                                                     }]}))
+        proxy.policies.insert(
+            2, rawobj.PolicyConfig("nginx_filters", {"headers": [{"name": "If-Match", "append": append}]})
+        )
 
     return service
 

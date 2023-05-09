@@ -11,9 +11,15 @@ from testsuite.echoed_request import EchoedRequest
 @pytest.fixture(scope="module")
 def policy_settings():
     """Add url_rewriting_append policy"""
-    return rawobj.PolicyConfig("url_rewriting", {
-        "query_args_commands": [{"op": "set", "arg": "new_arg", "value": "new_value"},
-                                {"op": "set", "arg": "arg", "value": "value"}]})
+    return rawobj.PolicyConfig(
+        "url_rewriting",
+        {
+            "query_args_commands": [
+                {"op": "set", "arg": "new_arg", "value": "new_value"},
+                {"op": "set", "arg": "arg", "value": "value"},
+            ]
+        },
+    )
 
 
 def test_url_rewriting_policy_query_set_args(api_client):

@@ -9,11 +9,15 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 class AccountPlansView(BaseAudienceView):
     """View representation of Account Plans Listing page"""
-    path_pattern = '/buyers/account_plans'
+
+    path_pattern = "/buyers/account_plans"
     new_plan = Text("//a[@href='/admin/buyers/account_plans/new']")
-    table = PatternflyTable("//*[@data-ouia-component-id='OUIA-Generated-Table-2']", column_widgets={
-        3: Dropdown(""),
-    })
+    table = PatternflyTable(
+        "//*[@data-ouia-component-id='OUIA-Generated-Table-2']",
+        column_widgets={
+            3: Dropdown(""),
+        },
+    )
 
     def publish(self, plan_name):
         """Publish account plan"""
@@ -29,25 +33,37 @@ class AccountPlansView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.new_plan.is_displayed and self.table.is_displayed \
-               and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.new_plan.is_displayed
+            and self.table.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class NewAccountPlanView(BaseAudienceView):
     """View representation of New Account page"""
+
     path_pattern = "/buyers/account_plans/new"
-    name = TextInput(id='account_plan_name')
-    system_name = TextInput(id='account_plan_system_name')
+    name = TextInput(id="account_plan_name")
+    system_name = TextInput(id="account_plan_system_name")
     approval = GenericLocatorWidget('//*[@id="account_plan_approval_required"]')
-    trial_period = TextInput(id='account_plan_trial_period_days')
-    setup_fee = TextInput(id='account_plan_setup_fee')
-    cost = TextInput(id='account_plan_cost_per_month')
+    trial_period = TextInput(id="account_plan_trial_period_days")
+    setup_fee = TextInput(id="account_plan_setup_fee")
+    cost = TextInput(id="account_plan_cost_per_month")
     create_button = ThreescaleSubmitButton()
 
     # pylint: disable=too-many-arguments
     @step("AccountPlansView")
-    def create(self, name: str, system_name: str, approval: bool = False, trial_period: str = "", setup_fee: str = "",
-               cost: str = ""):
+    def create(
+        self,
+        name: str,
+        system_name: str,
+        approval: bool = False,
+        trial_period: str = "",
+        setup_fee: str = "",
+        cost: str = "",
+    ):
         """Crate new accoutn plan"""
         self.name.fill(name)
         self.system_name.fill(system_name)
@@ -66,5 +82,9 @@ class NewAccountPlanView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.name.is_displayed and self.approval.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.name.is_displayed
+            and self.approval.is_displayed
+            and self.path in self.browser.url
+        )

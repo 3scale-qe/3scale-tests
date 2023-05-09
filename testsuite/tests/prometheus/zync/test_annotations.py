@@ -14,12 +14,10 @@ pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
 ]
 
-ANNOTATIONS = [
-    "prometheus.io/port", "prometheus.io/scrape"
-]
+ANNOTATIONS = ["prometheus.io/port", "prometheus.io/scrape"]
 
 
-@pytest.fixture(scope="module", params=['dc/zync', 'dc/zync-que'])
+@pytest.fixture(scope="module", params=["dc/zync", "dc/zync-que"])
 def pod(request):
     """Return zync pod object."""
     pods = openshift().deployment(request.param).get_pods().objects()
@@ -29,5 +27,5 @@ def pod(request):
 
 @pytest.mark.parametrize("annotation", ANNOTATIONS)
 def test_annotation_zync(annotation, pod):
-    """ Test annotations of zync/zync-que pod. """
+    """Test annotations of zync/zync-que pod."""
     assert pod.get_annotation(annotation) is not None

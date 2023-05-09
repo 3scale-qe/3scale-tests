@@ -33,7 +33,7 @@ def test_param_too_large(api_client, staging_gateway):
     Test that redundant warn logs are not present in apicast logs after 414 Request-URI Too Large response
     """
     client = api_client()
-    response = client.get("/anything/anything", params={"long": 10000 * 'a'})
+    response = client.get("/anything/anything", params={"long": 10000 * "a"})
     assert response.status_code == 414
     logs = staging_gateway.get_logs()
     for message in WARN_MESSAGES:

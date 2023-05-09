@@ -8,11 +8,16 @@ from testsuite.echoed_request import EchoedRequest
 
 @pytest.fixture(scope="module")
 def policy_settings():
-    """Set policy settings """
-    return rawobj.PolicyConfig("url_rewriting", {
-        "query_args_commands": [
-            {"op": "set", "arg": "invalid", "value_type": "liquid", "value": "{{ now() }}"},
-            {"op": "set", "arg": "valid", "value_type": "liquid", "value": "{{ uri }}"}]})
+    """Set policy settings"""
+    return rawobj.PolicyConfig(
+        "url_rewriting",
+        {
+            "query_args_commands": [
+                {"op": "set", "arg": "invalid", "value_type": "liquid", "value": "{{ now() }}"},
+                {"op": "set", "arg": "valid", "value_type": "liquid", "value": "{{ uri }}"},
+            ]
+        },
+    )
 
 
 def test_url_rewriting_query_liquid(api_client):

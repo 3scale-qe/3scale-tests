@@ -8,9 +8,10 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
-              pytest.mark.disruptive,
-              ]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
+    pytest.mark.disruptive,
+]
 
 
 def test_metric_worker(prometheus, production_gateway):
@@ -28,18 +29,20 @@ def test_metric_worker(prometheus, production_gateway):
     if prometheus.operator_based:
         labels["pod"] = pod_name
 
-    count_before = prometheus.get_metrics("worker_process", labels)[0]['value'][1]
+    count_before = prometheus.get_metrics("worker_process", labels)[0]["value"][1]
 
     # There is no ps/top/htop in container, we need to search all processes and find out nginx: worker and kill him
-    kill_worker = ('for k in /proc/[0-9]*;'
-                   'do grep -i "^nginx: worker process" $k/cmdline 2>&1 >/dev/null;'
-                   'if [[ $? == 0 ]]; then echo ${k##*/}; fi;'
-                   'done | xargs kill -9')
-    ocp.do_action("exec", ['-ti', pod_name, "--", "/bin/sh", "-c", kill_worker])
+    kill_worker = (
+        "for k in /proc/[0-9]*;"
+        'do grep -i "^nginx: worker process" $k/cmdline 2>&1 >/dev/null;'
+        "if [[ $? == 0 ]]; then echo ${k##*/}; fi;"
+        "done | xargs kill -9"
+    )
+    ocp.do_action("exec", ["-ti", pod_name, "--", "/bin/sh", "-c", kill_worker])
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
     prometheus.wait_on_next_scrape("apicast-production")
 
-    count_after = prometheus.get_metrics("worker_process", labels)[0]['value'][1]
+    count_after = prometheus.get_metrics("worker_process", labels)[0]["value"][1]
 
     assert int(count_after) == int(count_before) + 1

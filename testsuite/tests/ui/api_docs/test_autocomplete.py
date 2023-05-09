@@ -8,12 +8,12 @@ from testsuite.ui.views.admin.settings.api_docs import APIDocsView
 @pytest.mark.usefixtures("login")
 def test_autocomplete(navigator, service, testconfig):
     """
-        A test that checks whether autocomplete works as expected on API Docs
+    A test that checks whether autocomplete works as expected on API Docs
 
-        - creates a service (product) that will be used in auto-complete
-        - goes to API Docs and searches for "Service Read" category
-        - fills out "Service Read" arguments and then sends it to server
-        - checks whether all went as expected
+    - creates a service (product) that will be used in auto-complete
+    - goes to API Docs and searches for "Service Read" category
+    - fills out "Service Read" arguments and then sends it to server
+    - checks whether all went as expected
     """
     token = testconfig["threescale"]["admin"]["token"]
 

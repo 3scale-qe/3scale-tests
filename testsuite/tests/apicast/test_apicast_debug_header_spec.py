@@ -16,15 +16,15 @@ def test_make_request(api_client, service, application):
     - 'X-3scale-service-name' - What is the service name
     """
     user_key = application.authobj().credentials["user_key"]
-    debug_header = service.proxy.list().configs.latest()['content']['backend_authentication_value']
+    debug_header = service.proxy.list().configs.latest()["content"]["backend_authentication_value"]
 
-    response = api_client().get('/get', headers={'X-3scale-Debug': debug_header})
+    response = api_client().get("/get", headers={"X-3scale-Debug": debug_header})
 
     assert response.status_code == 200
 
-    assert response.headers['X-3scale-matched-rules'] == '/'
+    assert response.headers["X-3scale-matched-rules"] == "/"
 
-    assert response.headers['X-3scale-credentials'] == f"user_key={user_key}"
+    assert response.headers["X-3scale-credentials"] == f"user_key={user_key}"
 
     assert "X-3scale-usage" in response.headers
 

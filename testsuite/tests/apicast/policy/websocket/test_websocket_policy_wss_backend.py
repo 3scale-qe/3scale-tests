@@ -16,9 +16,7 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
 # websockets may fail for reason described above
-pytestmark = [
-        pytest.mark.sandbag,
-        pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
+pytestmark = [pytest.mark.sandbag, pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
 
 
 @pytest.fixture(scope="module")

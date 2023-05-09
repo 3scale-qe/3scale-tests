@@ -8,6 +8,7 @@ from testsuite.ui.widgets import ActiveDocV3Section
 class Navbar(View, Navigable):
     """Represents top navigation menu for logged in Devel Views
     TODO: When browser is not maximized, this menu is collapsed. Add dynamical interaction"""
+
     ROOT = "//nav[@role='navigation']"
 
     applications_btn = Text("//a[@href='/admin/applications']")
@@ -24,9 +25,13 @@ class Navbar(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.applications_btn.is_displayed and \
-               self.documentation_btn.is_displayed and self.messages_btn.is_displayed and \
-               self.settings_btn.is_displayed and self.sign_out_btn.is_displayed
+        return (
+            self.applications_btn.is_displayed
+            and self.documentation_btn.is_displayed
+            and self.messages_btn.is_displayed
+            and self.settings_btn.is_displayed
+            and self.sign_out_btn.is_displayed
+        )
 
 
 class BaseDevelView(View, Navigable):
@@ -34,7 +39,8 @@ class BaseDevelView(View, Navigable):
     Parent View for all the logged in Devel Views.
     Features post_navigate step that fill access_code if required.
     """
-    path_pattern = ''
+
+    path_pattern = ""
     navbar = View.nested(Navbar)
     footer_logo = GenericLocatorWidget(locator='//*[@class="powered-by"]')
     navbar_brand = GenericLocatorWidget(locator='//*[@class="navbar-brand"]')
@@ -46,7 +52,7 @@ class BaseDevelView(View, Navigable):
 
     @property
     def is_logged_in(self):
-        """ Detect if user is logged in developer portal"""
+        """Detect if user is logged in developer portal"""
         return self.navbar.sign_out_btn.is_displayed
 
     # pylint: disable=using-constant-test
@@ -67,6 +73,7 @@ class BaseDevelView(View, Navigable):
 
 class LandingView(BaseDevelView):
     """Developer portal landing page"""
+
     sign_in_btn = Text("//a[contains(@href, '/login')]")
     close_csm = GenericLocatorWidget('//*[@id="cms-toolbar-menu-right"]/li/a')
 
@@ -82,8 +89,9 @@ class LandingView(BaseDevelView):
 
 class AccessView(View):
     """View for Access Code"""
-    access_code_label = Text('//label')
-    access_code_field = TextInput(id='access_code')
+
+    access_code_label = Text("//label")
+    access_code_field = TextInput(id="access_code")
     enter_btn = GenericLocatorWidget("//input[@type='submit']")
 
     def access_code(self, code):
@@ -93,13 +101,16 @@ class AccessView(View):
 
     @property
     def is_displayed(self):
-        return self.access_code_label.is_displayed and \
-               self.access_code_label.text == 'Access code' and \
-               self.access_code_field.is_displayed
+        return (
+            self.access_code_label.is_displayed
+            and self.access_code_label.text == "Access code"
+            and self.access_code_field.is_displayed
+        )
 
 
 class SignUpView(BaseDevelView):
     """View for Sign Up into devel portal"""
+
     path_pattern = "/signup"
     organization = TextInput(id="account_org_name")
     username = TextInput(id="account_user_username")
@@ -119,12 +130,18 @@ class SignUpView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.organization.is_displayed and self.username.is_displayed and self.email.is_displayed
+        return (
+            BaseDevelView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.organization.is_displayed
+            and self.username.is_displayed
+            and self.email.is_displayed
+        )
 
 
 class DocsView(BaseDevelView):
     """View for Documentation page of devel portal"""
+
     path_pattern = "/docs"
     active_docs_section = ActiveDocV3Section()
 
@@ -139,5 +156,8 @@ class DocsView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
-            self.active_docs_section.is_displayed
+        return (
+            BaseDevelView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.active_docs_section.is_displayed
+        )

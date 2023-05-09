@@ -58,18 +58,18 @@ def _print_logs(item, start_time, phase, suffix):
         for gateway_name, gateway in item.gateways.items():
             name = f" {gateway_name} ({suffix}) "
             if Capability.LOGS in gateway.CAPABILITIES:
-                item.add_report_section(phase,
-                                        "stdout",
-                                        _generate_log_section(name, gateway.get_logs(since_time=start_time)))
+                item.add_report_section(
+                    phase, "stdout", _generate_log_section(name, gateway.get_logs(since_time=start_time))
+                )
             else:
-                item.add_report_section(phase,
-                                        "stdout",
-                                        _generate_log_section(name, "Gateway doesn't have LOGS capability"))
+                item.add_report_section(
+                    phase, "stdout", _generate_log_section(name, "Gateway doesn't have LOGS capability")
+                )
     # pylint: disable=broad-except
     except Exception as exc:
-        item.add_report_section(phase,
-                                "stderr",
-                                f"({suffix}) Exception encountered while getting gateway logs: {exc}\n")
+        item.add_report_section(
+            phase, "stderr", f"({suffix}) Exception encountered while getting gateway logs: {exc}\n"
+        )
 
 
 def _generate_log_section(name, content):

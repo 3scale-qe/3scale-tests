@@ -10,6 +10,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDelet
 
 class BackendNewView(BaseAdminView):
     """View representation of New Backend page"""
+
     path_pattern = "p/admin/backend_apis/new"
     name = TextInput(id="backend_api_name")
     system_name = TextInput(id="backend_api_system_name")
@@ -30,12 +31,17 @@ class BackendNewView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return BaseAdminView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.name.is_displayed and self.system_name.is_displayed
+        return (
+            BaseAdminView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.name.is_displayed
+            and self.system_name.is_displayed
+        )
 
 
 class BackendDetailView(BaseBackendView):
     """View representation of Backend detail page"""
+
     path_pattern = "p/admin/backend_apis/{backend_id}"
     edit_button = Text("//*[contains(@href,'edit')]")
 
@@ -49,12 +55,14 @@ class BackendDetailView(BaseBackendView):
 
     @property
     def is_displayed(self):
-        return BaseBackendView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.edit_button.is_displayed
+        return (
+            BaseBackendView.is_displayed.fget(self) and self.path in self.browser.url and self.edit_button.is_displayed
+        )
 
 
 class BackendEditView(BaseBackendView):
     """View representation of Edit Backend page"""
+
     path_pattern = "p/admin/backend_apis/{backend_id}/edit"
     name = TextInput(id="backend_api_name")
     system_name = TextInput(id="backend_api_system_name")
@@ -83,5 +91,9 @@ class BackendEditView(BaseBackendView):
 
     @property
     def is_displayed(self):
-        return BaseBackendView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.name and self.system_name.is_displayed
+        return (
+            BaseBackendView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.name
+            and self.system_name.is_displayed
+        )

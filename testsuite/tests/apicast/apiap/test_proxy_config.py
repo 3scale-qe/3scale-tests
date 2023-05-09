@@ -10,7 +10,8 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3626")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3626"),
+]
 
 
 @pytest.fixture(scope="module")

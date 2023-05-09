@@ -10,7 +10,8 @@ from testsuite.ui.views.admin.foundation import DashboardView
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6321")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6321"),
+]
 
 
 @pytest.mark.usefixtures("login")

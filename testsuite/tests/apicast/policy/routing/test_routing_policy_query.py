@@ -15,16 +15,20 @@ def service(service, private_base_url):
     test_query1 = {"operations": [{"op": "==", "value": "route1", "match": "query_arg", "query_arg_name": "test_arg"}]}
     test_query2 = {"operations": [{"op": "==", "value": "route2", "match": "query_arg", "query_arg_name": "test_arg"}]}
     proxy = service.proxy.list()
-    proxy.policies.insert(0, {
-        "name": "routing",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "rules": [{"url": private_base_url("echo_api") + "/route1",
-                       "condition": test_query1},
-                      {"url": private_base_url("echo_api") + "/route2",
-                       "condition": test_query2}
-                      ]}})
+    proxy.policies.insert(
+        0,
+        {
+            "name": "routing",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {
+                "rules": [
+                    {"url": private_base_url("echo_api") + "/route1", "condition": test_query1},
+                    {"url": private_base_url("echo_api") + "/route2", "condition": test_query2},
+                ]
+            },
+        },
+    )
 
     return service
 

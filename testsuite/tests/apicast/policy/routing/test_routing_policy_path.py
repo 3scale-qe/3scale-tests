@@ -30,8 +30,7 @@ def service(service, private_base_url, httpbin_host):
     """
     Set policy settings
     """
-    routing_policy_op = {"operations": [
-        {"op": "==", "value": "/anything/anything", "match": "path"}]}
+    routing_policy_op = {"operations": [{"op": "==", "value": "/anything/anything", "match": "path"}]}
 
     proxy = service.proxy.list()
 
@@ -52,14 +51,15 @@ def service(service, private_base_url, httpbin_host):
         netloc = f"{netloc}:{port}"
     url = urlunsplit((scheme, netloc, path, query, fragment))
 
-    proxy.policies.insert(0, {
-        "name": "routing",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "rules": [{"url": url,
-                       "host_header": httpbin_host,
-                       "condition": routing_policy_op}]}})
+    proxy.policies.insert(
+        0,
+        {
+            "name": "routing",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {"rules": [{"url": url, "host_header": httpbin_host, "condition": routing_policy_op}]},
+        },
+    )
 
     return service
 

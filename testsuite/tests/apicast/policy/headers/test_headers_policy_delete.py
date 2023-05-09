@@ -8,11 +8,18 @@ from testsuite.echoed_request import EchoedRequest
 
 @pytest.fixture(scope="module")
 def service(service):
-    """Set policy settings """
+    """Set policy settings"""
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("headers", {
-        "response": [{"op": "delete", "header": "X-RESPONSE-CUSTOM"}],
-        "request": [{"op": "delete", "header": "Accept"}]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "headers",
+            {
+                "response": [{"op": "delete", "header": "X-RESPONSE-CUSTOM"}],
+                "request": [{"op": "delete", "header": "Accept"}],
+            },
+        ),
+    )
     return service
 
 

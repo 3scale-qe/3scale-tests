@@ -26,7 +26,7 @@ def my_accounts(custom_account, account, request):
 @pytest.fixture(scope="module")
 def my_account_users(request, user, custom_user, my_accounts, testconfig):
     """Account users fixture"""
-    username = blame(request, 'user')
+    username = blame(request, "user")
     domain = testconfig["threescale"]["superdomain"]
     user2 = custom_user(
         my_accounts[1],
@@ -43,8 +43,10 @@ def my_account_users(request, user, custom_user, my_accounts, testconfig):
 @pytest.fixture(scope="module")
 def my_app_plans(request, custom_app_plan, my_services):
     """App. plans fixture"""
-    return (custom_app_plan(rawobj.ApplicationPlan(blame(request, "silver")), my_services[0]),
-            custom_app_plan(rawobj.ApplicationPlan(blame(request, "gold")), my_services[1]))
+    return (
+        custom_app_plan(rawobj.ApplicationPlan(blame(request, "silver")), my_services[0]),
+        custom_app_plan(rawobj.ApplicationPlan(blame(request, "gold")), my_services[1]),
+    )
 
 
 @pytest.fixture(scope="module")
@@ -65,15 +67,15 @@ def empty_list(my_services, my_applications, create_cmd):
     """Fixture for empty list constant"""
     # these fixtures should be created for being able to list empty list
     # pylint: disable=unused-argument
-    return toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))['stdout']
+    return toolbox.run_cmd(create_cmd("list", f"--service={my_services[0]['id']}"))["stdout"]
 
 
 @pytest.fixture(scope="module")
 def create_cmd(threescale_src1):
-    """ Returns function of application command creation """
+    """Returns function of application command creation"""
 
     def _create_cmd(cmd, args=None):
-        args = args or ''
+        args = args or ""
         return f"application {cmd} {threescale_src1} {args}"
 
     return _create_cmd
@@ -81,7 +83,7 @@ def create_cmd(threescale_src1):
 
 def parse_create_command_out(output):
     """Returns id from 'create' command output."""
-    return re.match(r'Created application id: (\d+)', output).groups()[0]
+    return re.match(r"Created application id: (\d+)", output).groups()[0]
 
 
 # Global variable for metrics' values to check
@@ -90,25 +92,25 @@ out_variables = {}
 
 def test_list1(empty_list, my_services, my_applications, create_cmd):
     """Run command 'list'"""
-    ret = toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))
-    assert not ret['stderr']
-    assert ret['stdout'] == empty_list
-    assert re.findall(r'ID\tNAME\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID', ret['stdout'])
-    to_cmp = f"{my_applications['id']}" + r'\t' + f"{my_applications['name']}"
-    to_cmp += r'\t' + f"{my_applications['state']}" + r'\t'
-    to_cmp += str(my_applications['enabled']).lower()
-    to_cmp += r'\t' + f"{my_applications['account_id']}" + r'\t' + f"{my_applications['service_id']}"
-    to_cmp += r'\t' + f"{my_applications['plan_id']}"
-    assert re.findall(to_cmp, ret['stdout'])
+    ret = toolbox.run_cmd(create_cmd("list", f"--service={my_services[0]['id']}"))
+    assert not ret["stderr"]
+    assert ret["stdout"] == empty_list
+    assert re.findall(r"ID\tNAME\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID", ret["stdout"])
+    to_cmp = f"{my_applications['id']}" + r"\t" + f"{my_applications['name']}"
+    to_cmp += r"\t" + f"{my_applications['state']}" + r"\t"
+    to_cmp += str(my_applications["enabled"]).lower()
+    to_cmp += r"\t" + f"{my_applications['account_id']}" + r"\t" + f"{my_applications['service_id']}"
+    to_cmp += r"\t" + f"{my_applications['plan_id']}"
+    assert re.findall(to_cmp, ret["stdout"])
 
 
 def test_create_app1(my_services, my_accounts, my_app_plans, create_cmd):
     """Run command 'create' to create first application"""
     cmd = f"{my_accounts[0]['id']} {my_services[0]['id']} {my_app_plans[0]['id']} app1 --user-key=\"123456\""
-    ret = toolbox.run_cmd(create_cmd('create', cmd))
-    assert not ret['stderr']
+    ret = toolbox.run_cmd(create_cmd("create", cmd))
+    assert not ret["stderr"]
 
-    out_variables['app1'] = my_accounts[0].applications[int(parse_create_command_out(ret['stdout']))].entity
+    out_variables["app1"] = my_accounts[0].applications[int(parse_create_command_out(ret["stdout"]))].entity
 
 
 def test_create_app2(my_services, my_accounts, my_app_plans, create_cmd):
@@ -118,42 +120,42 @@ def test_create_app2(my_services, my_accounts, my_app_plans, create_cmd):
     cmd = f"{my_accounts[1]['id']} {my_services[1]['id']} {my_app_plans[1]['id']} app2 "
     cmd += r'--description="app 2 description" --application-id="123456" '
     cmd += r'--application-key="123456"'
-    ret = toolbox.run_cmd(create_cmd('create', cmd))
-    assert not ret['stderr']
+    ret = toolbox.run_cmd(create_cmd("create", cmd))
+    assert not ret["stderr"]
 
-    out_variables['app2'] = my_accounts[1].applications[int(parse_create_command_out(ret['stdout']))].entity
+    out_variables["app2"] = my_accounts[1].applications[int(parse_create_command_out(ret["stdout"]))].entity
 
 
 def test_list2(empty_list, my_services, my_applications, create_cmd):
     """Run command 'create' to create second application"""
     # these fixtures should be created for listing
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('list', f"--service={my_services[0]['id']}"))
-    assert not ret['stderr']
+    ret = toolbox.run_cmd(create_cmd("list", f"--service={my_services[0]['id']}"))
+    assert not ret["stderr"]
     for line in empty_list.splitlines():
         if line:
-            assert line in ret['stdout']
-    to_cmp = f"{out_variables['app1']['id']}" + r'\tapp1\tlive\ttrue\t'
-    to_cmp += f"{out_variables['app1']['account_id']}" + r'\t'
-    to_cmp += f"{out_variables['app1']['service_id']}" + r'\t'
+            assert line in ret["stdout"]
+    to_cmp = f"{out_variables['app1']['id']}" + r"\tapp1\tlive\ttrue\t"
+    to_cmp += f"{out_variables['app1']['account_id']}" + r"\t"
+    to_cmp += f"{out_variables['app1']['service_id']}" + r"\t"
     to_cmp += f"{out_variables['app1']['plan_id']}"
-    assert re.findall(to_cmp, ret['stdout'])
+    assert re.findall(to_cmp, ret["stdout"])
 
 
 def test_show_app2(my_services, my_accounts, my_app_plans, create_cmd):
     """Run command 'show' to show second application"""
     # these fixtures should be created for showing
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('show', f"{out_variables['app2']['id']}"))
-    assert not ret['stderr']
-    to_cmp = r'ID\tNAME\tDESCRIPTION\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID'
-    to_cmp += r'\tUSER_KEY\tAPPLICATION_ID'
-    assert re.findall(to_cmp, ret['stdout'])
-    to_cmp = f"{out_variables['app2']['id']}" + r'\tapp2\tapp 2 description\t'
-    to_cmp += r'live\ttrue\t' + f"{my_accounts[1]['id']}" + r'\t'
-    to_cmp += f"{my_services[1]['id']}" + r'\t' + f"{my_app_plans[1]['id']}"
-    to_cmp += r'\t[0-9a-z]+\t\(empty\)'
-    assert re.findall(to_cmp, ret['stdout'])
+    ret = toolbox.run_cmd(create_cmd("show", f"{out_variables['app2']['id']}"))
+    assert not ret["stderr"]
+    to_cmp = r"ID\tNAME\tDESCRIPTION\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID"
+    to_cmp += r"\tUSER_KEY\tAPPLICATION_ID"
+    assert re.findall(to_cmp, ret["stdout"])
+    to_cmp = f"{out_variables['app2']['id']}" + r"\tapp2\tapp 2 description\t"
+    to_cmp += r"live\ttrue\t" + f"{my_accounts[1]['id']}" + r"\t"
+    to_cmp += f"{my_services[1]['id']}" + r"\t" + f"{my_app_plans[1]['id']}"
+    to_cmp += r"\t[0-9a-z]+\t\(empty\)"
+    assert re.findall(to_cmp, ret["stdout"])
 
 
 def test_update_app1_1(my_services, my_accounts, my_app_plans, create_cmd):
@@ -163,24 +165,24 @@ def test_update_app1_1(my_services, my_accounts, my_app_plans, create_cmd):
     cmd = f"{out_variables['app1']['id']} "
     cmd += "--description='app1 description updated' "
     cmd += "--name='app1name' "
-    cmd += '--suspend '
-    ret = toolbox.run_cmd(create_cmd('apply', cmd))
-    assert not ret['stderr']
-    assert re.findall(f"Applied application id: {out_variables['app1']['id']}; Suspended", ret['stdout'])
+    cmd += "--suspend "
+    ret = toolbox.run_cmd(create_cmd("apply", cmd))
+    assert not ret["stderr"]
+    assert re.findall(f"Applied application id: {out_variables['app1']['id']}; Suspended", ret["stdout"])
 
-    out_variables['app3'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
+    out_variables["app3"] = my_accounts[0].applications[int(out_variables["app1"]["id"])].entity
 
 
 def test_update_app1_2(my_services, my_accounts, create_cmd):
     """Run command 'update' to update first application again"""
     # these fixtures should be created for update
     # pylint: disable=unused-argument
-    cmd = f"{out_variables['app1']['id']} " + r'--resume --user-key=345678 '
-    ret = toolbox.run_cmd(create_cmd('apply', cmd))
-    assert not ret['stderr']
-    assert re.findall(f"Applied application id: {out_variables['app1']['id']}; Resumed", ret['stdout'])
+    cmd = f"{out_variables['app1']['id']} " + r"--resume --user-key=345678 "
+    ret = toolbox.run_cmd(create_cmd("apply", cmd))
+    assert not ret["stderr"]
+    assert re.findall(f"Applied application id: {out_variables['app1']['id']}; Resumed", ret["stdout"])
 
-    out_variables['app4'] = my_accounts[0].applications[int(out_variables['app1']['id'])].entity
+    out_variables["app4"] = my_accounts[0].applications[int(out_variables["app1"]["id"])].entity
 
 
 # pylint: disable=too-many-arguments
@@ -188,61 +190,61 @@ def test_list3(empty_list, my_services, my_accounts, my_app_plans, my_applicatio
     """Run command 'list' applications"""
     # these fixtures should be created for listing
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('list'))
-    assert not ret['stderr']
+    ret = toolbox.run_cmd(create_cmd("list"))
+    assert not ret["stderr"]
     for line in empty_list.splitlines():
-        assert line in ret['stdout']
-    to_cmp = f"{out_variables['app1']['id']}" + r'\tapp1name\tlive\ttrue\t'
-    to_cmp += f"{my_accounts[0]['id']}" + r'\t'
-    to_cmp += f"{my_services[0]['id']}" + r'\t'
+        assert line in ret["stdout"]
+    to_cmp = f"{out_variables['app1']['id']}" + r"\tapp1name\tlive\ttrue\t"
+    to_cmp += f"{my_accounts[0]['id']}" + r"\t"
+    to_cmp += f"{my_services[0]['id']}" + r"\t"
     to_cmp += f"{my_app_plans[0]['id']}"
-    assert re.findall(to_cmp, ret['stdout'])
-    to_cmp = f"{out_variables['app2']['id']}" + r'\tapp2\tlive\ttrue\t'
-    to_cmp += f"{my_accounts[1]['id']}" + r'\t' + f"{my_services[1]['id']}"
-    to_cmp += r'\t' + f"{my_app_plans[1]['id']}"
-    assert re.findall(to_cmp, ret['stdout'])
+    assert re.findall(to_cmp, ret["stdout"])
+    to_cmp = f"{out_variables['app2']['id']}" + r"\tapp2\tlive\ttrue\t"
+    to_cmp += f"{my_accounts[1]['id']}" + r"\t" + f"{my_services[1]['id']}"
+    to_cmp += r"\t" + f"{my_app_plans[1]['id']}"
+    assert re.findall(to_cmp, ret["stdout"])
 
 
 def test_show_app1(my_applications, create_cmd):
     """Run command 'show' to show first application"""
     # my_applications and all related fixtures should be created for showing
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('show', f"{out_variables['app1']['id']}"))
-    assert not ret['stderr']
-    to_find = r'ID\tNAME\tDESCRIPTION\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID'
-    to_find += r'\tUSER_KEY\tAPPLICATION_ID'
-    assert re.findall(to_find, ret['stdout'])
+    ret = toolbox.run_cmd(create_cmd("show", f"{out_variables['app1']['id']}"))
+    assert not ret["stderr"]
+    to_find = r"ID\tNAME\tDESCRIPTION\tSTATE\tENABLED\tACCOUNT_ID\tSERVICE_ID\tPLAN_ID"
+    to_find += r"\tUSER_KEY\tAPPLICATION_ID"
+    assert re.findall(to_find, ret["stdout"])
     to_cmp = f"{out_variables['app1']['id']}"
-    to_cmp += r'\tapp1name\tapp1 description updated\tlive\ttrue\t'
-    to_cmp += f"{out_variables['app1']['account_id']}" + r'\t'
-    to_cmp += f"{out_variables['app1']['service_id']}" + r'\t'
-    to_cmp += f"{out_variables['app1']['plan_id']}" + r'\t345678\t\(empty\)'
-    assert re.findall(to_cmp, ret['stdout'])
+    to_cmp += r"\tapp1name\tapp1 description updated\tlive\ttrue\t"
+    to_cmp += f"{out_variables['app1']['account_id']}" + r"\t"
+    to_cmp += f"{out_variables['app1']['service_id']}" + r"\t"
+    to_cmp += f"{out_variables['app1']['plan_id']}" + r"\t345678\t\(empty\)"
+    assert re.findall(to_cmp, ret["stdout"])
 
 
 def test_delete_app2(my_applications, create_cmd):
     """Run command 'delete' to delete second application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('delete', f"{out_variables['app2']['id']}"))
-    assert not ret['stderr']
-    assert f"Application id: {out_variables['app2']['id']} deleted" in ret['stdout']
+    ret = toolbox.run_cmd(create_cmd("delete", f"{out_variables['app2']['id']}"))
+    assert not ret["stderr"]
+    assert f"Application id: {out_variables['app2']['id']} deleted" in ret["stdout"]
 
 
 def test_delete_app1(my_applications, create_cmd):
     """Run command 'delete' to delete first application"""
     # my_applications and all related fixtures should be created for deletion
     # pylint: disable=unused-argument
-    ret = toolbox.run_cmd(create_cmd('delete', "'345678'"))
-    assert not ret['stderr']
-    assert f"Application id: {out_variables['app1']['id']} deleted" in ret['stdout']
+    ret = toolbox.run_cmd(create_cmd("delete", "'345678'"))
+    assert not ret["stderr"]
+    assert f"Application id: {out_variables['app1']['id']} deleted" in ret["stdout"]
 
 
 def test_list4(empty_list, my_services, create_cmd):
     """Run command 'list' applications"""
-    ret = toolbox.run_cmd(create_cmd('list', f" --service={my_services[0]['id']}"))
-    assert not ret['stderr']
-    assert empty_list == ret['stdout']
+    ret = toolbox.run_cmd(create_cmd("list", f" --service={my_services[0]['id']}"))
+    assert not ret["stderr"]
+    assert empty_list == ret["stdout"]
 
 
 def test_check_applications_values(my_services, my_accounts, my_app_plans):
@@ -251,23 +253,75 @@ def test_check_applications_values(my_services, my_accounts, my_app_plans):
     # 'account_id', 'description', 'enabled', 'name', 'org_name', 'plan_name', 'plan_id',
     # 'service_id', 'state', 'user_key'
 
-    attr_list = constants.APPLICATION_CMP_ATTRS - {'account_id', 'plan_id', 'service_id'}
-    toolbox.check_object(out_variables['app1'], attr_list, [
-        my_accounts[0]['id'], 'app1', True, 'app1', my_accounts[0]['org_name'],
-        my_app_plans[0]['id'], my_app_plans[0]['name'], my_services[0]['id'],
-        my_services[0]['name'], 'live', '123456'])
+    attr_list = constants.APPLICATION_CMP_ATTRS - {"account_id", "plan_id", "service_id"}
+    toolbox.check_object(
+        out_variables["app1"],
+        attr_list,
+        [
+            my_accounts[0]["id"],
+            "app1",
+            True,
+            "app1",
+            my_accounts[0]["org_name"],
+            my_app_plans[0]["id"],
+            my_app_plans[0]["name"],
+            my_services[0]["id"],
+            my_services[0]["name"],
+            "live",
+            "123456",
+        ],
+    )
 
-    toolbox.check_object(out_variables['app3'], attr_list, [
-        my_accounts[0]['id'], 'app1 description updated', False, 'app1name',
-        my_accounts[0]['org_name'], my_app_plans[0]['id'], my_app_plans[0]['name'],
-        my_services[0]['id'], my_services[0]['name'], 'suspended', '123456'])
+    toolbox.check_object(
+        out_variables["app3"],
+        attr_list,
+        [
+            my_accounts[0]["id"],
+            "app1 description updated",
+            False,
+            "app1name",
+            my_accounts[0]["org_name"],
+            my_app_plans[0]["id"],
+            my_app_plans[0]["name"],
+            my_services[0]["id"],
+            my_services[0]["name"],
+            "suspended",
+            "123456",
+        ],
+    )
 
-    toolbox.check_object(out_variables['app4'], attr_list, [
-        my_accounts[0]['id'], 'app1 description updated', True, 'app1name',
-        my_accounts[0]['org_name'], my_app_plans[0]['id'], my_app_plans[0]['name'],
-        my_services[0]['id'], my_services[0]['name'], 'live', '345678'])
+    toolbox.check_object(
+        out_variables["app4"],
+        attr_list,
+        [
+            my_accounts[0]["id"],
+            "app1 description updated",
+            True,
+            "app1name",
+            my_accounts[0]["org_name"],
+            my_app_plans[0]["id"],
+            my_app_plans[0]["name"],
+            my_services[0]["id"],
+            my_services[0]["name"],
+            "live",
+            "345678",
+        ],
+    )
 
-    attr_list = attr_list.union({'user_key'})
-    toolbox.check_object(out_variables['app2'], attr_list, [
-        my_accounts[1]['id'], 'app 2 description', True, 'app2', my_accounts[1]['org_name'],
-        my_app_plans[1]['id'], my_app_plans[1]['name'], my_services[1]['id'], my_services[1]['name'], 'live'])
+    attr_list = attr_list.union({"user_key"})
+    toolbox.check_object(
+        out_variables["app2"],
+        attr_list,
+        [
+            my_accounts[1]["id"],
+            "app 2 description",
+            True,
+            "app2",
+            my_accounts[1]["org_name"],
+            my_app_plans[1]["id"],
+            my_app_plans[1]["name"],
+            my_services[1]["id"],
+            my_services[1]["name"],
+            "live",
+        ],
+    )

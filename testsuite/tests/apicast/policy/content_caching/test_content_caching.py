@@ -16,20 +16,18 @@ pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.9')")
 @pytest.fixture(scope="module")
 def policy_settings():
     "config of cors policy"
-    return rawobj.PolicyConfig("content_caching", {
-        "rules": [{
-            "cache": True,
-            "header": "X-Cache-Status",
-            "condition": {
-                "combine_op": "and",
-                "operations": [{
-                    "left": "oo",
-                    "op": "==",
-                    "right": "oo"
-                }]
-            }
-        }]
-    })
+    return rawobj.PolicyConfig(
+        "content_caching",
+        {
+            "rules": [
+                {
+                    "cache": True,
+                    "header": "X-Cache-Status",
+                    "condition": {"combine_op": "and", "operations": [{"left": "oo", "op": "==", "right": "oo"}]},
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")
@@ -98,14 +96,14 @@ def test_caching_body_check(client):
     """Check same body response"""
     origin_localhost = {"origin": "localhost"}
 
-    response = client.get('/uuid', headers=origin_localhost)
+    response = client.get("/uuid", headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") != "HIT"
     echoed_request = EchoedRequest.create(response)
 
-    response = client.get('/uuid', headers=origin_localhost)
+    response = client.get("/uuid", headers=origin_localhost)
     assert response.status_code == 200
     assert response.headers.get("X-Cache-Status") == "HIT"
 
     echoed_request_cached = EchoedRequest.create(response)
-    assert echoed_request.json['uuid'] == echoed_request_cached.json['uuid']
+    assert echoed_request.json["uuid"] == echoed_request_cached.json["uuid"]

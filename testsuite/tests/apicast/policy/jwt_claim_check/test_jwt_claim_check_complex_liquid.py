@@ -10,24 +10,29 @@ ERROR_MESSAGE = "Invalid JWT check"
 
 def add_policy(application):
     """Adds policy to the service"""
-    config = rawobj.PolicyConfig("jwt_claim_check", {
-        "rules": [
-            {
-                "methods": ['GET'],
-                "operations": [{
-                    "op": "==",
-                    "jwt_claim": f"{{{{ azp | replace: '{application['client_id']}', 'foo'}}}}",
-                    "value": "foo",
-                    "value_type": "plain",
-                    "jwt_claim_type": "liquid",
-                }],
-                "combine_op": "and",
-                "resource": "/get",
-                "resource_type": "plain",
-            }
-        ],
-        "error_message": ERROR_MESSAGE,
-    })
+    config = rawobj.PolicyConfig(
+        "jwt_claim_check",
+        {
+            "rules": [
+                {
+                    "methods": ["GET"],
+                    "operations": [
+                        {
+                            "op": "==",
+                            "jwt_claim": f"{{{{ azp | replace: '{application['client_id']}', 'foo'}}}}",
+                            "value": "foo",
+                            "value_type": "plain",
+                            "jwt_claim_type": "liquid",
+                        }
+                    ],
+                    "combine_op": "and",
+                    "resource": "/get",
+                    "resource_type": "plain",
+                }
+            ],
+            "error_message": ERROR_MESSAGE,
+        },
+    )
     application.service.proxy.list().policies.append(config)
 
 
@@ -48,10 +53,10 @@ def test_application_matching_jwt_operation(api_client, application, application
     client_doesnt_match = api_client(application_doesnt_match)
 
     token = rhsso_service_info.access_token(application)
-    assert client_match.get('/get', params={'access_token': token}).status_code == 200
+    assert client_match.get("/get", params={"access_token": token}).status_code == 200
 
     token = rhsso_service_info.access_token(application)
-    response = client_doesnt_match.get('/get', params={'access_token': token})
+    response = client_doesnt_match.get("/get", params={"access_token": token})
 
     assert response.status_code == 403
     assert response.text == ERROR_MESSAGE + "\n"

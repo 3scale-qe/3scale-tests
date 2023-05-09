@@ -14,6 +14,8 @@ __all__ = ["CapabilityRegistry", "Capability"]
 
 class Capability(enum.Enum):
     """Enum containing all known environment capabilities"""
+
+    # fmt: off
     PRODUCTION_GATEWAY = "production"           # Allows production gateway with reload() capability
     APICAST = "apicast"                         # Is APIcast, this is mutually exclusive with Service Mesh
     CUSTOM_ENVIRONMENT = "env"                  # Allows environment manipulation through environ() method
@@ -27,10 +29,12 @@ class Capability(enum.Enum):
     OCP4 = "ocp4"                               # If the current environment is OpenShift 4
     OCP3 = "ocp3"                               # If the current environment is OpenShift 3
     SCALING = "scaling"                         # If the current environment supports scaling of components
+    # fmt: on
 
 
 class Singleton(type):
     """Metaclass for creating Singletons"""
+
     def __init__(cls, name, bases, mmbs):
         super().__init__(name, bases, mmbs)
         cls._instance = super().__call__()
@@ -44,6 +48,7 @@ Provider = Callable[[], Set[Any]]
 
 class CapabilityRegistry(metaclass=Singleton):
     """Registry for all the capabilities testsuite has"""
+
     def __init__(self) -> None:
         super().__init__()
         self.providers: List[Tuple[Set[Any], Provider]] = []

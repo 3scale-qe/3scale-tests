@@ -1,5 +1,7 @@
 "top-level conftest"
 
+# pylint: disable=too-many-lines
+
 import inspect
 import logging
 import os
@@ -36,7 +38,7 @@ if weakget(settings)["reporting"]["print_app_logs"] % True:
     pytest_plugins = ("testsuite.gateway_logs",)
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def term_handler():
     """
     This will handle ^C, cleanup won't be skipped
@@ -50,25 +52,30 @@ def term_handler():
 def pytest_addoption(parser):
     """Add option to include disruptive tests in testrun"""
 
+    parser.addoption("--toolbox", action="store_true", default=False, help="Run also toolbox tests (default: False)")
     parser.addoption(
-        "--toolbox", action="store_true", default=False, help="Run also toolbox tests (default: False)")
-    parser.addoption(
-        "--disruptive", action="store_true", default=False, help="Run also disruptive tests (default: False)")
-    parser.addoption(
-        "--performance", action="store_true", default=False, help="Run also performance tests (default: False)")
-    parser.addoption(
-        "--ui", action="store_true", default=False, help="Run also UI tests (default: False)"
+        "--disruptive", action="store_true", default=False, help="Run also disruptive tests (default: False)"
     )
     parser.addoption(
-        "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)")
+        "--performance", action="store_true", default=False, help="Run also performance tests (default: False)"
+    )
+    parser.addoption("--ui", action="store_true", default=False, help="Run also UI tests (default: False)")
     parser.addoption(
-        "--sandbag", action="store_true", default=False,
-        help="Run ONLY demanding/slow tests skipped by --drop-sandbag (default: False)")
+        "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)"
+    )
     parser.addoption(
-        "--drop-nopersistence", action="store_true", default=False, help="Skip tests incompatible with persistence "
-                                                                         "plugin (default: False)")
+        "--sandbag",
+        action="store_true",
+        default=False,
+        help="Run ONLY demanding/slow tests skipped by --drop-sandbag (default: False)",
+    )
     parser.addoption(
-        "--images", action="store_true", default=False, help="Run also image check tests (default: False)")
+        "--drop-nopersistence",
+        action="store_true",
+        default=False,
+        help="Skip tests incompatible with persistence " "plugin (default: False)",
+    )
+    parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
 
 
 # there are many branches as there are many options to influence test selection
@@ -166,6 +173,7 @@ def _junit_testsuite_property(config, name, value):
     """Record a property to junit on testsuite level"""
 
     from _pytest.junitxml import xml_key
+
     xml = config.stash.get(xml_key, None)
     if xml:
         xml.add_global_property(name, value)
@@ -191,38 +199,45 @@ def pytest_metadata(metadata):
     if _settings["fixtures"]["threescale"]["private_tenant"] % False:
         admin_url = "(private tenant created on the fly is in use)"
 
-    metadata.update({
-        "env_for_dynaconf": settings["env_for_dynaconf"],
-        "testsuite-version": testsuite_version,
-        "_3SCALE_TESTS_threescale__admin__url": admin_url,
-        "_3SCALE_TESTS_threescale__version": version,
-        "_3SCALE_TESTS_openshift__servers__default__server_url":
-            _settings["openshift"]["servers"]["default"]["server_url"] % "UNKNOWN",
-        "NAMESPACE": namespace,
-        "polarion-testrun-title": title,
-        "polarion-testrun-id": title.replace(".", "_").replace(" ", "_"),
-        "polarion-testrun-status-id": "inprogress",
-        "polarion-project-id": _settings["reporting"]["testsuite_properties"]["polarion_project_id"] % "None",
-        "polarion-response-myteamsname":
-            _settings["reporting"]["testsuite_properties"]["polarion_response_myteamsname"] % "None",
-        "polarion-lookup-method": "name",
-        "project": "3scale-" + str(version).replace(".", "")[:3],
-    })
+    metadata.update(
+        {
+            "env_for_dynaconf": settings["env_for_dynaconf"],
+            "testsuite-version": testsuite_version,
+            "_3SCALE_TESTS_threescale__admin__url": admin_url,
+            "_3SCALE_TESTS_threescale__version": version,
+            "_3SCALE_TESTS_openshift__servers__default__server_url": _settings["openshift"]["servers"]["default"][
+                "server_url"
+            ]
+            % "UNKNOWN",
+            "NAMESPACE": namespace,
+            "polarion-testrun-title": title,
+            "polarion-testrun-id": title.replace(".", "_").replace(" ", "_"),
+            "polarion-testrun-status-id": "inprogress",
+            "polarion-project-id": _settings["reporting"]["testsuite_properties"]["polarion_project_id"] % "None",
+            "polarion-response-myteamsname": _settings["reporting"]["testsuite_properties"][
+                "polarion_response_myteamsname"
+            ]
+            % "None",
+            "polarion-lookup-method": "name",
+            "project": "3scale-" + str(version).replace(".", "")[:3],
+        }
+    )
 
     if Capability.OCP4 in CapabilityRegistry():
-
-        metadata["_3SCALE_TESTS_threescale__gateway__OperatorApicast__openshift__project_name"] = \
+        metadata["_3SCALE_TESTS_threescale__gateway__OperatorApicast__openshift__project_name"] = (
             _settings["threescale"]["gateway"]["OperatorApicast"]["openshift"]["project_name"] % "None"
-        metadata["_3SCALE_TESTS_threescale__apicast_operator_version"] = \
+        )
+        metadata["_3SCALE_TESTS_threescale__apicast_operator_version"] = (
             _settings["threescale"]["apicast_operator_version"] % "UNKNOWN"
+        )
         metadata["_3SCALE_TESTS_threescale__catalogsource"] = _settings["threescale"]["catalogsource"] % "UNKNOWN"
 
-    toolboximage = _settings["toolbox"]["podman_image"].split(':')[-1] % "UNKNOWN"
+    toolboximage = _settings["toolbox"]["podman_image"].split(":")[-1] % "UNKNOWN"
     toolboxversion = "UNKNOWN"
 
     if toolboximage != "UNKNOWN":
         try:
-            toolboxversion = toolbox.run_cmd("-v")['stdout'].strip()
+            toolboxversion = toolbox.run_cmd("-v")["stdout"].strip()
         except BoxKeyError:
             warnings.warn("Toolbox executioner is not configured")
 
@@ -264,16 +279,16 @@ def openshift(testconfig):
 @pytest.fixture(scope="session")
 def operator_apicast_openshift():
     """Creates OpenShiftClient for operator apicast project"""
-    project_name = settings["threescale"]["gateway"]["OperatorApicast"]['openshift']['project_name']
+    project_name = settings["threescale"]["gateway"]["OperatorApicast"]["openshift"]["project_name"]
 
     try:
-        server = settings["openshift"]["servers"]['default']
+        server = settings["openshift"]["servers"]["default"]
     except KeyError:
         server = {}
 
-    return OpenShiftClient(project_name=project_name,
-                           server_url=server.get("server_url", None),
-                           token=server.get("token", None))
+    return OpenShiftClient(
+        project_name=project_name, server_url=server.get("server_url", None), token=server.get("token", None)
+    )
 
 
 # pylint: disable=too-few-public-methods,broad-except
@@ -287,7 +302,7 @@ def tools(testconfig):
         """dynamic __init__ args introspection"""
 
         init_args = inspect.signature(klass.__init__).parameters.keys()
-        init_args -= ['self', 'args', 'kwargs']
+        init_args -= ["self", "args", "kwargs"]
         if len(init_args) == 0:
             return klass()
         init_args = {k: v for k, v in options.items() if k in init_args}
@@ -328,10 +343,11 @@ def prod_client(production_gateway, application, request):
         api_client (HttpClient): Api client for application
 
     """
+
     def _prod_client(app=application, promote: bool = True, version: int = -1, redeploy: bool = True):
         if promote:
             if version == -1:
-                version = app.service.proxy.list().configs.latest()['version']
+                version = app.service.proxy.list().configs.latest()["version"]
             app.service.proxy.list().promote(version=version)
         if redeploy:
             production_gateway.reload()
@@ -362,7 +378,7 @@ def threescale(testconfig, request):
         testconfig["threescale"]["admin"]["url"],
         testconfig["threescale"]["admin"]["token"],
         ssl_verify=testconfig["ssl_verify"],
-        wait=0
+        wait=0,
     )
 
 
@@ -373,13 +389,14 @@ def master_threescale(testconfig):
     return client.ThreeScaleClient(
         testconfig["threescale"]["master"]["url"],
         testconfig["threescale"]["master"]["token"],
-        ssl_verify=testconfig["ssl_verify"])
+        ssl_verify=testconfig["ssl_verify"],
+    )
 
 
 @pytest.fixture(scope="session")
 def account_password():
     """Default password for Accounts"""
-    return '123456'
+    return "123456"
 
 
 @pytest.fixture(scope="session")
@@ -407,6 +424,7 @@ def custom_account(threescale, request, testconfig):
     Args:
         :param params: dict for remote call, rawobj.Account should be used
     """
+
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = resilient.accounts_create(threescale_client, params=params)
         if autoclean and not testconfig["skip_cleanup"]:
@@ -419,7 +437,7 @@ def custom_account(threescale, request, testconfig):
 @pytest.fixture(scope="session")
 def user(custom_user, account, request, testconfig):
     "Preconfigured user existing over whole testing session"
-    username = blame(request, 'us')
+    username = blame(request, "us")
     domain = testconfig["threescale"]["superdomain"]
     usr = {
         "username": username,
@@ -443,8 +461,10 @@ def custom_user(request, testconfig):  # pylint: disable=unused-argument
     def _custom_user(cus_account, params, autoclean=True):
         usr = cus_account.users.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
+
             def finalizer():
                 usr.delete()
+
             request.addfinalizer(finalizer)
         return usr
 
@@ -460,7 +480,7 @@ def provider_account(threescale):
 @pytest.fixture(scope="module")
 def provider_account_user(custom_provider_account_user, account_password, request):
     """Preconfigured provider account existing over whole testing session"""
-    username = blame(request, 'pa')
+    username = blame(request, "pa")
     user = rawobj.AccountUser(username=username, email=f"{username}@example.com", password=account_password)
     user = custom_provider_account_user(user)
 
@@ -473,6 +493,7 @@ def custom_provider_account_user(request, threescale, testconfig):
     Args:
         :param params: dict for remote call, rawobj.AccountUser should be used
     """
+
     def _custom_user(params, autoclean=True):
         user = threescale.provider_account_users.create(params=params)
         if autoclean and not testconfig["skip_cleanup"]:
@@ -515,10 +536,8 @@ def rhsso_service_info(request, testconfig, tools):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
-    rhsso = RHSSO(server_url=tools["no-ssl-sso"],
-                  username=cnf["username"],
-                  password=cnf["password"])
-    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24*60*60)
+    rhsso = RHSSO(server_url=tools["no-ssl-sso"], username=cnf["username"], password=cnf["password"])
+    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
 
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
@@ -529,7 +548,8 @@ def rhsso_service_info(request, testconfig, tools):
         directAccessGrantsEnabled=False,
         publicClient=False,
         protocol="openid-connect",
-        standardFlowEnabled=False)
+        standardFlowEnabled=False,
+    )
 
     username = cnf["test_user"]["username"]
     password = cnf["test_user"]["password"]
@@ -615,6 +635,7 @@ def api_client(application, request):
     Returns:
         api_client (HttpClient): Api client for application
     """
+
     def _api_client(app=application, **kwargs):
         client = app.api_client(**kwargs)
         request.addfinalizer(client.close)
@@ -647,7 +668,7 @@ def custom_app_plan(custom_service, service_proxy_settings, request, testconfig)
 
 
 @pytest.fixture(scope="module")
-def oas3_body(fil=resources.files('testsuite.resources.oas3').joinpath('petstore-expanded.json')):
+def oas3_body(fil=resources.files("testsuite.resources.oas3").joinpath("petstore-expanded.json")):
     """Loads OAS3 file to string"""
     return fil.read_text()
 
@@ -655,8 +676,7 @@ def oas3_body(fil=resources.files('testsuite.resources.oas3').joinpath('petstore
 @pytest.fixture(scope="module")
 def active_doc(request, service, oas3_body, custom_active_doc):
     """Active doc. bound to service."""
-    return custom_active_doc(
-        rawobj.ActiveDoc(blame(request, "activedoc"), oas3_body, service=service))
+    return custom_active_doc(rawobj.ActiveDoc(blame(request, "activedoc"), oas3_body, service=service))
 
 
 @pytest.fixture(scope="module")
@@ -715,6 +735,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
         app = account.applications.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
+
             def finalizer():
                 for hook in _select_hooks("on_application_delete", hooks):
                     try:
@@ -722,6 +743,7 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
                     except Exception:  # pylint: disable=broad-except
                         pass
                 app.delete()
+
             request.addfinalizer(finalizer)
 
         app.api_client_verify = testconfig["ssl_verify"]
@@ -754,14 +776,23 @@ def custom_service(threescale, request, testconfig, logger):
 
     class _CustomService:
         """Object representing original _create_service interface with access to finalizers that are not autocleaned"""
+
         def __init__(self):
             self.orphan_finalizers = []
             self._autoclean = True
             self._lock = threading.Lock()
 
         # pylint: disable=too-many-arguments
-        def _custom_service(self, params, proxy_params=None, backends=None, autoclean=True,
-                            hooks=None, annotate=True, threescale_client=threescale):
+        def _custom_service(
+            self,
+            params,
+            proxy_params=None,
+            backends=None,
+            autoclean=True,
+            hooks=None,
+            annotate=True,
+            threescale_client=threescale,
+        ):
             params = params.copy()
             for hook in _select_hooks("before_service", hooks):
                 params = hook(params)
@@ -773,6 +804,7 @@ def custom_service(threescale, request, testconfig, logger):
 
             self._autoclean = autoclean
             if not testconfig["skip_cleanup"]:
+
                 def finalizer():
                     for hook in _select_hooks("on_service_delete", hooks):
                         try:
@@ -785,9 +817,10 @@ def custom_service(threescale, request, testconfig, logger):
                         bindings = svc.backend_usages.list()
                         bindings = [svc.threescale_client.backends[i["backend_id"]] for i in bindings]
                         implicit = [
-                            i for i in bindings
-                            if i["name"] == f"{svc['name']} Backend"
-                            and i["description"] == f"Backend of {svc['name']}"]
+                            i
+                            for i in bindings
+                            if i["name"] == f"{svc['name']} Backend" and i["description"] == f"Backend of {svc['name']}"
+                        ]
 
                     svc.delete()
 
@@ -848,8 +881,9 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         :param endpoint: endpoint of backend
     """
 
-    def _custom_backend(name="be", endpoint=None, autoclean=True, hooks=None, threescale_client=threescale,
-                        blame_name=True):
+    def _custom_backend(
+        name="be", endpoint=None, autoclean=True, hooks=None, threescale_client=threescale, blame_name=True
+    ):
         if endpoint is None:
             endpoint = private_base_url()
 
@@ -864,6 +898,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
         backend = threescale_client.backends.create(params=params)
 
         if autoclean and not testconfig["skip_cleanup"]:
+
             def finalizer():
                 for hook in _select_hooks("on_backend_delete", hooks):
                     try:
@@ -871,6 +906,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
                     except Exception:  # pylint: disable=broad-except
                         pass
                 _backend_delete(backend)
+
             request.addfinalizer(finalizer)
 
         for hook in _select_hooks("on_backend_create", hooks):
@@ -894,6 +930,7 @@ def custom_tenant(testconfig, master_threescale, request):
     """
     Custom Tenant
     """
+
     def _custom_tenant(name="t", autoclean=True):
         user_name = blame(request, name)
         tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
@@ -923,12 +960,14 @@ def prometheus(testconfig, openshift):
         return PrometheusClient(testconfig["prometheus"]["url"], token=token, namespace=threescale_namespace)
 
     if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
-        warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped. "
-                      "Without Openshift configuration you need to set up Prometheus url. (token/namespace if needed)")
+        warn_and_skip(
+            "Prometheus is not present in this project. Prometheus tests have been skipped. "
+            "Without Openshift configuration you need to set up Prometheus url. (token/namespace if needed)"
+        )
 
     def _prepare_prometheus_endpoint(routes):
         protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
-        return protocol + routes[0]['spec']['host']
+        return protocol + routes[0]["spec"]["host"]
 
     openshift_monitoring = openshift(project="openshift-monitoring")
     routes = openshift_monitoring.routes.for_service("thanos-querier")
@@ -939,14 +978,14 @@ def prometheus(testconfig, openshift):
         if prometheus_client.has_metric("rails_requests_total"):
             return prometheus_client
 
-    routes = openshift().routes.for_service('prometheus-operated')
+    routes = openshift().routes.for_service("prometheus-operated")
     if len(routes) > 0:
         prometheus_url = _prepare_prometheus_endpoint(routes)
         prometheus_client = PrometheusClient(prometheus_url, True)
         if prometheus_client.has_metric("rails_requests_total"):
             return prometheus_client
 
-    routes = openshift().routes.for_service('prometheus')
+    routes = openshift().routes.for_service("prometheus")
     if len(routes) > 0:
         prometheus_url = _prepare_prometheus_endpoint(routes)
         prometheus_client = PrometheusClient(prometheus_url, False)
@@ -986,7 +1025,7 @@ def apicast_operator(testconfig):
 @pytest.fixture(scope="module")
 def mailhog_client(openshift, tools, testconfig):
     """Creates mailhog client with url set to the
-     route of the 'mailhog' app in the openshift"""
+    route of the 'mailhog' app in the openshift"""
     mailhog = MailhogClient(openshift(), fallback=weakget(tools)["mailhog"] % None)
 
     yield mailhog

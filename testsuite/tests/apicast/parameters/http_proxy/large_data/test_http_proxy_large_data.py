@@ -11,9 +11,11 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.utils import random_string
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3863"),
-              pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3863"),
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+]
 
 
 @pytest.fixture(scope="module")
@@ -32,7 +34,7 @@ def test_large_data(api_client, num_bytes):
     # requests/urllib3 doesn't retry post(); need get() to wait until all is up
     client.get("/get")
 
-    response = client.post('/post', data=data)
+    response = client.post("/post", data=data)
     assert response.status_code == 200
     echo = EchoedRequest.create(response)
     assert echo.headers.get("X-Forwarded-By", "MISSING").startswith("MockServer")

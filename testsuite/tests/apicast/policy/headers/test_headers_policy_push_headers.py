@@ -19,20 +19,32 @@ def service_proxy_settings(private_base_url):
 @pytest.fixture(scope="module")
 def policy_settings():
     "configure headers in policy"
-    return rawobj.PolicyConfig("headers", {
-        "response": [{"op": "push",
-                      "header": "X-RESPONSE-CUSTOM-PUSH",
-                      "value_type": "plain",
-                      "value": "Additional response header"}],
-        "request": [{"op": "push",
-                     "header": "X-REQUEST-CUSTOM-PUSH",
-                     "value_type": "plain",
-                     "value": "Additional request header"}]})
+    return rawobj.PolicyConfig(
+        "headers",
+        {
+            "response": [
+                {
+                    "op": "push",
+                    "header": "X-RESPONSE-CUSTOM-PUSH",
+                    "value_type": "plain",
+                    "value": "Additional response header",
+                }
+            ],
+            "request": [
+                {
+                    "op": "push",
+                    "header": "X-REQUEST-CUSTOM-PUSH",
+                    "value_type": "plain",
+                    "value": "Additional request header",
+                }
+            ],
+        },
+    )
 
 
 def test_headers_policy_function(api_client):
     """testing custom header policy"""
-    response = api_client().get('/get')
+    response = api_client().get("/get")
     echoed_request = EchoedRequest.create(response)
     assert "X-Response-Custom-Push" in response.headers
     assert echoed_request.headers["X-Request-Custom-Push"] == "Additional request header"

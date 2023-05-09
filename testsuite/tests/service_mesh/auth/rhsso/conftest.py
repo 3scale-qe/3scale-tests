@@ -43,7 +43,8 @@ class ServiceMeshRHSSOHook(OIDCClientAuthHook, LifecycleHook):
         """Register OIDC auth object for api_client"""
 
         application.register_auth(
-            "oidc", ServiceMeshOIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location))
+            "oidc", ServiceMeshOIDCClientAuth.partial(self.rhsso_service_info, location=self.credentials_location)
+        )
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -22,10 +22,11 @@ def case_header_increment() -> Tuple[dict, List[tuple], List[str]]:
     Case matching a 200 status code, incrementing by the value sent in the 'increment' header in the
     upstream API response
     """
-    policy = custom_metrics_policy([
-        rule(condition(left="200"), increment="{{ resp.headers['increment'] }}")])
-    calls = [call(200, [1], "/response-headers", {"increment": [1]}),
-             call(200, [10], "/response-headers", {"increment": [10]})]
+    policy = custom_metrics_policy([rule(condition(left="200"), increment="{{ resp.headers['increment'] }}")])
+    calls = [
+        call(200, [1], "/response-headers", {"increment": [1]}),
+        call(200, [10], "/response-headers", {"increment": [10]}),
+    ]
     metrics = ["foo"]
     return policy, calls, metrics
 
@@ -34,8 +35,9 @@ def case_matches() -> Tuple[dict, List[tuple], List[str]]:
     """
     Case matching based on the regular expressions (PCRE)
     """
-    policy = custom_metrics_policy([rule(condition(left="{{status}}", left_type="liquid",
-                                                   right="4..", right_type="plain", operation="matches"))])
+    policy = custom_metrics_policy(
+        [rule(condition(left="{{status}}", left_type="liquid", right="4..", right_type="plain", operation="matches"))]
+    )
     calls = [call(403, [1]), call(402, [1]), call(500, [0])]
     metrics = ["foo"]
     return policy, calls, metrics
@@ -45,8 +47,9 @@ def case_matches_multiple_rules() -> Tuple[dict, List[tuple], List[str]]:
     """
     Case with a multiple rules incrementing multiple metrics at once
     """
-    policy = custom_metrics_policy([rule(condition(left="200"), "foo"),
-                                    rule(condition(left="200"), "foo_{{status}}", "2")])
+    policy = custom_metrics_policy(
+        [rule(condition(left="200"), "foo"), rule(condition(left="200"), "foo_{{status}}", "2")]
+    )
     metrics = ["foo", "foo_200"]
     calls = [call(200, increments=[1, 2])]
     return policy, calls, metrics
@@ -72,31 +75,23 @@ def call(status_code, increments=None, endpoint: str = None, params: dict = None
     return status_code, increments, endpoint, params
 
 
-def condition(right="{{status}}", right_type="liquid",
-              left="403", left_type="plain", operation="=="):
+def condition(right="{{status}}", right_type="liquid", left="403", left_type="plain", operation="=="):
     """
     The condition that the policy uses to match the requests
     """
-    return {"operations": [{
-                "right": right,
-                "right_type": right_type,
-                "left": left,
-                "left_type": left_type,
-                "op": operation
-                }],
-            "combine_op": "and"
-            }
+    return {
+        "operations": [
+            {"right": right, "right_type": right_type, "left": left, "left_type": left_type, "op": operation}
+        ],
+        "combine_op": "and",
+    }
 
 
 def rule(cond, metric="foo", increment="1"):
     """
     A rule for the custom metric policy
     """
-    return {"metric": metric,
-            "increment": increment,
-            "condition": cond,
-            "combine_op": "and"
-            }
+    return {"metric": metric, "increment": increment, "condition": cond, "combine_op": "and"}
 
 
 def custom_metrics_policy(rules):

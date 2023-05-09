@@ -6,14 +6,17 @@ from keycloak import KeycloakAdmin, KeycloakOpenID
 
 class Realm:
     """Helper class for RHSSO realm manipulation"""
+
     def __init__(self, master: KeycloakAdmin, name) -> None:
-        self.admin = KeycloakAdmin(server_url=master.connection.server_url,
-                                   username=master.connection.username,
-                                   password=master.connection.password,
-                                   realm_name=name,
-                                   user_realm_name="master",
-                                   verify=False,
-                                   auto_refresh_token=['get', 'put', 'post', 'delete'])
+        self.admin = KeycloakAdmin(
+            server_url=master.connection.server_url,
+            username=master.connection.username,
+            password=master.connection.password,
+            realm_name=name,
+            user_realm_name="master",
+            verify=False,
+            auto_refresh_token=["get", "put", "post", "delete"],
+        )
         self.name = name
 
     def delete(self):
@@ -22,10 +25,7 @@ class Realm:
 
     def create_client(self, name, **kwargs):
         """Creates new client"""
-        self.admin.create_client(payload={
-            **kwargs,
-            "clientId": name}
-        )
+        self.admin.create_client(payload={**kwargs, "clientId": name})
         client_id = self.admin.get_client_id(name)
         return Client(self, client_id)
 
@@ -42,14 +42,17 @@ class Realm:
 
     def oidc_client(self, client_id, client_secret):
         """Create OIDC client for this realm"""
-        return KeycloakOpenID(server_url=self.admin.connection.server_url,
-                              client_id=client_id,
-                              realm_name=self.name,
-                              client_secret_key=client_secret)
+        return KeycloakOpenID(
+            server_url=self.admin.connection.server_url,
+            client_id=client_id,
+            realm_name=self.name,
+            client_secret_key=client_secret,
+        )
 
 
 class Client:
     """Helper class for RHSSO client manipulation"""
+
     def __init__(self, realm: Realm, client_id) -> None:
         self.admin = realm.admin
         self.realm = realm
@@ -78,29 +81,25 @@ class RHSSO:
         # python-keycloak API requires url to be pointed at auth/ endpoint
         # pylint: disable=protected-access
         self.server_url = urlparse(server_url)._replace(path="auth/").geturl()
-        self.master = KeycloakAdmin(server_url=self.server_url,
-                                    username=username,
-                                    password=password,
-                                    realm_name="master",
-                                    verify=False,
-                                    auto_refresh_token=['get', 'put', 'post', 'delete'])
+        self.master = KeycloakAdmin(
+            server_url=self.server_url,
+            username=username,
+            password=password,
+            realm_name="master",
+            verify=False,
+            auto_refresh_token=["get", "put", "post", "delete"],
+        )
 
     def create_realm(self, name: str, **kwargs) -> Realm:
         """Creates new realm"""
-        self.master.create_realm(payload={
-            "realm": name,
-            "enabled": True,
-            "sslRequired": "None",
-            **kwargs
-        })
+        self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
         return Realm(self.master, name)
 
     def create_oidc_client(self, realm, client_id, secret) -> KeycloakOpenID:
         """Creates OIDC client"""
-        return KeycloakOpenID(server_url=self.master.server_url,
-                              client_id=client_id,
-                              realm_name=realm,
-                              client_secret_key=secret)
+        return KeycloakOpenID(
+            server_url=self.master.server_url, client_id=client_id, realm_name=realm, client_secret_key=secret
+        )
 
 
 # pylint: disable=too-few-public-methods

@@ -7,7 +7,8 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.1')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4736")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4736"),
+]
 
 
 @pytest.fixture(scope="module")

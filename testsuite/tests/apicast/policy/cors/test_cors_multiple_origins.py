@@ -8,13 +8,13 @@ If not, the "Access-Control-Allow-Origin" is not set.
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 
 pytestmark = [
-              pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6569"),
-             ]
+    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6569"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -25,13 +25,16 @@ def service(service):
     the upstream API, so we can test that this header is added by the cors policy.
     """
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("cors", {
-        "allow_methods": ["GET", "POST"],
-        "allow_credentials": True,
-        "allow_origin": "(foo|bar).example.com"
-        }))
-    proxy.policies.insert(0, rawobj.PolicyConfig("headers", {
-        "response": [{"op": "delete", "header": "Access-Control-Allow-Origin"}]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "cors",
+            {"allow_methods": ["GET", "POST"], "allow_credentials": True, "allow_origin": "(foo|bar).example.com"},
+        ),
+    )
+    proxy.policies.insert(
+        0, rawobj.PolicyConfig("headers", {"response": [{"op": "delete", "header": "Access-Control-Allow-Origin"}]})
+    )
     return service
 
 

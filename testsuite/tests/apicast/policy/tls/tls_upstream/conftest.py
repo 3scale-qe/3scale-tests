@@ -37,10 +37,9 @@ def upstream_certificate(request, manager, valid_authority, upstream_cert_hostna
     Certificate sent from upstream (httpbin) to be validated by APIcast
     """
     label = "httpbin_" + upstream_cert_hostname
-    cert = manager.get_or_create(label,
-                                 common_name=upstream_cert_hostname,
-                                 hosts=[upstream_cert_hostname],
-                                 certificate_authority=valid_authority)
+    cert = manager.get_or_create(
+        label, common_name=upstream_cert_hostname, hosts=[upstream_cert_hostname], certificate_authority=valid_authority
+    )
 
     request.addfinalizer(cert.delete_files)
     return cert
@@ -79,18 +78,17 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
     httpbin_image = testconfig["fixtures"]["custom_httpbin"]["image"]
 
     def _httpbin(name, tls_route_type=None):
-        path = resources.files('testsuite.resources.tls').joinpath('httpbin_go.yaml')
+        path = resources.files("testsuite.resources.tls").joinpath("httpbin_go.yaml")
         name = blame(request, name)
         parameters = {
             "NAME": name,
             "CERTIFICATE": upstream_certificate.certificate,
             "CERTIFICATE_KEY": upstream_certificate.key,
             "CA_CERTIFICATE": upstream_authority.certificate,
-            "IMAGE": httpbin_image
+            "IMAGE": httpbin_image,
         }
 
-        request.addfinalizer(
-            lambda: staging_gateway.openshift.delete_template(path, parameters))
+        request.addfinalizer(lambda: staging_gateway.openshift.delete_template(path, parameters))
         staging_gateway.openshift.new_app(path, parameters)
         # pylint: disable=protected-access
         staging_gateway.openshift.deployment(f"dc/{name}").wait_for()

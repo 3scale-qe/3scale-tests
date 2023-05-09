@@ -9,11 +9,10 @@ from testsuite.ui.widgets import NavigationMenu
 
 class ProductsView(BaseAdminView):
     """View representation of Product Listing page"""
+
     path_pattern = "/apiconfig/services"
     create_product_button = Text("//a[@href='/apiconfig/services/new']")
-    table = PatternflyTable("//*[@id='products']/section/table", column_widgets={
-        "Name": Text("./a")
-    })
+    table = PatternflyTable("//*[@id='products']/section/table", column_widgets={"Name": Text("./a")})
     search_bar = TextInput(locator="//input[@type='search']")
     search_button = GenericLocatorWidget("//button[contains(@aria-label,'search')]")
 
@@ -46,8 +45,9 @@ class BaseProductView(BaseAdminView):
     displayed Product (this applies for all Views that inherits from BaseProductView).
     This value is verified in `is_displayed` method.
     """
-    NAV_ITEMS = ['Overview', 'Analytics', 'Applications', 'ActiveDocs', 'Integration']
-    nav = NavigationMenu(id='mainmenu')
+
+    NAV_ITEMS = ["Overview", "Analytics", "Applications", "ActiveDocs", "Integration"]
+    nav = NavigationMenu(id="mainmenu")
     outdated_config = GenericLocatorWidget(locator="//*/li/a[contains(@class, 'outdated-config')]")
 
     def __init__(self, parent, product, **kwargs):
@@ -69,5 +69,8 @@ class BaseProductView(BaseAdminView):
 
     @property
     def is_displayed(self):
-        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS \
-               and self.nav.nav_resource() == self.product['name']
+        return (
+            self.nav.is_displayed
+            and self.nav.nav_links() == self.NAV_ITEMS
+            and self.nav.nav_resource() == self.product["name"]
+        )

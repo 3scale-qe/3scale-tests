@@ -9,6 +9,7 @@ from testsuite.openshift.env import Properties
 
 if TYPE_CHECKING:
     from typing import Optional
+
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
 
@@ -16,13 +17,15 @@ if TYPE_CHECKING:
 class SystemApicast(AbstractApicast):
     """Apicast that is deployed with 3scale"""
 
-    CAPABILITIES = {Capability.SAME_CLUSTER,
-                    Capability.CUSTOM_ENVIRONMENT,
-                    Capability.APICAST,
-                    Capability.PRODUCTION_GATEWAY,
-                    Capability.STANDARD_GATEWAY,
-                    Capability.LOGS,
-                    Capability.JAEGER}
+    CAPABILITIES = {
+        Capability.SAME_CLUSTER,
+        Capability.CUSTOM_ENVIRONMENT,
+        Capability.APICAST,
+        Capability.PRODUCTION_GATEWAY,
+        Capability.STANDARD_GATEWAY,
+        Capability.LOGS,
+        Capability.JAEGER,
+    }
     HAS_PRODUCTION = True
 
     def __init__(self, staging: bool, openshift: "Optional[OpenShiftClient]" = None):
@@ -56,10 +59,8 @@ class SystemApicast(AbstractApicast):
         config_map_name = f"{jaeger_randomized_name}.json"
         service_name = jaeger_randomized_name
         self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, service_name))
-        self.deployment.add_volume("jaeger-config-vol",
-                                   "/tmp/jaeger/", configmap_name=config_map_name)
-        self.environ.set_many({"OPENTRACING_TRACER": "jaeger",
-                               "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
+        self.environ.set_many({"OPENTRACING_TRACER": "jaeger", "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
 
     def _wait_for_apicasts(self):
         """Waits until changes to APIcast have been applied"""
@@ -78,14 +79,14 @@ class SystemApicast(AbstractApicast):
         """Sets custom policy to the Operator"""
 
         api_manager = self.openshift.api_manager
-        api_manager.modify_and_apply(lambda manager: manager.set_path(
-            "spec/apicast/stagingSpec/customPolicies", [policy]))
+        api_manager.modify_and_apply(
+            lambda manager: manager.set_path("spec/apicast/stagingSpec/customPolicies", [policy])
+        )
         self._wait_for_apicasts()
 
     def remove_custom_policy(self):
         """Removes all custom policies to the Operator"""
 
         api_manager = self.openshift.api_manager
-        api_manager.modify_and_apply(lambda manager: manager.set_path(
-            "spec/apicast/stagingSpec/customPolicies", []))
+        api_manager.modify_and_apply(lambda manager: manager.set_path("spec/apicast/stagingSpec/customPolicies", []))
         self._wait_for_apicasts()

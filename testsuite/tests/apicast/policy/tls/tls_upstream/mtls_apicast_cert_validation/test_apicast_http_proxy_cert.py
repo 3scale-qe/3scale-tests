@@ -13,13 +13,17 @@ from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-672")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-672"),
+]
 
 
-@pytest.fixture(scope="module", params=[
+@pytest.fixture(
+    scope="module",
+    params=[
         pytest.param(("valid_authority", 200), id="Matching authorities"),
-        pytest.param(("invalid_authority", 502), id="Mismatched authorities")
-])
+        pytest.param(("invalid_authority", 502), id="Mismatched authorities"),
+    ],
+)
 def authority_and_code(request):
     """
     Returns authority for httpbin and return code it should return
@@ -43,10 +47,9 @@ def setup_gateway(request, mount_certificate_secret, staging_gateway, certificat
     path = f'/var/run/secrets/{blame(request, "http_proxy_cert")}'
     mount_certificate_secret(path, certificate)
 
-    staging_gateway.environ.set_many({
-        "APICAST_PROXY_HTTPS_CERTIFICATE_KEY": f"{path}/tls.key",
-        "APICAST_PROXY_HTTPS_CERTIFICATE": f"{path}/tls.crt"
-    })
+    staging_gateway.environ.set_many(
+        {"APICAST_PROXY_HTTPS_CERTIFICATE_KEY": f"{path}/tls.key", "APICAST_PROXY_HTTPS_CERTIFICATE": f"{path}/tls.crt"}
+    )
 
 
 @pytest.fixture(scope="session")

@@ -7,11 +7,13 @@ from urllib.parse import urlparse
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6312")]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6312"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -60,18 +62,17 @@ def test_debug_policy(api_client, access_token, service):
     client = api_client()
     client.auth = None
 
-    response = client.get('/echo/anything/echo', params={'access_token': access_token})
+    response = client.get("/echo/anything/echo", params={"access_token": access_token})
     assert response.status_code == 200
 
     jrequest = response.json()
-    parsed_url = urlparse(service.proxy.list()['sandbox_endpoint'])
+    parsed_url = urlparse(service.proxy.list()["sandbox_endpoint"])
 
     assert "uri" in jrequest
     assert jrequest["uri"] == "/"
     assert jrequest["host"] == parsed_url.hostname
     assert jrequest["http_method"] == "GET"
-    assert jrequest["current"]["original_request"]["current"]["query"] ==\
-        "access_token=" + access_token
+    assert jrequest["current"]["original_request"]["current"]["query"] == "access_token=" + access_token
 
     assert "headers" in jrequest
     assert "remote_addr" in jrequest

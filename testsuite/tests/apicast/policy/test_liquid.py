@@ -13,32 +13,44 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION <= Version('2.13')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8483"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8484")
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8484"),
 ]
 
 
 @pytest.fixture(scope="module")
 def policy_settings():
     """configures headers in policy"""
-    return rawobj.PolicyConfig("headers", {
-        "response": [
-            {
-                "op": "set", "header": "X-Liquid-String-Doesnt-Contain", "value_type": "liquid",
-                "value": '{% if "abcdef" contains "wxyz" %}fail{% else %}pass{% endif %}'
-            },
-            {
-                "op": "set", "header": "X-Liquid-String-Contains", "value_type": "liquid",
-                "value": '{% if "abcdef" contains "bcd" %}pass{% else %}fail{% endif %}'
-            },
-            {
-                "op": "set", "header": "X-Liquid-Array-Doesnt-Contain", "value_type": "liquid",
-                "value": '{% assign arr = "abcd afooa efghi" | split: " " %}{% if arr contains "foo" %}fail{% else %}pass{% endif%}'# noqa # pylint: disable=line-too-long
-            },
-            {
-                "op": "set", "header": "X-Liquid-Array-Contains", "value_type": "liquid",
-                "value": '{% assign arr = "abcd foo efghi" | split: " " %}{% if arr contains "foo" %}pass{% else %}fail{% endif%}'  # noqa # pylint: disable=line-too-long
-            }
-        ]})
+    return rawobj.PolicyConfig(
+        "headers",
+        {
+            "response": [
+                {
+                    "op": "set",
+                    "header": "X-Liquid-String-Doesnt-Contain",
+                    "value_type": "liquid",
+                    "value": '{% if "abcdef" contains "wxyz" %}fail{% else %}pass{% endif %}',
+                },
+                {
+                    "op": "set",
+                    "header": "X-Liquid-String-Contains",
+                    "value_type": "liquid",
+                    "value": '{% if "abcdef" contains "bcd" %}pass{% else %}fail{% endif %}',
+                },
+                {
+                    "op": "set",
+                    "header": "X-Liquid-Array-Doesnt-Contain",
+                    "value_type": "liquid",
+                    "value": '{% assign arr = "abcd afooa efghi" | split: " " %}{% if arr contains "foo" %}fail{% else %}pass{% endif%}',  # noqa # pylint: disable=line-too-long
+                },
+                {
+                    "op": "set",
+                    "header": "X-Liquid-Array-Contains",
+                    "value_type": "liquid",
+                    "value": '{% assign arr = "abcd foo efghi" | split: " " %}{% if arr contains "foo" %}pass{% else %}fail{% endif%}',  # noqa # pylint: disable=line-too-long
+                },
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")

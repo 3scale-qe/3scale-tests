@@ -12,14 +12,13 @@ def stripe_gateway(custom_admin_login, navigator, testconfig):
     custom_admin_login()
     billing = navigator.navigate(BillingSettingsView)
     billing.charging(True)
-    billing.stripe(testconfig["stripe"]["secret_key"],
-                   testconfig["stripe"]["publishable_key"],
-                   "empty-webhook")
+    billing.stripe(testconfig["stripe"]["secret_key"], testconfig["stripe"]["publishable_key"], "empty-webhook")
 
 
 @pytest.fixture(scope="module")
 def custom_card(account, custom_devel_login, billing_address, navigator):
     """Credit card setup"""
+
     def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
         cc_details = CreditCard(cc_number, 123, 10, 25)

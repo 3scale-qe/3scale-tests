@@ -11,7 +11,8 @@ from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-im
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4913")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4913"),
+]
 
 
 BATCH_REPORT_SECONDS = 50
@@ -55,8 +56,7 @@ def test_batcher_policy_append(api_client, application, metric_name):
     """
     client = api_client()
     analytics = application.threescale_client.analytics
-    usage_before = analytics.list_by_service(
-        application["service_id"], metric_name=metric_name)["total"]
+    usage_before = analytics.list_by_service(application["service_id"], metric_name=metric_name)["total"]
 
     for i in range(3):
         response = client.get("/anything")
@@ -64,6 +64,5 @@ def test_batcher_policy_append(api_client, application, metric_name):
 
     sleep(BATCH_REPORT_SECONDS + 1)
 
-    usage_after = analytics.list_by_service(application["service_id"],
-                                            metric_name=metric_name)["total"]
+    usage_after = analytics.list_by_service(application["service_id"], metric_name=metric_name)["total"]
     assert usage_after == usage_before + 3

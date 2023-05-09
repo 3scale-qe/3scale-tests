@@ -34,9 +34,9 @@ def test_basic_auth_app_id_key(application, api_client):
     Then request made with appropriate Basic auth made has to pass as expected"""
 
     creds = application.authobj().credentials
-    expected_authorization = basic_auth_string(creds['app_id'], creds['app_key'])
+    expected_authorization = basic_auth_string(creds["app_id"], creds["app_key"])
 
-    response = api_client().get('/get')
+    response = api_client().get("/get")
 
     assert response.status_code == 200
     assert response.request.headers["Authorization"] == expected_authorization

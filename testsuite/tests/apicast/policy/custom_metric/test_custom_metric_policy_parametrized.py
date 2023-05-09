@@ -10,12 +10,13 @@ from pytest_cases import parametrize_with_cases
 
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
-from testsuite import rawobj, resilient, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, resilient, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
+    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -96,7 +97,8 @@ def test_custom_policy(application, threescale, config, client):
         for i, metric in enumerate(metrics):
             threshold = hits_before[i] + increments[i]
             hits_after.append(
-                resilient.analytics_list_by_service(threescale, application["service_id"], metric, "total", threshold))
+                resilient.analytics_list_by_service(threescale, application["service_id"], metric, "total", threshold)
+            )
 
         for i, increment in enumerate(increments):
             assert hits_after[i] - hits_before[i] == increment
