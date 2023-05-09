@@ -1,4 +1,4 @@
-.PHONY: commit-acceptance pylint flake8 mypy all-is-package \
+.PHONY: commit-acceptance pylint flake8 mypy all-is-package black-check \
 	test pytest tests smoke junit \
 	pipenv pipenv-dev \
 	container-image \
@@ -35,10 +35,13 @@ ifeq ($(filter-out --store --load,$(flags)),$(flags))
 	PYTEST += -p no:persistence
 endif
 
-commit-acceptance: pylint flake8 mypy all-is-package
+commit-acceptance: pylint flake8 mypy all-is-package black-check
 
 pylint flake8 mypy: pipenv-dev
 	pipenv run $@ $(flags) testsuite
+
+black-check: pipenv-dev
+	pipenv run black --check testsuite
 
 all-is-package:
 	@echo
