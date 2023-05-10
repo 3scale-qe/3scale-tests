@@ -30,6 +30,7 @@ from testsuite.tests.apicast.policy.tls.conftest import (
 )
 
 pytestmark = [
+    pytest.mark.sandbag,  # TLS requires pretty specific complex setup
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
     pytest.mark.usefixtures("login"),
