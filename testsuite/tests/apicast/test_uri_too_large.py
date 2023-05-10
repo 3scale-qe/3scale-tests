@@ -2,6 +2,8 @@
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
+from weakget import weakget
+
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 WARN_MESSAGES = [
@@ -12,29 +14,40 @@ WARN_MESSAGES = [
 ]
 
 
-@pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7906")
-def test_uri_too_large(api_client, staging_gateway):
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.13')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7906"),
+    pytest.mark.issue("https://issues.redhat.com/browse/MGDAPI-5655"),
+]
+
+
+@pytest.fixture
+def status_code(testconfig):
+    """Expected status code based on testing environment"""
+    if weakget(testconfig)["threescale"]["deployment_type"] == "rhoam":
+        return 503
+    return 414
+
+
+def test_uri_too_large(api_client, staging_gateway, status_code):
     """
     Test that redundant warn logs are not present in apicast logs after 414 Request-URI Too Large response
     """
     client = api_client()
     response = client.get(f"/{10000 * 'a'}")
-    assert response.status_code == 414
+    assert response.status_code == status_code
     logs = staging_gateway.get_logs()
     for message in WARN_MESSAGES:
         assert message not in logs
 
 
-@pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7906")
-def test_param_too_large(api_client, staging_gateway):
+def test_param_too_large(api_client, staging_gateway, status_code):
     """
     Test that redundant warn logs are not present in apicast logs after 414 Request-URI Too Large response
     """
     client = api_client()
     response = client.get("/anything/anything", params={"long": 10000 * "a"})
-    assert response.status_code == 414
+    assert response.status_code == status_code
     logs = staging_gateway.get_logs()
     for message in WARN_MESSAGES:
         assert message not in logs
