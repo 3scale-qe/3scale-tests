@@ -5,8 +5,11 @@ Conftest for auth tests
 import pytest
 
 from testsuite import resilient
-from testsuite.ui.views.admin.settings.sso_integrations import NewSSOIntegrationView, SSOIntegrationEditView, \
-    SSOIntegrationDetailView
+from testsuite.ui.views.admin.settings.sso_integrations import (
+    NewSSOIntegrationView,
+    SSOIntegrationEditView,
+    SSOIntegrationDetailView,
+)
 from testsuite.ui.views.auth import Auth0View, RhssoView
 
 
@@ -23,6 +26,7 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
         sso = threescale.admin_portal_auth_providers.read(sso_id)
 
         if not testconfig["skip_cleanup"]:
+
             def _delete():
                 custom_admin_login()
                 sso_edit = navigator.navigate(SSOIntegrationEditView, integration=sso)
@@ -44,7 +48,7 @@ def auth0_setup(ui_sso_integration, testconfig, navigator, set_callback_urls, au
         - publish SSO integration
     """
     auth = testconfig["auth0"]
-    integration = ui_sso_integration('auth0', auth["client"], auth["client-secret"], f"https://{auth['domain']}")
+    integration = ui_sso_integration("auth0", auth["client"], auth["client-secret"], f"https://{auth['domain']}")
 
     sso = navigator.navigate(SSOIntegrationDetailView, integration=integration)
     urls = sso.callback_urls()
@@ -90,7 +94,7 @@ def rhsso_setup(ui_sso_integration, request, rhsso_service_info, navigator, test
     client_id = rhsso_service_info.client.client_id
     client = admin.get_client(client_id)["clientId"]
     client_secret = admin.get_client_secrets(client_id)["value"]
-    integration = ui_sso_integration('keycloak', client, client_secret, rhsso_service_info.issuer_url())
+    integration = ui_sso_integration("keycloak", client, client_secret, rhsso_service_info.issuer_url())
 
     sso = navigator.navigate(SSOIntegrationDetailView, integration=integration)
     urls = sso.callback_urls()
@@ -102,8 +106,9 @@ def rhsso_setup(ui_sso_integration, request, rhsso_service_info, navigator, test
     sso.publish()
 
     def _delete():
-        user = resilient.resource_read_by_name(threescale.provider_account_users,
-                                               admin.get_user(rhsso_service_info.user)["username"])
+        user = resilient.resource_read_by_name(
+            threescale.provider_account_users, admin.get_user(rhsso_service_info.user)["username"]
+        )
         user.delete()
 
     request.addfinalizer(_delete)

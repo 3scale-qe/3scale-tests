@@ -13,9 +13,15 @@ def policy_settings():
     """
     Add the 'url_rewriting' policy to the policy chain with following settings
     """
-    return rawobj.PolicyConfig("url_rewriting", {
-        "query_args_commands": [{"op": "push", "arg": "new_arg", "value": "new_value"},
-                                {"op": "push", "arg": "arg", "value": "value"}]})
+    return rawobj.PolicyConfig(
+        "url_rewriting",
+        {
+            "query_args_commands": [
+                {"op": "push", "arg": "new_arg", "value": "new_value"},
+                {"op": "push", "arg": "arg", "value": "value"},
+            ]
+        },
+    )
 
 
 def test_url_rewriting_push_query_args(api_client):
@@ -29,5 +35,5 @@ def test_url_rewriting_push_query_args(api_client):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.params.get('arg') == ['old_value', 'value']
-    assert echoed_request.params.get('new_arg') == 'new_value'
+    assert echoed_request.params.get("arg") == ["old_value", "value"]
+    assert echoed_request.params.get("new_arg") == "new_value"

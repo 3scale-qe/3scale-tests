@@ -142,8 +142,10 @@ class PrometheusClient:
         def _time_of_scrape():
             for target in self.get_targets():
                 if "container" in target["labels"].keys() and target["labels"]["container"] == target_container:
-                    return datetime.fromisoformat(target["lastScrape"][:19]), datetime.strptime(
-                        target["discoveredLabels"]["__scrape_interval__"], "%Ss").second
+                    return (
+                        datetime.fromisoformat(target["lastScrape"][:19]),
+                        datetime.strptime(target["discoveredLabels"]["__scrape_interval__"], "%Ss").second,
+                    )
             return None, PROMETHEUS_REFRESH
 
         last_scrape, scrape_interval = _time_of_scrape()

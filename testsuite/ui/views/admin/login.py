@@ -12,7 +12,8 @@ class LoginView(View, Navigable):
     """
     Basic login view page object that can be found on path
     """
-    path = '/p/login'
+
+    path = "/p/login"
     ROOT = "/html//div[@id='pf-login-page-container']"
     header = Text("//main/header/h2")
     error_message = Text("//p[@class='pf-c-form__helper-text pf-m-error']")
@@ -30,7 +31,7 @@ class LoginView(View, Navigable):
         :return DashboardView page object
         """
         self.login_widget.do_login(name, password)
-        if '/p/admin/onboarding/wizard/intro' in self.browser.url:
+        if "/p/admin/onboarding/wizard/intro" in self.browser.url:
             wizard = WizardIntroView(self.browser.root_browser)
             wizard.close_wizard()
 
@@ -67,6 +68,10 @@ class LoginView(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.password_reset_link.is_displayed and self.path in self.browser.url and \
-               self.browser.title == '3scale Login' and 'Log in to your account' in self.header.text and \
-               self.login_widget.is_displayed
+        return (
+            self.password_reset_link.is_displayed
+            and self.path in self.browser.url
+            and self.browser.title == "3scale Login"
+            and "Log in to your account" in self.header.text
+            and self.login_widget.is_displayed
+        )

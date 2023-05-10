@@ -22,7 +22,6 @@ ANNOTATIONS_PRE_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
     ("capabilities", "Full Lifecycle"),
     ("categories", "Integration & Delivery"),
     ("certified", "false"),
-
 ]
 
 ANNOTATIONS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
@@ -39,7 +38,7 @@ ANNOTATIONS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 @pytest.mark.skipif("APICAST_OPERATOR_VERSION >  Version('0.6.0')")  # since threescale 2.12
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_PRE_2_12)
 def test_labels_operator_old(annotation, expected_value, apicast_operator):
-    """ Test labels of operator pod. """
+    """Test labels of operator pod."""
     value = apicast_operator.get_annotation(annotation)
     assert value is not None
     if expected_value:
@@ -49,7 +48,7 @@ def test_labels_operator_old(annotation, expected_value, apicast_operator):
 @pytest.mark.skipif("APICAST_OPERATOR_VERSION <= Version('0.6.0')")
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_POST_2_12)
 def test_labels_operator_new(annotation, expected_value, apicast_operator):
-    """ Test labels of operator pod. """
+    """Test labels of operator pod."""
     value = apicast_operator.get_annotation(annotation)
     assert value is not None
     if expected_value:

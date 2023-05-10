@@ -6,7 +6,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 from testsuite.echoed_request import EchoedRequest
 from testsuite import rawobj
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
@@ -17,9 +17,13 @@ def service(service, private_base_url):
     """Add url_rewriting policy, configure metrics/mapping"""
     proxy = service.proxy.list()
 
-    proxy.policies.insert(0, rawobj.PolicyConfig("url_rewriting", {
-        "commands": [{"op": "gsub", "regex": "initial", "replace": "rewritten", "methods":
-                      ["GET", "PUT"]}]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "url_rewriting",
+            {"commands": [{"op": "gsub", "regex": "initial", "replace": "rewritten", "methods": ["GET", "PUT"]}]},
+        ),
+    )
 
     metric = service.metrics.create(rawobj.Metric("get_metric"))
     hello_metric = service.metrics.create(rawobj.Metric("hello_metric"))
@@ -37,9 +41,10 @@ def service(service, private_base_url):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5259")
-@pytest.mark.parametrize("method,path_after,hits", [("GET", "/anything/rewritten", 1),
-                                                    ("PUT", "/anything/rewritten", 1),
-                                                    ("POST", "/anything/initial", 0)])
+@pytest.mark.parametrize(
+    "method,path_after,hits",
+    [("GET", "/anything/rewritten", 1), ("PUT", "/anything/rewritten", 1), ("POST", "/anything/initial", 0)],
+)
 def test_url_rewriting_http_method(application, api_client, method, path_after, hits):
     """
     /initial should be rewritten to /rewritten on GET and PUT request, metrics should be counted

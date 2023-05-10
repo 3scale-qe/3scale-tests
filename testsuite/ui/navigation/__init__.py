@@ -125,7 +125,7 @@ class Navigator:
         page = self.page_chain.pop()
         dest = self.page_chain[-1]
 
-        possible_steps = inspect.getmembers(page, lambda o: hasattr(o, '_class_name'))
+        possible_steps = inspect.getmembers(page, lambda o: hasattr(o, "_class_name"))
         if self._invoke_step(possible_steps, dest, **kwargs):
             dest.post_navigate(**kwargs)
             return self._perform_steps(**kwargs)
@@ -155,7 +155,7 @@ class Navigator:
                 except Exception as exc:
                     raise NavigationStepException(method.__dict__, destination, method) from exc
                 return True
-            if key_word.startswith('@'):
+            if key_word.startswith("@"):
                 alternative_steps.append(method)
 
         return self._invoke_alternative_step(alternative_steps, destination)
@@ -172,7 +172,7 @@ class Navigator:
         :return: Bool value representing if step was preformed or not
         """
         for method in alternative_steps:
-            if method._class_name.startswith('@href'):
+            if method._class_name.startswith("@href"):
                 try:
                     method(destination.path)
                 except Exception as exc:
@@ -207,10 +207,9 @@ class NavigationStepException(Exception):
         self.step = step
 
     def __str__(self):
-        return (
-            "Step from current [{}] View to destination [{}] View failed"
-            " during method invocation: [{}]"
-        ).format(self.dest, self.current, self.step)
+        return ("Step from current [{}] View to destination [{}] View failed" " during method invocation: [{}]").format(
+            self.dest, self.current, self.step
+        )
 
 
 class Navigable:

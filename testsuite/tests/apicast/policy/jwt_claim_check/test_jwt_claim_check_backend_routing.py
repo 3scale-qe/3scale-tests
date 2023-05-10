@@ -5,36 +5,42 @@ restrict the access to the resource.
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite import rawobj
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6410")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6410"),
+]
 
 ERROR_MESSAGE = "Invalid JWT check"
 
 
 def add_policy(application):
     """Adds policy to the service"""
-    config = rawobj.PolicyConfig("jwt_claim_check", {
-        "rules": [
-            {
-                "methods": ['GET'],
-                "operations": [{
-                    "op": "==",
-                    "jwt_claim": "azp",
-                    "value": application['client_id'],
-                    "value_type": "plain",
-                    "jwt_claim_type": "plain",
-                }],
-                "combine_op": "and",
-                "resource": "/anything/protected",
-                "resource_type": "plain",
-            }
-        ],
-        "error_message": ERROR_MESSAGE,
-    })
+    config = rawobj.PolicyConfig(
+        "jwt_claim_check",
+        {
+            "rules": [
+                {
+                    "methods": ["GET"],
+                    "operations": [
+                        {
+                            "op": "==",
+                            "jwt_claim": "azp",
+                            "value": application["client_id"],
+                            "value_type": "plain",
+                            "jwt_claim_type": "plain",
+                        }
+                    ],
+                    "combine_op": "and",
+                    "resource": "/anything/protected",
+                    "resource_type": "plain",
+                }
+            ],
+            "error_message": ERROR_MESSAGE,
+        },
+    )
     application.service.proxy.list().policies.append(config)
 
 
@@ -62,11 +68,11 @@ def test_application_matching_jwt_operation(api_client, application, application
     """
     client_match = api_client(application)
     token = rhsso_service_info.access_token(application)
-    response = client_match.get('/foo/anything/protected/1', params={'access_token': token})
+    response = client_match.get("/foo/anything/protected/1", params={"access_token": token})
     assert response.status_code == 200
 
     client_doesnt_match = api_client(application_doesnt_match)
     token_doesnt_match = rhsso_service_info.access_token(application_doesnt_match)
-    response = client_doesnt_match.get('/foo/anything/protected/1', params={'access_token': token_doesnt_match})
+    response = client_doesnt_match.get("/foo/anything/protected/1", params={"access_token": token_doesnt_match})
 
     assert response.status_code == 403

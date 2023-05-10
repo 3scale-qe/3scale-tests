@@ -109,6 +109,7 @@ class _HttpbinGoRequest(EchoedRequest):
 
 class _MockServerRequest(EchoedRequest):
     """Wrapper over MockServer backend"""
+
     def __init__(self, response: requests.Response) -> None:
         super().__init__(response)
         self.headers = _flatten(self.headers)

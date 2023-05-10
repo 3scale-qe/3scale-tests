@@ -14,11 +14,12 @@ class _Endpoint(ParametrizedView):
     """
     Parametrized View that represents a section (for example "Service Read") in API Docs
     """
-    PARAMETERS = ('endpoint_name',)
+
+    PARAMETERS = ("endpoint_name",)
     ROOT = ParametrizedLocator('//a[text()={endpoint_name|quote}]/ancestor::li[contains(@class, "operation")]')
     ALL_ENDPOINTS = './/a[@class="toggle"]'
     name = Text(locator='.//a[@class="toggle"]')
-    access_token = TextInput(name='access_token')
+    access_token = TextInput(name="access_token")
     submit_button = Button(locator='.//button[@class="submit"]')
     status_code_field = Text(locator='.//div[@class="block response_code"]/pre')
 
@@ -68,7 +69,8 @@ class APIDocsView(BaseSettingsView):
     """
     View representation of API Docs page
     """
-    path_pattern = '/p/admin/api_docs'
+
+    path_pattern = "/p/admin/api_docs"
     page_title = Text(locator='//*[@id="content"]/h1')
     service_management_api_category = Text(locator='//*[@data-name="service_management_api"]')
     account_management_api_category = Text(locator='//*[@data-name="account_management_api"]')
@@ -82,9 +84,9 @@ class APIDocsView(BaseSettingsView):
         """
         auto_complete_part = '//*[@id="content"]/div/div[13]/ul/li'
         for li_index in range(len(self.browser.elements(auto_complete_part))):
-            if self.browser.element(auto_complete_part + f'[{li_index + 1}]/strong').text == name:
-                return self.browser.element(auto_complete_part + f'[{li_index + 1}]/span')
-        raise NoSuchElementException('No element was found')
+            if self.browser.element(auto_complete_part + f"[{li_index + 1}]/strong").text == name:
+                return self.browser.element(auto_complete_part + f"[{li_index + 1}]/span")
+        raise NoSuchElementException("No element was found")
 
     def prerequisite(self):
         return BaseSettingsView
@@ -99,10 +101,12 @@ class APIDocsView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) \
-               and self.path in self.browser.url \
-               and self.page_title.is_displayed \
-               and self.service_management_api_category.is_displayed \
-               and self.account_management_api_category.is_displayed \
-               and self.policy_registry_api_category.is_displayed \
-               and self.page_title.text == "3scale API Documentation"
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.page_title.is_displayed
+            and self.service_management_api_category.is_displayed
+            and self.account_management_api_category.is_displayed
+            and self.policy_registry_api_category.is_displayed
+            and self.page_title.text == "3scale API Documentation"
+        )

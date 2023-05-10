@@ -35,7 +35,8 @@ _tr = {
     "httpbin_go": "go-httpbin+ssl",
     "httpbin_service": "go-httpbin+svc",
     "httpbin_go_service": "go-httpbin+svc",
-    "jaeger": "jaeger-query"}
+    "jaeger": "jaeger-query",
+}
 
 
 def _url(openshift, key, namespace):
@@ -82,6 +83,7 @@ class OpenshiftProject:
 
 class Settings:
     """Get testenv tools from testsuite settings"""
+
     def __getitem__(self, name):
         if name == "no-ssl-sso":
             return settings["rhsso"]["url"]

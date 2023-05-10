@@ -12,7 +12,8 @@ from testsuite.ui.views.common.login import LoginForm
 
 class LoginView(BaseDevelView):
     """Login View for Devel portal"""
-    path_pattern = '/login'
+
+    path_pattern = "/login"
     login_widget = View.nested(LoginForm)
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
@@ -51,12 +52,17 @@ class LoginView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return self.path_pattern in self.browser.url and self.login_widget.username_field.is_displayed and \
-               self.login_widget.password_field.is_displayed and self.login_widget.submit.is_displayed
+        return (
+            self.path_pattern in self.browser.url
+            and self.login_widget.username_field.is_displayed
+            and self.login_widget.password_field.is_displayed
+            and self.login_widget.submit.is_displayed
+        )
 
 
 class ReCaptcha(View):
     """View that represents the reCAPTCHA box"""
+
     # Frame variable is needed due to implementation of Recaptcha via IFrame and nested view in test(works as ROOT)
     FRAME = "//iframe[@title='reCAPTCHA']"
     check_box = Text("//div[contains(@class, 'recaptcha-checkbox-borderAnimation')]")
@@ -77,7 +83,8 @@ class ReCaptcha(View):
 
 class BasicSignUpView(SignUpView):
     """View for Sign Up into devel portal as developer with default sign up flow"""
-    path_pattern = '/signup'
+
+    path_pattern = "/signup"
     password = TextInput(id="account_user_password")
     password2 = TextInput(id="account_user_password_confirmation")
     recaptcha = View.nested(ReCaptcha)
@@ -104,23 +111,32 @@ class BasicSignUpView(SignUpView):
 
     @property
     def is_displayed(self):
-        return SignUpView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.password.is_displayed and self.password2.is_displayed
+        return (
+            SignUpView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.password.is_displayed
+            and self.password2.is_displayed
+        )
 
 
 class SuccessfulAccountCreationView(BaseDevelView):
     """View with successful message after account creation in dev portal"""
+
     path_pattern = "/signup/success"
     thank_you = Text("//div[contains(@class, 'panel-body panel-footer')]/h2")
 
     @property
     def is_displayed(self):
-        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.thank_you.text == "Thank you"
+        return (
+            BaseDevelView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.thank_you.text == "Thank you"
+        )
 
 
 class ForgotPasswordView(BaseDevelView):
     """View for recovering the lost developer account password"""
+
     path_pattern = "/admin/account/password/new"
     email = TextInput(id="email")
     recaptcha = View.nested(ReCaptcha)
@@ -146,5 +162,9 @@ class ForgotPasswordView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.email.is_displayed and self.reset_button.is_displayed
+        return (
+            BaseDevelView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.email.is_displayed
+            and self.reset_button.is_displayed
+        )

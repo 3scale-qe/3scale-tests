@@ -13,32 +13,34 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 class Scopes(enum.Enum):
     """Tokens scopes"""
-    BILLING = 'user_member_permission_ids_finance'
-    DEV_PORTAL = 'user_member_permission_ids_portal'
-    SETTINGS = 'user_member_permission_ids_settings'
-    ACCOUNT_APPLICATION = 'user_member_permission_ids_partners'
-    ANALYTICS = 'user_member_permission_ids_monitoring'
-    APP_PLANS = 'user_member_permission_ids_plans'
-    POLICY = 'user_member_permission_ids_policy_registry'
+
+    BILLING = "user_member_permission_ids_finance"
+    DEV_PORTAL = "user_member_permission_ids_portal"
+    SETTINGS = "user_member_permission_ids_settings"
+    ACCOUNT_APPLICATION = "user_member_permission_ids_partners"
+    ANALYTICS = "user_member_permission_ids_monitoring"
+    APP_PLANS = "user_member_permission_ids_plans"
+    POLICY = "user_member_permission_ids_policy_registry"
 
 
 # pylint: disable=invalid-overridden-method
 class UsersView(BaseSettingsView):
     """View representation of Users Listing page"""
-    path_pattern = '/p/admin/account/users'
-    table = PatternflyTable('//*[@id="users"]', column_widgets={
-        4: Text("./a[contains(@class, 'delete')]"),
-        5: Text("./a[contains(@class, 'edit')]")
-    })
+
+    path_pattern = "/p/admin/account/users"
+    table = PatternflyTable(
+        '//*[@id="users"]',
+        column_widgets={4: Text("./a[contains(@class, 'delete')]"), 5: Text("./a[contains(@class, 'edit')]")},
+    )
 
     @step("UserDetailView")
     def detail(self, user):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=('id', 'user_' + str(user.entity_id)))[5].widget.click()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[5].widget.click()
 
     def delete(self, user):
         """Delete user by ID"""
-        self.table.row(_row__attr=('id', 'user_' + str(user.entity_id)))[4].widget.click()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.click()
 
     def prerequisite(self):
         return BaseSettingsView
@@ -50,37 +52,42 @@ class UsersView(BaseSettingsView):
 
 class UserDetailView(BaseSettingsView):
     """View representation of User Detail page"""
-    path_pattern = '/p/admin/account/users/{user_id}/edit'
-    username = TextInput(id='#user_username')
-    email = TextInput(id='#user_email')
-    password = TextInput(id='#user_password')
-    organization = TextInput(id='#user_password_confirmation')
+
+    path_pattern = "/p/admin/account/users/{user_id}/edit"
+    username = TextInput(id="#user_username")
+    email = TextInput(id="#user_email")
+    password = TextInput(id="#user_password")
+    organization = TextInput(id="#user_password_confirmation")
     update_btn = ThreescaleUpdateButton()
     role = RadioGroup('//*[@id="user_role_input"]')
 
-    permissions = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
-                                ol_identifier='FeatureAccessList')
-    access_list = CheckBoxGroup('//*[@id="user_member_permissions_input"]',  # type:ignore
-                                ol_identifier='ServiceAccessList')
+    permissions = CheckBoxGroup(
+        '//*[@id="user_member_permissions_input"]',  # type:ignore
+        ol_identifier="FeatureAccessList",
+    )
+    access_list = CheckBoxGroup(
+        '//*[@id="user_member_permissions_input"]',  # type:ignore
+        ol_identifier="ServiceAccessList",
+    )
 
     def __init__(self, parent, user):
         super().__init__(parent, user_id=user.entity_id)
 
     def set_admin_role(self):
         """Set admin role for the User"""
-        self.role.select('user_role_admin')
+        self.role.select("user_role_admin")
 
     def set_member_role(self):
         """Set member role for the User"""
-        self.role.select('user_role_member')
+        self.role.select("user_role_member")
 
     def check_all_products(self):
         """Allow permissions for all products"""
-        self.permissions.check(['user_member_permission_ids_services'])
+        self.permissions.check(["user_member_permission_ids_services"])
 
     def uncheck_all_products(self):
         """Allow permissions for all products"""
-        self.permissions.uncheck(['user_member_permission_ids_services'])
+        self.permissions.uncheck(["user_member_permission_ids_services"])
 
     def add_permissions(self, scope: List[Scopes]):
         """
@@ -123,5 +130,10 @@ class UserDetailView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.username.is_displayed and\
-               self.email.is_displayed and self.role.is_displayed and self.path in self.browser.url
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.username.is_displayed
+            and self.email.is_displayed
+            and self.role.is_displayed
+            and self.path in self.browser.url
+        )

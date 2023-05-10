@@ -8,19 +8,25 @@ from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import AudienceTable, ThreescaleSelect
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, \
-    ThreescaleCreateButton, ThreescaleEditButton, ThreescaleSubmitButton
+from testsuite.ui.widgets.buttons import (
+    ThreescaleUpdateButton,
+    ThreescaleDeleteButton,
+    ThreescaleCreateButton,
+    ThreescaleEditButton,
+    ThreescaleSubmitButton,
+)
 
 
 class ApplicationsView(BaseAudienceView):
     """View representation of Application Listing page"""
-    path_pattern = '/p/admin/applications'
+
+    path_pattern = "/p/admin/applications"
     table = AudienceTable("//*[@class='data']")
 
     @step("ApplicationDetailView")
     def detail(self, application):
         """Opens detail app by ID"""
-        self.table.row(_row__attr=('id', f'contract_{application.entity_id}')).name.click()
+        self.table.row(_row__attr=("id", f"contract_{application.entity_id}")).name.click()
 
     def prerequisite(self):
         return BaseAudienceView
@@ -32,14 +38,15 @@ class ApplicationsView(BaseAudienceView):
 
 class ApplicationDetailView(BaseProductView):
     """View representation of Application detail page"""
-    path_pattern = '/p/admin/applications/{application_id}'
+
+    path_pattern = "/p/admin/applications/{application_id}"
     edit_button = ThreescaleEditButton()
     suspend_button = Text("//*[contains(@class, 'suspend')]")
     regenerate_button = Text("//*[contains(@class, 'refresh')]")
     add_random_app_key_button = Text("//*[contains(@class, 'create_key')]")
-    api_credentials_table = PatternflyTable("//*[@id='keys']", column_widgets={
-        1: Text("./span/a[contains(@class, 'delete')]")
-    })
+    api_credentials_table = PatternflyTable(
+        "//*[@id='keys']", column_widgets={1: Text("./span/a[contains(@class, 'delete')]")}
+    )
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
     plan_dropdown = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
@@ -67,7 +74,7 @@ class ApplicationDetailView(BaseProductView):
 
     def delete_app_key(self, key: str):
         """Delete given app key"""
-        self.api_credentials_table.row(_row__attr=('id', f'application_key_{key}'))[1].widget.click()
+        self.api_credentials_table.row(_row__attr=("id", f"application_key_{key}"))[1].widget.click()
 
     def change_plan(self, value):
         """Change application plan"""
@@ -84,15 +91,20 @@ class ApplicationDetailView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.edit_button.is_displayed and self.suspend_button.is_displayed
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.edit_button.is_displayed
+            and self.suspend_button.is_displayed
+        )
 
 
 class ApplicationNewView(BaseAudienceView):
     """View representation of New Application page"""
-    path_pattern = '/buyers/accounts/{account_id}/applications/new'
-    username = TextInput(id='cinstance[name]')
-    description = TextInput(id='cinstance[description]')
+
+    path_pattern = "/buyers/accounts/{account_id}/applications/new"
+    username = TextInput(id="cinstance[name]")
+    description = TextInput(id="cinstance[description]")
     app_plan = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
     product = ThreescaleSelect(locator="//label[@for='product']/../div[1]")
     service_plan = ThreescaleSelect(locator="//label[@for='cinstance_service_plan_id']/../div[1]")
@@ -114,15 +126,20 @@ class ApplicationNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and \
-               self.description.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.username.is_displayed
+            and self.description.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class ApplicationEditView(BaseProductView):
     """View representation of Edit Application page"""
-    path_pattern = '/p/admin/applications/{application_id}/edit'
-    username = TextInput(id='cinstance_name')
-    description = TextInput(id='cinstance_description')
+
+    path_pattern = "/p/admin/applications/{application_id}/edit"
+    username = TextInput(id="cinstance_name")
+    description = TextInput(id="cinstance_description")
     update_button = ThreescaleUpdateButton()
     delete_button = ThreescaleDeleteButton()
 
@@ -146,5 +163,9 @@ class ApplicationEditView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.username.is_displayed and \
-               self.description.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.username.is_displayed
+            and self.description.is_displayed
+            and self.path in self.browser.url
+        )

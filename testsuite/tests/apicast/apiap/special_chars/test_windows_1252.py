@@ -12,7 +12,8 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 pytestmark = [
     pytest.mark.xfail,
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6834")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6834"),
+]
 
 HEX_CHARS = "0123456789ABCDEF"
 
@@ -46,7 +47,7 @@ def windows_1252_chars():
     chars = list(chars)
 
     # speed up of the test, we will create one long path with 10 chars joined together
-    return [''.join(chars[i:i + 10]) for i in range(0, len(chars), 10)]
+    return ["".join(chars[i : i + 10]) for i in range(0, len(chars), 10)]
 
 
 def test_apicast_wont_change_path(api_client, windows_1252_chars, backend_path):

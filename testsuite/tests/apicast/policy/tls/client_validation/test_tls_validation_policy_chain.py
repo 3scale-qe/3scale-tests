@@ -8,13 +8,16 @@ from testsuite.capabilities import Capability
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param(("all_valid", 200), id="all_certs_valid"),
-    pytest.param(("no_valid", 400), id="no_valid_certs"),
-    pytest.param(("some_valid1", 200), id="some_certs_valid1"),
-    pytest.param(("some_valid2", 200), id="some_certs_valid2"),
-    pytest.param(("empty", 400), id="empty_chain"),
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(("all_valid", 200), id="all_certs_valid"),
+        pytest.param(("no_valid", 400), id="no_valid_certs"),
+        pytest.param(("some_valid1", 200), id="some_certs_valid1"),
+        pytest.param(("some_valid2", 200), id="some_certs_valid2"),
+        pytest.param(("empty", 400), id="empty_chain"),
+    ],
+)
 def certificates_and_code(request, certificate):
     """List of certificates and their respective expected return codes"""
     return request.getfixturevalue(request.param[0]), certificate, request.param[1]

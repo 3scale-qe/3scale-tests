@@ -24,7 +24,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def services(services):
     """Service fixture will add '/' POST mapping rule, so we can make such requests in perf-test"""
     for svc in services:
@@ -34,17 +34,17 @@ def services(services):
     return services
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def template(root_path):
     """Path to template"""
-    return os.path.join(root_path, 'smoke/templates/template_oidc.hf.yaml')
+    return os.path.join(root_path, "smoke/templates/template_oidc.hf.yaml")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def setup_benchmark(hyperfoil_utils, applications, promoted_services, rhsso_service_info, shared_template):
     """Setup of benchmark. It will add necessary host connections, csv data and files."""
     hyperfoil_utils.add_hosts(promoted_services, shared_connections=20)
-    hyperfoil_utils.add_oidc_auth(rhsso_service_info, applications, 'auth_oidc.csv')
+    hyperfoil_utils.add_oidc_auth(rhsso_service_info, applications, "auth_oidc.csv")
     hyperfoil_utils.add_file(HyperfoilUtils.message_1kb)
     hyperfoil_utils.add_shared_template(shared_template)
     return hyperfoil_utils
@@ -58,9 +58,9 @@ def wait_run(run):
 
 def test_smoke_oidc(applications, setup_benchmark, prod_client):
     """
-        Test checks that application is setup correctly.
-        Runs the created benchmark.
-        Asserts it was successful.
+    Test checks that application is setup correctly.
+    Runs the created benchmark.
+    Asserts it was successful.
     """
     for app in applications:
         client = prod_client(app)
@@ -75,7 +75,7 @@ def test_smoke_oidc(applications, setup_benchmark, prod_client):
     stats = run.all_stats()
 
     assert stats
-    assert stats.get('info', {}).get('errors') == []
-    assert stats.get('failures') == []
-    assert stats.get('stats', []) != []
-    assert len(stats.get('stats', [])) == 3
+    assert stats.get("info", {}).get("errors") == []
+    assert stats.get("failures") == []
+    assert stats.get("stats", []) != []
+    assert len(stats.get("stats", [])) == 3

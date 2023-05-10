@@ -14,18 +14,17 @@ def params():
     """
     Parameters p to create query arg commands, used in the liquid format of:
      {{ p }}
-     """
+    """
     return ["remote_addr", "http_method", "uri", "host", "remote_addr"]
 
 
 @pytest.fixture(scope="module")
 def funcs():
     """
-     Parameters p to create query arg commands, used in the liquid
-     format of: {{ 1000 | p }}
+    Parameters p to create query arg commands, used in the liquid
+    format of: {{ 1000 | p }}
     """
-    return ["time", "localtime", "today", "now", "utctime", "cookie_time",
-            "http_time"]
+    return ["time", "localtime", "today", "now", "utctime", "cookie_time", "http_time"]
 
 
 @pytest.fixture(scope="module")
@@ -53,10 +52,8 @@ def query_args_commands(params, funcs) -> List[Dict[str, str]]:
 
     # appends three commands without a distinct pattern
     commands.append({"op": "set", "arg": "normal_arg", "value": "value"})
-    commands.append({"op": "set", "arg": "liquid_arg", "value_type": "liquid",
-                     "value": "Service {{ service.id }}"})
-    commands.append({"op": "set", "arg": "md5_uri", "value_type": "liquid",
-                     "value": "{{ uri | md5 }}"})
+    commands.append({"op": "set", "arg": "liquid_arg", "value_type": "liquid", "value": "Service {{ service.id }}"})
+    commands.append({"op": "set", "arg": "md5_uri", "value_type": "liquid", "value": "{{ uri | md5 }}"})
     return commands
 
 
@@ -73,9 +70,8 @@ def create_command_from_param(param: str, is_func: bool) -> Dict[str, str]:
 
 @pytest.fixture(scope="module")
 def policy_settings(query_args_commands):
-    """ Adds url query rewriting policy, configured using the query_args_commands """
-    return rawobj.PolicyConfig("url_rewriting", {
-        "query_args_commands": query_args_commands})
+    """Adds url query rewriting policy, configured using the query_args_commands"""
+    return rawobj.PolicyConfig("url_rewriting", {"query_args_commands": query_args_commands})
 
 
 def test_query_rewrite_policy_liquid_set(api_client, service, all_params):
@@ -114,7 +110,7 @@ def test_query_rewrite_policy_liquid_set(api_client, service, all_params):
 
     echoed_request = EchoedRequest.create(response)
     echoed_request_params = echoed_request.params
-    parsed_url = urlparse(service.proxy.list()['sandbox_endpoint'])
+    parsed_url = urlparse(service.proxy.list()["sandbox_endpoint"])
 
     assert echoed_request_params["normal_arg"] == "value"
     assert echoed_request_params["liquid_arg"] == "Service " + str(service["id"])

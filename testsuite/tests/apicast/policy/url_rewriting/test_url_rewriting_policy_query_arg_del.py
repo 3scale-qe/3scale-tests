@@ -11,8 +11,7 @@ from testsuite.echoed_request import EchoedRequest
 @pytest.fixture(scope="module")
 def policy_settings():
     """Add url_rewriting_append policy"""
-    return rawobj.PolicyConfig("url_rewriting", {
-        "query_args_commands": [{"op": "delete", "arg": "arg"}]})
+    return rawobj.PolicyConfig("url_rewriting", {"query_args_commands": [{"op": "delete", "arg": "arg"}]})
 
 
 def test_url_rewriting_policy_delete_arg_req(api_client):
@@ -21,5 +20,5 @@ def test_url_rewriting_policy_delete_arg_req(api_client):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert 'arg' not in echoed_request.params
-    assert echoed_request.params['arg2'] == "value"
+    assert "arg" not in echoed_request.params
+    assert echoed_request.params["arg2"] == "value"

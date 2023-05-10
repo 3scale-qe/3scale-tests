@@ -8,7 +8,8 @@ from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-im
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4301")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4301"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -55,8 +56,15 @@ def url_rewriting_first(service):
     proxy.deploy()
 
 
-@pytest.mark.parametrize("setup,prefix", [("apicast_first", "/"), ("url_rewriting_first", "/"),
-                                          ("apicast_first", "/bin/"), ("url_rewriting_first", "/bin/")])
+@pytest.mark.parametrize(
+    "setup,prefix",
+    [
+        ("apicast_first", "/"),
+        ("url_rewriting_first", "/"),
+        ("apicast_first", "/bin/"),
+        ("url_rewriting_first", "/bin/"),
+    ],
+)
 def test(request, api_client, setup, prefix):
     """Test that url_rewriting works with APIAP as expected
 

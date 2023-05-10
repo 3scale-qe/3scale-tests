@@ -23,9 +23,7 @@ async def many_services(request, event_loop, custom_service, service_proxy_setti
         )
     )
 
-    return await asyncio.gather(
-        *(asyncio.to_thread(_create_services) for _ in range(505))
-    )
+    return await asyncio.gather(*(asyncio.to_thread(_create_services) for _ in range(505)))
 
 
 @pytest.mark.disruptive  # this generates high load on 3scale with impact on other tests

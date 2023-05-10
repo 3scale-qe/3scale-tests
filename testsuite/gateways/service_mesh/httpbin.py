@@ -15,7 +15,7 @@ class Httpbin:
         self.name = f"httpbin-{identifier}"
         self.deployment = self.openshift.deployment(f"deployment/{self.name}")
 
-        path = resources.files('testsuite.resources.service_mesh').joinpath('httpbin.yaml')
+        path = resources.files("testsuite.resources.service_mesh").joinpath("httpbin.yaml")
         self.openshift.new_app(path, {"NAME": self.name})
         self.deployment.wait_for()
 
@@ -25,28 +25,28 @@ class Httpbin:
 
     def patch_service(self, service_id):
         """Patches currently tested service into httpbin deployment"""
-        self.deployment.patch([
-                                 {"op": "replace",
-                                  "path": "/spec/template/metadata/labels/service-mesh.3scale.net~1service-id",
-                                  "value": str(service_id)
-                                  },
-                                 {"op": "replace",
-                                  "path": "/spec/template/metadata/labels/service-mesh.3scale.net~1credentials",
-                                  "value": self.credentials
-                                  },
-                             ], patch_type="json")
+        self.deployment.patch(
+            [
+                {
+                    "op": "replace",
+                    "path": "/spec/template/metadata/labels/service-mesh.3scale.net~1service-id",
+                    "value": str(service_id),
+                },
+                {
+                    "op": "replace",
+                    "path": "/spec/template/metadata/labels/service-mesh.3scale.net~1credentials",
+                    "value": self.credentials,
+                },
+            ],
+            patch_type="json",
+        )
         # pylint: disable=protected-access
         self.deployment.wait_for()
 
     def create_policy(self, name: str, info: RHSSOServiceConfiguration):
         """Creates new Policy, used for OIDC authorization, for specific realm setup"""
-        params = {
-            "NAME": name,
-            "TARGET": self.name,
-            "ISSUER": info.issuer_url(),
-            "JWKS": info.jwks_uri()
-        }
-        path = resources.files('testsuite.resources.service_mesh').joinpath('policy.yaml')
+        params = {"NAME": name, "TARGET": self.name, "ISSUER": info.issuer_url(), "JWKS": info.jwks_uri()}
+        path = resources.files("testsuite.resources.service_mesh").joinpath("policy.yaml")
         self.openshift.new_app(path, params)
 
     def remove_policy(self, name: str):

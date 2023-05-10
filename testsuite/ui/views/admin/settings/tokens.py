@@ -13,7 +13,8 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 class TokensView(BaseSettingsView):
     """View representation of Tokens page"""
-    path_pattern = '/p/admin/user/access_tokens'
+
+    path_pattern = "/p/admin/user/access_tokens"
     add_token = Text(locator="//*[@href='/p/admin/user/access_tokens/new']")
     token_table = PatternflyTable("//*[@id='access-tokens']/table")
 
@@ -27,22 +28,25 @@ class TokensView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.token_table.is_displayed and \
-               self.path in self.browser.url
+        return (
+            BaseSettingsView.is_displayed.fget(self) and self.token_table.is_displayed and self.path in self.browser.url
+        )
 
 
 class Scopes(enum.Enum):
     """Tokens scopes"""
-    BILLING = 'access_token_scopes_finance'
-    MANAGEMENT = 'access_token_scopes_account_management'
-    ANALYTICS = 'access_token_scopes_stats'
-    POLICY = 'access_token_scopes_policy_registry'
+
+    BILLING = "access_token_scopes_finance"
+    MANAGEMENT = "access_token_scopes_account_management"
+    ANALYTICS = "access_token_scopes_stats"
+    POLICY = "access_token_scopes_policy_registry"
 
 
 class TokenNewView(BaseSettingsView):
     """View representation of New Token page"""
-    path_pattern = '/p/admin/user/access_tokens/new'
-    name = TextInput(id='access_token_name')
+
+    path_pattern = "/p/admin/user/access_tokens/new"
+    name = TextInput(id="access_token_name")
     scopes = CheckBoxGroup("//*[@id='access_token_scopes_input']")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
     create_button = ThreescaleSubmitButton()
@@ -63,5 +67,11 @@ class TokenNewView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.name.is_displayed and self.scopes.is_displayed and \
-               self.permissions.is_displayed and self.create_button.is_displayed and self.path in self.browser.url
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.name.is_displayed
+            and self.scopes.is_displayed
+            and self.permissions.is_displayed
+            and self.create_button.is_displayed
+            and self.path in self.browser.url
+        )

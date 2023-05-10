@@ -6,11 +6,12 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.utils import random_string
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -33,8 +34,7 @@ def service(service):
     return service
 
 
-@pytest.mark.parametrize("num_bytes,status_code", [(10, 200),
-                                                   (101, 413)])
+@pytest.mark.parametrize("num_bytes,status_code", [(10, 200), (101, 413)])
 def test_policy_limit_passing(api_client, num_bytes, status_code):
     """
     Tests that the request with a content_length greater than the limit
@@ -49,5 +49,5 @@ def test_policy_limit_passing(api_client, num_bytes, status_code):
     # requests/urllib3 doesn't retry post(); need get() to wait until all is up
     client.get("/get")
 
-    response = client.post('/post', data=data)
+    response = client.post("/post", data=data)
     assert response.status_code == status_code

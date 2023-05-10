@@ -16,7 +16,7 @@ from testsuite.utils import blame, blame_desc
 pytestmark = [
     pytest.mark.nopersistence,
     pytest.mark.flaky,
-    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1203")
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1203"),
 ]
 
 ACCOUNTS_COUNT = 10
@@ -31,6 +31,7 @@ def paid_app_plan(request, service, custom_app_plan) -> ApplicationPlan:
 @pytest.fixture()
 def custom_paid_account(request, paid_app_plan, custom_account, custom_application, account_password):
     """Returns function for custom account creation"""
+
     def _custom_paid_account(num: int) -> Account:
         """
         Makes number of accounts with applications that use paid app plan.
@@ -42,12 +43,12 @@ def custom_paid_account(request, paid_app_plan, custom_account, custom_applicati
         account = custom_account(acc_params)
         custom_application(rawobj.Application(name, paid_app_plan, blame_desc(request, "desc")), account=account)
         return account
+
     return _custom_paid_account
 
 
 @pytest.fixture()
-def create_invoice(custom_paid_account, master_threescale, threescale,
-                   provider_account, request):
+def create_invoice(custom_paid_account, master_threescale, threescale, provider_account, request):
     """Creates ACCOUNTS_COUNT accounts and for each account charge invoice with master_api"""
     next_day = (date.today() + timedelta(days=1)).isoformat()
     accounts = []
@@ -75,6 +76,6 @@ def test_unique_invoice(create_invoice, threescale):  # pylint: disable=unused-a
     for acc in create_invoice:
         for invoice in threescale.invoices.list_by_account(acc):
             invoices.append(invoice)
-            invoices_by_friendly_id.add(invoice['friendly_id'])
+            invoices_by_friendly_id.add(invoice["friendly_id"])
 
     assert len(invoices) == len(invoices_by_friendly_id) == ACCOUNTS_COUNT

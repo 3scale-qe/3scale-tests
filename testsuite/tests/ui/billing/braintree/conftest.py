@@ -22,6 +22,7 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
     """
     Enables Braintree billing gateway.
     """
+
     def _braintree(verify_3ds: bool):
         """
         Args:
@@ -32,10 +33,12 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
         billing.charging(True)
         currency = braintree.merchant_currency()
         billing.charging_form.change_currency(currency)
-        billing.braintree(testconfig["braintree"]["public_key"],
-                          testconfig["braintree"]["merchant_id"],
-                          testconfig["braintree"]["private_key"],
-                          verify_3ds)
+        billing.braintree(
+            testconfig["braintree"]["public_key"],
+            testconfig["braintree"]["merchant_id"],
+            testconfig["braintree"]["private_key"],
+            verify_3ds,
+        )
 
     return _braintree
 
@@ -43,6 +46,7 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
 @pytest.fixture(scope="module")
 def custom_card(account, custom_devel_login, billing_address, navigator):
     """Add credit card and billing address for the user in Developer portal"""
+
     def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
         cc_view = navigator.navigate(BraintreeCCView)

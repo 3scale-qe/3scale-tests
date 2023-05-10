@@ -9,10 +9,12 @@ from testsuite.ui.widgets import GenericLocatorWidget, ThreescaleSelect
 
 class ProductBackendsView(BaseProductView):
     """View representation of Product's Backends page"""
+
     path_pattern = "/apiconfig/services/{product_id}/backend_usages"
     add_backend_button = Text("//*[contains(@href,'/backend_usages/new')]")
-    backend_table = PatternflyTable("//*[@id='backend_api_configs']", column_widgets={
-        3: GenericLocatorWidget("./a[contains(@class, 'delete')]")})
+    backend_table = PatternflyTable(
+        "//*[@id='backend_api_configs']", column_widgets={3: GenericLocatorWidget("./a[contains(@class, 'delete')]")}
+    )
 
     @step("ProductAddBackendView")
     def add_backend(self):
@@ -28,12 +30,16 @@ class ProductBackendsView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url and \
-               self.backend_table.is_displayed
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.backend_table.is_displayed
+        )
 
 
 class ProductAddBackendView(BaseProductView):
     """View representation of Product's Backends add page"""
+
     path_pattern = "/apiconfig/services/{product_id}/backend_usages/new"
     backend = ThreescaleSelect(locator="//label[@for='backend_api_config_backend_api_id']/../div[1]")
     backend_path = TextInput(id="backend_api_config_path")
@@ -50,5 +56,9 @@ class ProductAddBackendView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.backend.is_displayed and self.backend_path.is_displayed
+        return (
+            BaseProductView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.backend.is_displayed
+            and self.backend_path.is_displayed
+        )

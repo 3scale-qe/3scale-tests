@@ -23,29 +23,44 @@ def service(service, private_base_url):
     Set policy settings
     """
     proxy = service.proxy.list()
-    proxy.policies.insert(0, {
-        "name": "url_rewriting",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "commands": [{"op": "sub", "regex": "^/anything", "replace": "/get"}
-                         ]}})
-    proxy.policies.insert(0, {
-        "name": "routing",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "rules": [{"url": private_base_url("httpbin"),
-                       "condition": {"operations": [{"liquid_value": '{{ original_request.path }}', "op": 'matches',
-                                                     "value": '/anything', "match": "liquid",
-                                                     }]},
-                       }]}})
+    proxy.policies.insert(
+        0,
+        {
+            "name": "url_rewriting",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {"commands": [{"op": "sub", "regex": "^/anything", "replace": "/get"}]},
+        },
+    )
+    proxy.policies.insert(
+        0,
+        {
+            "name": "routing",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {
+                "rules": [
+                    {
+                        "url": private_base_url("httpbin"),
+                        "condition": {
+                            "operations": [
+                                {
+                                    "liquid_value": "{{ original_request.path }}",
+                                    "op": "matches",
+                                    "value": "/anything",
+                                    "match": "liquid",
+                                }
+                            ]
+                        },
+                    }
+                ]
+            },
+        },
+    )
 
     metric = service.metrics.create(rawobj.Metric("get_metric"))
 
-    proxy.mapping_rules.create({
-        "http_method": "GET", "pattern": "/get",
-        "metric_id": metric["id"], "delta": 5})
+    proxy.mapping_rules.create({"http_method": "GET", "pattern": "/get", "metric_id": metric["id"], "delta": 5})
 
     # proxy needs to be updated to apply added mapping
     proxy.deploy()

@@ -18,6 +18,7 @@ class Mockserver:
     is randomized per instance to a) make matching bit easier, b) allow
     bit of concurrency.
     """
+
     def __init__(self, url, verify=True):
         self._url = url
         self.verify = verify
@@ -26,13 +27,17 @@ class Mockserver:
 
     def temporary_fail_request(self, num, status=500):
         """Create failing call for num occurences"""
-        response = requests.put(urljoin(self._url, "/mockserver/expectation"), verify=self.verify, data=json.dumps(
-            {
-                "httpRequest": {"path": f"/fail-request/{num}/{status}"},
-                "times": {"remainingTimes": num, "unlimited": False},
-                "httpResponse": {"statusCode": status}
-            }
-        ))
+        response = requests.put(
+            urljoin(self._url, "/mockserver/expectation"),
+            verify=self.verify,
+            data=json.dumps(
+                {
+                    "httpRequest": {"path": f"/fail-request/{num}/{status}"},
+                    "times": {"remainingTimes": num, "unlimited": False},
+                    "httpResponse": {"statusCode": status},
+                }
+            ),
+        )
         response.raise_for_status()
         return response
 
@@ -50,7 +55,8 @@ class Mockserver:
                     "type": "XPATH",
                     # this is xpath, it's long
                     # pylint: disable=line-too-long
-                    "xpath": f'/event[action/text() = "{action}"]/object/*[local-name() = /event/type/text()]/id[text() = "{entity_id}"]'}  # noqa
+                    "xpath": f'/event[action/text() = "{action}"]/object/*[local-name() = /event/type/text()]/id[text() = "{entity_id}"]',  # noqa
+                },
             }
             response = self._retrieve(matcher)
         except requests.exceptions.HTTPError:
@@ -63,7 +69,8 @@ class Mockserver:
             urljoin(self._url, "/mockserver/retrieve"),
             params={"type": "REQUEST_RESPONSES"},
             data=json.dumps(matcher),
-            verify=self.verify)
+            verify=self.verify,
+        )
         response.raise_for_status()
         return response
 
@@ -72,7 +79,8 @@ class Mockserver:
         response = requests.put(
             urljoin(self._url, "/mockserver/verifySequence"),
             data=json.dumps({"httpRequests": expected_requests}),
-            verify=self.verify)
+            verify=self.verify,
+        )
         if response.status_code == 400:
             raise HTTPError("Invalid matcher format", response=response)
         return response.status_code == 202

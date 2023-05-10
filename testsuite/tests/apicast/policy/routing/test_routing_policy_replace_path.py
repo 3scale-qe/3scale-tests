@@ -12,14 +12,23 @@ def service(service, private_base_url):
     Sets routing policy configuration to service
     routes by patch matching and is using 'replace_path' to modify path if matched
     """
-    routing_policy_op = {"operations": [
-        {"op": "==", "value": "/anything/anything", "match": "path"}]}
+    routing_policy_op = {"operations": [{"op": "==", "value": "/anything/anything", "match": "path"}]}
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("routing", {
-        "rules": [
-            {"url": private_base_url(),
-             "condition": routing_policy_op,
-             "replace_path": "{{ original_request.path | remove_first: '/anything' }}"}]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "routing",
+            {
+                "rules": [
+                    {
+                        "url": private_base_url(),
+                        "condition": routing_policy_op,
+                        "replace_path": "{{ original_request.path | remove_first: '/anything' }}",
+                    }
+                ]
+            },
+        ),
+    )
 
     return service
 

@@ -13,7 +13,7 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6594"),
     pytest.mark.required_capabilities(Capability.LOGS),
     pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')")
+    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')"),
 ]
 
 

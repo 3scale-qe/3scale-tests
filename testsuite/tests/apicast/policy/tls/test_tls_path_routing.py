@@ -17,24 +17,32 @@ pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8000"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8252"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')")
+    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')"),
 ]
 
 
 @pytest.fixture(scope="module")
 def tls_policy(certificate):
     """Sets up the embedded TLS termination policy"""
-    return rawobj.PolicyConfig("tls", {"certificates": [{
-        "certificate": embedded(certificate.certificate, "tls.crt", "pkix-cert"),
-        "certificate_key": embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    }]})
+    return rawobj.PolicyConfig(
+        "tls",
+        {
+            "certificates": [
+                {
+                    "certificate": embedded(certificate.certificate, "tls.crt", "pkix-cert"),
+                    "certificate_key": embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey"),
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")
 def logging_policy():
     """Sets up the logging policy"""
-    return rawobj.PolicyConfig("logging", {
-        "custom_logging": "MY REQUEST HOST: {{original_request.host}} AND PATH: {{original_request.path}}"})
+    return rawobj.PolicyConfig(
+        "logging", {"custom_logging": "MY REQUEST HOST: {{original_request.host}} AND PATH: {{original_request.path}}"}
+    )
 
 
 def delete_all_mapping_rules(proxy):
@@ -85,11 +93,11 @@ def service2_proxy_settings(private_base_url):
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings,
-             service2_mapping, tls_policy, logging_policy):
+def service2(
+    request, custom_service, lifecycle_hooks, service2_proxy_settings, service2_mapping, tls_policy, logging_policy
+):
     """Create second service and mapping rule."""
-    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings,
-                              hooks=lifecycle_hooks)
+    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings, hooks=lifecycle_hooks)
 
     service2.proxy.list().policies.append(tls_policy)
     service2.proxy.list().policies.append(logging_policy)
@@ -159,11 +167,11 @@ def test_tls_path_routing_with_logging(client, client2, staging_gateway):
         response = session.get(url1, verify=False)
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
-        assert echoed_request.json['path'] == '/service1/foo/bar'
+        assert echoed_request.json["path"] == "/service1/foo/bar"
         response = session.get(url2, verify=False)
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
-        assert echoed_request.json['path'] == '/service2/bar/foo'
+        assert echoed_request.json["path"] == "/service2/bar/foo"
 
     logs = staging_gateway.get_logs()
     assert f"MY REQUEST HOST: {urlsplit(client._base_url).hostname} AND PATH: /bar/foo" in logs

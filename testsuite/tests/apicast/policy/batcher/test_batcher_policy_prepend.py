@@ -15,14 +15,15 @@ def service(service):
     Set policy settings
     """
     proxy = service.proxy.list()
-    proxy.policies.insert(0, {
-        "name": "3scale_batcher",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "batch_report_seconds": BATCH_REPORT_SECONDS
-        }
-    })
+    proxy.policies.insert(
+        0,
+        {
+            "name": "3scale_batcher",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {"batch_report_seconds": BATCH_REPORT_SECONDS},
+        },
+    )
 
     return service
 

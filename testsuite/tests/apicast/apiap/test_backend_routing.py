@@ -5,18 +5,15 @@ import pytest
 
 from testsuite import rawobj, resilient
 
-pytestmark = [
-    pytest.mark.nopersistence,
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")
-]
+pytestmark = [pytest.mark.nopersistence, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623")]
 
 
 @pytest.fixture(scope="module")
 def backends_mapping(custom_backend):
     """
-     Create 2 separate backends:
-        - path to Backend 1: "/echo"
-        - path to Backend 2: "/quotes"
+    Create 2 separate backends:
+       - path to Backend 1: "/echo"
+       - path to Backend 2: "/quotes"
     """
     return {"/echo": custom_backend("echo"), "/quotes": custom_backend("quotes")}
 
@@ -169,20 +166,26 @@ def hits(app, analytics):
     return analytics.list_by_service(app["service_id"], metric_name="hits")["total"]
 
 
-@pytest.mark.parametrize("setup,expect_ok,expect_not_found", [
-    (
-        "isolated_backends",
-        ["/echo/anything/loud", "/echo/anything/low", "/quotes/anything/qod"],
-        ["", "/echo/anything", "/echo/"]),
-    (
-        "empty_path",
-        ["/anything/loud", "/anything/low", "/quotes/anything/qod"],
-        ["", "/quotes/anything/test", "/quotes/anything/bar"]),
-    (
-        "path_extension",
-        ["/quotes/anything/test/anything/loud", "/quotes//anything/qod", "/quotes/anything/test/anything/low"],
-        ["", "/quotes", "/quotes/test", "/quotes/anything/test"]),
-])
+@pytest.mark.parametrize(
+    "setup,expect_ok,expect_not_found",
+    [
+        (
+            "isolated_backends",
+            ["/echo/anything/loud", "/echo/anything/low", "/quotes/anything/qod"],
+            ["", "/echo/anything", "/echo/"],
+        ),
+        (
+            "empty_path",
+            ["/anything/loud", "/anything/low", "/quotes/anything/qod"],
+            ["", "/quotes/anything/test", "/quotes/anything/bar"],
+        ),
+        (
+            "path_extension",
+            ["/quotes/anything/test/anything/loud", "/quotes//anything/qod", "/quotes/anything/test/anything/low"],
+            ["", "/quotes", "/quotes/test", "/quotes/anything/test"],
+        ),
+    ],
+)
 # pylint: disable=too-many-arguments
 def test(request, backend_usages, application, client, setup, expect_ok, expect_not_found):
     """
@@ -204,7 +207,8 @@ def test(request, backend_usages, application, client, setup, expect_ok, expect_
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
         hits_after = resilient.analytics_list_by_service(
-            application.threescale_client, application["service_id"], "hits", "total", hits_before+1)
+            application.threescale_client, application["service_id"], "hits", "total", hits_before + 1
+        )
 
         assert hits_before + 1 == hits_after, f"For path {path} expected hits to be increased by 1"
 

@@ -18,9 +18,9 @@ def openshift(server="default", project="threescale") -> OpenShiftClient:
     except KeyError:
         server = {}
 
-    return OpenShiftClient(project_name=project_name,
-                           server_url=server.get("server_url", None),
-                           token=server.get("token", None))
+    return OpenShiftClient(
+        project_name=project_name, server_url=server.get("server_url", None), token=server.get("token", None)
+    )
 
 
 def call(method, **kwargs):
@@ -36,6 +36,7 @@ class SettingsParser(metaclass=Singleton):
     """
     Parses settings into objects
     """
+
     def __init__(self) -> None:
         super().__init__()
         self.kinds: Dict[str, Any] = {}

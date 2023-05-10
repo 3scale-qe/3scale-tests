@@ -11,7 +11,8 @@ from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6415")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6415"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -29,13 +30,20 @@ def service(service, private_base_url):
     (Using the logic that an empty condition should act as a catch all rule)
     """
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig(
-        "routing", {
-            "rules": [
-                {
-                 "url": private_base_url("httpbin"),
-                 "condition": {},
-                }]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "routing",
+            {
+                "rules": [
+                    {
+                        "url": private_base_url("httpbin"),
+                        "condition": {},
+                    }
+                ]
+            },
+        ),
+    )
 
     return service
 

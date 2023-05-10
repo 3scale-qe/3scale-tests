@@ -16,7 +16,8 @@ def service(service):
     """Adds policies to servies"""
     service.proxy.list().policies.append(
         rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS}),
-        rawobj.PolicyConfig("caching", {"caching_type": "allow"}))
+        rawobj.PolicyConfig("caching", {"caching_type": "allow"}),
+    )
     return service
 
 

@@ -28,15 +28,20 @@ def test_dashboard_is_loaded_correctly(navigator):
     assert dashboard.is_displayed
 
 
-@pytest.mark.parametrize("link, nested, view", [("create_product_button", "products", ProductNewView),
-                                                ("create_backend_button", "backends", BackendNewView),
-                                                ("explore_all_products", None, ProductsView),
-                                                ("explore_all_backends", None, BackendsView),
-                                                ("account_link", None, AccountsView),
-                                                ("application_link", None, ApplicationsView),
-                                                ("billing_link", None, BillingView),
-                                                ("develop_portal_link", None, DeveloperPortalContentView),
-                                                ("message_link", None, MessagesView)])
+@pytest.mark.parametrize(
+    "link, nested, view",
+    [
+        ("create_product_button", "products", ProductNewView),
+        ("create_backend_button", "backends", BackendNewView),
+        ("explore_all_products", None, ProductsView),
+        ("explore_all_backends", None, BackendsView),
+        ("account_link", None, AccountsView),
+        ("application_link", None, ApplicationsView),
+        ("billing_link", None, BillingView),
+        ("develop_portal_link", None, DeveloperPortalContentView),
+        ("message_link", None, MessagesView),
+    ],
+)
 def test_audience_navigation_bar(navigator, browser, link, nested, view):
     """
     Test:
@@ -62,8 +67,7 @@ def test_3scale_version_in_ui(navigator):
     """
     dashboard = navigator.open(DashboardView)
     assert dashboard.threescale_version.is_displayed
-    if settings["threescale"]["deployment_type"] == 'rhoam':
-        assert dashboard.threescale_version.text == 'Version RHOAM -'
+    if settings["threescale"]["deployment_type"] == "rhoam":
+        assert dashboard.threescale_version.text == "Version RHOAM -"
     else:
-        assert dashboard.threescale_version.text \
-               == f'Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -'
+        assert dashboard.threescale_version.text == f"Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -"

@@ -12,10 +12,11 @@ from testsuite.ui.widgets import ContextMenu
 
 class BaseMasterView(View, Navigable):
     """
-        Basic representation of logged in master portal page.
-        All master portal page should inherits from this class.
+    Basic representation of logged in master portal page.
+    All master portal page should inherits from this class.
     """
-    path_pattern = ''
+
+    path_pattern = ""
     explorer_menu = Text("//div[@id='api_selector']//a[@title='Context Selector']/span")
     threescale_menu_logo = GenericLocatorWidget('//*[@id="user_widget"]/a/div')
     support_link = Text("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
@@ -48,13 +49,18 @@ class BaseMasterView(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.threescale_menu_logo.is_displayed and self.support_link.is_displayed \
-               and self.explorer_menu.is_displayed and self.master_header.is_displayed
+        return (
+            self.threescale_menu_logo.is_displayed
+            and self.support_link.is_displayed
+            and self.explorer_menu.is_displayed
+            and self.master_header.is_displayed
+        )
 
 
 class MasterDashboardView(BaseMasterView):
     """Dashboard view page object that can be found on path"""
-    path_pattern = '/p/admin/dashboard'
+
+    path_pattern = "/p/admin/dashboard"
     account_link = Text('//a[@href="/buyers/accounts"]')
     application_link = Text('//a[@href="/p/admin/applications"]')
     message_link = Text('//a[@href="/p/admin/messages"]')
@@ -65,6 +71,7 @@ class MasterDashboardView(BaseMasterView):
     # pylint: disable=invalid-name
     class backends(View):
         """Backends page object"""
+
         backend_title = Text(locator='//*[@id="backends-widget"]/article/div[1]/div[1]/h1')
         create_backend_button = Button(locator='//a[@href="/p/admin/backend_apis/new"]')
 
@@ -76,6 +83,7 @@ class MasterDashboardView(BaseMasterView):
     # pylint: disable=invalid-name
     class products(View):
         """Products page object"""
+
         products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
         create_product_button = Button(locator="//a[@href='/apiconfig/services/new']")
 
@@ -88,6 +96,11 @@ class MasterDashboardView(BaseMasterView):
 
     @property
     def is_displayed(self):
-        return self.path in self.browser.url and self.message_link.is_displayed \
-               and self.products.is_displayed and self.backends.is_displayed \
-               and self.account_link.is_displayed and self.application_link.is_displayed
+        return (
+            self.path in self.browser.url
+            and self.message_link.is_displayed
+            and self.products.is_displayed
+            and self.backends.is_displayed
+            and self.account_link.is_displayed
+            and self.application_link.is_displayed
+        )

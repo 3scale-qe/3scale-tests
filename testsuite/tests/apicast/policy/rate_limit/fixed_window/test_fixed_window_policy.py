@@ -44,7 +44,7 @@ def config(case_data, service_plus, service_plus2):
     service_plus.proxy.list().policies.append(policy_config)
     service_plus2.proxy.list().policies.append(policy_config)
     # When scope=service we want 2 application for same service
-    if scope == 'service':
+    if scope == "service":
         return status_code, service_plus
     # when scope=global we want 1 application for each service
     return status_code, service_plus2

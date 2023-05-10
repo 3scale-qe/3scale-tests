@@ -12,10 +12,9 @@ pytestmark = [pytest.mark.nopersistence]
 def policy_settings():
     """Update policy settings"""
 
-    return rawobj.PolicyConfig("ip_check", {
-        "ips": ['10.10.10.10'],
-        "check_type": "whitelist",
-        "client_ip_sources": ["X-Real-IP"]})
+    return rawobj.PolicyConfig(
+        "ip_check", {"ips": ["10.10.10.10"], "check_type": "whitelist", "client_ip_sources": ["X-Real-IP"]}
+    )
 
 
 def test_ip_check_policy_ip_whitelisted(api_client):

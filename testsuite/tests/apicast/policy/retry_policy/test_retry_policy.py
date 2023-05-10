@@ -63,11 +63,14 @@ def mockserver(base_url, testconfig):
     return Mockserver(base_url, testconfig["ssl_verify"])
 
 
-@pytest.mark.parametrize("num_of_requests, awaited_response", [
-    pytest.param(4, 200, id="4 requests, should succeed"),
-    pytest.param(5, 200, id="5 request should succeed"),
-    pytest.param(6, 500, id="6 request, should fail")
-])
+@pytest.mark.parametrize(
+    "num_of_requests, awaited_response",
+    [
+        pytest.param(4, 200, id="4 requests, should succeed"),
+        pytest.param(5, 200, id="5 request should succeed"),
+        pytest.param(6, 500, id="6 request, should fail"),
+    ],
+)
 def test_retry_policy(client, mockserver, num_of_requests, awaited_response):
     """
     To test retry policy:
@@ -83,6 +86,5 @@ def test_retry_policy(client, mockserver, num_of_requests, awaited_response):
     - test if response is 500
     """
     mockserver.temporary_fail_request(num_of_requests)
-    response = client.get(
-        "/fail-request/" + str(num_of_requests) + "/500")
+    response = client.get("/fail-request/" + str(num_of_requests) + "/500")
     assert response.status_code == awaited_response

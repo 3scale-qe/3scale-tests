@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class BillingAddressForm(View):
     """Billing Address form"""
+
     ROOT = "//form[@action='/admin/account/payment_details']"
     name = TextInput(id="account_billing_address_name")
     address1 = TextInput(id="account_billing_address_address1")
@@ -42,11 +43,13 @@ class BillingAddressForm(View):
 
 class StripeCCForm(View):
     """Stripe Credit card form"""
+
     submit_btn = GenericLocatorWidget(".//button[@id='stripe-submit']")
 
     @View.nested
     class cc_details(View):  # pylint: disable=invalid-name
         """IFrame that contains credit card information"""
+
         FRAME = ".//form[@id='stripe-form']//iframe"
         cardnumber = TextInput(name="cardnumber")
         expiration = TextInput(name="exp-date")
@@ -68,16 +71,19 @@ class StripeCCForm(View):
 
 class OTPForm(View):
     """3DS Stripe verification form. OTP test button is hidden in 3 IFrames"""
+
     FRAME = "html/body/div/iframe[contains(@name, 'StripeFrame')]"
 
     @View.nested
     class challenge_frame(View):  # pylint: disable=invalid-name
         """Nested IFrame"""
+
         FRAME = ".//iframe[@id='challengeFrame']"
 
         @View.nested
         class acs_frame(View):  # pylint: disable=invalid-name
             """Nested IFrame that contains OTP elements"""
+
             FRAME = ".//iframe[@name='acsFrame']"
             complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-3ds']")
 
@@ -90,7 +96,8 @@ class OTPForm(View):
 
 class StripeCCView(BaseDevelView):
     """View for adding credit card to the Stripe payment gateway"""
-    path_pattern = '/admin/account/stripe'
+
+    path_pattern = "/admin/account/stripe"
     tabs = View.nested(SettingsTabs)
     add_billing_address_btn = Text("//a[@href='/admin/account/stripe/edit']")
     add_cc_details_btn = GenericLocatorWidget("//*[normalize-space(.)='Edit Credit Card Details']")

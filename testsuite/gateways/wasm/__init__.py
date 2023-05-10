@@ -22,8 +22,9 @@ class WASMGateway(AbstractGateway):
     CAPABILITIES = {Capability.SERVICE_MESH, Capability.SERVICE_MESH_WASM}
 
     # pylint: disable=too-many-arguments
-    def __init__(self, httpbin: OpenShiftClient, mesh: OpenShiftClient,
-                 portal_endpoint, backend_host, image, pull_secret):
+    def __init__(
+        self, httpbin: OpenShiftClient, mesh: OpenShiftClient, portal_endpoint, backend_host, image, pull_secret
+    ):
         self.label = generate_tail()
         self.httpbin = httpbin
         self.image = image
@@ -34,18 +35,26 @@ class WASMGateway(AbstractGateway):
         self.portal_host = res[1]
         self.portal_token = res[0]
         self.backend_host = backend_host
-        self.base_path = resources.files('testsuite.resources.service_mesh')
+        self.base_path = resources.files("testsuite.resources.service_mesh")
 
         self.extensions: Dict[Service, WASMExtension] = {}
 
     def before_service(self, service_params: dict) -> dict:
-        service_params['deployment_option'] = "service_mesh_istio"
+        service_params["deployment_option"] = "service_mesh_istio"
         return service_params
 
     def on_service_create(self, service: Service):
-        self.extensions[service["id"]] = WASMExtension(self.httpbin, self.mesh, self.portal_host, self.portal_token,
-                                                       self.backend_host, self.image, self.label, service,
-                                                       self.pull_secret)
+        self.extensions[service["id"]] = WASMExtension(
+            self.httpbin,
+            self.mesh,
+            self.portal_host,
+            self.portal_token,
+            self.backend_host,
+            self.image,
+            self.label,
+            service,
+            self.pull_secret,
+        )
 
     def on_service_delete(self, service: Service):
         self.extensions[service["id"]].delete()
@@ -57,16 +66,14 @@ class WASMGateway(AbstractGateway):
         application._client_factory = self._create_api_client
 
     def create(self):
-        self.mesh.new_app(self.base_path.joinpath('service_entry.yaml'), {
-            "NAME": f"system-entry-{self.label}",
-            "LABEL": self.label,
-            "HOST": self.portal_host
-        })
-        self.mesh.new_app(self.base_path.joinpath('service_entry.yaml'), {
-            "NAME": f"backend-entry-{self.label}",
-            "LABEL": self.label,
-            "HOST": self.backend_host
-        })
+        self.mesh.new_app(
+            self.base_path.joinpath("service_entry.yaml"),
+            {"NAME": f"system-entry-{self.label}", "LABEL": self.label, "HOST": self.portal_host},
+        )
+        self.mesh.new_app(
+            self.base_path.joinpath("service_entry.yaml"),
+            {"NAME": f"backend-entry-{self.label}", "LABEL": self.label, "HOST": self.backend_host},
+        )
 
     def destroy(self):
         self.mesh.delete_app(self.label, resources="serviceentry,destinationrule")
@@ -80,14 +87,8 @@ class WASMGateway(AbstractGateway):
         """Creates new Policy, used for OIDC authorization, for specific realm setup"""
         service_id = name.split("-")[1]
         label = f"{self.label}-{service_id}"
-        params = {
-            "NAME": name,
-            "TARGET": label,
-            "ISSUER": info.issuer_url(),
-            "JWKS": info.jwks_uri(),
-            "LABEL": label
-        }
-        path = resources.files('testsuite.resources.service_mesh').joinpath('policy.yaml')
+        params = {"NAME": name, "TARGET": label, "ISSUER": info.issuer_url(), "JWKS": info.jwks_uri(), "LABEL": label}
+        path = resources.files("testsuite.resources.service_mesh").joinpath("policy.yaml")
         self.httpbin.new_app(path, params)
 
     def remove_policy(self, name: str):
@@ -106,13 +107,15 @@ class WASMGateway(AbstractGateway):
         if ext.synchronise_credentials():
             ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
 
-        return ServiceMeshHttpClient(app=application,
-                                     cert=cert,
-                                     disable_retry_status_list=disable_retry_status_list,
-                                     verify=verify,
-                                     openshift=self.mesh,
-                                     root_path=ext.httpbin_name,
-                                     root_url=ext.ingress_url)
+        return ServiceMeshHttpClient(
+            app=application,
+            cert=cert,
+            disable_retry_status_list=disable_retry_status_list,
+            verify=verify,
+            openshift=self.mesh,
+            root_path=ext.httpbin_name,
+            root_url=ext.ingress_url,
+        )
 
     @property
     def environ(self) -> Properties:

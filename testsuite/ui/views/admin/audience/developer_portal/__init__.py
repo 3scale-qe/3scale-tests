@@ -6,17 +6,24 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import ThreescaleDropdown, DivBasedEditor, ThreescaleButtonGroup, ThreescaleCheckBox, \
-    CheckBoxGroup, APIDocsSelect
+from testsuite.ui.widgets import (
+    ThreescaleDropdown,
+    DivBasedEditor,
+    ThreescaleButtonGroup,
+    ThreescaleCheckBox,
+    CheckBoxGroup,
+    APIDocsSelect,
+)
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton, ThreescaleDeleteButton, ThreescaleCreateButton
 
 
 class CMSNewPageView(BaseAudienceView):
     """View representation of Developer Portal New Page page"""
-    path_pattern = '/p/admin/cms/pages/new'
-    title = TextInput(id='cms_template_title')
+
+    path_pattern = "/p/admin/cms/pages/new"
+    title = TextInput(id="cms_template_title")
     section = ThreescaleDropdown(".//*[@id='cms_template_section_input']")
-    path_input = TextInput(id='cms_template_path')
+    path_input = TextInput(id="cms_template_path")
     layout_select = ThreescaleDropdown("//*[@id='cms_template_layout_id']")
     code = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
     advanced_options = GenericLocatorWidget(".//*[normalize-space(.)='Advanced options']")
@@ -42,14 +49,20 @@ class CMSNewPageView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
-            self.section.is_displayed and self.path.is_displayed and self.code.is_displayed and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.title.is_displayed
+            and self.section.is_displayed
+            and self.path.is_displayed
+            and self.code.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class CMSEditPageView(BaseAudienceView):
     """View representation of Developer Portal Edit Page page"""
-    path_pattern = '/p/admin/cms/pages/{page_id}/edit'
+
+    path_pattern = "/p/admin/cms/pages/{page_id}/edit"
     publish_button = GenericLocatorWidget(".//button[@title='Save and publish the current draft.']")
     path_input = TextInput(id="cms_template_path")
     delete_button = ThreescaleDeleteButton()
@@ -75,16 +88,22 @@ class CMSEditPageView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.publish_button.is_displayed and \
-            self.path_input.is_displayed and self.delete_button.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.publish_button.is_displayed
+            and self.path_input.is_displayed
+            and self.delete_button.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class CMSNewSectionView(BaseAudienceView):
     """View representation of Developer Portal New Section page"""
-    path_pattern = '/p/admin/cms/sections/new'
-    title = TextInput(id='cms_section_title')
+
+    path_pattern = "/p/admin/cms/sections/new"
+    title = TextInput(id="cms_section_title")
     public = ThreescaleCheckBox('//input[@id="cms_section_public"]')
-    path_input = TextInput(id='cms_section_partial_path')
+    path_input = TextInput(id="cms_section_partial_path")
     submit = ThreescaleSubmitButton()
 
     def create(self, title, path, public=True):
@@ -99,17 +118,23 @@ class CMSNewSectionView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
-            self.public.is_displayed and self.path_input.is_displayed and self.submit.is_displayed and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.title.is_displayed
+            and self.public.is_displayed
+            and self.path_input.is_displayed
+            and self.submit.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class CMSEditSectionView(BaseAudienceView):
     """View representation of Developer Portal Edit Section page"""
-    path_pattern = '/p/admin/cms/builtin_sections/{section_id}/edit'
-    title = TextInput(id='cms_section_title')
+
+    path_pattern = "/p/admin/cms/builtin_sections/{section_id}/edit"
+    title = TextInput(id="cms_section_title")
     public = ThreescaleCheckBox('//input[@id="cms_section_public"]')
-    path_input = TextInput(id='cms_section_partial_path')
+    path_input = TextInput(id="cms_section_partial_path")
     delete_button = ThreescaleDeleteButton()
 
     def __init__(self, parent, section_id):
@@ -124,15 +149,21 @@ class CMSEditSectionView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.title.is_displayed and \
-            self.public.is_displayed and self.path_input.is_displayed and self.delete_button.is_displayed and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.title.is_displayed
+            and self.public.is_displayed
+            and self.path_input.is_displayed
+            and self.delete_button.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class DeveloperPortalContentView(BaseAudienceView):
     """View representation of Developer Portal Content page"""
+
     # path can be different when clicking from dashboard is '/p/admin/cms' and from menu is '/p/admin/cms/templates'
-    path_pattern = '/p/admin/cms'
+    path_pattern = "/p/admin/cms"
     quick_links = Text("//a[@href='#quick-links']")
     snippets = Text("//a[@href='#tips-and-tricks']")
     button_group = ThreescaleButtonGroup(locator=".//*[@id='cms-new-content-button']")
@@ -162,13 +193,18 @@ class DeveloperPortalContentView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.quick_links.is_displayed and \
-            self.snippets.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.quick_links.is_displayed
+            and self.snippets.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class DeveloperPortalLogoView(BaseAudienceView):
     """View representation of Developer Portal Logo edit page"""
-    path_pattern = '/p/admin/account/logo/edit'
+
+    path_pattern = "/p/admin/account/logo/edit"
     file_input = FileInput(id="profile_logo")
     upload_button = ThreescaleSubmitButton()
     delete_logo_button = ThreescaleDeleteButton()
@@ -188,13 +224,18 @@ class DeveloperPortalLogoView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.file_input.is_displayed and \
-            self.upload_button.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.file_input.is_displayed
+            and self.upload_button.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class ActiveDocsView(BaseAudienceView):
     """View representation of Active Docs list page"""
-    path_pattern = '/admin/api_docs/services'
+
+    path_pattern = "/admin/api_docs/services"
     create_new_spec_link = Text("//a[@href='/admin/api_docs/services/new']")
 
     @step("ActiveDocsNewView")
@@ -207,13 +248,17 @@ class ActiveDocsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.create_new_spec_link.is_displayed and \
-            self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.create_new_spec_link.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class ActiveDocsNewView(BaseAudienceView):
     """View representation of New Active Docs page"""
-    path_pattern = '/admin/api_docs/services/new'
+
+    path_pattern = "/admin/api_docs/services/new"
     create_spec_btn = ThreescaleCreateButton()
     skip_swagger_validation_checkbox = GenericLocatorWidget("#api_docs_service_skip_swagger_validations")
     name_field = TextInput(id="api_docs_service_name")
@@ -224,8 +269,9 @@ class ActiveDocsNewView(BaseAudienceView):
     json_spec = DivBasedEditor(locator="//*[contains(@class, 'CodeMirror cm-s-neat CodeMirror-wrap')]")
 
     # pylint: disable=too-many-arguments
-    def create_spec(self, name, sys_name, description, service,
-                    oas_spec, publish_option=False, skip_validation_option=False):
+    def create_spec(
+        self, name, sys_name, description, service, oas_spec, publish_option=False, skip_validation_option=False
+    ):
         """
         Create new active doc specification via UI
         :param name: Name of Active doc
@@ -254,12 +300,17 @@ class ActiveDocsNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.create_spec_btn.is_displayed and \
-            self.sys_name_field.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.create_spec_btn.is_displayed
+            and self.sys_name_field.is_displayed
+            and self.path in self.browser.url
+        )
 
 
 class SpamProtection(BaseAudienceView):
     """View representation of Developer Portal's Spam Protection setup"""
+
     path_pattern = "/site/spam_protection/edit"
     no_protection = Text('//*[@id="settings_spam_protection_level_none"]')
     sus_protection = Text('//*[@id="settings_spam_protection_level_auto"]')
@@ -295,16 +346,22 @@ class SpamProtection(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url \
-            and self.no_protection.is_displayed and self.sus_protection.is_displayed \
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.no_protection.is_displayed
+            and self.sus_protection.is_displayed
             and self.always_protection.is_displayed
+        )
 
 
 class DeveloperPortalGroupView(BaseAudienceView):
     """View representation of Groups page"""
-    path_pattern = '/p/admin/cms/groups'
-    table = PatternflyTable(".//table[@class='data']", column_widgets={
-        3: GenericLocatorWidget("./a[contains(@class, 'delete')]")})
+
+    path_pattern = "/p/admin/cms/groups"
+    table = PatternflyTable(
+        ".//table[@class='data']", column_widgets={3: GenericLocatorWidget("./a[contains(@class, 'delete')]")}
+    )
     create_button = GenericLocatorWidget(".//*[@href='/p/admin/cms/groups/new']")
 
     @step("DeveloperPortalGroupNewView")
@@ -321,13 +378,13 @@ class DeveloperPortalGroupView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and \
-            self.path in self.browser.url
+        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url
 
 
 class DeveloperPortalGroupNewView(BaseAudienceView):
     """View representation of Create Group page"""
-    path_pattern = '/p/admin/cms/groups/new'
+
+    path_pattern = "/p/admin/cms/groups/new"
     name = TextInput(id="cms_group_name")
     allowed_section = CheckBoxGroup(locator="//*[@id='cms_group_section_ids_input']")
     submit = ThreescaleSubmitButton()
@@ -343,5 +400,9 @@ class DeveloperPortalGroupNewView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.name.is_displayed and \
-            self.allowed_section.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.name.is_displayed
+            and self.allowed_section.is_displayed
+            and self.path in self.browser.url
+        )

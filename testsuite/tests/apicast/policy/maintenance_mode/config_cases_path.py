@@ -13,16 +13,19 @@ def case_eq_path(status_code) -> Tuple[int, int, str, dict]:
     policy_config = {
         "condition": {
             "operations": [
-                {"left_type": "liquid",
-                 "right_type": "plain",
-                 "left": "{{ original_request.path }}",
-                 "right": "/test",
-                 "op": "=="}
+                {
+                    "left_type": "liquid",
+                    "right_type": "plain",
+                    "left": "{{ original_request.path }}",
+                    "right": "/test",
+                    "op": "==",
+                }
             ],
-            "combine_op": "and"},
+            "combine_op": "and",
+        },
         "status": status_code,
-        "message": message
-        }
+        "message": message,
+    }
 
     return status_code, 200, f"{message}\n", policy_config
 
@@ -33,16 +36,19 @@ def case_match_path(status_code) -> Tuple[int, int, str, dict]:
     policy_config = {
         "condition": {
             "operations": [
-                {"left_type": "liquid",
-                 "right_type": "plain",
-                 "left": "{{ original_request.path }}",
-                 "right": "/te",
-                 "op": "matches"}
+                {
+                    "left_type": "liquid",
+                    "right_type": "plain",
+                    "left": "{{ original_request.path }}",
+                    "right": "/te",
+                    "op": "matches",
+                }
             ],
-            "combine_op": "and"},
+            "combine_op": "and",
+        },
         "status": status_code,
-        "message": message
-        }
+        "message": message,
+    }
 
     return status_code, 200, f"{message}\n", policy_config
 
@@ -50,10 +56,6 @@ def case_match_path(status_code) -> Tuple[int, int, str, dict]:
 def case_service_maintenance(status_code) -> Tuple[int, int, str, dict]:
     """Case whole service on maintenance"""
     message = "Service Unavailable - Maintenance"
-    policy_config = {
-        "status": status_code,
-        "message": message,
-        "message_content_type": "text/plain; charset=utf-8"
-        }
+    policy_config = {"status": status_code, "message": message, "message_content_type": "text/plain; charset=utf-8"}
 
     return status_code, status_code, f"{message}\n", policy_config

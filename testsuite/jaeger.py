@@ -8,12 +8,13 @@ import requests
 
 class Jaeger:
     """Wrapper for the Jaeger Api"""
+
     def __init__(self, endpoint: str, custom_config, verify):
         self.endpoint = endpoint
         self.verify = verify
         self.custom_config = custom_config
 
-    @backoff.on_predicate(backoff.constant, lambda x: x['data'] == [], max_tries=10)
+    @backoff.on_predicate(backoff.constant, lambda x: x["data"] == [], max_tries=10)
     def traces(self, service: str, operation: str):
         """
         Gets traces for given service and operation
@@ -22,12 +23,8 @@ class Jaeger:
         :param operation - operation of the traces
         :return: list of the traces
         """
-        params = {
-            "service": service,
-            "operation": operation
-        }
-        response = requests.get(f"{self.endpoint}/api/traces", params=params,
-                                verify=self.verify)
+        params = {"service": service, "operation": operation}
+        response = requests.get(f"{self.endpoint}/api/traces", params=params, verify=self.verify)
         response.raise_for_status()
 
         return response.json()
@@ -41,26 +38,23 @@ class Jaeger:
             configmap_name: {
                 "service_name": service_name,
                 "disabled": "false",
-                "sampler": {
-                    "type": "const",
-                    "param": 1
-                },
+                "sampler": {"type": "const", "param": 1},
                 "reporter": {
                     "queueSize": 100,
                     "buffer_flush_interval": 10,
                     "logSpans": False,
-                    "localAgentHostPort": self.custom_config["reporter"]["localAgentHostPort"]
+                    "localAgentHostPort": self.custom_config["reporter"]["localAgentHostPort"],
                 },
                 "headers": {
                     "jaegerDebugHeader": "debug-id",
                     "jaegerBaggageHeader": "baggage",
                     "TraceContextHeaderName": "uber-trace-id",
-                    "traceBaggageHeaderPrefix": "testctx-"
+                    "traceBaggageHeaderPrefix": "testctx-",
                 },
                 "baggage_restrictions": {
                     "denyBaggageOnInitializationFailure": False,
                     "hostPort": self.custom_config["baggage_restrictions"]["hostPort"],
-                    "refreshInterval": 60
-                }
+                    "refreshInterval": 60,
+                },
             }
         }

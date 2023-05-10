@@ -15,10 +15,15 @@ def policy_settings(certificate):
     """
     embedded_cert = embedded(certificate.certificate, "tls.crt", "pkix-cert")
     embedded_key = embedded(certificate.key, "tls.key", "x-iwork-keynote-sffkey")
-    return rawobj.PolicyConfig("upstream_mtls", {"certificate_type": "embedded",
-                                                 "certificate_key_type": "embedded",
-                                                 "certificate": embedded_cert,
-                                                 "certificate_key": embedded_key})
+    return rawobj.PolicyConfig(
+        "upstream_mtls",
+        {
+            "certificate_type": "embedded",
+            "certificate_key_type": "embedded",
+            "certificate": embedded_cert,
+            "certificate_key": embedded_key,
+        },
+    )
 
 
 @pytest.fixture(scope="session")
@@ -60,7 +65,8 @@ def backends_mapping(custom_backend, httpbin_original, httpbin_new):
     """
     return {
         "/orig": custom_backend("backend-orig", httpbin_original),
-        "/new": custom_backend("backend-new", httpbin_new)}
+        "/new": custom_backend("backend-new", httpbin_new),
+    }
 
 
 @pytest.fixture(scope="module")

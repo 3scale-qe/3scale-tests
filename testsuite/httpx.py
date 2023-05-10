@@ -21,8 +21,10 @@ log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 def _log_request(request):
     """log request details"""
+
     class Request:
         """attribute body/url is needed"""
+
         def __init__(self, request):
             self.__request = request
             self.body = "".join([i.decode("utf-8") for i in request.stream])
@@ -36,8 +38,10 @@ def _log_request(request):
 
 def _log_response(response):
     """log response details"""
+
     class Response:
         """attr reason is needed"""
+
         def __init__(self, response):
             response.read()
             self.__response = response
@@ -51,6 +55,7 @@ def _log_response(response):
 
 class UnexpectedResponse(Exception):
     """Slightly different response attributes were expected"""
+
     def __init__(self, msg, response):
         super().__init__(msg)
         self.response = response
@@ -78,8 +83,15 @@ class HttpxClient:
         """Returns partially initialized HttpxClient suitable for client in the application"""
         return functools.partial(cls, http2, **kwargs)
 
-    def __init__(self, http2, app, endpoint: str = "sandbox_endpoint",
-                 verify: bool = None, cert=None, disable_retry_status_list: Iterable = ()) -> None:
+    def __init__(
+        self,
+        http2,
+        app,
+        endpoint: str = "sandbox_endpoint",
+        verify: bool = None,
+        cert=None,
+        disable_retry_status_list: Iterable = (),
+    ) -> None:
         self._app = app
         self._endpoint = endpoint
         self._status_forcelist = {503, 404} - set(disable_retry_status_list)
@@ -111,10 +123,21 @@ class HttpxClient:
         """
 
     @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8, jitter=None)
-    def request(self, method, path,
-                content=None, data=None, files=None, json=None,
-                params=None, headers=None, cookies=None,
-                auth=None, allow_redirects=True, timeout=None):
+    def request(
+        self,
+        method,
+        path,
+        content=None,
+        data=None,
+        files=None,
+        json=None,
+        params=None,
+        headers=None,
+        cookies=None,
+        auth=None,
+        allow_redirects=True,
+        timeout=None,
+    ):
         """mimics requests interface"""
         auth = auth or self.auth
         self._client.auth = auth
@@ -130,7 +153,8 @@ class HttpxClient:
             headers=headers,
             cookies=cookies,
             follow_redirects=allow_redirects,
-            timeout=timeout)
+            timeout=timeout,
+        )
 
         if response.status_code in self._status_forcelist:
             raise UnexpectedResponse(f"Didn't expect '{response.status_code}' status code", response)
@@ -139,23 +163,23 @@ class HttpxClient:
 
     def get(self, *args, **kwargs):
         """mimics requests interface"""
-        return self.request('GET', *args, **kwargs)
+        return self.request("GET", *args, **kwargs)
 
     def post(self, *args, **kwargs):
         """mimics requests interface"""
-        return self.request('POST', *args, **kwargs)
+        return self.request("POST", *args, **kwargs)
 
     def patch(self, *args, **kwargs):
         """mimics requests interface"""
-        return self.request('PATCH', *args, **kwargs)
+        return self.request("PATCH", *args, **kwargs)
 
     def put(self, *args, **kwargs):
         """mimics requests interface"""
-        return self.request('PUT', *args, **kwargs)
+        return self.request("PUT", *args, **kwargs)
 
     def delete(self, *args, **kwargs):
         """mimics requests interface"""
-        return self.request('DELETE', *args, **kwargs)
+        return self.request("DELETE", *args, **kwargs)
 
 
 async def _async_log_request(request):
@@ -168,6 +192,7 @@ async def _async_log_response(response):
 
     class Response:
         """attr reason is needed"""
+
         def __init__(self, response):
             self.__response = response
             self.reason = response.reason_phrase
@@ -180,19 +205,21 @@ async def _async_log_response(response):
 
 class AsyncClient(httpx.AsyncClient):
     """Asynchronous Api client class that is using HTTPX library instead of requests"""
+
     @classmethod
     def partial(cls, http2, **kwargs):
         """Returns partially initialized HttpxClient suitable for client in the application"""
         return functools.partial(cls, http2, **kwargs)
 
     def __init__(
-            self,
-            http2: bool,
-            app: Application,
-            endpoint: str = "sandbox_endpoint",
-            verify: bool = True,
-            cert=None,
-            disable_retry_status_list: Iterable = ()):
+        self,
+        http2: bool,
+        app: Application,
+        endpoint: str = "sandbox_endpoint",
+        verify: bool = True,
+        cert=None,
+        disable_retry_status_list: Iterable = (),
+    ):
         base_url = app.service.proxy.fetch()[endpoint]
         ssl_context = create_ssl_context(cert=cert, verify=verify, http2=http2, trust_env=True)
         super().__init__(base_url=base_url, verify=ssl_context, http2=http2)
@@ -205,36 +232,38 @@ class AsyncClient(httpx.AsyncClient):
 
     @backoff.on_exception(backoff.fibo, UnexpectedResponse, max_tries=8, jitter=None)
     async def request(
-            self,
-            method: str,
-            url,
-            *,
-            content=None,
-            data=None,
-            files=None,
-            json=None,
-            params=None,
-            headers=None,
-            cookies=None,
-            auth=USE_CLIENT_DEFAULT,
-            follow_redirects=True,
-            timeout=USE_CLIENT_DEFAULT,
-            extensions=None) -> Response:
+        self,
+        method: str,
+        url,
+        *,
+        content=None,
+        data=None,
+        files=None,
+        json=None,
+        params=None,
+        headers=None,
+        cookies=None,
+        auth=USE_CLIENT_DEFAULT,
+        follow_redirects=True,
+        timeout=USE_CLIENT_DEFAULT,
+        extensions=None,
+    ) -> Response:
         """request with retry on unexpected status code"""
         response = await super().request(
-                method,
-                url,
-                content=content,
-                data=data,
-                files=files,
-                json=json,
-                params=params,
-                headers=headers,
-                cookies=cookies,
-                auth=auth,
-                follow_redirects=follow_redirects,
-                timeout=timeout,
-                extensions=extensions)
+            method,
+            url,
+            content=content,
+            data=data,
+            files=files,
+            json=json,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            follow_redirects=follow_redirects,
+            timeout=timeout,
+            extensions=extensions,
+        )
         if response.status_code in self._status_forcelist:
             raise UnexpectedResponse(f"Didn't expect '{response.status_code}' status code", response)
 
@@ -270,12 +299,12 @@ class HttpxBaseClientAuth(Auth):
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         """Authenticates requests with 3scale credentials"""
-        if self.location == 'authorization':
+        if self.location == "authorization":
             key, value = self.credentials.values()  # pylint: disable=unbalanced-dict-unpacking
-            request.headers['Authorization'] = basic_auth_string(key, value)
-        elif self.location == 'headers':
+            request.headers["Authorization"] = basic_auth_string(key, value)
+        elif self.location == "headers":
             self._prepare_headers(request)
-        elif self.location == 'query':
+        elif self.location == "query":
             request.url = URL(request.url, params=self.credentials)
         else:
             raise ValueError("Unknown credentials location '%s'" % self.location)
@@ -294,14 +323,12 @@ class HttpxUserKeyAuth(HttpxBaseClientAuth):
 
     def __init__(self, app, location=None):
         super().__init__(app, location)
-        self.credentials = {
-            self.app.service.proxy.list()["auth_user_key"]: self.app["user_key"]
-        }
+        self.credentials = {self.app.service.proxy.list()["auth_user_key"]: self.app["user_key"]}
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
-        if self.location == 'authorization':
+        if self.location == "authorization":
             key = list(self.credentials.values())[0]
-            request.headers['Authorization'] = basic_auth_string(key, '')
+            request.headers["Authorization"] = basic_auth_string(key, "")
             yield request
         else:
             yield from super().auth_flow(request)
@@ -316,7 +343,7 @@ class HttpxAppIdKeyAuth(HttpxBaseClientAuth):
         proxy = self.app.service.proxy.list()
         self.credentials = {
             proxy["auth_app_id"]: self.app["application_id"],
-            proxy["auth_app_key"]: self.app.keys.list()["keys"][0]["key"]["value"]
+            proxy["auth_app_key"]: self.app.keys.list()["keys"][0]["key"]["value"],
         }
 
 
@@ -334,12 +361,12 @@ class HttpxOidcClientAuth(HttpxBaseClientAuth):
         self.token = self.rhsso.access_token(app)
 
     def _add_credentials(self, request: Request):
-        if self.location == 'authorization':
-            request.headers['Authorization'] = f"Bearer {self.token}"
-        elif self.location == 'headers':
-            request.headers['access_token'] = self.token
-        elif self.location == 'query':
-            request.url = URL(request.url, params={'access_token': self.token})
+        if self.location == "authorization":
+            request.headers["Authorization"] = f"Bearer {self.token}"
+        elif self.location == "headers":
+            request.headers["access_token"] = self.token
+        elif self.location == "query":
+            request.url = URL(request.url, params={"access_token": self.token})
         else:
             raise ValueError("Unknown credentials location '%s'" % self.location)
 

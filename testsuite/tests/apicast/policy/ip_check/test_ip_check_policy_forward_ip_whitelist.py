@@ -13,11 +13,9 @@ pytestmark = [pytest.mark.nopersistence]
 @pytest.fixture(scope="module")
 def policy_settings(ip4_addresses):
     """Update policy settings"""
-    return rawobj.PolicyConfig("ip_check", {
-        "check_type": "whitelist",
-        "client_ip_sources": ["X-Forwarded-For"],
-        "ips": ip4_addresses
-    })
+    return rawobj.PolicyConfig(
+        "ip_check", {"check_type": "whitelist", "client_ip_sources": ["X-Forwarded-For"], "ips": ip4_addresses}
+    )
 
 
 def test_ip_check_policy_ip_blacklisted(api_client):
@@ -26,17 +24,29 @@ def test_ip_check_policy_ip_blacklisted(api_client):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("ip_addresses,status_code",
-                         [(None, 200),
-                          (["10.10.10.10"], 403),
-                          pytest.param([","], 403, marks=[
-                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076"),
-                              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-                          ]),
-                          pytest.param([",10.10.10.10"], 403, marks=[
-                              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075"),
-                              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-                          ])])
+@pytest.mark.parametrize(
+    "ip_addresses,status_code",
+    [
+        (None, 200),
+        (["10.10.10.10"], 403),
+        pytest.param(
+            [","],
+            403,
+            marks=[
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076"),
+                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+            ],
+        ),
+        pytest.param(
+            [",10.10.10.10"],
+            403,
+            marks=[
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075"),
+                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+            ],
+        ),
+    ],
+)
 def test_ips_with_random_port(ip_addresses, status_code, api_client, ip4_addresses):
     """
     Test must pass all the ip4 addresses with port because that are white listed.
@@ -47,5 +57,5 @@ def test_ips_with_random_port(ip_addresses, status_code, api_client, ip4_address
 
     client = api_client()
     for ip_address in ip_addresses:
-        response = client.get('/get', headers={'X-Forwarded-For': f"{ip_address}:12345"})
+        response = client.get("/get", headers={"X-Forwarded-For": f"{ip_address}:12345"})
         assert response.status_code == status_code, f"failed on ip: {ip_address}"

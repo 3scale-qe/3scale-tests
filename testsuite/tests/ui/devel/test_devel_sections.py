@@ -4,9 +4,14 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.ui.views.admin.audience.account import AccountUserGroupView
-from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalGroupNewView, \
-    CMSEditPageView, CMSNewPageView, CMSNewSectionView, \
-    DeveloperPortalGroupView, CMSEditSectionView
+from testsuite.ui.views.admin.audience.developer_portal import (
+    DeveloperPortalGroupNewView,
+    CMSEditPageView,
+    CMSNewPageView,
+    CMSNewSectionView,
+    DeveloperPortalGroupView,
+    CMSEditSectionView,
+)
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 

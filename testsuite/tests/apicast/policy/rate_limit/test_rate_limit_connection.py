@@ -45,7 +45,7 @@ TOTAL_REQUESTS = 20
 CONNECTIONS = 10
 BURST = 5
 DELAY = 9
-DATEFMT = '%a, %d %b %Y %H:%M:%S GMT'
+DATEFMT = "%a, %d %b %Y %H:%M:%S GMT"
 WAIT = 15
 
 
@@ -76,10 +76,10 @@ async def test_rate_limit_connection_u(logger, client, client2):
     assert len(responses) == TOTAL_REQUESTS
 
     # responses should be ok (connections limit + burst)
-    assert len([i for i in responses if i.status_code == 200]) == CONNECTIONS+BURST
+    assert len([i for i in responses if i.status_code == 200]) == CONNECTIONS + BURST
 
     # responses should receive 429 (above limit & burst)
-    assert len([i for i in responses if i.status_code == 429]) == TOTAL_REQUESTS-(CONNECTIONS+BURST)
+    assert len([i for i in responses if i.status_code == 429]) == TOTAL_REQUESTS - (CONNECTIONS + BURST)
 
     # ok responses should be finished DELAY seconds later (delayed burst)
     delay = timedelta(seconds=DELAY)
@@ -116,7 +116,8 @@ async def concurrent_requests(logger, client1, client2, limit_me):
     # each request will be logged
     report = [
         (i.status_code, strptime(i.request.headers["Date"], DATEFMT), strptime(i.headers["Date"], DATEFMT))
-        for i in responses]
+        for i in responses
+    ]
 
     # it will be sorted by response Date header
     report.sort(key=lambda k: k[2])
@@ -129,12 +130,9 @@ async def concurrent_requests(logger, client1, client2, limit_me):
 async def get(client, limit_me, relpath):
     """Helper to make async request with correct Date header"""
     # let's spread requests over short period; avoid all at one moment
-    await asyncio.sleep(random.uniform(0, WAIT-DELAY-2))
+    await asyncio.sleep(random.uniform(0, WAIT - DELAY - 2))
 
-    return await client.get(
-        relpath, headers={
-            "X-Limit-Me": limit_me,
-            "Date": datetime.utcnow().strftime(DATEFMT)})
+    return await client.get(relpath, headers={"X-Limit-Me": limit_me, "Date": datetime.utcnow().strftime(DATEFMT)})
 
 
 @pytest.fixture
@@ -147,20 +145,30 @@ def policy_settings(variation, key_scope, matching_rule, redis_url, logger):
     single or append/prepend another connection_limiter with 500 conn limit"""
 
     # variation == "single"  # have one single connection limiter
-    rate_limit = rawobj.PolicyConfig("rate_limit", {
-        "connection_limiters": [
-            connection_limiter(key_scope, matching_rule)]})
+    rate_limit = rawobj.PolicyConfig(
+        "rate_limit", {"connection_limiters": [connection_limiter(key_scope, matching_rule)]}
+    )
 
     if variation == "double":  # have two connection limiters (doubled)
-        rate_limit = rawobj.PolicyConfig("rate_limit", {
-            "connection_limiters": [
-                connection_limiter(key_scope, matching_rule, "{{ remote_addr }}, 500)"),
-                connection_limiter(key_scope, matching_rule)]})
+        rate_limit = rawobj.PolicyConfig(
+            "rate_limit",
+            {
+                "connection_limiters": [
+                    connection_limiter(key_scope, matching_rule, "{{ remote_addr }}, 500)"),
+                    connection_limiter(key_scope, matching_rule),
+                ]
+            },
+        )
     elif variation == "rev-order":  # have two connection limiters in opposite order
-        rate_limit = rawobj.PolicyConfig("rate_limit", {
-            "connection_limiters": [
-                connection_limiter(key_scope, matching_rule),
-                connection_limiter(key_scope, matching_rule, "{{ remote_addr }}, 500)")]})
+        rate_limit = rawobj.PolicyConfig(
+            "rate_limit",
+            {
+                "connection_limiters": [
+                    connection_limiter(key_scope, matching_rule),
+                    connection_limiter(key_scope, matching_rule, "{{ remote_addr }}, 500)"),
+                ]
+            },
+        )
 
     if key_scope == "global":
         rate_limit["configuration"]["redis_url"] = redis_url("global")
@@ -174,19 +182,23 @@ def connection_limiter(key_scope, matching_rule, key_name="{{ host }}", conn=CON
     """helper to create connection_limiter of rate_limit policy configuration"""
 
     return {
-        "key": {
-            "name": randomize(key_name),
-            "name_type": "liquid",
-            "scope": key_scope},
+        "key": {"name": randomize(key_name), "name_type": "liquid", "scope": key_scope},
         "condition": {
             "combine_op": "and",
-            "operations": [{
-                "left_type": "liquid", "left": "{{ headers['X-Limit-Me'] }}",
-                "op": matching_rule[0],
-                "right_type": "plain", "right": matching_rule[1]}]},
+            "operations": [
+                {
+                    "left_type": "liquid",
+                    "left": "{{ headers['X-Limit-Me'] }}",
+                    "op": matching_rule[0],
+                    "right_type": "plain",
+                    "right": matching_rule[1],
+                }
+            ],
+        },
         "conn": conn,
         "burst": BURST,
-        "delay": DELAY}
+        "delay": DELAY,
+    }
 
 
 @pytest.fixture(params=("single", "double", "rev-order"))
@@ -228,7 +240,7 @@ def app2(service_plus, custom_application, custom_app_plan, lifecycle_hooks, req
 async def client(application):
     """client needs to wait more than WAIT time"""
     async with application.api_client() as client:
-        client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
+        client.timeout = httpx.Timeout(WAIT + DELAY + 9.0)
         # pylint: disable=protected-access
         # no public interface to this, not sure this particular change helps
         # too early to build one (maybe after couple of months or a year of
@@ -245,7 +257,7 @@ async def client2(key_scope, request):
         # this is a trick to create app2 just for 'global' scope when needed
         app2 = request.getfixturevalue("app2")
         async with app2.api_client() as client:
-            client.timeout = httpx.Timeout(WAIT+DELAY+9.0)
+            client.timeout = httpx.Timeout(WAIT + DELAY + 9.0)
             # pylint: disable=protected-access
             # no public interface to this, not sure this particular change helps
             # too early to build one (maybe after couple of months or a year of

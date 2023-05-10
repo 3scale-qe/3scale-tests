@@ -13,7 +13,7 @@ pytestmark = [
     pytest.mark.nopersistence,
     pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.5.2')"),
     pytest.mark.required_capabilities(Capability.OCP4, Capability.APICAST),
-    ]
+]
 
 BATCH_REPORT_SECONDS = 50
 NUM_OF_REQUESTS = 5
@@ -23,7 +23,8 @@ NUM_OF_REQUESTS = 5
 def service(service):
     """Adds policies to servies"""
     service.proxy.list().policies.append(
-        rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS}))
+        rawobj.PolicyConfig("3scale_batcher", {"batch_report_seconds": BATCH_REPORT_SECONDS})
+    )
     return service
 
 
@@ -31,9 +32,7 @@ def pod_monitor_object_definition(apicast_deployment, namespace, apicast_operato
     """Return PodMonitor yaml definition"""
     selector_text = ""
     if apicast_operator_namespace:
-        selector_text = ("  namespaceSelector:\n"
-                         "    matchNames:\n"
-                         f"    - {apicast_operator_namespace}\n")
+        selector_text = "  namespaceSelector:\n" "    matchNames:\n" f"    - {apicast_operator_namespace}\n"
 
     return f"""apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
@@ -58,7 +57,7 @@ spec:
 
 @pytest.fixture(scope="module")
 def pod_monitor(prometheus, openshift, staging_gateway):
-    """ define pod monitor for prometheus """
+    """define pod monitor for prometheus"""
 
     apicast_openshift_client = staging_gateway.openshift
     apicast_deployment = staging_gateway.deployment.name
@@ -69,11 +68,13 @@ def pod_monitor(prometheus, openshift, staging_gateway):
 
     #  object in 3scale namespace (for prometheus deployed by free-deployer)
     pod_monitor_3scale_namespace = openshift_client.create(
-        pod_monitor_object_definition(apicast_deployment, namespace, apicast_operator_namespace))
+        pod_monitor_object_definition(apicast_deployment, namespace, apicast_operator_namespace)
+    )
 
     #  object in apicast operator namespace (for openshift user workload monitoring)
     pod_monitor_apicast_namespace = openshift_client.create(
-        pod_monitor_object_definition(apicast_deployment, apicast_operator_namespace))
+        pod_monitor_object_definition(apicast_deployment, apicast_operator_namespace)
+    )
 
     #  wait a little more so operator will get this config and have time to do a first scrape
     prometheus.wait_on_next_scrape(apicast_deployment, datetime.utcnow() + timedelta(seconds=60))
@@ -110,17 +111,19 @@ def test_batcher_policy(prometheus, pod_monitor, api_client, staging_gateway, ap
 
     hits, misses = get_batching_metrics(prometheus, apicast_deployment, staging_gateway.openshift.project_name)
 
-    assert (int(hits), int(misses)) == (NUM_OF_REQUESTS-1, 1)
+    assert (int(hits), int(misses)) == (NUM_OF_REQUESTS - 1, 1)
 
 
 def get_batching_metrics(prometheus, apicast_deployment, namespace):
-    """ extract hits and misses count from prometheus """
-    hits_metrics = prometheus.get_metrics("batching_policy_auths_cache_hits",
-                                          {"namespace": namespace, "container": apicast_deployment})
-    misses_metrics = prometheus.get_metrics("batching_policy_auths_cache_misses",
-                                            {"namespace": namespace, "container": apicast_deployment})
+    """extract hits and misses count from prometheus"""
+    hits_metrics = prometheus.get_metrics(
+        "batching_policy_auths_cache_hits", {"namespace": namespace, "container": apicast_deployment}
+    )
+    misses_metrics = prometheus.get_metrics(
+        "batching_policy_auths_cache_misses", {"namespace": namespace, "container": apicast_deployment}
+    )
 
-    hits = hits_metrics[0]['value'][1]
-    misses = misses_metrics[0]['value'][1]
+    hits = hits_metrics[0]["value"][1]
+    misses = misses_metrics[0]["value"][1]
 
     return hits, misses

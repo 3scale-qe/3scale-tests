@@ -16,13 +16,13 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite.capabilities import Capability
 from testsuite.openshift.objects import Routes
 from testsuite.tests.apicast.policy.tls import embedded
-from testsuite import TESTED_VERSION, rawobj # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7099")
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7099"),
 ]
 
 
@@ -52,21 +52,33 @@ def invalid_upstream_hostname():
     return "mismatched_hostname"
 
 
-@pytest.fixture(scope="module", params=[
+@pytest.fixture(
+    scope="module",
+    params=[
         pytest.param(("valid_authority", "valid_upstream_hostname", 200), id="Matching authority"),
         pytest.param(("invalid_authority", "valid_upstream_hostname", 502), id="Mismatched authority"),
-        pytest.param((None, "valid_upstream_hostname", 502), id="No provided authority",
-                     marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7508")]),
-        pytest.param(("valid_authority", "invalid_upstream_hostname", 502), id="Invalid upstream hostname",
-                     marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-768")]),
-])
+        pytest.param(
+            (None, "valid_upstream_hostname", 502),
+            id="No provided authority",
+            marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7508")],
+        ),
+        pytest.param(
+            ("valid_authority", "invalid_upstream_hostname", 502),
+            id="Invalid upstream hostname",
+            marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-768")],
+        ),
+    ],
+)
 def apicast_auth_httpbin_host_expected_code(request):
     """
     Returns authority for setting the ca_certificates in the policy settings at APIcast,
     hostname used by the upstream certificate and the expected return code.
     """
-    return request.getfixturevalue(request.param[0]) if request.param[0] is not None else None,\
-        request.getfixturevalue(request.param[1]), request.param[2]
+    return (
+        request.getfixturevalue(request.param[0]) if request.param[0] is not None else None,
+        request.getfixturevalue(request.param[1]),
+        request.param[2],
+    )
 
 
 @pytest.fixture(scope="module")
@@ -96,11 +108,13 @@ def policy_settings(apicast_authority, apicast_certificate):
     embedded_cert = embedded(apicast_certificate.certificate, "tls.crt", "pkix-cert")
     embedded_key = embedded(apicast_certificate.key, "tls.key", "x-iwork-keynote-sffkey")
 
-    configuration = {"certificate_type": "embedded",
-                     "certificate_key_type": "embedded",
-                     "certificate": embedded_cert,
-                     "certificate_key": embedded_key,
-                     "verify": True}
+    configuration = {
+        "certificate_type": "embedded",
+        "certificate_key_type": "embedded",
+        "certificate": embedded_cert,
+        "certificate_key": embedded_key,
+        "verify": True,
+    }
 
     if apicast_authority is not None:
         configuration["ca_certificates"] = [apicast_authority.certificate]

@@ -23,14 +23,12 @@ def backends_mapping(custom_backend, private_base_url):
     Creates four echo-api backends with the private paths being the keys in
     the dict
     """
-    return {"/backpath1":
-            custom_backend("backend1", endpoint=private_base_url("echo_api")),
-            "/backpath2/backpath21/backpath22":
-                custom_backend("backend2", endpoint=private_base_url("echo_api")),
-            "/backpath2/backpath21":
-                custom_backend("backend3", endpoint=private_base_url("echo_api")),
-            "/backpath2":
-                custom_backend("backend4", endpoint=private_base_url("echo_api"))}
+    return {
+        "/backpath1": custom_backend("backend1", endpoint=private_base_url("echo_api")),
+        "/backpath2/backpath21/backpath22": custom_backend("backend2", endpoint=private_base_url("echo_api")),
+        "/backpath2/backpath21": custom_backend("backend3", endpoint=private_base_url("echo_api")),
+        "/backpath2": custom_backend("backend4", endpoint=private_base_url("echo_api")),
+    }
 
 
 @pytest.fixture(scope="module")
@@ -141,19 +139,26 @@ def hits(app):
     return analytics.list_by_service(app["service_id"], metric_name="hits")["total"]
 
 
-@pytest.mark.parametrize("expect_ok", [
-    ([("/backpath2/backpath21/backpath22/path1/1234", 3),
-      ("/backpath2/backpath21/backpath22/path1", 2),
-      ("/backpath2/backpath21/backpath22/", 1),
-      ("/backpath2/backpath21/path1/1234", 3),
-      ("/backpath2/backpath21/path1", 2),
-      ("/backpath2/backpath21/", 1),
-      ("/backpath2/path1/1234", 3),
-      ("/backpath2/path1", 2),
-      ("/backpath2/", 1),
-      ("/backpath1/path1/bar/1234", 1),
-      ("/backpath1/path1/bar", 1)])
-])
+@pytest.mark.parametrize(
+    "expect_ok",
+    [
+        (
+            [
+                ("/backpath2/backpath21/backpath22/path1/1234", 3),
+                ("/backpath2/backpath21/backpath22/path1", 2),
+                ("/backpath2/backpath21/backpath22/", 1),
+                ("/backpath2/backpath21/path1/1234", 3),
+                ("/backpath2/backpath21/path1", 2),
+                ("/backpath2/backpath21/", 1),
+                ("/backpath2/path1/1234", 3),
+                ("/backpath2/path1", 2),
+                ("/backpath2/", 1),
+                ("/backpath1/path1/bar/1234", 1),
+                ("/backpath1/path1/bar", 1),
+            ]
+        )
+    ],
+)
 # pylint: disable=unused-argument
 def test(application, client, backend_usages, backends, expect_ok):
     """
@@ -175,6 +180,6 @@ def test(application, client, backend_usages, backends, expect_ok):
         assert response.status_code == 200, f"For path {path} expected status_code 200"
 
         hits_after = resilient.analytics_list_by_service(
-            application.threescale_client, application["service_id"], "hits", "total", hits_before+expected_hits_diff)
-        assert hits_after == hits_before + expected_hits_diff, \
-            f"For {path} expected different number of hits"
+            application.threescale_client, application["service_id"], "hits", "total", hits_before + expected_hits_diff
+        )
+        assert hits_after == hits_before + expected_hits_diff, f"For {path} expected different number of hits"

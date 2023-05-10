@@ -16,9 +16,7 @@ def jaeger(testconfig, tools):
     """
 
     url = weakget(testconfig)["fixtures"]["jaeger"]["url"] % tools["jaeger"]
-    return Jaeger(url,
-                  testconfig["fixtures"]["jaeger"]["config"],
-                  testconfig["ssl_verify"])
+    return Jaeger(url, testconfig["fixtures"]["jaeger"]["config"], testconfig["ssl_verify"])
 
 
 @pytest.fixture(scope="module")

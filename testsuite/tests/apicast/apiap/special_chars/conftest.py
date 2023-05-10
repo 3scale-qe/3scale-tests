@@ -1,16 +1,16 @@
 """Conftest for special char tests"""
 import pytest
 
-PATHS = ['/', '/foo/']
+PATHS = ["/", "/foo/"]
 
 
-@pytest.fixture(scope='module', params=PATHS)
+@pytest.fixture(scope="module", params=PATHS)
 def backend_path(request):
     """Path to the backend"""
     return request.param
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def backends_mapping(private_base_url, custom_backend):
     """
     For each path create separate backend

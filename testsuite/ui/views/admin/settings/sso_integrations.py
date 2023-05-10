@@ -12,6 +12,7 @@ from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleEditB
 
 class SSOIntegrationsView(BaseSettingsView):
     """View representation of SSO Integrations page"""
+
     path_pattern = "/p/admin/account/authentication_providers"
     new_integration = Text("//a[@href='/p/admin/account/authentication_providers/new']")
     table = PatternflyTable("//table[@class='data']")
@@ -35,18 +36,23 @@ class SSOIntegrationsView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and \
-               self.path in self.browser.url and self.new_integration.is_displayed and \
-               self.table.is_displayed and self.new_integration.is_displayed
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.new_integration.is_displayed
+            and self.table.is_displayed
+            and self.new_integration.is_displayed
+        )
 
 
 class NewSSOIntegrationView(BaseSettingsView):
     """View representation of new SSO Integrations page"""
+
     path_pattern = "/p/admin/account/authentication_providers/new"
     SSO_provider = ThreescaleDropdown("//*[@id='authentication_provider_kind_input']")
-    client = TextInput(id='authentication_provider_client_id')
-    client_secret = TextInput(id='authentication_provider_client_secret')
-    realm = TextInput(id='authentication_provider_site')
+    client = TextInput(id="authentication_provider_client_id")
+    client_secret = TextInput(id="authentication_provider_client_secret")
+    realm = TextInput(id="authentication_provider_site")
     create_button = ThreescaleCreateButton()
 
     def create(self, provider, client, secret, realm=None):
@@ -61,20 +67,26 @@ class NewSSOIntegrationView(BaseSettingsView):
 
     def get_id(self):
         """Get ID of SSO integration from URL"""
-        return urlparse(self.browser.url).path.split('/')[-1]
+        return urlparse(self.browser.url).path.split("/")[-1]
 
     def prerequisite(self):
         return SSOIntegrationsView
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.SSO_provider.is_displayed and self.client.is_displayed and self.client_secret.is_displayed \
-               and self.realm.is_displayed
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.SSO_provider.is_displayed
+            and self.client.is_displayed
+            and self.client_secret.is_displayed
+            and self.realm.is_displayed
+        )
 
 
 class SSOIntegrationDetailView(BaseSettingsView):
     """View representation of detail SSO Integrations page"""
+
     path_pattern = "/p/admin/account/authentication_providers/{integration_id}"
     test_flow_link = Text(".//*[normalize-space(.)='Test authentication flow now']")
     test_flow_checkbox = ThreescaleCheckBox(locator="//input[@id='check']")
@@ -111,12 +123,17 @@ class SSOIntegrationDetailView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.test_flow_link.is_displayed and self.edit_button.is_displayed
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.test_flow_link.is_displayed
+            and self.edit_button.is_displayed
+        )
 
 
 class SSOIntegrationEditView(BaseSettingsView):
     """View representation of edit SSO Integrations page"""
+
     path_pattern = "/p/admin/account/authentication_providers/{integration_id}/edit"
     delete_button = ThreescaleDeleteButton()
 
@@ -132,5 +149,8 @@ class SSOIntegrationEditView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.delete_button.is_displayed
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and self.delete_button.is_displayed
+        )

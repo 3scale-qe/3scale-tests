@@ -11,5 +11,7 @@ def check_availability(prometheus):
     """
 
     if not prometheus.has_metric("que_workers_total"):
-        warn_and_skip("The Prometheus is not configured to run this test. The collection"
-                      " of basic metrics is not set up. The test has been skipped.")
+        warn_and_skip(
+            "The Prometheus is not configured to run this test. The collection"
+            " of basic metrics is not set up. The test has been skipped."
+        )

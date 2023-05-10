@@ -23,9 +23,9 @@ def service_proxy_settings(service_proxy_settings):
 
 
 def test_headers_user_key(application, api_client):
-    """Check credentials passed in headers """
+    """Check credentials passed in headers"""
     key, value = list(application.authobj().credentials.items())[0]
-    response = api_client().get('/get')
+    response = api_client().get("/get")
 
     assert response.status_code == 200
     assert response.request.headers[key] == value

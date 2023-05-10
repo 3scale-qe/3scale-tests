@@ -12,8 +12,8 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.DEBUG)
     # pylint: disable=invalid-name
-    fmt = '%(asctime)s %(levelname)s:%(name)s:%(message)s'
-    datefmt = '%H:%M:%S'
+    fmt = "%(asctime)s %(levelname)s:%(name)s:%(message)s"
+    datefmt = "%H:%M:%S"
     formatter = logging.Formatter(fmt, datefmt)
     # time in UTC
     formatter.converter = time.gmtime  # type: ignore
@@ -57,15 +57,17 @@ except ImportError:
     from dynaconf.vendor.box.exceptions import BoxKeyError
 
 BoxKeyError.native_str = BoxKeyError.__str__
-BoxKeyError.__str__ = lambda self: \
-    self.native_str() + \
-    "\nHINT: Don't forget, either login to openshift (and set '3scale' project) or have all required config/ set!"
+BoxKeyError.__str__ = (
+    lambda self: self.native_str()
+    + "\nHINT: Don't forget, either login to openshift (and set '3scale' project) or have all required config/ set!"
+)
 
 if settings["ssl_verify"]:
     for ca_bundle in (
-            "/etc/pki/tls/certs/ca-bundle.crt",
-            "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
-            "/etc/ssl/certs/ca-certificates.crt"):
+        "/etc/pki/tls/certs/ca-bundle.crt",
+        "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
+        "/etc/ssl/certs/ca-certificates.crt",
+    ):
         if os.path.exists(ca_bundle):
             if "REQUESTS_CA_BUNDLE" not in os.environ:
                 os.environ["REQUESTS_CA_BUNDLE"] = ca_bundle
@@ -75,8 +77,12 @@ if settings["ssl_verify"]:
 else:
     os.environ["OPENSHIFT_CLIENT_PYTHON_DEFAULT_SKIP_TLS_VERIFY"] = "true"
 
-TESTED_VERSION = Version(str(
-    weakget(settings)["threescale"]["version"] % resources.files("testsuite").joinpath("VERSION").read_text().strip()))
+TESTED_VERSION = Version(
+    str(
+        weakget(settings)["threescale"]["version"]
+        % resources.files("testsuite").joinpath("VERSION").read_text().strip()
+    )
+)
 APICAST_OPERATOR_VERSION = Version(str(weakget(settings)["threescale"]["apicast_operator_version"] % 0))
 HTTP2 = settings.get("http2", False)
 ROOT_DIR = Path(os.path.abspath(__file__)).parent.parent

@@ -15,10 +15,8 @@ class Scaler:
     Simple layer on top of pure openshift scaling commands that either scale directly
     or through an operator, if possible
     """
-    DEPLOYMENT_MAPPINGS = {
-        "backend-listener": "scale_backend",
-        "apicast-production": "scale_apicast_production"
-    }
+
+    DEPLOYMENT_MAPPINGS = {"backend-listener": "scale_backend", "apicast-production": "scale_apicast_production"}
 
     def __init__(self, client: "OpenShiftClient"):
         self.client = client

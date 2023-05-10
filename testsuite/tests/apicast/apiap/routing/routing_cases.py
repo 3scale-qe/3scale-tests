@@ -10,7 +10,7 @@ def path_valid_chars():
 
 def case_default_get():
     """Default test that checks routing with /get path"""
-    return ['/get']
+    return ["/get"]
 
 
 def case_url_valid_chars():

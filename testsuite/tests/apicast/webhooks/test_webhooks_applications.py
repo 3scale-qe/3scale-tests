@@ -16,7 +16,8 @@ from testsuite.utils import blame
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5207"),
-    pytest.mark.disruptive]
+    pytest.mark.disruptive,
+]
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -35,8 +36,9 @@ def custom_app(custom_application, custom_app_plan, service, lifecycle_hooks, re
     Create a second application
     """
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app_plan")), service)
-    return custom_application(rawobj.Application(blame(request, "app_name"), plan), autoclean=False,
-                              hooks=lifecycle_hooks)
+    return custom_application(
+        rawobj.Application(blame(request, "app_name"), plan), autoclean=False, hooks=lifecycle_hooks
+    )
 
 
 def test_application_created(application, requestbin):
@@ -63,9 +65,9 @@ def test_application_updated(application, requestbin):
         - Get webhook response for updated
         - Assert that webhook response is not None
         - Assert that response xml body contains right application name and description
-      """
+    """
 
-    application.update({"name": "updated_name", "description": 'updated_description'})
+    application.update({"name": "updated_name", "description": "updated_description"})
     webhook = requestbin.get_webhook("updated", str(application.entity_id))
     assert webhook is not None
 

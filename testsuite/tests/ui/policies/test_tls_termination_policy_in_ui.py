@@ -15,14 +15,25 @@ from testsuite.utils import blame
 
 # Imports for TLS fixtures
 # noqa # pylint: disable=unused-import
-from testsuite.tests.apicast.policy.tls.conftest import require_openshift, staging_gateway, mount_certificate_secret, \
-    valid_authority, certificate, create_cert, server_authority, manager, superdomain,\
-    gateway_options, gateway_environment
+from testsuite.tests.apicast.policy.tls.conftest import (
+    require_openshift,
+    staging_gateway,
+    mount_certificate_secret,
+    valid_authority,
+    certificate,
+    create_cert,
+    server_authority,
+    manager,
+    superdomain,
+    gateway_options,
+    gateway_environment,
+)
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
-    pytest.mark.usefixtures("login")]
+    pytest.mark.usefixtures("login"),
+]
 
 
 @pytest.fixture(scope="function")
@@ -37,8 +48,9 @@ def client(policy_application):
 @pytest.fixture(scope="function")
 def policy_service(request, backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks):
     """Preconfigured service with backend with scope for 1 test due to harmful changes on policy chain"""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
-                          hooks=lifecycle_hooks)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
 
 @pytest.fixture(scope="function")
@@ -73,12 +85,16 @@ def embedded_certs(certificate):
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.parametrize("cert_type_setup", [
-    pytest.param("local_certs", id="Local certificates", marks=pytest.mark.required_capabilities(Capability.OCP3)),
-    pytest.param("embedded_certs", id="Embedded certificates"),
-])
-def test_tls_terminology_policy_via_ui(request, policy_service, navigator, cert_type_setup, client, valid_authority,
-                                       policy_application):
+@pytest.mark.parametrize(
+    "cert_type_setup",
+    [
+        pytest.param("local_certs", id="Local certificates", marks=pytest.mark.required_capabilities(Capability.OCP3)),
+        pytest.param("embedded_certs", id="Embedded certificates"),
+    ],
+)
+def test_tls_terminology_policy_via_ui(
+    request, policy_service, navigator, cert_type_setup, client, valid_authority, policy_application
+):
     """
     Test:
         - Create service via API
@@ -102,7 +118,7 @@ def test_tls_terminology_policy_via_ui(request, policy_service, navigator, cert_
     api_client.session = requests.Session()
     assert api_client.get("/get").status_code == 200
 
-    with pytest.raises(Exception, match='certificate verify failed: unable to get local issuer certificate'):
+    with pytest.raises(Exception, match="certificate verify failed: unable to get local issuer certificate"):
         client.get("/get")
 
 

@@ -22,6 +22,7 @@ class Certificate(TmpFilePersist):
 
 class UnsignedKey(TmpFilePersist):
     """Representing generated key that hasn't been signed yet"""
+
     def __init__(self, key, csr) -> None:
         super().__init__()
         self.key = key
@@ -60,6 +61,7 @@ class CertificateStore(ABC):
 # pylint: disable=too-few-public-methods
 class SigningProvider(ABC):
     """Provider key signing capabilities"""
+
     @abstractmethod
     def sign(self, key: UnsignedKey, certificate_authority: Optional[Certificate] = None) -> Certificate:
         """Signs the generated key, returns final certificate.
@@ -79,11 +81,11 @@ class SigningProvider(ABC):
 
 class KeyProvider(ABC):
     """Class that can generate keys to be used in certificates"""
+
     @abstractmethod
-    def generate_key(self,
-                     common_name: str,
-                     names: Optional[List[Dict[str, str]]] = None,
-                     hosts: Optional[List[str]] = None) -> UnsignedKey:
+    def generate_key(
+        self, common_name: str, names: Optional[List[Dict[str, str]]] = None, hosts: Optional[List[str]] = None
+    ) -> UnsignedKey:
         """Create a new unsigned key.
         Args:
             :param common_name: The fully qualified domain name for
@@ -93,11 +95,12 @@ class KeyProvider(ABC):
         """
 
     @abstractmethod
-    def generate_ca(self,
-                    common_name: str,
-                    names: List[Dict[str, str]],
-                    hosts: List[str],
-                    ) -> Tuple[Certificate, UnsignedKey]:
+    def generate_ca(
+        self,
+        common_name: str,
+        names: List[Dict[str, str]],
+        hosts: List[str],
+    ) -> Tuple[Certificate, UnsignedKey]:
         """Creates new CA key, returns both self signed certificate and Unsigned key with CSR
          if we want to make it a intermediate CA
         Args:
@@ -132,12 +135,14 @@ class CertificateManager:
         self.store = store
 
     # pylint: disable=too-many-arguments
-    def create(self,
-               label: str,
-               common_name: str,
-               hosts: List[str],
-               names: Optional[List[Dict[str, str]]] = None,
-               certificate_authority: Optional[Certificate] = None) -> Certificate:
+    def create(
+        self,
+        label: str,
+        common_name: str,
+        hosts: List[str],
+        names: Optional[List[Dict[str, str]]] = None,
+        certificate_authority: Optional[Certificate] = None,
+    ) -> Certificate:
         """Create a new certificate.
         Args:
             :param certificate_authority: Certificate Authority to be used for signing
@@ -162,11 +167,13 @@ class CertificateManager:
         """Returns already existing certificate from the store"""
         return self.store[label]
 
-    def create_ca(self,
-                  label: str,
-                  hosts: List[str],
-                  names: Optional[List[Dict[str, str]]] = None,
-                  certificate_authority: Optional[Certificate] = None) -> Tuple[Certificate, UnsignedKey]:
+    def create_ca(
+        self,
+        label: str,
+        hosts: List[str],
+        names: Optional[List[Dict[str, str]]] = None,
+        certificate_authority: Optional[Certificate] = None,
+    ) -> Tuple[Certificate, UnsignedKey]:
         """Create a new certificate authority, if ca is specified it will create an intermediate ca.
         Args:
             :param certificate_authority:

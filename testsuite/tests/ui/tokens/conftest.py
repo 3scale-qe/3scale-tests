@@ -20,8 +20,9 @@ def api_client(testconfig):
         headers = headers or {}
         params = params or {}
         params.update(access_token=token)
-        return requests.request(method=method, url=url, headers=headers,
-                                params=params, verify=testconfig["ssl_verify"], **kwargs)
+        return requests.request(
+            method=method, url=url, headers=headers, params=params, verify=testconfig["ssl_verify"], **kwargs
+        )
 
     return _api_client
 
@@ -29,15 +30,16 @@ def api_client(testconfig):
 @pytest.fixture
 def invoice(threescale, account):
     """Crate invoice through API"""
-    invoice = threescale.invoices.create({"account_id": account['id']})
+    invoice = threescale.invoices.create({"account_id": account["id"]})
 
     yield invoice
 
     invoice.state_update(InvoiceState.CANCELLED)
 
 
-@pytest.fixture(scope="module",
-                params=[pytest.param((False, 403), id='Read Only'), pytest.param((True, 201), id='Read and Write')])
+@pytest.fixture(
+    scope="module", params=[pytest.param((False, 403), id="Read Only"), pytest.param((True, 201), id="Read and Write")]
+)
 def permission(request):
     """Permission of token"""
     return request.param
@@ -64,10 +66,11 @@ def schema():
                         "type": "object",
                         "properties": {
                             "value1": {"type": "string", "description": "Value1"},
-                            "value2": {"type": "string", "description": "Value2"}
+                            "value2": {"type": "string", "description": "Value2"},
                         },
-                        "required": ["value1"]
-                    }
+                        "required": ["value1"],
+                    },
                 }
-            }
-        }}
+            },
+        },
+    }

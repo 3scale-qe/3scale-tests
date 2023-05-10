@@ -12,8 +12,10 @@ import pytest
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.template import TemplateApicast
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6193")]
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6193"),
+]
 
 
 ACCESS_LOG_FILE = "access.log"

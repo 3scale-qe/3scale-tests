@@ -20,14 +20,15 @@ from testsuite.utils import blame_desc
 pytestmark = [
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1948"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1949"),
-    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951")]
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951"),
+]
 
 
 DEFAULT_FLOWS = {
     "implicit_flow_enabled": False,
     "standard_flow_enabled": False,
     "direct_access_grants_enabled": False,
-    "service_accounts_enabled": False
+    "service_accounts_enabled": False,
 }
 
 
@@ -42,17 +43,15 @@ def service_settings(service_settings):
 def service_proxy_settings(rhsso_service_info, service_proxy_settings):
     "Set OIDC issuer and type"
     service_proxy_settings.update(
-        oidc_issuer_endpoint=rhsso_service_info.authorization_url(),
-        oidc_issuer_type="keycloak")
+        oidc_issuer_endpoint=rhsso_service_info.authorization_url(), oidc_issuer_type="keycloak"
+    )
     return service_proxy_settings
 
 
 @pytest.fixture(scope="module")
 def service(service):
     """Updates OIDC configuration to default flows (each flow is set to false)"""
-    service.proxy.oidc.update(params={
-        "oidc_configuration": DEFAULT_FLOWS
-    })
+    service.proxy.oidc.update(params={"oidc_configuration": DEFAULT_FLOWS})
     return service
 
 
@@ -93,7 +92,7 @@ def get_flows(realm, client_id, expected_flow, expected_value):
         "implicit_flow_enabled": rhsso_client["implicitFlowEnabled"],
         "standard_flow_enabled": rhsso_client["standardFlowEnabled"],
         "direct_access_grants_enabled": rhsso_client["directAccessGrantsEnabled"],
-        "service_accounts_enabled": rhsso_client["serviceAccountsEnabled"]
+        "service_accounts_enabled": rhsso_client["serviceAccountsEnabled"],
     }
 
     if flows[expected_flow] != expected_value:
@@ -101,11 +100,15 @@ def get_flows(realm, client_id, expected_flow, expected_value):
     return flows
 
 
-@pytest.mark.parametrize("flow_type,expected", [
-    ("implicit_flow_enabled", (True, False, False, False)),
-    ("standard_flow_enabled", (False, True, False, False)),
-    ("direct_access_grants_enabled", (False, False, True, False)),
-    ("service_accounts_enabled", (False, False, False, True))])
+@pytest.mark.parametrize(
+    "flow_type,expected",
+    [
+        ("implicit_flow_enabled", (True, False, False, False)),
+        ("standard_flow_enabled", (False, True, False, False)),
+        ("direct_access_grants_enabled", (False, False, True, False)),
+        ("service_accounts_enabled", (False, False, False, True)),
+    ],
+)
 def test(application, rhsso_service_info, request, flow_type, expected):
     """
     Test checks if the change of the flows of 3scale service were reflected on
@@ -118,7 +121,7 @@ def test(application, rhsso_service_info, request, flow_type, expected):
     client_id = rhsso_service_info.get_application_client(application)
     flows = get_flows(rhsso_service_info.realm, client_id, flow_type, True)
 
-    assert flows['implicit_flow_enabled'] is expected[0]
-    assert flows['standard_flow_enabled'] is expected[1]
-    assert flows['direct_access_grants_enabled'] is expected[2]
-    assert flows['service_accounts_enabled'] is expected[3]
+    assert flows["implicit_flow_enabled"] is expected[0]
+    assert flows["standard_flow_enabled"] is expected[1]
+    assert flows["direct_access_grants_enabled"] is expected[2]
+    assert flows["service_accounts_enabled"] is expected[3]

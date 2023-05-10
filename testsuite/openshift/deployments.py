@@ -14,7 +14,8 @@ if typing.TYPE_CHECKING:
 
 class Deployment(ABC):
     """Common class for KubernetesDeployments and DeploymentConfigs,
-     enables functionality that works on both to be written once"""
+    enables functionality that works on both to be written once"""
+
     def __init__(self, openshift: "OpenShiftClient", resource) -> None:
         super().__init__()
         self.openshift = openshift
@@ -65,8 +66,7 @@ class Deployment(ABC):
             return deployment.model.spec.replicas
 
     # pylint: disable=too-many-arguments
-    def add_volume(self, volume_name: str, mount_path: str,
-                   secret_name: str = None, configmap_name: str = None):
+    def add_volume(self, volume_name: str, mount_path: str, secret_name: str = None, configmap_name: str = None):
         """Add volume to a given deployment.
 
         Args:
@@ -86,9 +86,9 @@ class Deployment(ABC):
         self._manage_volume("remove", volume_name)
 
     # pylint: disable=too-many-arguments
-    def _manage_volume(self, action: str, volume_name: str,
-                       mount_path: str = None, secret_name: str = None,
-                       configmap_name: str = None):
+    def _manage_volume(
+        self, action: str, volume_name: str, mount_path: str = None, secret_name: str = None, configmap_name: str = None
+    ):
         """Manage volumes for a given deployment.
 
         You can add or remove a volume by passing `add` or `remove` to :param action.
@@ -164,12 +164,12 @@ class Deployment(ABC):
 
 class KubernetesDeployment(Deployment):
     """Pure Kubernetes deployment"""
+
     def __init__(self, openshift: "OpenShiftClient", resource: "str") -> None:
         super().__init__(openshift, resource)
 
     def rollout(self):
-        self.openshift.do_action("delete", ["pod", "--force",
-                                            "--grace-period=0", "-l", f"deployment={self.name}"])
+        self.openshift.do_action("delete", ["pod", "--force", "--grace-period=0", "-l", f"deployment={self.name}"])
         self.wait_for()
 
     def wait_for(self, timeout: int = 90):
@@ -188,6 +188,7 @@ class KubernetesDeployment(Deployment):
 
 class DeploymentConfig(Deployment):
     """OpenShift DeploymentConfig object"""
+
     def __init__(self, openshift: "OpenShiftClient", resource: str) -> None:
         super().__init__(openshift, resource)
 

@@ -2,10 +2,13 @@
 import pytest
 
 
-@pytest.fixture(scope="module", params=[
+@pytest.fixture(
+    scope="module",
+    params=[
         pytest.param(("valid_authority", 200), id="Matching authorities"),
-        pytest.param(("invalid_authority", 502), id="Mismatched authorities")
-])
+        pytest.param(("invalid_authority", 502), id="Mismatched authorities"),
+    ],
+)
 def authority_and_code(request):
     """
     Returns authority for httpbin and return code it should return

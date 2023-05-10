@@ -31,8 +31,8 @@ def test_field_definitions(account, navigator, browser):
     """
     user = account.users.list()[0]
     user_edit = navigator.navigate(AccountUserEditView, account=account, user=user)
-    field = TextInput(browser, id='user_extra_fields_custom_field')
-    field.fill('anything')
+    field = TextInput(browser, id="user_extra_fields_custom_field")
+    field.fill("anything")
     user_edit.update_button.click()
     navigator.navigate(AccountUserDetailView, account=account, user=user)
     assert browser.element(".//th[contains(text(),'Contact Name')]").is_displayed()

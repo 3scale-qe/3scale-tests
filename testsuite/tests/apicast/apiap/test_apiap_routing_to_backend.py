@@ -10,7 +10,8 @@ from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.8.1')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4904")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4904"),
+]
 
 
 @pytest.fixture(scope="module")

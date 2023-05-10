@@ -14,7 +14,7 @@ def test_proxy_endpoints_set(service, testconfig):
     """
     Test checks if the endpoints match.
     """
-    if testconfig['threescale']['deployment_type'] == 'saas':
+    if testconfig["threescale"]["deployment_type"] == "saas":
         warn_and_skip("Different naming scheme for apicast on saas")
 
     service_name = service.entity["name"]

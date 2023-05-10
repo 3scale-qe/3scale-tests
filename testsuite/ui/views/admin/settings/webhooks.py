@@ -12,22 +12,37 @@ class WebhooksView(BaseSettingsView):
     """
     View representation of Webhook page
     """
-    path_pattern = '/p/admin/webhooks/edit'
+
+    path_pattern = "/p/admin/webhooks/edit"
     webhook_active = GenericLocatorWidget('//*[@id="web_hook_active"]')
     webhook_provider = GenericLocatorWidget('//*[@id="web_hook_provider_actions"]')
     accounts = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Accounts']/../../..")
     users = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Users']/../../..")
     applications = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Applications']/../../..")
     keys = CheckBoxGroup("//fieldset[@class='inputs']/legend/span[text()='Keys']/../../..")
-    checkbox_names = {"Accounts": ["web_hook_account_created_on", "web_hook_account_updated_on",
-                                   "web_hook_account_plan_changed_on", "web_hook_account_deleted_on"],
-                      "Users": ["web_hook_user_created_on", "web_hook_user_updated_on", "web_hook_user_deleted_on"],
-                      "Applications": ["web_hook_application_created_on", "web_hook_application_updated_on",
-                                       "web_hook_application_suspended_on", "web_hook_application_plan_changed_on",
-                                       "web_hook_application_user_key_updated_on", "web_hook_application_deleted_on"],
-                      "Keys": ["web_hook_application_key_created_on", "web_hook_application_key_deleted_on",
-                               "web_hook_application_key_updated_on"]}
-    url = TextInput(id='web_hook_url')
+    checkbox_names = {
+        "Accounts": [
+            "web_hook_account_created_on",
+            "web_hook_account_updated_on",
+            "web_hook_account_plan_changed_on",
+            "web_hook_account_deleted_on",
+        ],
+        "Users": ["web_hook_user_created_on", "web_hook_user_updated_on", "web_hook_user_deleted_on"],
+        "Applications": [
+            "web_hook_application_created_on",
+            "web_hook_application_updated_on",
+            "web_hook_application_suspended_on",
+            "web_hook_application_plan_changed_on",
+            "web_hook_application_user_key_updated_on",
+            "web_hook_application_deleted_on",
+        ],
+        "Keys": [
+            "web_hook_application_key_created_on",
+            "web_hook_application_key_deleted_on",
+            "web_hook_application_key_updated_on",
+        ],
+    }
+    url = TextInput(id="web_hook_url")
     update = ThreescaleUpdateButton()
 
     def webhook_check(self, webhook_type: str, requestbin: str):
@@ -55,5 +70,9 @@ class WebhooksView(BaseSettingsView):
 
     @property
     def is_displayed(self):
-        return BaseSettingsView.is_displayed.fget(self) and self.webhook_active.is_displayed \
-               and self.webhook_provider.is_displayed and self.path in self.browser.url
+        return (
+            BaseSettingsView.is_displayed.fget(self)
+            and self.webhook_active.is_displayed
+            and self.webhook_provider.is_displayed
+            and self.path in self.browser.url
+        )

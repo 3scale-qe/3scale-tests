@@ -18,7 +18,8 @@ from testsuite.tests.apicast.policy.maintenance_mode import config_cases_host
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6552")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6552"),
+]
 
 
 @pytest.fixture
@@ -68,18 +69,28 @@ def mapping_rules(service, backend_bin, backend_echo):
 @pytest.fixture
 def policy_settings_alt(service, echo_api_base_url) -> dict:
     """set the maintenance mode policy before Apicast in the chain"""
-    service = service.proxy.list().policies.insert(0, rawobj.PolicyConfig(
-        "maintenance_mode",
-        {
-            "condition": {"operations": [
-                {"left_type": "liquid",
-                 "right_type": "plain",
-                 "left": "{{ upstream.host }}",
-                 "right": urlparse(echo_api_base_url).hostname.split(".", 1)[0],
-                 "op": "matches"}], "combine_op": "or"},
-            "status": 328,
-            "message": "SERVICE UNAVAILABLE"
-        }))
+    service = service.proxy.list().policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "maintenance_mode",
+            {
+                "condition": {
+                    "operations": [
+                        {
+                            "left_type": "liquid",
+                            "right_type": "plain",
+                            "left": "{{ upstream.host }}",
+                            "right": urlparse(echo_api_base_url).hostname.split(".", 1)[0],
+                            "op": "matches",
+                        }
+                    ],
+                    "combine_op": "or",
+                },
+                "status": 328,
+                "message": "SERVICE UNAVAILABLE",
+            },
+        ),
+    )
 
     return service
 
@@ -109,9 +120,9 @@ def test_maintenance_mode_policy(config, application):
 # pylint: disable=unused-argument
 def test_maintenance_mode_policy_failure(policy_settings_alt, application):
     """Test that maintenance mode fails to check upstream host if the policy is placed
-       before apicast.
-       The fixture 'policy_settings_alt' configure the policy chain placing the maintenance
-       mode policy before apicast.
+    before apicast.
+    The fixture 'policy_settings_alt' configure the policy chain placing the maintenance
+    mode policy before apicast.
     """
     api_client = application.api_client()
 

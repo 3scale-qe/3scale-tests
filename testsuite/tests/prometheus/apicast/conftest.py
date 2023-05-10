@@ -11,9 +11,13 @@ def check_availability(prometheus):
     """
 
     if not prometheus.has_metric("worker_process", "apicast-staging"):
-        warn_and_skip("The Prometheus is not configured to run this test. The collection"
-                      " of basic metrics is not set up. The test has been skipped.")
+        warn_and_skip(
+            "The Prometheus is not configured to run this test. The collection"
+            " of basic metrics is not set up. The test has been skipped."
+        )
 
     if not prometheus.has_metric("worker_process", "apicast-production"):
-        warn_and_skip("The Prometheus is not configured to run this test. The collection"
-                      " of basic metrics is not set up. The test has been skipped.")
+        warn_and_skip(
+            "The Prometheus is not configured to run this test. The collection"
+            " of basic metrics is not set up. The test has been skipped."
+        )

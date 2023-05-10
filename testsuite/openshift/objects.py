@@ -33,18 +33,15 @@ class SecretTypes(enum.Enum):
 class RemoteMapping:
     """Dict-like interface to generic yaml object"""
 
-    def __init__(self, client: 'OpenShiftClient', resource_name: str):
+    def __init__(self, client: "OpenShiftClient", resource_name: str):
         self._client = client
         self._resource_name = resource_name
 
-    def do_action(self, verb: str, cmd_args: List[Union[str, List[str]]] = None,
-                  auto_raise: bool = True):
+    def do_action(self, verb: str, cmd_args: List[Union[str, List[str]]] = None, auto_raise: bool = True):
         """Executes command and returns output in yaml format"""
         cmd_args = cmd_args or []
         cmd_args.extend(["-o", "yaml"])
-        return yaml.load(
-            StringIO(self._client.do_action(verb, cmd_args, auto_raise).out()),
-            Loader=yaml.FullLoader)
+        return yaml.load(StringIO(self._client.do_action(verb, cmd_args, auto_raise).out()), Loader=yaml.FullLoader)
 
     def __iter__(self):
         """Return iterator for requested resource"""
@@ -79,7 +76,10 @@ class Routes(RemoteMapping):
         PASSTHROUGH = "passthrough"
         REENCRYPT = "reencrypt"
 
-    def __init__(self, client, ) -> None:
+    def __init__(
+        self,
+        client,
+    ) -> None:
         super().__init__(client, "route")
 
     def expose(self, name, service, hostname):
@@ -108,15 +108,16 @@ class Routes(RemoteMapping):
         :return: list of routes
         """
         routes = [r for r in self if r["spec"]["to"]["name"] == service]
-        routes = list(sorted(routes,
-                             key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", math.inf))))
+        routes = list(
+            sorted(routes, key=lambda x: float(x["metadata"]["labels"].get("3scale.net/tenant_id", math.inf)))
+        )
         return routes
 
 
 class Secrets(RemoteMapping):
     """Dict-like interface to openshift secrets"""
 
-    def __init__(self, client: 'OpenShiftClient'):
+    def __init__(self, client: "OpenShiftClient"):
         super().__init__(client, "secret")
 
     def __getitem__(self, name: str):
@@ -136,9 +137,15 @@ class Secrets(RemoteMapping):
         return _DecodedSecrets(super().__getitem__(name)["data"])
 
     # pylint: disable=too-many-arguments
-    def create(self, name: str, kind: SecretKinds = SecretKinds.GENERIC, secret_type: SecretTypes = None,
-               string_data: typing.Dict[str, str] = None, files: typing.Dict[str, str] = None,
-               certificate: Certificate = None):
+    def create(
+        self,
+        name: str,
+        kind: SecretKinds = SecretKinds.GENERIC,
+        secret_type: SecretTypes = None,
+        string_data: typing.Dict[str, str] = None,
+        files: typing.Dict[str, str] = None,
+        certificate: Certificate = None,
+    ):
         """Create a new secret.
 
         Args:
@@ -174,7 +181,7 @@ class Secrets(RemoteMapping):
 class ConfigMaps(RemoteMapping):
     """Dict-like interface to openshift secrets"""
 
-    def __init__(self, client: 'OpenShiftClient'):
+    def __init__(self, client: "OpenShiftClient"):
         super().__init__(client, "cm")
 
     def __getitem__(self, name):

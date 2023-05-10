@@ -6,8 +6,9 @@ from testsuite.ui.widgets import NavigationMenu
 
 class BaseSettingsView(BaseAdminView):
     """Parent View for Audience Views."""
-    NAV_ITEMS = ['Overview', 'Personal', 'Users', 'Integrate', 'Export']
-    nav = NavigationMenu(id='mainmenu')
+
+    NAV_ITEMS = ["Overview", "Personal", "Users", "Integrate", "Export"]
+    nav = NavigationMenu(id="mainmenu")
 
     @step("@href")
     def step(self, href, **kwargs):

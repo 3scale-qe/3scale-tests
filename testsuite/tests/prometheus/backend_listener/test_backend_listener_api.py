@@ -51,8 +51,9 @@ def service_oauth(backends_mapping, custom_service, request, service_proxy_setti
     """
     Service secured with oauth
     """
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping,
-                          hooks=lifecycle_hooks_oauth)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks_oauth
+    )
 
 
 @pytest.fixture(scope="module")
@@ -77,8 +78,9 @@ def oauth_service_token(application_oauth):
     """
     Service token of the application using oauth
     """
-    return application_oauth.service.proxy.list().configs.list(
-        env="sandbox")[0]["proxy_config"]['content']["backend_authentication_value"]
+    return application_oauth.service.proxy.list().configs.list(env="sandbox")[0]["proxy_config"]["content"][
+        "backend_authentication_value"
+    ]
 
 
 @pytest.fixture(scope="module")
@@ -87,11 +89,14 @@ def oauth_params(service_oauth, oauth_service_token, token, application_oauth):
     Returns two sets of parameters for an application using oauth authentication.
     The former producing 2xx request, the later unauthorized 403 request
     """
-    return {"params": {"service_token": oauth_service_token,
-                       "service_id": service_oauth.entity_id,
-                       "app_id": application_oauth["application_id"],
-                       "access_token": token}}, \
-           {"params": {}}
+    return {
+        "params": {
+            "service_token": oauth_service_token,
+            "service_id": service_oauth.entity_id,
+            "app_id": application_oauth["application_id"],
+            "access_token": token,
+        }
+    }, {"params": {}}
 
 
 @pytest.fixture(scope="module")
@@ -100,10 +105,12 @@ def standard_auth(service, service_token, application):
     Returns two sets of parameters for an application using standard authentication.
     The former producing 2xx request, the later unauthorized 403 request
     """
-    return {"params": {**{"service_token": service_token,
-                          "service_id": service.entity_id},
-                       **application.authobj().credentials}}, \
-           {"params": {}}
+    return {
+        "params": {
+            **{"service_token": service_token, "service_id": service.entity_id},
+            **application.authobj().credentials,
+        }
+    }, {"params": {}}
 
 
 @pytest.fixture(scope="module")
@@ -113,12 +120,14 @@ def transaction_auth(service, service_token, application):
     where the auth information has to be passed as data
     The former producing 2xx request, the later 403 request
     """
-    return {"data": {"service_token": service_token,
-                     "service_id": service.entity_id,
-                     "transactions[0][usage][hits]": "1",
-                     "transactions[0][user_key]": application.authobj().credentials["user_key"]
-                     }}, \
-           {"data": {}}
+    return {
+        "data": {
+            "service_token": service_token,
+            "service_id": service.entity_id,
+            "transactions[0][usage][hits]": "1",
+            "transactions[0][user_key]": application.authobj().credentials["user_key"],
+        }
+    }, {"data": {}}
 
 
 @pytest.fixture(scope="function")
@@ -130,8 +139,9 @@ def auth_request(backend_listener_url):
 
     def _auth_request(method, endpoint, auth_object):
         formatted_endpoint = backend_listener_url + "/transactions" + endpoint
-        return requests.request(method, formatted_endpoint, **auth_object[0]), \
-            requests.request(method, formatted_endpoint, **auth_object[1])
+        return requests.request(method, formatted_endpoint, **auth_object[0]), requests.request(
+            method, formatted_endpoint, **auth_object[1]
+        )
 
     return _auth_request
 
@@ -181,8 +191,7 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request, prome
         for _ in range(NUM_OF_REQUESTS):
             response_2xx, response_403 = auth_request(method, endpoint, params)
             assert response_2xx.status_code in {200, 202}
-            assert response_403.status_code == 403, \
-                f"failed for {request_type}"
+            assert response_403.status_code == 403, f"failed for {request_type}"
 
     # wait for prometheus to collect the metrics
     prometheus.wait_on_next_scrape("backend-listener")
@@ -194,12 +203,14 @@ def test_authrep(data, prometheus_response_codes_for_metric, auth_request, prome
         key, labels = authrep_backend_api_query(request_type)
         count_after[request_type] = prometheus_response_codes_for_metric(key, labels)
         for response_code in ["2xx", "403"]:
-            results[request_type + response_code] = \
-                response_code in count_after[request_type] and \
-                ((response_code not in count_before[request_type] and
-                  int(count_after[request_type][response_code]) == NUM_OF_REQUESTS) or
-                 int(count_after[request_type][response_code])
-                 - int(count_before[request_type][response_code]) == NUM_OF_REQUESTS)
+            results[request_type + response_code] = response_code in count_after[request_type] and (
+                (
+                    response_code not in count_before[request_type]
+                    and int(count_after[request_type][response_code]) == NUM_OF_REQUESTS
+                )
+                or int(count_after[request_type][response_code]) - int(count_before[request_type][response_code])
+                == NUM_OF_REQUESTS
+            )
 
     for request_type_response_code in results.values():
         assert request_type_response_code, f"{results}"

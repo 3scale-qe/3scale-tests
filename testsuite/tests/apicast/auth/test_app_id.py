@@ -11,8 +11,7 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY),
-              pytest.mark.disruptive]
+pytestmark = [pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY), pytest.mark.disruptive]
 
 
 @pytest.fixture(scope="module")
@@ -25,8 +24,7 @@ def service_settings(service_settings):
 @pytest.fixture(scope="module")
 def service_settings2(request):
     """settings for second service"""
-    return {"name": blame(request, "svc"),
-            "backend_version": Service.AUTH_APP_ID_KEY}
+    return {"name": blame(request, "svc"), "backend_version": Service.AUTH_APP_ID_KEY}
 
 
 @pytest.fixture(scope="module")
@@ -99,38 +97,41 @@ def app_key2(application2):
 
 
 @pytest_cases.parametrize(
-    'test_client,application_id,key',
+    "test_client,application_id,key",
     [
         (fixture_ref(client), fixture_ref(app_id), fixture_ref(app_key)),
-        (fixture_ref(client2), fixture_ref(app_id2), fixture_ref(app_key2))],
-    ids=[
-        "service_with_valid_credentials",
-        "service2_with_valid_credentials"])
+        (fixture_ref(client2), fixture_ref(app_id2), fixture_ref(app_key2)),
+    ],
+    ids=["service_with_valid_credentials", "service2_with_valid_credentials"],
+)
 def test_successful_requests(test_client, application_id, key):
     """Test checks if applications with correct auth params will return 200"""
-    response = test_client.get('/get', params={"app_id": application_id, "app_key": key})
+    response = test_client.get("/get", params={"app_id": application_id, "app_key": key})
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.params['app_key'] == key
-    assert echoed_request.params['app_id'] == application_id
+    assert echoed_request.params["app_key"] == key
+    assert echoed_request.params["app_id"] == application_id
 
 
 @pytest_cases.parametrize(
-    'test_client,application_id,key',
+    "test_client,application_id,key",
     [
         (fixture_ref(client), fixture_ref(app_id2), fixture_ref(app_key2)),
         (fixture_ref(client2), fixture_ref(app_id), fixture_ref(app_key)),
         (fixture_ref(client), "", ""),
         (fixture_ref(client), fixture_ref(app_id), ""),
-        (fixture_ref(client), "", fixture_ref(app_key))],
+        (fixture_ref(client), "", fixture_ref(app_key)),
+    ],
     ids=[
         "credentials_from_another_service",
         "credentials_from_another_service",
         "empty_id_and_key",
         "empty_app_key",
-        "empty_app_id"])
+        "empty_app_id",
+    ],
+)
 def test_failed_requests(test_client, application_id, key):
     """Test checks if different invalid auth params returns 403 status code"""
-    response = test_client.get('/get', params={"app_id": application_id, "app_key": key})
+    response = test_client.get("/get", params={"app_id": application_id, "app_key": key})
     assert response.status_code == 403

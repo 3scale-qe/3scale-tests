@@ -27,7 +27,7 @@ def test_config_version(service, navigator):
         - Assert that there isn't notification for outdated config
     """
     settings = navigator.navigate(ProductSettingsView, product=service)
-    settings.change_authentication('service_proxy_authentication_method_oidc')
+    settings.change_authentication("service_proxy_authentication_method_oidc")
     settings = navigator.navigate(ProductConfigurationView, product=service)
 
     assert settings.outdated_config.is_enabled
@@ -35,12 +35,12 @@ def test_config_version(service, navigator):
     settings.configuration.staging_promote_btn.click()
 
     settings = navigator.navigate(ProductSettingsView, product=service)
-    settings.update_client_id('azpza')
+    settings.update_client_id("azpza")
     settings.update_button.click()
-    assert settings.client_id.value == 'azpza'
+    assert settings.client_id.value == "azpza"
 
     settings = navigator.navigate(ProductConfigurationView, product=service)
     assert settings.configuration.staging_promote_btn.is_enabled
     assert settings.outdated_config.is_displayed
 
-    assert service.proxy.list().configs.latest().entity['content']['proxy']['authentication_method']
+    assert service.proxy.list().configs.latest().entity["content"]["proxy"]["authentication_method"]

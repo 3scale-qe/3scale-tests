@@ -20,22 +20,30 @@ LOGGER = logging.getLogger(__name__)
 class TLSApicast(AbstractApicast):
     """Apicast with TLS enabled, works for all subclasses of OpenshiftApicast (so both Template and Operator one)"""
 
-    CAPABILITIES = {Capability.APICAST,
-                    Capability.CUSTOM_ENVIRONMENT,
-                    Capability.PRODUCTION_GATEWAY,
-                    Capability.LOGS,
-                    Capability.JAEGER}
+    CAPABILITIES = {
+        Capability.APICAST,
+        Capability.CUSTOM_ENVIRONMENT,
+        Capability.PRODUCTION_GATEWAY,
+        Capability.LOGS,
+        Capability.JAEGER,
+    }
 
     # pylint: disable=too-many-arguments
-    def __init__(self, name, staging, superdomain, server_authority,
-                 manager, generate_name=False, path_routing=False) -> None:
+    def __init__(
+        self, name, staging, superdomain, server_authority, manager, generate_name=False, path_routing=False
+    ) -> None:
         super().__init__()
         # We expect that the SelfManagedApicast returns subclass of OpenshiftApicast,
         # which is for now true, but it is not ensured
-        self.gateway: OpenshiftApicast = new_gateway({}, kind=SelfManagedApicast, staging=staging,  # type: ignore
-                                                     settings_=settings["threescale"]["gateway"],
-                                                     name=name, randomize_name=generate_name,
-                                                     path_routing=path_routing)
+        self.gateway: OpenshiftApicast = new_gateway(
+            {},
+            kind=SelfManagedApicast,
+            staging=staging,  # type: ignore
+            settings_=settings["threescale"]["gateway"],
+            name=name,
+            randomize_name=generate_name,
+            path_routing=path_routing,
+        )
         # Ugly monkey-patching of a method
         self.gateway.add_route = self.add_route  # type: ignore
         self.secret_name = self.gateway.deployment.name
@@ -51,10 +59,9 @@ class TLSApicast(AbstractApicast):
     @property
     def server_certificate(self) -> Certificate:
         """Returns server certificate currently in-use"""
-        return self.manager.get_or_create("server",
-                                          self._hostname,
-                                          hosts=[self._hostname],
-                                          certificate_authority=self.server_authority)
+        return self.manager.get_or_create(
+            "server", self._hostname, hosts=[self._hostname], certificate_authority=self.server_authority
+        )
 
     def on_application_create(self, application: Application):
         application.api_client_verify = self.server_authority.files["certificate"]
@@ -71,8 +78,9 @@ class TLSApicast(AbstractApicast):
     def add_route(self, name, kind=Routes.Types.PASSTHROUGH):
         """Adds new route for this APIcast"""
         hostname = f"{name}.{self.superdomain}"
-        result = self.openshift.routes.create(name, kind, hostname=hostname,
-                                              service=self.deployment.name, port="httpsproxy")
+        result = self.openshift.routes.create(
+            name, kind, hostname=hostname, service=self.deployment.name, port="httpsproxy"
+        )
         # pylint: disable=protected-access
         self.gateway._routes.append(name)
         return result

@@ -107,14 +107,12 @@ def _rhsso_password(server_url, token):
     """Search for SSO admin password"""
     try:
         # is this RHOAM?
-        tools = OpenShiftClient(
-            project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
+        tools = OpenShiftClient(project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
         return tools.secrets["credential-rhssouser"]["ADMIN_PASSWORD"].decode("utf-8")
     except (OpenShiftPythonException, KeyError):
         try:
             # was it deployed as part of tools?
-            tools = OpenShiftClient(
-                project_name="tools", server_url=server_url, token=token)
+            tools = OpenShiftClient(project_name="tools", server_url=server_url, token=token)
             # first RHSSO 7.5 way
             return tools.secrets["credential-sso"]["ADMIN_PASSWORD"].decode("utf-8")
         except (OpenShiftPythonException, KeyError):
@@ -159,21 +157,19 @@ def _apicast_ocp(ocp, settings):
 
     if not settings.get("project_name"):
         maybe_ocp = OpenShiftClient(
-            project_name=maybe_project_name,
-            server_url=settings.get("server_url"),
-            token=settings.get("token"))
+            project_name=maybe_project_name, server_url=settings.get("server_url"), token=settings.get("token")
+        )
         if maybe_ocp.project_exists:
             return maybe_ocp
         return OpenShiftClient(ocp.project_name, ocp.server_url, ocp.token)
 
     return OpenShiftClient(
-        project_name=settings.get("project_name"),
-        server_url=settings.get("server_url"),
-        token=settings.get("token"))
+        project_name=settings.get("project_name"), server_url=settings.get("server_url"), token=settings.get("token")
+    )
 
 
 def get_routes(ocp):
-    """Returns routes grouped by the service they are for """
+    """Returns routes grouped by the service they are for"""
     mapping = {}
     for route in ocp.routes:
         mapping.setdefault(route["spec"]["to"]["name"], []).append(route)
@@ -225,9 +221,8 @@ def load(obj, env=None, silent=None, key=None):
         ocp_setup = obj.get("openshift", {}).get("servers", {}).get("default", {})
 
         ocp = OpenShiftClient(
-            project_name=project,
-            server_url=ocp_setup.get("server_url"),
-            token=ocp_setup.get("token"))
+            project_name=project, server_url=ocp_setup.get("server_url"), token=ocp_setup.get("token")
+        )
 
         apicast_ocp = _apicast_ocp(ocp, obj)
         apicast_operator_ocp = _apicast_operator_ocp(apicast_ocp)
@@ -268,12 +263,9 @@ def load(obj, env=None, silent=None, key=None):
         data = {
             "openshift": {
                 "version": ocp.version,
-                "projects": {
-                    "threescale": {
-                        "name": project}},
-                "servers": {
-                    "default": {
-                        "server_url": ocp.api_url}}},
+                "projects": {"threescale": {"name": project}},
+                "servers": {"default": {"server_url": ocp.api_url}},
+            },
             "threescale": {
                 "version": _guess_version(ocp, project),
                 "apicast_operator_version": _guess_apicast_operator_version(apicast_ocp, obj),
@@ -283,57 +275,44 @@ def load(obj, env=None, silent=None, key=None):
                     "url": admin_url,
                     "username": system_seed["ADMIN_USER"].decode("utf-8"),
                     "password": system_seed["ADMIN_PASSWORD"].decode("utf-8"),
-                    "token": admin_token},
+                    "token": admin_token,
+                },
                 "master": {
                     "url": master_url,
                     "username": system_seed["MASTER_USER"].decode("utf-8"),
                     "password": system_seed["MASTER_PASSWORD"].decode("utf-8"),
-                    "token": master_token},
-                "devel": {
-                    "url": devel_url},
+                    "token": master_token,
+                },
+                "devel": {"url": devel_url},
                 "deployment_type": _deployment_type(ocp),
                 "gateway": {
                     "default": {
                         "portal_endpoint": f"https://{admin_token}@3scale-admin.{superdomain}",
-                        "openshift": ocp
+                        "openshift": ocp,
                     },
                     "TemplateApicast": {
                         "image": _apicast_image(ocp),
                     },
                     "OperatorApicast": {
-                        "openshift": {
-                            "kind": "OpenShiftClient",
-                            "project_name": apicast_ocp.project_name
-                        }
+                        "openshift": {"kind": "OpenShiftClient", "project_name": apicast_ocp.project_name}
                     },
-                    "WASMGateway": {
-                        "backend_host": backend_route["spec"]["host"]
-                    }
+                    "WASMGateway": {"backend_host": backend_route["spec"]["host"]},
                 },
                 "backend_internal_api": {
                     "route": backend_route,
                     "username": backend_internal_api["username"],
-                    "password": backend_internal_api["password"]
-                }
+                    "password": backend_internal_api["password"],
+                },
             },
             "operators": {
-                "threescale": {
-                    "openshift": threescale_operator_ocp
-                },
-                "apicast": {
-                    "openshift": apicast_operator_ocp
-                },
+                "threescale": {"openshift": threescale_operator_ocp},
+                "apicast": {"openshift": apicast_operator_ocp},
             },
-            "rhsso": {
-                "password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))
-            }}
+            "rhsso": {"password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))},
+        }
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated
-        project_data = {
-            "openshift": {
-                "projects": {
-                    "threescale": {
-                        "name": project}}}}
+        project_data = {"openshift": {"projects": {"threescale": {"name": project}}}}
 
         settings.update(project_data)
         obj.update(data, loader_identifier=identifier)

@@ -12,16 +12,27 @@ def service(service, private_base_url):
     """
     Set policy settings
     """
-    test_header = {"operations": [
-        {"op": "==", "value": "{{ service.id }}", "value_type": "liquid", "match": "header",
-         "header_name": "Test-Header"}]}
+    test_header = {
+        "operations": [
+            {
+                "op": "==",
+                "value": "{{ service.id }}",
+                "value_type": "liquid",
+                "match": "header",
+                "header_name": "Test-Header",
+            }
+        ]
+    }
     proxy = service.proxy.list()
-    proxy.policies.insert(0, {
-        "name": "routing",
-        "version": "builtin",
-        "enabled": True,
-        "configuration": {
-            "rules": [{"url": private_base_url("httpbin"), "condition": test_header}]}})
+    proxy.policies.insert(
+        0,
+        {
+            "name": "routing",
+            "version": "builtin",
+            "enabled": True,
+            "configuration": {"rules": [{"url": private_base_url("httpbin"), "condition": test_header}]},
+        },
+    )
     return service
 
 
@@ -51,7 +62,7 @@ def test_routing_policy_with_header_without_id(api_client, private_base_url):
 
 def test_routing_policy_without_header(api_client, private_base_url):
     """
-     Test for the request send without Test-Header
+    Test for the request send without Test-Header
     """
     parsed_url = urlparse(private_base_url())
     response = api_client().get("/get")

@@ -12,9 +12,12 @@ pytestmark = [pytest.mark.nopersistence]
 def service(service):
     """Update policy settings"""
     proxy = service.proxy.list()
-    proxy.policies.append(rawobj.PolicyConfig("ip_check", {"ips": ['10.10.10.10', '10.100.10.0/24'],
-                                                           "check_type": "blacklist",
-                                                           "client_ip_sources": ["X-Real-IP"]}))
+    proxy.policies.append(
+        rawobj.PolicyConfig(
+            "ip_check",
+            {"ips": ["10.10.10.10", "10.100.10.0/24"], "check_type": "blacklist", "client_ip_sources": ["X-Real-IP"]},
+        )
+    )
 
     return service
 

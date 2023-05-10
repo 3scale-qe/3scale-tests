@@ -10,7 +10,7 @@ from testsuite.containers.container_runtime import ContainerRuntime, ContainerCo
 
 
 class PodmanRuntime(ContainerRuntime):
-    """ Podman implementation of ContainerRuntime """
+    """Podman implementation of ContainerRuntime"""
 
     def __init__(self, remote_uri: str, identity_file: str = "~/.ssh/id_master", uri: str = "unix:/tmp/podman.sock"):
         super().__init__()
@@ -29,7 +29,7 @@ class PodmanRuntime(ContainerRuntime):
             env=[f"{k}={v}" for k, v in container_config.env.items()],
             detach=True,
             publish=[f"{host}:{cont}" for cont, host in container_config.ports.items()],
-            volume=[f"{host}:{cont['bind']}:{cont['mode']}" for host, cont in container_config.volumes.items()]
+            volume=[f"{host}:{cont['bind']}:{cont['mode']}" for host, cont in container_config.volumes.items()],
         ).start()
 
         return Container(container.id, started=True)

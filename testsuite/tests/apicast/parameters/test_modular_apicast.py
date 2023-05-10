@@ -18,17 +18,28 @@ from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553"),
-              pytest.mark.sandbag]  # explicit requirement of operator apicast - doesn't have to be available
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-553"),
+    pytest.mark.sandbag,
+]  # explicit requirement of operator apicast - doesn't have to be available
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param(TemplateApicast,
-                 id="Custom policy test (Template)", marks=[pytest.mark.required_capabilities(Capability.OCP3)]),
-    pytest.param(OperatorApicast,
-                 id="Custom image test (Operator)", marks=[pytest.mark.required_capabilities(Capability.OCP4)])
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(
+            TemplateApicast,
+            id="Custom policy test (Template)",
+            marks=[pytest.mark.required_capabilities(Capability.OCP3)],
+        ),
+        pytest.param(
+            OperatorApicast,
+            id="Custom image test (Operator)",
+            marks=[pytest.mark.required_capabilities(Capability.OCP4)],
+        ),
+    ],
+)
 def gateway_kind(request):
     """Gateway class to use for tests"""
     return request.param
@@ -47,27 +58,31 @@ def set_gateway_image(openshift, staging_gateway, request):
     openshift_client = staging_gateway.openshift
     image_stream_name = blame(request, "examplepolicy")
 
-    github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
-    copy_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy_copy.yml")
+    github_template = resources.files("testsuite.resources.modular_apicast").joinpath("example_policy.yml")
+    copy_template = resources.files("testsuite.resources.modular_apicast").joinpath("example_policy_copy.yml")
 
     amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
     project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
     build_name_copy = blame(request, "apicast-example-policy-copy")
 
-    github_params = {"AMP_RELEASE": amp_release,
-                     "NAMESPACE": project,
-                     "BUILD_NAME": build_name_github,
-                     "IMAGE_STREAM_NAME": image_stream_name,
-                     "IMAGE_STREAM_TAG": "github"}
+    github_params = {
+        "AMP_RELEASE": amp_release,
+        "NAMESPACE": project,
+        "BUILD_NAME": build_name_github,
+        "IMAGE_STREAM_NAME": image_stream_name,
+        "IMAGE_STREAM_TAG": "github",
+    }
 
-    copy_params = {"AMP_RELEASE": amp_release,
-                   "NAMESPACE": project,
-                   "BUILD_NAME": build_name_copy,
-                   "TARGET_IMAGE_STREAM": image_stream_name,
-                   "TARGET_TAG": "latest",
-                   "EXAMPLE_POLICY_IMAGE_STREAM": image_stream_name,
-                   "EXAMPLE_POLICY_TAG": "github"}
+    copy_params = {
+        "AMP_RELEASE": amp_release,
+        "NAMESPACE": project,
+        "BUILD_NAME": build_name_copy,
+        "TARGET_IMAGE_STREAM": image_stream_name,
+        "TARGET_TAG": "latest",
+        "EXAMPLE_POLICY_IMAGE_STREAM": image_stream_name,
+        "EXAMPLE_POLICY_TAG": "github",
+    }
 
     def _delete_builds():
         openshift_client.delete_template(github_template, github_params)
@@ -115,4 +130,4 @@ def test_modular_apicast(set_gateway_image, api_client):
     """
     response = get(api_client(), "/")
     assert response.status_code == 200
-    assert 'X-Example-Policy-Response' in response.headers
+    assert "X-Example-Policy-Response" in response.headers

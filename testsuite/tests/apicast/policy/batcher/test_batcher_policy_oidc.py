@@ -33,7 +33,7 @@ def test_batcher_policy_oidc(api_client, application, rhsso_service_info):
     client = api_client()
 
     for _ in range(5):
-        response = client.get("/get", headers={'access_token': token})
+        response = client.get("/get", headers={"access_token": token})
 
     assert response.request.headers["Authorization"].startswith("Bearer")  # RHSSO used?
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]

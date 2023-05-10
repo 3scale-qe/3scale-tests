@@ -15,7 +15,7 @@ def service(navigator, threescale, testconfig, request):
     assert service, "Service wasn't created"
 
     if not testconfig["skip_cleanup"]:
-        backend_id = service.backend_usages.list()[0]['backend_id']
+        backend_id = service.backend_usages.list()[0]["backend_id"]
         backend = threescale.backends.get(backend_id)
         request.addfinalizer(backend.delete)
         request.addfinalizer(service.delete)

@@ -11,11 +11,11 @@ from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalLo
 @pytest.mark.usefixtures("login")
 def test_logo_upload(navigator, file_name):
     """
-        A test that checks if it possible to upload different types of logos (png, gif)
-        - Upload logo
-        - Assert that logo was uploaded
-        - Delete logo
-        - Assert that logo was deleted
+    A test that checks if it possible to upload different types of logos (png, gif)
+    - Upload logo
+    - Assert that logo was uploaded
+    - Delete logo
+    - Assert that logo was deleted
     """
     logo_file = resources.files("testsuite.resources.logo").joinpath(file_name)
     logo_page = navigator.navigate(DeveloperPortalLogoView)

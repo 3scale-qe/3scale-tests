@@ -20,9 +20,24 @@ def _locator(path, apiobj):
 
 class APIManager(APIObject):
     """Wrapper on top of APIObject for specifically working with APIManager CRD"""
-    ALL_DEPLOYMENTS = {'apicast-staging', 'backend-cron', 'backend-listener', 'backend-redis', 'backend-worker',
-                       'system-memcache', 'system-mysql', 'system-redis', 'zync', 'zync-database', 'zync-que',
-                       'apicast-production', 'system-app', 'system-sidekiq', 'system-sphinx'}
+
+    ALL_DEPLOYMENTS = {
+        "apicast-staging",
+        "backend-cron",
+        "backend-listener",
+        "backend-redis",
+        "backend-worker",
+        "system-memcache",
+        "system-mysql",
+        "system-redis",
+        "zync",
+        "zync-database",
+        "zync-que",
+        "apicast-production",
+        "system-app",
+        "system-sidekiq",
+        "system-sphinx",
+    }
 
     def set_path(self, path, value, apiobj=None):
         """Sets value to a path in a string form"""

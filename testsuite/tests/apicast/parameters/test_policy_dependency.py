@@ -3,6 +3,7 @@ Tests that an apicast custom policy with lua dependency can be built and used
 """
 import importlib_resources as resources
 import pytest
+
 # pylint: disable=no-name-in-module, c-extension-no-member
 # pylint has problem with lxml for some reason
 from lxml import etree
@@ -14,17 +15,28 @@ from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7488"),
-              pytest.mark.sandbag]  # explicit requirement of operator apicast - doesn't have to be available
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7488"),
+    pytest.mark.sandbag,
+]  # explicit requirement of operator apicast - doesn't have to be available
 
 
-@pytest.fixture(scope="module", params=[
-    pytest.param(TemplateApicast,
-                 id="Custom policy test (Template)", marks=[pytest.mark.required_capabilities(Capability.OCP3)]),
-    pytest.param(OperatorApicast,
-                 id="Custom image test (Operator)", marks=[pytest.mark.required_capabilities(Capability.OCP4)])
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(
+            TemplateApicast,
+            id="Custom policy test (Template)",
+            marks=[pytest.mark.required_capabilities(Capability.OCP3)],
+        ),
+        pytest.param(
+            OperatorApicast,
+            id="Custom image test (Operator)",
+            marks=[pytest.mark.required_capabilities(Capability.OCP4)],
+        ),
+    ],
+)
 def gateway_kind(request):
     """Gateway class to use for tests"""
     return request.param
@@ -43,17 +55,19 @@ def set_gateway_image(openshift, staging_gateway, request):
     openshift_client = staging_gateway.openshift
     image_stream_name = blame(request, "xml_policy")
 
-    template = resources.files('testsuite.resources.modular_apicast').joinpath("xml_policy.yml")
+    template = resources.files("testsuite.resources.modular_apicast").joinpath("xml_policy.yml")
 
     amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
     project = openshift().project_name
     build_name = blame(request, "apicast-xml-policy")
 
-    params = {"AMP_RELEASE": amp_release,
-              "NAMESPACE": project,
-              "BUILD_NAME": build_name,
-              "IMAGE_STREAM_NAME": image_stream_name,
-              "IMAGE_STREAM_TAG": "latest"}
+    params = {
+        "AMP_RELEASE": amp_release,
+        "NAMESPACE": project,
+        "BUILD_NAME": build_name,
+        "IMAGE_STREAM_NAME": image_stream_name,
+        "IMAGE_STREAM_TAG": "latest",
+    }
 
     def _delete_builds():
         openshift_client.delete_template(template, params)

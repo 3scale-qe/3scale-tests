@@ -30,16 +30,17 @@ def test_active_docs_v2_generate_endpoints(navigator, service, request):
     system_name = blame(request, "system_name")
     oas_spec = resources.files("testsuite.resources.oas2").joinpath("swagger.json").read_text()
     edit = navigator.navigate(ActiveDocsNewView)
-    edit.create_spec(name=name,
-                     sys_name=system_name,
-                     description="Active docs V2",
-                     service=service,
-                     oas_spec=oas_spec,
-                     publish_option=True,
-                     skip_validation_option=True)
-    preview_page = navigator.navigate(ActiveDocsDetailView, product=service,
-                                      active_doc=service.active_docs.list()[0])
+    edit.create_spec(
+        name=name,
+        sys_name=system_name,
+        description="Active docs V2",
+        service=service,
+        oas_spec=oas_spec,
+        publish_option=True,
+        skip_validation_option=True,
+    )
+    preview_page = navigator.navigate(ActiveDocsDetailView, product=service, active_doc=service.active_docs.list()[0])
     preview_page.oas2.expand_operations_link.click()
-    assert preview_page.oas2.active_docs_section.endpoints == ['/get', '/post', '/put', '/delete']
-    preview_page.oas2.make_request('/get')
-    assert preview_page.oas2.active_docs_section.get_response_code() == '200'
+    assert preview_page.oas2.active_docs_section.endpoints == ["/get", "/post", "/put", "/delete"]
+    preview_page.oas2.make_request("/get")
+    assert preview_page.oas2.active_docs_section.get_response_code() == "200"

@@ -25,7 +25,7 @@ def policy_settings(testconfig):
     proxy_config = {
         "https_proxy": "https://" + proxy_service,
         "http_proxy": "http://" + proxy_service,
-        "all_proxy": "http://" + proxy_service
+        "all_proxy": "http://" + proxy_service,
     }
     return rawobj.PolicyConfig("http_proxy", proxy_config)
 

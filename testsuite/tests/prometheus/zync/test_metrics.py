@@ -67,21 +67,21 @@ def metrics_zync(prometheus):
     return get_metrics_keys(prometheus.get_metrics(labels={"container": "zync"}))
 
 
-@pytest.mark.parametrize(("pod", "expected_metric"),
-                         [("metrics_que", x) for x in METRICS_QUE] + [("metrics_zync", x) for x in METRICS_ZYNC]
-                         )
+@pytest.mark.parametrize(
+    ("pod", "expected_metric"), [("metrics_que", x) for x in METRICS_QUE] + [("metrics_zync", x) for x in METRICS_ZYNC]
+)
 def test_metric_zync(request, expected_metric, pod):
-    """ Test metrics presence. """
+    """Test metrics presence."""
     actual_metrics = request.getfixturevalue(pod)
     assert expected_metric in actual_metrics
 
 
-@pytest.mark.parametrize(("pod", "expected_metric"),
-                         [("metrics_que", x) for x in METRICS_QUE_HISTOGRAM] +
-                         [("metrics_zync", x) for x in METRICS_ZYNC_HISTOGRAM]
-                         )
+@pytest.mark.parametrize(
+    ("pod", "expected_metric"),
+    [("metrics_que", x) for x in METRICS_QUE_HISTOGRAM] + [("metrics_zync", x) for x in METRICS_ZYNC_HISTOGRAM],
+)
 def test_metric_zync_histogram(request, expected_metric, pod):
-    """ Test metrics presence. """
+    """Test metrics presence."""
     actual_metrics = request.getfixturevalue(pod)
     for suffix in ["_sum", "_count", "_bucket"]:
-        assert expected_metric+suffix in actual_metrics
+        assert expected_metric + suffix in actual_metrics

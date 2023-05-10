@@ -62,7 +62,7 @@ def prod_client(production_gateway, application, request):
     def _prod_client(app=application, promote: bool = True, version: int = -1, redeploy: bool = True):
         if promote:
             if version == -1:
-                version = app.service.proxy.list().configs.latest()['version']
+                version = app.service.proxy.list().configs.latest()["version"]
             try:
                 app.service.proxy.list().promote(version=version)
             except threescale_api.errors.ApiClientError as err:
@@ -87,6 +87,7 @@ def redis_url(tools, testconfig):
     Fixture is callable because of former implementation/interace
 
     """
+
     def _redis_url(scope):
         """if scope id 'global' returns URL, otherwise empty string"""
         if scope != "global":
@@ -96,8 +97,9 @@ def redis_url(tools, testconfig):
             redis = redis.replace("http", "redis", 1)
             redis_url = f"{redis}/1"
         except KeyError:
-            redis_url = testconfig['redis']['url']
+            redis_url = testconfig["redis"]["url"]
         return redis_url
+
     return _redis_url
 
 

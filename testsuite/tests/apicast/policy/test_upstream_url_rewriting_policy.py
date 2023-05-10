@@ -15,19 +15,33 @@ from testsuite.echoed_request import EchoedRequest
 def service(service, private_base_url):
     """Add url_rewriting policy, configure metrics/mapping"""
     proxy = service.proxy.list()
-    proxy.policies.insert(0, rawobj.PolicyConfig("upstream", {
-        "rules": [{"url": private_base_url("echo_api"), "regex": "v1"},
-                  {"url": private_base_url(), "regex": "v2"}]}))
-    proxy.policies.append(rawobj.PolicyConfig("url_rewriting", {
-        "commands": [{"op": "sub", "regex": "httpbin/v1", "replace": "rewrite"},
-                     {"op": "sub", "regex": "httpbin/v2", "replace": "get"}]}))
+    proxy.policies.insert(
+        0,
+        rawobj.PolicyConfig(
+            "upstream",
+            {
+                "rules": [
+                    {"url": private_base_url("echo_api"), "regex": "v1"},
+                    {"url": private_base_url(), "regex": "v2"},
+                ]
+            },
+        ),
+    )
+    proxy.policies.append(
+        rawobj.PolicyConfig(
+            "url_rewriting",
+            {
+                "commands": [
+                    {"op": "sub", "regex": "httpbin/v1", "replace": "rewrite"},
+                    {"op": "sub", "regex": "httpbin/v2", "replace": "get"},
+                ]
+            },
+        )
+    )
 
-    metric = service.metrics.create(
-        {"name": "get_metric", "friendly_name": "get_metrics", "unit": "hit"})
+    metric = service.metrics.create({"name": "get_metric", "friendly_name": "get_metrics", "unit": "hit"})
 
-    proxy.mapping_rules.create({
-        "http_method": "GET", "pattern": "/",
-        "metric_id": metric["id"], "delta": 1})
+    proxy.mapping_rules.create({"http_method": "GET", "pattern": "/", "metric_id": metric["id"], "delta": 1})
 
     # proxy needs to be updated to apply added mapping
     proxy.deploy()
@@ -57,5 +71,6 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     assert request.headers["Host"] == parsed_url.hostname
 
     hits = resilient.analytics_list_by_service(
-        application.threescale_client, application["service_id"], "hits", "total", old_usage+1)
+        application.threescale_client, application["service_id"], "hits", "total", old_usage + 1
+    )
     assert hits == old_usage + 1

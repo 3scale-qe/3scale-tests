@@ -15,10 +15,13 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
-@pytest.fixture(scope="module", params=[
-    SystemApicast,
-    pytest.param(SelfManagedApicast, marks=pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT))
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        SystemApicast,
+        pytest.param(SelfManagedApicast, marks=pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT)),
+    ],
+)
 def gateway_kind(request):
     """Gateway class to use for tests"""
     return request.param
@@ -37,7 +40,8 @@ def user_wrong_realm(rhsso_service_info, request, testconfig):
         directAccessGrantsEnabled=True,
         publicClient=False,
         protocol="openid-connect",
-        standardFlowEnabled=False)
+        standardFlowEnabled=False,
+    )
 
     username = testconfig["rhsso"]["test_user"]["username"]
     password = testconfig["rhsso"]["test_user"]["password"]
@@ -49,7 +53,7 @@ def user_wrong_realm(rhsso_service_info, request, testconfig):
 def wrong_realm_token(user_wrong_realm):
     """Token for a wrong realm"""
     client, username, password = user_wrong_realm
-    return Token(client.token(username, password))['access_token']
+    return Token(client.token(username, password))["access_token"]
 
 
 @pytest.fixture(scope="module")
@@ -73,7 +77,7 @@ def test_wrong_realm_auth(api_client, wrong_realm_token, correct_realm_token, ga
     client = api_client()
     client.auth = None
 
-    response = client.get("/test/get", headers={"Authorization": f'Bearer {correct_realm_token}'})
+    response = client.get("/test/get", headers={"Authorization": f"Bearer {correct_realm_token}"})
     assert response.status_code == 200
 
     response = client.get("/test/get")

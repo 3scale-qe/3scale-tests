@@ -12,11 +12,10 @@ if TYPE_CHECKING:
 
 class EnvironmentVariable:
     """Class for working with pure environmental variable that is set directly"""
+
     pattern = r"(?P<name>.*)=(?P<value>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient',
-                 match: Match,
-                 environ: "Environ") -> None:
+    def __init__(self, openshift: "OpenShiftClient", match: Match, environ: "Environ") -> None:
         self.name = match.group("name")
         self.match = match
         self.deployment = environ.deployment
@@ -41,9 +40,10 @@ class EnvironmentVariable:
 
 class SecretEnvironmentVariable(EnvironmentVariable):
     """Class for working with environmental variable that is set from secret"""
+
     pattern = r"#\ (?P<name>.*)\ from\ secret\ (?P<secret>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', match: Match, environ: "Environ") -> None:
+    def __init__(self, openshift: "OpenShiftClient", match: Match, environ: "Environ") -> None:
         super().__init__(openshift, match, environ)
         self.secret = match.group("secret")
         self.key = match.group("key")
@@ -60,9 +60,10 @@ class SecretEnvironmentVariable(EnvironmentVariable):
 
 class ConfigMapEnvironmentVariable(EnvironmentVariable):
     """Class for working with environment variable that is set from configmap"""
+
     pattern = r"#\ (?P<name>.*)\ from\ configmap\ (?P<config>.*),\ key\ (?P<key>.*)"
 
-    def __init__(self, openshift: 'OpenShiftClient', match: Match, environ: "Environ") -> None:
+    def __init__(self, openshift: "OpenShiftClient", match: Match, environ: "Environ") -> None:
         super().__init__(openshift, match, environ)
         self.config = match.group("config")
         self.key = match.group("key")
@@ -103,6 +104,7 @@ class Properties(abc.ABC):
 
 class Environ(Properties):
     """Contains all env variables for a specific deployment config"""
+
     types = [EnvironmentVariable, SecretEnvironmentVariable, ConfigMapEnvironmentVariable]
 
     def __init__(self, deployment: "Deployment") -> None:
@@ -124,9 +126,7 @@ class Environ(Properties):
             for env_type in self.types:
                 match_obj = re.match(env_type.pattern, line)
                 if match_obj:
-                    env = env_type(openshift=self.openshift,
-                                   match=match_obj,
-                                   environ=self)
+                    env = env_type(openshift=self.openshift, match=match_obj, environ=self)
                     self.__envs[env.name] = env
                     break
 

@@ -16,10 +16,11 @@ from testsuite.openshift.client import OpenShiftClient
 class MailhogClient:
     """Wrapper for the mailhog API"""
 
-    def __init__(self, openshift: OpenShiftClient,
-                 mailhog_service_name: str = "mailhog", fallback: Optional[str] = None):
+    def __init__(
+        self, openshift: OpenShiftClient, mailhog_service_name: str = "mailhog", fallback: Optional[str] = None
+    ):
         """Initializes the client, the mailhog app has to be running in the
-            same openshift as 3scale, and has to be named 'mailhog'"""
+        same openshift as 3scale, and has to be named 'mailhog'"""
         # mailhog is first searched in 3scale namespace, if that fails
         # tools is second choice, this is intentional order, tests assume
         # exclusive mailhog instance, therefore a 'private' instance is always
@@ -139,4 +140,4 @@ class MailhogClient:
             messages = self.find_by_content(content)
         if not (subject or content):
             raise ValueError("No identifier defined to search for messages")
-        assert messages['count'] == expected_count, f"Expected {expected_count} mail, found {messages['count']}"
+        assert messages["count"] == expected_count, f"Expected {expected_count} mail, found {messages['count']}"

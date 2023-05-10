@@ -25,32 +25,34 @@ class ServiceMesh:
 
     def patch_credentials(self, credentials):
         """Patches credentials of currently tested 3scale into service mesh"""
-        self.openshift.patch("handler",
-                             credentials,
-                             [
-                                 {"op": "replace",
-                                  "path": "/spec/params/access_token",
-                                  "value": self.token
-                                  },
-                                 {"op": "replace",
-                                  "path": "/spec/params/system_url",
-                                  "value": self.url
-                                  }
-                             ], patch_type="json")
+        self.openshift.patch(
+            "handler",
+            credentials,
+            [
+                {"op": "replace", "path": "/spec/params/access_token", "value": self.token},
+                {"op": "replace", "path": "/spec/params/system_url", "value": self.url},
+            ],
+            patch_type="json",
+        )
 
     def generate_credentials(self):
         """Genereate new set of credentials for 3scale adapter"""
         name = f"3scale-credentials-{self.identifier}"
         with ExitStack() as stack:
             self.openshift.prepare_context(stack)
-            result = self.openshift\
-                .select_resource("pod", {"app": "3scale-istio-adapter"})\
-                .object()\
-                .execute(["./3scale-config-gen",
-                          f"--url={self.url}",
-                          f"--name={name}",
-                          f"--token={self.token}",
-                          f"--namespace={self.openshift.project_name}"])
+            result = (
+                self.openshift.select_resource("pod", {"app": "3scale-istio-adapter"})
+                .object()
+                .execute(
+                    [
+                        "./3scale-config-gen",
+                        f"--url={self.url}",
+                        f"--name={name}",
+                        f"--token={self.token}",
+                        f"--namespace={self.openshift.project_name}",
+                    ]
+                )
+            )
 
         resources = result.out().split("---\n")
 

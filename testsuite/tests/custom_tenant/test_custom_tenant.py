@@ -41,11 +41,12 @@ def account(custom_account, request, account_password):
 
 @pytest.fixture(scope="module")
 def custom_account(threescale, request, testconfig):
-    """ Local module scoped custom_account to utilize custom tenant
+    """Local module scoped custom_account to utilize custom tenant
 
     Args:
         :param params: dict for remote call, rawobj.Account should be used
     """
+
     def _custom_account(params, autoclean=True, threescale_client=threescale):
         acc = resilient.accounts_create(threescale_client, params=params)
         if autoclean and not testconfig["skip_cleanup"]:

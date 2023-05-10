@@ -12,14 +12,15 @@ from pytest_cases import fixture_ref
 
 from testsuite.utils import blame, wait_interval
 from testsuite import rawobj
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.flaky]
+    pytest.mark.flaky,
+]
 
 
 @pytest_cases.fixture
@@ -54,12 +55,9 @@ def app_plan_backend(service, custom_app_plan, threescale, request):
     proxy.mapping_rules.create(rawobj.Mapping(service_metric, pattern="/anything/foo"))
     proxy.deploy()
 
-    plan = custom_app_plan(
-        rawobj.ApplicationPlan(blame(request, "app")), service)
-    plan.limits(backend_metric).create({
-        "metric_id": backend_metric["id"], "period": "minute", "value": 10})
-    plan.limits(service_metric).create({
-        "metric_id": service_metric["id"], "period": "minute", "value": 5})
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service)
+    plan.limits(backend_metric).create({"metric_id": backend_metric["id"], "period": "minute", "value": 10})
+    plan.limits(service_metric).create({"metric_id": service_metric["id"], "period": "minute", "value": 5})
 
     return plan
 
@@ -77,20 +75,13 @@ def app_plan_service(service, custom_app_plan, request):
     metric_anything_foo = service.metrics.create(rawobj.Metric("foo"))
 
     proxy = service.proxy.list()
-    proxy.mapping_rules.create(
-        rawobj.Mapping(metric_anything, pattern="/anything")
-    )
-    proxy.mapping_rules.create(
-        rawobj.Mapping(metric_anything_foo, pattern="/anything/foo")
-    )
+    proxy.mapping_rules.create(rawobj.Mapping(metric_anything, pattern="/anything"))
+    proxy.mapping_rules.create(rawobj.Mapping(metric_anything_foo, pattern="/anything/foo"))
     proxy.deploy()
 
-    plan = custom_app_plan(
-        rawobj.ApplicationPlan(blame(request, "app")), service)
-    plan.limits(metric_anything).create({
-        "metric_id": metric_anything["id"], "period": "minute", "value": 10})
-    plan.limits(metric_anything_foo).create({
-        "metric_id": metric_anything_foo["id"], "period": "minute", "value": 5})
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service)
+    plan.limits(metric_anything).create({"metric_id": metric_anything["id"], "period": "minute", "value": 10})
+    plan.limits(metric_anything_foo).create({"metric_id": metric_anything_foo["id"], "period": "minute", "value": 5})
 
     return plan
 
@@ -101,8 +92,7 @@ def application(app_plan, custom_application, request, lifecycle_hooks):
     """
     Creates an application with a application plan defined in the specified fixture
     """
-    application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan),
-                                     hooks=lifecycle_hooks)
+    application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan), hooks=lifecycle_hooks)
 
     return application
 

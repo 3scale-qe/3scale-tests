@@ -22,7 +22,8 @@ def user_wrong_realm(rhsso_service_info, request, testconfig):
         directAccessGrantsEnabled=True,
         publicClient=False,
         protocol="openid-connect",
-        standardFlowEnabled=False)
+        standardFlowEnabled=False,
+    )
 
     username = testconfig["rhsso"]["test_user"]["username"]
     password = testconfig["rhsso"]["test_user"]["password"]
@@ -34,7 +35,7 @@ def user_wrong_realm(rhsso_service_info, request, testconfig):
 def wrong_realm_token(user_wrong_realm):
     """Token for a wrong realm"""
     client, username, password = user_wrong_realm
-    return Token(client.token(username, password))['access_token']
+    return Token(client.token(username, password))["access_token"]
 
 
 @pytest.fixture(scope="function")
@@ -49,7 +50,7 @@ def test_wrong_realm_auth(api_client, wrong_realm_token, correct_realm_token):
     assert client.get("/get").status_code == 200
     client.auth = None
 
-    response = client.get("/get", headers={"Authorization": f'Bearer {correct_realm_token}'})
+    response = client.get("/get", headers={"Authorization": f"Bearer {correct_realm_token}"})
     assert response.status_code == 200
 
     response = client.get("/get")

@@ -4,7 +4,7 @@ Default test for HTTP2 policy
 import pytest
 
 import testsuite
-from testsuite import rawobj # noqa # pylint: disable=unused-import
+from testsuite import rawobj  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.httpx import HttpxClient
@@ -13,7 +13,8 @@ from testsuite.httpx import HttpxClient
 # CFSSL instance is necessary
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4684")]
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4684"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -29,8 +30,8 @@ def backends_mapping(custom_backend, private_base_url):
     """
     return {
         "/http1": custom_backend("http1", private_base_url("httpbin_service")),
-        "/http2": custom_backend("http2", private_base_url("httpbin_go_service"))
-        }
+        "/http2": custom_backend("http2", private_base_url("httpbin_go_service")),
+    }
 
 
 @pytest.fixture(scope="module")

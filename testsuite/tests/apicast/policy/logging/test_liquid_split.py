@@ -16,9 +16,7 @@ pytestmark = [
 @pytest.fixture(scope="module")
 def policy_settings():
     """Customize the access logs format"""
-    return rawobj.PolicyConfig("logging", {
-        "custom_logging": '{% assign s = "1,2,3,4,5" | split: "," | json %}{{ s }}'
-    })
+    return rawobj.PolicyConfig("logging", {"custom_logging": '{% assign s = "1,2,3,4,5" | split: "," | json %}{{ s }}'})
 
 
 def test_date_logging(api_client, staging_gateway):

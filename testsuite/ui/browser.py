@@ -15,7 +15,7 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
     Plug-in for :class:`ThreeScaleBrowser` which make sure page is loaded completely and is safe for UI interacting.
     """
 
-    ENSURE_PAGE_SAFE = '''
+    ENSURE_PAGE_SAFE = """
         function jqueryInactive() {
          return (typeof jQuery === "undefined") ? true : jQuery.active < 1
         }
@@ -28,9 +28,9 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
             ajax: ajaxInactive(),
             document: document.readyState == "complete",
         }
-        '''
+        """
 
-    def ensure_page_safe(self, timeout='15s'):
+    def ensure_page_safe(self, timeout="15s"):
         """
         Ensures page is fully loaded.
         Default timeout was 10s, this changes it to 15s.
@@ -57,7 +57,7 @@ class ThreescaleBrowserPlugin(DefaultPlugin):
         # because gecodriver(firefox driver) execute actions in strange way
         # TODO: explore possibilities to check JS running or stalness of
         #  clickable element in click / after_click action
-        if self.browser.browser_type == 'firefox':
+        if self.browser.browser_type == "firefox":
             sleep(1)
         pass
 
@@ -72,12 +72,9 @@ class ThreeScaleBrowser(Browser):
         :param extra_objects: any extra objects you want to include.
         """
         extra_objects = extra_objects or {}
-        extra_objects.update({'session': session})
+        extra_objects.update({"session": session})
         selenium = webdriver.start_session()
-        super().__init__(
-            selenium,
-            plugin_class=ThreescaleBrowserPlugin,
-            extra_objects=extra_objects)
+        super().__init__(selenium, plugin_class=ThreescaleBrowserPlugin, extra_objects=extra_objects)
         self.window_handle = selenium.current_window_handle
         self.webdriver = webdriver
 

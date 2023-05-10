@@ -13,14 +13,13 @@ def service(service, private_base_url):
     "Add url_rewriting policy, configure metrics/mapping"
     proxy = service.proxy.list()
 
-    proxy.policies.append(rawobj.PolicyConfig("url_rewriting", {
-        "commands": [{"op": "gsub", "regex": "hello", "replace": "get"}]}))
+    proxy.policies.append(
+        rawobj.PolicyConfig("url_rewriting", {"commands": [{"op": "gsub", "regex": "hello", "replace": "get"}]})
+    )
 
     metric = service.metrics.create(rawobj.Metric("get_metric"))
 
-    proxy.mapping_rules.create({
-        "http_method": "GET", "pattern": "/hello",
-        "metric_id": metric["id"], "delta": 5})
+    proxy.mapping_rules.create({"http_method": "GET", "pattern": "/hello", "metric_id": metric["id"], "delta": 5})
 
     # proxy needs to be updated to apply added mapping
     proxy.update(rawobj.Proxy(private_base_url("echo_api")))

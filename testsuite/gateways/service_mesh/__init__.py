@@ -27,11 +27,11 @@ class ServiceMeshGateway(AbstractGateway):
 
         # Disable mypy for this one line, because it just cannot understand that the httpbin
         # will have value at the time of anyone using it
-        self.httpbin: Httpbin = None       # type: ignore
-        self.mesh: ServiceMesh = None      # type: ignore
+        self.httpbin: Httpbin = None  # type: ignore
+        self.mesh: ServiceMesh = None  # type: ignore
 
     def before_service(self, service_params: dict) -> dict:
-        service_params['deployment_option'] = "service_mesh_istio"
+        service_params["deployment_option"] = "service_mesh_istio"
         return service_params
 
     def on_service_create(self, service: Service):
@@ -41,8 +41,9 @@ class ServiceMeshGateway(AbstractGateway):
         application._client_factory = self._create_api_client
 
     def create(self):
-        self.mesh = ServiceMesh(openshift=self.mesh_oc, identifier=self.identifier,
-                                portal_endpoint=self.portal_endpoint)
+        self.mesh = ServiceMesh(
+            openshift=self.mesh_oc, identifier=self.identifier, portal_endpoint=self.portal_endpoint
+        )
         credential_name = self.mesh.generate_credentials()
         self.httpbin = Httpbin(openshift=self.httpbin_oc, identifier=self.identifier, credentials=credential_name)
 
@@ -71,10 +72,12 @@ class ServiceMeshGateway(AbstractGateway):
 
     # pylint: disable=unused-argument, too-many-arguments
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
-        return ServiceMeshHttpClient(app=application,
-                                     cert=cert,
-                                     disable_retry_status_list=disable_retry_status_list,
-                                     verify=verify,
-                                     openshift=self.mesh.openshift,
-                                     root_path=self.httpbin.name,
-                                     root_url=self.mesh.ingress_url)
+        return ServiceMeshHttpClient(
+            app=application,
+            cert=cert,
+            disable_retry_status_list=disable_retry_status_list,
+            verify=verify,
+            openshift=self.mesh.openshift,
+            root_path=self.httpbin.name,
+            root_url=self.mesh.ingress_url,
+        )

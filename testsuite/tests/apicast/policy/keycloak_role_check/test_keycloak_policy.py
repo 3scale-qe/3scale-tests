@@ -18,8 +18,7 @@ from testsuite import rawobj
 from testsuite.capabilities import Capability
 from .conftest import token
 
-pytestmark = [pytest.mark.disruptive,
-              pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
+pytestmark = [pytest.mark.disruptive, pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
 
 
 @pytest_cases.fixture
@@ -89,16 +88,16 @@ def test_separated(rhsso_service_info, application, config, create_users, prod_c
     user_with_role, user_without_role = create_users
     user_key_with_role = token(application, rhsso_service_info, user_with_role["username"])
     user_key_without_role = token(application, rhsso_service_info, user_without_role["username"])
-    request = prod_client.get(f"/anything/{list_type}", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get(f"/anything/{list_type}", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == code1
-    request = prod_client.get(f"/anything/{list_type}", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get(f"/anything/{list_type}", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == code2
-    request = prod_client.get("/get", headers={'authorization': "Bearer " + user_key_with_role})
+    request = prod_client.get("/get", headers={"authorization": "Bearer " + user_key_with_role})
     assert request.status_code == code2
-    request = prod_client.get("/get", headers={'authorization': "Bearer " + user_key_without_role})
+    request = prod_client.get("/get", headers={"authorization": "Bearer " + user_key_without_role})
     assert request.status_code == code2
     if method != {}:
-        request = prod_client.post(f"/anything/{list_type}", headers={'authorization': "Bearer " + user_key_with_role})
+        request = prod_client.post(f"/anything/{list_type}", headers={"authorization": "Bearer " + user_key_with_role})
         assert request.status_code == code2
-        request = prod_client.post("/post", headers={'authorization': "Bearer " + user_key_with_role})
+        request = prod_client.post("/post", headers={"authorization": "Bearer " + user_key_with_role})
         assert request.status_code == code2

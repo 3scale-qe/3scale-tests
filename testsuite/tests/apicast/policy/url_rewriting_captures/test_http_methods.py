@@ -5,15 +5,17 @@ In 2.10 version the HTTP methods were added
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.echoed_request import EchoedRequest
 
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
-              pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-6270")]
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-6270"),
+]
 
 
-METHODS = ['POST', 'PUT', 'DELETE', 'PATCH']
+METHODS = ["POST", "PUT", "DELETE", "PATCH"]
 
 
 @pytest.fixture(scope="module")
@@ -21,13 +23,14 @@ def policy_settings():
     """
     Set policy settings
     """
-    return rawobj.PolicyConfig("rewrite_url_captures", {
-        "transformations": [
-            {
-                "match_rule": "/{var_1}/{var_2}",
-                "template": "/{var_2}?my_arg={var_1}",
-                "methods": ['GET']
-            }]})
+    return rawobj.PolicyConfig(
+        "rewrite_url_captures",
+        {
+            "transformations": [
+                {"match_rule": "/{var_1}/{var_2}", "template": "/{var_2}?my_arg={var_1}", "methods": ["GET"]}
+            ]
+        },
+    )
 
 
 @pytest.fixture(scope="module")

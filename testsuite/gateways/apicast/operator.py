@@ -18,7 +18,7 @@ RegexMatcher = Dict[Pattern, Callable[[APIcast, Match, Any], Any]]
 
 
 def apicast_service_list(apicast: APIcast, services: str):
-    """Sets APICAST_SERVICE_LIST in the APIcast CR """
+    """Sets APICAST_SERVICE_LIST in the APIcast CR"""
     service_list = str(services).split(",")
     apicast["enabledServices"] = service_list
 
@@ -35,6 +35,7 @@ class OperatorEnviron(Properties):
     Implements Properties for use in Operator and
     transforms APIcast environmental variables into operator properties
     """
+
     def __init__(self, apicast: APIcast, wait_function) -> None:
         self.apicast = apicast
         self.wait_function = wait_function
@@ -56,12 +57,10 @@ class OperatorEnviron(Properties):
         "APICAST_CACHE_STATUS_CODES": "cacheStatusCodes",
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
         "APICAST_CONFIGURATION_LOADER": "configurationLoadMode",
-        "APICAST_CONFIGURATION_CACHE": "cacheConfigurationSeconds"
+        "APICAST_CONFIGURATION_CACHE": "cacheConfigurationSeconds",
     }
 
-    REGEX_NAMES: RegexMatcher = {
-        re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version
-    }
+    REGEX_NAMES: RegexMatcher = {re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version}
 
     def _set(self, apicast, name, value):
         if name in self.NAMES:
@@ -91,6 +90,7 @@ class OperatorEnviron(Properties):
         def _update(apicast):
             for name, value in envs.items():
                 self._set(apicast, name, value)
+
         self.apicast.modify_and_apply(_update)
         self.wait_function()
 
@@ -113,13 +113,27 @@ class OperatorEnviron(Properties):
 
 class OperatorApicast(OpenshiftApicast):
     """Gateway for use with APIcast deployed by operator"""
-    CAPABILITIES = {Capability.APICAST, Capability.PRODUCTION_GATEWAY,
-                    Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER}
+
+    CAPABILITIES = {
+        Capability.APICAST,
+        Capability.PRODUCTION_GATEWAY,
+        Capability.CUSTOM_ENVIRONMENT,
+        Capability.LOGS,
+        Capability.JAEGER,
+    }
     PRIORITY = 1000
 
     # pylint: disable=too-many-arguments
-    def __init__(self, staging: bool, openshift: OpenShiftClient, name,
-                 portal_endpoint, image=None, generate_name=False, path_routing=False):
+    def __init__(
+        self,
+        staging: bool,
+        openshift: OpenShiftClient,
+        name,
+        portal_endpoint,
+        image=None,
+        generate_name=False,
+        path_routing=False,
+    ):
         # APIcast operator prepends apicast in front the deployment name
         super().__init__(staging, openshift, name, generate_name, path_routing)
         self.portal_endpoint = portal_endpoint
@@ -129,9 +143,11 @@ class OperatorApicast(OpenshiftApicast):
 
     @staticmethod
     def fits(openshift: OpenShiftClient):
-        return Capability.OCP4 in CapabilityRegistry() \
-                and openshift.project_exists \
-                and weakget(settings)["operators"]["apicast"]["openshift"] % False
+        return (
+            Capability.OCP4 in CapabilityRegistry()
+            and openshift.project_exists
+            and weakget(settings)["operators"]["apicast"]["openshift"] % False
+        )
 
     @property
     def deployment(self):
@@ -148,9 +164,7 @@ class OperatorApicast(OpenshiftApicast):
 
     def create(self):
         # Create secret with Provider URL credentials
-        self.openshift.secrets.create(self.name, string_data={
-            "AdminPortalURL": self.portal_endpoint
-        })
+        self.openshift.secrets.create(self.name, string_data={"AdminPortalURL": self.portal_endpoint})
         self._to_delete.append(("secret", self.name))
 
         apicast = APIcast.create_instance(
@@ -187,6 +201,7 @@ class OperatorApicast(OpenshiftApicast):
         def _add_tls(apicast):
             apicast["httpsPort"] = https_port
             apicast["httpsCertificateSecretRef"] = {"name": secret_name}
+
         self.apicast.modify_and_apply(_add_tls)
         self.reload()
 
@@ -196,6 +211,7 @@ class OperatorApicast(OpenshiftApicast):
     def set_image(self, image):
         def _update(apicast):
             apicast["image"] = image
+
         self.apicast.modify_and_apply(_update)
         self.reload()
 
@@ -208,16 +224,16 @@ class OperatorApicast(OpenshiftApicast):
         :returns Name of the jaeger service
         """
         secret_name = f"{self.name}-jaeger"
-        self.openshift.secrets.create(name=secret_name,
-                                      string_data=jaeger.apicast_config("config", self.name))
+        self.openshift.secrets.create(name=secret_name, string_data=jaeger.apicast_config("config", self.name))
         self._to_delete.append(("secret", secret_name))
 
         def _add_jaeger(apicast):
             apicast["openTracing"] = {
                 "enabled": True,
                 "tracingLibrary": "jaeger",
-                "tracingConfigSecretRef": {"name": secret_name}
+                "tracingConfigSecretRef": {"name": secret_name},
             }
+
         self.apicast.modify_and_apply(_add_jaeger)
         self.reload()
         return self.name
@@ -246,12 +262,12 @@ class OperatorApicast(OpenshiftApicast):
 
     def set_custom_policy(self, policy):
         """Sets custom policy to the Operator"""
-        self.apicast.modify_and_apply(lambda apicast:
-                                      apicast.model.spec.setdefault("customPolicies", []).append(policy))
+        self.apicast.modify_and_apply(
+            lambda apicast: apicast.model.spec.setdefault("customPolicies", []).append(policy)
+        )
         self.reload()
 
     def remove_custom_policy(self):
         """Removes all custom policies to the Operator"""
-        self.apicast.modify_and_apply(lambda apicast:
-                                      apicast.model.spec.setdefault("customPolicies", []).clear())
+        self.apicast.modify_and_apply(lambda apicast: apicast.model.spec.setdefault("customPolicies", []).clear())
         self.reload()

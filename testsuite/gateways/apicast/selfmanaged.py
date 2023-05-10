@@ -28,16 +28,19 @@ class SelfManagedApicast(AbstractApicast):
     specific criteria have to be met.
     """
 
-    CAPABILITIES = {Capability.APICAST,
-                    Capability.CUSTOM_ENVIRONMENT,
-                    Capability.PRODUCTION_GATEWAY,
-                    Capability.LOGS,
-                    Capability.JAEGER}
+    CAPABILITIES = {
+        Capability.APICAST,
+        Capability.CUSTOM_ENVIRONMENT,
+        Capability.PRODUCTION_GATEWAY,
+        Capability.LOGS,
+        Capability.JAEGER,
+    }
     HAS_PRODUCTION = True
 
     # pylint: disable=unused-argument
-    def __new__(cls, staging: bool, openshift: OpenShiftClient, settings,
-                force: Union[Type[Gateway], str] = None, **kwargs):
+    def __new__(
+        cls, staging: bool, openshift: OpenShiftClient, settings, force: Union[Type[Gateway], str] = None, **kwargs
+    ):
         """
         :param force: The class to use can be defined explicitly
         """
@@ -57,8 +60,7 @@ class SelfManagedApicast(AbstractApicast):
                     return openshift
                 if isinstance(custom, OpenShiftClient):
                     return custom
-                return OpenShiftClient(
-                        custom.get("project_name"), custom.get("url"), custom.get("token"))
+                return OpenShiftClient(custom.get("project_name"), custom.get("url"), custom.get("token"))
 
             if not kind:
                 candidates = sorted([i for i in subclasses if i.fits(_openshift(i))], key=lambda x: x.PRIORITY)
@@ -72,8 +74,9 @@ class SelfManagedApicast(AbstractApicast):
         return super().__new__(cls)
 
     # pylint: disable=unused-argument
-    def __init__(self, staging: bool, openshift: OpenShiftClient, settings,
-                 force: Union[Type[Gateway], str] = None, **kwargs):
+    def __init__(
+        self, staging: bool, openshift: OpenShiftClient, settings, force: Union[Type[Gateway], str] = None, **kwargs
+    ):
         raise TypeError("SelfManagedApicast should be never created actually")
 
     @classmethod
@@ -82,4 +85,4 @@ class SelfManagedApicast(AbstractApicast):
         expected = set(inspect.signature(cls.__new__).parameters.keys())
         for subclass in OpenshiftApicast.__subclasses__():
             expected.update(inspect.signature(subclass.__init__).parameters.keys())
-        return list(expected - {'self', 'kwargs'})
+        return list(expected - {"self", "kwargs"})

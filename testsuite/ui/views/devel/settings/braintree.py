@@ -13,6 +13,7 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 class CustomerForm(View):
     """Billing Address form"""
+
     ROOT = ".//div[@id='braintree-form-wrapper']/form"
     first_name = TextInput(id="customer_first_name")
     last_name = TextInput(id="customer_last_name")
@@ -40,6 +41,7 @@ class CustomerForm(View):
 
 class BraintreeCCForm(View):
     """Braintree Credit card form"""
+
     cc_number = TextInput(id="credit-card-number")
     cvv = TextInput(id="cvv")
     expiration = TextInput(id="expiration")
@@ -47,13 +49,13 @@ class BraintreeCCForm(View):
 
     def add(self, credit_card: CreditCard):
         """Adds a new card for Braintree"""
+        self._iframe_fill("braintree-hosted-field-number", self.cc_number, credit_card.number)
+        self._iframe_fill("braintree-hosted-field-cvv", self.cvv, credit_card.cvc)
         self._iframe_fill(
-            "braintree-hosted-field-number", self.cc_number, credit_card.number)
-        self._iframe_fill(
-            "braintree-hosted-field-cvv", self.cvv, credit_card.cvc)
-        self._iframe_fill(
-            "braintree-hosted-field-expirationDate", self.expiration,
-            f"{credit_card.exp_month:02d}{credit_card.exp_year}")
+            "braintree-hosted-field-expirationDate",
+            self.expiration,
+            f"{credit_card.exp_month:02d}{credit_card.exp_year}",
+        )
 
     def _iframe_fill(self, frame_id, widget, value):
         frame = self.browser.selenium.find_element(By.XPATH, f"//iframe[@name='{frame_id}']")
@@ -64,6 +66,7 @@ class BraintreeCCForm(View):
 
 class ChallengeForm(View):
     """3DS Braintree verification form"""
+
     FRAME = '//iframe[@id="Cardinal-CCA-IFrame"]'
     otp_input = TextInput(name="challengeDataEntry")
     submit_btn = ThreescaleSubmitButton()
@@ -87,20 +90,17 @@ class ChallengeForm(View):
     def _wait_challenge_completed(self):
         """Wait for `BraintreeCCView` to reflect all changes when 3DS challenge was completed (or closed)"""
         self.browser.wait_for_element(
-            ".//dt[normalize-space(.)='Credit card number']|"
-            ".//p[@class='alert alert-danger']",
-            timeout=20
+            ".//dt[normalize-space(.)='Credit card number']|.//p[@class='alert alert-danger']", timeout=20
         )
 
 
 class BraintreeCCView(BaseDevelView):
     """View for adding credit card to the Braintree payment gateway"""
-    path_pattern = '/admin/account/braintree_blue'
+
+    path_pattern = "/admin/account/braintree_blue"
     tabs = View.nested(SettingsTabs)
-    add_billing_address = Text(
-        "//*[normalize-space(.)='Add Credit Card Details and Billing Address']/a")
-    edit_billing_address = Text(
-        "//*[normalize-space(.)='Edit Credit Card Details and Billing Address']/a")
+    add_billing_address = Text("//*[normalize-space(.)='Add Credit Card Details and Billing Address']/a")
+    edit_billing_address = Text("//*[normalize-space(.)='Edit Credit Card Details and Billing Address']/a")
     otp_tmp = GenericLocatorWidget("//div[@id='Cardinal-Modal']")
 
     customer_form = View.nested(CustomerForm)
@@ -139,7 +139,7 @@ class BraintreeCCView(BaseDevelView):
             ".//dt[normalize-space(.)='Credit card number']|"
             ".//p[@class='alert alert-danger']|"
             ".//iframe[@id='Cardinal-CCA-IFrame']",
-            timeout=20
+            timeout=20,
         )
 
     def prerequisite(self):

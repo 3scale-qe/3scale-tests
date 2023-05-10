@@ -50,14 +50,17 @@ def update_policies(service, application, rhsso_service_info):
     except KeyError:
         introspection_url = rhsso_service_info.oidc_client.well_known()["token_introspection_endpoint"]
 
-    policy_setting = rawobj.PolicyConfig("token_introspection", {
-        "auth-type": "client_id+client_secret",
-        "max_ttl_tokens": 10,
-        "max_cached_tokens": 10,
-        "client_id": application["client_id"],
-        "client_secret": application["client_secret"],
-        "introspection_url": introspection_url
-    })
+    policy_setting = rawobj.PolicyConfig(
+        "token_introspection",
+        {
+            "auth-type": "client_id+client_secret",
+            "max_ttl_tokens": 10,
+            "max_cached_tokens": 10,
+            "client_id": application["client_id"],
+            "client_secret": application["client_secret"],
+            "introspection_url": introspection_url,
+        },
+    )
 
     service.proxy.list().policies.append(policy_setting)
     service.proxy.deploy()

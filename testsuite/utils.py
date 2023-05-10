@@ -30,8 +30,8 @@ def randomize(name, tail=5):
 
 def _whoami():
     """Returns username"""
-    if 'tester' in settings:
-        return settings['tester']
+    if "tester" in settings:
+        return settings["tester"]
 
     try:
         return os.getlogin()
@@ -41,7 +41,7 @@ def _whoami():
         return str(os.getuid())
 
 
-def blame(request: 'FixtureRequest', name: str, tail: int = 5) -> str:
+def blame(request: "FixtureRequest", name: str, tail: int = 5) -> str:
     """Create 'scoped' name within given test
 
     This returns unique name for 3scale object(s) to avoid conflicts
@@ -65,7 +65,7 @@ def blame(request: 'FixtureRequest', name: str, tail: int = 5) -> str:
     return randomize(f"{name[:8]}-{_whoami()[:8]}-{context[:9]}", tail=tail)
 
 
-def blame_desc(request: 'FixtureRequest', text: str = None):
+def blame_desc(request: "FixtureRequest", text: str = None):
     """Returns string of text with details about execution suitable as description for 3scale objects"""
 
     nodename = request.node.name
@@ -84,10 +84,10 @@ def blame_desc(request: 'FixtureRequest', text: str = None):
 def random_string(num_bytes):
     """Generates random string for given number of bytes"""
     random_bytes = urandom(num_bytes)
-    return b64encode(random_bytes).decode('utf-8')[:num_bytes]
+    return b64encode(random_bytes).decode("utf-8")[:num_bytes]
 
 
-def _to_bytes(value, encoding='utf-8'):
+def _to_bytes(value, encoding="utf-8"):
     """Encodes string to bytes"""
     return value.encode(encoding)
 
@@ -112,8 +112,8 @@ def wait_interval(min_sec=15, max_sec=45):
 
 def wait_until_next_minute(min_sec=15, max_sec=45):
     """
-     Waits until the start of the next minute when are the limits reseted,
-     then waits until the start of the interval allowed to sent requests
+    Waits until the start of the next minute when are the limits reseted,
+    then waits until the start of the interval allowed to sent requests
     """
     seconds = datetime.datetime.now().second
     time.sleep(60 - seconds)
@@ -157,8 +157,7 @@ def warn_and_skip(message, action="warn"):
 
 
 def custom_policy() -> dict:
-    """Returns a dict containing a custom policy based on https://github.com/3scale-qe/apicast-example-policy
-    """
+    """Returns a dict containing a custom policy based on https://github.com/3scale-qe/apicast-example-policy"""
     initlua = "return require('example')"
     apicastpolicyjson = """
     {
@@ -229,8 +228,4 @@ def custom_policy() -> dict:
 
     return _M
     """
-    return {
-        "init.lua": initlua,
-        "example.lua": examplelua,
-        "apicast-policy.json": apicastpolicyjson
-    }
+    return {"init.lua": initlua, "example.lua": examplelua, "apicast-policy.json": apicastpolicyjson}

@@ -5,13 +5,11 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 from testsuite.utils import blame
 from testsuite import rawobj
-from testsuite import TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
-pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
-    pytest.mark.flaky]
+pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"), pytest.mark.flaky]
 
 
 @pytest.fixture(scope="module")

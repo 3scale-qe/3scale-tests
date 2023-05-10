@@ -4,6 +4,7 @@ from typing import NamedTuple
 
 class BillingAddress(NamedTuple):
     """Billing address info"""
+
     name: str
     address: str
     city: str
@@ -15,6 +16,7 @@ class BillingAddress(NamedTuple):
 
 class CreditCard(NamedTuple):
     """Credit card details"""
+
     number: str
     cvc: int
     exp_month: int

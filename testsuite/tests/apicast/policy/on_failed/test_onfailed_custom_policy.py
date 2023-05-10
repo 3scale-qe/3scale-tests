@@ -11,8 +11,10 @@ from testsuite.gateways import gateway
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.utils import blame
 
-pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6705")]
+pytestmark = [
+    pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6705"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -28,17 +30,19 @@ def set_gateway_image(openshift, staging_gateway, request):
     openshift_client = staging_gateway.openshift
     image_stream_name = blame(request, "examplepolicy")
 
-    github_template = resources.files('testsuite.resources.modular_apicast').joinpath("example_policy.yml")
+    github_template = resources.files("testsuite.resources.modular_apicast").joinpath("example_policy.yml")
 
     amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
     project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
 
-    github_params = {"AMP_RELEASE": amp_release,
-                     "NAMESPACE": project,
-                     "BUILD_NAME": build_name_github,
-                     "IMAGE_STREAM_NAME": image_stream_name,
-                     "IMAGE_STREAM_TAG": "github"}
+    github_params = {
+        "AMP_RELEASE": amp_release,
+        "NAMESPACE": project,
+        "BUILD_NAME": build_name_github,
+        "IMAGE_STREAM_NAME": image_stream_name,
+        "IMAGE_STREAM_TAG": "github",
+    }
 
     def _delete_builds():
         openshift_client.delete_template(github_template, github_params)
@@ -70,15 +74,13 @@ def policy_settings(on_failed_policy, failing_policy):
 @pytest.fixture
 def return_code(request) -> int:
     """returns the status code expected by the current run"""
-    on_failed_conf = request.getfixturevalue('on_failed_configuration')
+    on_failed_conf = request.getfixturevalue("on_failed_configuration")
     return on_failed_conf.get("error_status_code", 503)
 
 
-@backoff.on_predicate(backoff.fibo,
-                      lambda response: response.headers.get("server") != "openresty",
-                      max_tries=5)
+@backoff.on_predicate(backoff.fibo, lambda response: response.headers.get("server") != "openresty", max_tries=5)
 def make_request(api_client):
-    """Make request to the product and retry if the response isn't from APIcast """
+    """Make request to the product and retry if the response isn't from APIcast"""
     return api_client.get("/")
 
 

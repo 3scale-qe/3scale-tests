@@ -8,6 +8,7 @@ from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 class ProductSettingsView(BaseProductView):
     """View representation of Product's Settings page"""
+
     path_pattern = "/apiconfig/services/{product_id}/settings"
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
@@ -43,5 +44,6 @@ class ProductSettingsView(BaseProductView):
 
     @property
     def is_displayed(self):
-        return BaseProductView.is_displayed.fget(self) and self.path in self.browser.url \
-               and self.deployment.is_displayed
+        return (
+            BaseProductView.is_displayed.fget(self) and self.path in self.browser.url and self.deployment.is_displayed
+        )

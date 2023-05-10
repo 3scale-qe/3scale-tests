@@ -5,12 +5,14 @@ response body
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import rawobj, TESTED_VERSION # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
-pytestmark = [pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
-              pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
-              pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6736")]
+pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
+    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6736"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -27,9 +29,7 @@ def service_proxy_settings(private_base_url):
     return rawobj.Proxy(private_base_url("httpbin"))
 
 
-@pytest.mark.parametrize("num_bytes,status_code", [(10, 200),
-                                                   (100, 200),
-                                                   (101, 413)])
+@pytest.mark.parametrize("num_bytes,status_code", [(10, 200), (100, 200), (101, 413)])
 def test_payload_limits_response(api_client, num_bytes, status_code):
     """
     Tests that the backend response with a content_length greater than the limit
@@ -42,4 +42,4 @@ def test_payload_limits_response(api_client, num_bytes, status_code):
     """
     response = api_client().get(f"/bytes/{num_bytes}")
     assert response.status_code == status_code
-    assert response.headers['Content-Length'] == str(len(response.content))
+    assert response.headers["Content-Length"] == str(len(response.content))

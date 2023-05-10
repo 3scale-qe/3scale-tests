@@ -20,11 +20,12 @@ class RadioGroup(GenericLocatorWidget):
     """
     Radio group of 3scale pages.
     """
-    OPTIONS_SECTION_CLASS = '//fieldset/ol[contains(@class, "{}")]'
-    OPTIONS_SECTION = '/fieldset/ol'
 
-    OPTIONS = './li'
-    OPTIONS_INPUT = OPTIONS + '/label/input'
+    OPTIONS_SECTION_CLASS = '//fieldset/ol[contains(@class, "{}")]'
+    OPTIONS_SECTION = "/fieldset/ol"
+
+    OPTIONS = "./li"
+    OPTIONS_INPUT = OPTIONS + "/label/input"
     OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
 
     def __init__(self, parent=None, locator=None, field_set_identifier="", logger=None):
@@ -50,7 +51,7 @@ class RadioGroup(GenericLocatorWidget):
         options = self.browser.elements(self.OPTIONS_INPUT)
         for option in options:
             if option.is_selected():
-                return option.get_dom_attribute('id')
+                return option.get_dom_attribute("id")
         return None
 
 
@@ -64,11 +65,12 @@ class CheckBoxGroup(GenericLocatorWidget):
                      e.g. fieldset/ol[class=ServiceList]
     :param field_set_identifier: Set if Checkbox group identifier is in fieldset level of group.
     """
-    OPTIONS_SECTION = '/fieldset/ol'
+
+    OPTIONS_SECTION = "/fieldset/ol"
     OPTIONS_SECTION_OL_CLASS = '//fieldset/ol[contains(@class, "{}")]'
 
-    OPTIONS = './li'
-    OPTIONS_INPUT = OPTIONS + '/label/input'
+    OPTIONS = "./li"
+    OPTIONS_INPUT = OPTIONS + "/label/input"
     OPTIONS_BY_ID = OPTIONS_INPUT + '[@id="{}"]'
     OPTIONS_BY_TEXT = OPTIONS + '/label[normalize-space(.)="{}"]/input'
 
@@ -133,6 +135,7 @@ class ContextMenu(ContextSelector):
     ContextMenu that extends ContextSelector lactated in Widgetastic PF4 libraries, but briefly adjusted
     to fit 3scale needs.
     """
+
     DEFAULT_LOCATOR = './/div[contains(@class, "pf-c-context-selector")]'
     BUTTON_LOCATOR = './/a[@title="Context Selector"]'
 
@@ -150,11 +153,12 @@ class NavigationMenu(Navigation):
     argument (this argument is usually taken from destination View in a form of `path` variable),
     it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
     """
+
     RELATED_RESOURCE = './/h2[@class="pf-c-nav__section-title"]'
     LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'
     # Product and backend navigation menu differs from others,
     # hence we need different ITEMS parameter than default one is.
-    ITEMS = './section/ul/li/a| ./ul/li/a'
+    ITEMS = "./section/ul/li/a| ./ul/li/a"
     # We need NAVIGATION_ITEMS due to navigation in subitems which cannot be done From ITEMS locator
     NAVIGATION_ITEMS = "./ul/li|./section/ul/li"
     SUB_ITEMS = './section/ul/li[contains(@class, "pf-c-nav__item")]'
@@ -206,8 +210,9 @@ class ThreescaleDropdown(GenericLocatorWidget):
 
     def selected_value(self):
         """Return selected attribute from dropdown"""
-        return self.browser.selenium.find_element(By.XPATH, "//select/option[@selected='selected']") \
-            .get_attribute("value")
+        return self.browser.selenium.find_element(By.XPATH, "//select/option[@selected='selected']").get_attribute(
+            "value"
+        )
 
     def select_by_value(self, value):
         """Select given value from dropdown"""
@@ -228,6 +233,7 @@ class AudienceTable(PatternflyTable):
     to search or row manipulation. This widget specifies correct header columns. It may extend already existing
     search implementation from PF4 in the future.
     """
+
     HEADERS = "./thead/tr[1]/th"
 
 
@@ -254,12 +260,13 @@ class ThreescaleCheckBox(GenericLocatorWidget):
 # an abstract method
 class PolicySection(Widget):
     """Widget representing Policies table section"""
+
     ROOT = ParametrizedLocator("//*[@id='policies']/div/section")
-    POLICY_LIST = './ul/li'
-    ITEMS_LOCATOR = './ul/li/article/h3'
+    POLICY_LIST = "./ul/li"
+    ITEMS_LOCATOR = "./ul/li/article/h3"
     ITEM_LOCATOR = "./ul/li/article/h3[text()='{}']"
-    ADD_POLICY_LOC = '.PolicyChain-addPolicy'
-    CANCEL_LOC = '.PolicyChain-addPolicy--cancel'
+    ADD_POLICY_LOC = ".PolicyChain-addPolicy"
+    CANCEL_LOC = ".PolicyChain-addPolicy--cancel"
 
     def __init__(self, parent=None, logger=None):
         Widget.__init__(self, parent, logger=logger)
@@ -280,7 +287,7 @@ class PolicySection(Widget):
         Get First policy name in policy chain
         :return: Name of policy
         """
-        return self.browser.elements('./ul/li[1]/article/h3')[0].text
+        return self.browser.elements("./ul/li[1]/article/h3")[0].text
 
     def add_policy(self, policy_name):
         """Opens Policy registry list and add policy by its name
@@ -300,7 +307,7 @@ class PolicySection(Widget):
         if self.has_item(policy_name):
             self.item_select(policy_name)
         else:
-            raise ItemNotPresentException('Item {!r} not found.'.format(policy_name))
+            raise ItemNotPresentException("Item {!r} not found.".format(policy_name))
 
     def drag_and_drop_policy(self, source, destination):
         """Drag and drop element from source element to destination
@@ -308,8 +315,10 @@ class PolicySection(Widget):
             source: string : name of source Policy
             destination: string : name of destination Policy
         """
-        self.browser.drag_and_drop(source="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(source),
-                                   target="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(destination))
+        self.browser.drag_and_drop(
+            source="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(source),
+            target="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(destination),
+        )
 
     def has_item(self, item):
         """Returns whether the items exists.
@@ -328,14 +337,14 @@ class PolicySection(Widget):
         try:
             return self.browser.element(self.ITEM_LOCATOR.format(item), parent=self)
         except NoSuchElementException:
-            raise ItemNotPresentException('Item {!r} not found.'.format(item))
+            raise ItemNotPresentException("Item {!r} not found.".format(item))
 
     def item_select(self, item):
         """Opens the Policy registry and selects the desired policy.
         :param
             item: Item to be selected
         """
-        self.logger.info('Selecting %r', item)
+        self.logger.info("Selecting %r", item)
         if not self.has_item(item):
             raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
         self.browser.click(self.item_element(item))
@@ -343,6 +352,7 @@ class PolicySection(Widget):
 
 class ThreescaleSelect(Select):
     """Specific select for 3scale pages"""
+
     BUTTON_LOCATOR = "./div/button"
 
 
@@ -370,9 +380,10 @@ class DivBasedEditor(TextInput):
 # an abstract method
 class ActiveDocV2Section(Widget):
     """Active Doc V2 preview section"""
+
     ROOT = ParametrizedLocator('//*[@id="default_endpoint_list"]')
-    ENDPOINTS_LIST = './li'
-    ITEMS_LOCATOR = './li/ul/li/div/h3/span[2]/a'
+    ENDPOINTS_LIST = "./li"
+    ITEMS_LOCATOR = "./li/ul/li/div/h3/span[2]/a"
     ITEMS_BUTTON_LOCATOR = './li/ul/li/div/h3/span[2]/a[text()="{}"]/ancestor::li/div[2]/form/div/input'
     RESPONSE_CODE_LOCATOR = './/*[contains(@class, "response_code")]/pre'
 
@@ -392,7 +403,7 @@ class ActiveDocV2Section(Widget):
         try:
             return self.browser.element(self.ITEMS_BUTTON_LOCATOR.format(item), parent=self)
         except NoSuchElementException:
-            raise NoSuchElementException('Item {!r} not found.'.format(item))
+            raise NoSuchElementException("Item {!r} not found.".format(item))
 
     @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
     def try_it_out(self, method):
@@ -412,9 +423,10 @@ class ActiveDocV2Section(Widget):
 # an abstract method
 class ActiveDocV3Section(Widget):
     """Active Doc V3 preview section"""
+
     ROOT = ParametrizedLocator('//*[@class="operation-tag-content"]')
-    ENDPOINTS_LIST = './span/div'
-    ITEMS_LOCATOR = './span/div/div/button/span[2]/a/span'
+    ENDPOINTS_LIST = "./span/div"
+    ITEMS_LOCATOR = "./span/div/div/button/span[2]/a/span"
     ITEMS_EXPAND_LOCATOR = './span/div/div/button/span[text()="{}"]/../span[2]/a/span[contains(text(),"{}")]'
     RESPONSE_CODE_LOCATOR = './/*[text()="Server response"]/../table/tbody/tr/td[1]'
     TRY_OUT_BUTTON_LOCATOR = './/*[@class="btn try-out__btn"]'
@@ -435,7 +447,7 @@ class ActiveDocV3Section(Widget):
         try:
             return self.browser.element(self.ITEMS_EXPAND_LOCATOR.format(method, path), parent=self)
         except NoSuchElementException:
-            raise NoSuchElementException('Method {} with path {} not found.'.format(method, path))
+            raise NoSuchElementException("Method {} with path {} not found.".format(method, path))
 
     @backoff.on_exception(backoff.fibo, NoSuchElementException, max_tries=4, jitter=None)
     def try_it_out(self, method, path, key):
@@ -477,9 +489,7 @@ class ThreescaleButtonGroup(GenericLocatorWidget):
     DROPDOWN_ITEMS = "./ul/li/a"
     DROPDOWN_TOGGLE = "./a[2]"
 
-    def __init__(self, parent=None,
-                 locator="",
-                 logger=None):
+    def __init__(self, parent=None, locator="", logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
 
     def select(self, option):

@@ -34,8 +34,9 @@ def custom_app(service, custom_app_plan, custom_application, lifecycle_hooks, re
 
     def _custom_app(autoclean=True):
         plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app_plan")), service)
-        return custom_application(rawobj.Application(blame(request, "app_name"), plan), autoclean=autoclean,
-                                  hooks=lifecycle_hooks)
+        return custom_application(
+            rawobj.Application(blame(request, "app_name"), plan), autoclean=autoclean, hooks=lifecycle_hooks
+        )
 
     return _custom_app
 
@@ -63,7 +64,7 @@ def test_application_updated(custom_app, navigator, requestbin, service):
         - Get webhook response for updated
         - Assert that webhook response is not None
         - Assert that response xml body contains right application name and description
-      """
+    """
     application = custom_app()
     app = navigator.navigate(ApplicationEditView, application=application, product=service)
     app.update("updated_name", "updated_description")
@@ -109,7 +110,7 @@ def test_application_plan_changed(custom_app_plan, request, navigator, service, 
     application = custom_app()
     app_plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app_plan")), service)
     app = navigator.navigate(ApplicationDetailView, application=application, product=service)
-    app.change_plan(app_plan['name'])
+    app.change_plan(app_plan["name"])
 
     webhook = requestbin.get_webhook("plan_changed", str(application.entity_id))
     assert webhook is not None

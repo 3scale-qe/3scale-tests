@@ -10,6 +10,7 @@ from testsuite.ui.views.admin.foundation import BaseAdminView
 
 class Auth0View(View, Navigable):
     """View representation of 3rd party Auth0 provider page"""
+
     url_domain = weakget(settings)["auth0"]["domain"] % None
     email = TextInput(name="email")
     password = TextInput(name="password")
@@ -33,12 +34,17 @@ class Auth0View(View, Navigable):
 
     @property
     def is_displayed(self):
-        return self.email.is_displayed and self.password.is_displayed and self.login_button.is_displayed and \
-               self.url_domain in self.browser.url
+        return (
+            self.email.is_displayed
+            and self.password.is_displayed
+            and self.login_button.is_displayed
+            and self.url_domain in self.browser.url
+        )
 
 
 class RhssoView(View, Navigable):
     """View representation of 3rd party RHSSO provider page"""
+
     username = TextInput(name="username")
     password = TextInput(name="password")
     login_button = GenericLocatorWidget(locator="//*[@name='login']")

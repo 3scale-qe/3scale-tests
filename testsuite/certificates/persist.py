@@ -8,6 +8,7 @@ from typing import Dict
 
 class TmpFilePersist(ABC):
     """Persists data into files so it can be used in commands that require files"""
+
     def __init__(self) -> None:
         super().__init__()
         self._files = None

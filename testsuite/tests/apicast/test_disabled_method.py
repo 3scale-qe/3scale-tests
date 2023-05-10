@@ -21,8 +21,7 @@ def application(application):
     proxy = service.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(method, pattern="/anything/disabled_method"))
 
-    service.app_plans.list()[0].limits(method).create({
-        "metric_id": method["id"], "period": "eternity", "value": 0})
+    service.app_plans.list()[0].limits(method).create({"metric_id": method["id"], "period": "eternity", "value": 0})
 
     proxy.deploy()
 
