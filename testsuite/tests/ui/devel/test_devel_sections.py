@@ -15,12 +15,11 @@ from testsuite.ui.views.admin.audience.developer_portal import (
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 
-pytestmark = pytest.mark.usefixtures("login")
-
 
 @pytest.fixture(scope="module")
 def dev_portal_section(navigator, request, custom_admin_login):
     """Creates a new section in developer portal"""
+    custom_admin_login()
     view = navigator.navigate(CMSNewSectionView)
     section_name = blame(request, "TestSection")
     section_path = blame(request, "section")
@@ -36,9 +35,10 @@ def dev_portal_section(navigator, request, custom_admin_login):
     return section_name
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def dev_portal_page(navigator, request, dev_portal_section, custom_admin_login):
     """Creates a new page in developer portal and assign it to section"""
+    custom_admin_login()
     view = navigator.navigate(CMSNewPageView)
     page_name = blame(request, "TestPage")
     page_path = blame(request, "/test")
@@ -59,7 +59,7 @@ def dev_portal_page(navigator, request, dev_portal_section, custom_admin_login):
     return view.get_path()
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def dev_portal_group(navigator, request, account, dev_portal_section, custom_admin_login):
     """Creates a new group in developer portal and assign account to this group"""
     custom_admin_login()
@@ -81,6 +81,7 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9020")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-836")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.14')")
+@pytest.mark.usefixtures("dev_portal_group")
 def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):
     """
     Preparation:
