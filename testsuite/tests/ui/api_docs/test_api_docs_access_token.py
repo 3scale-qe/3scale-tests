@@ -1,7 +1,6 @@
 """Test API Docs access token validation: https://issues.redhat.com/browse/THREESCALE-7084"""
 import pytest
 
-from testsuite import rawobj
 from testsuite.ui.views.admin.settings.api_docs import APIDocsView
 
 
@@ -27,7 +26,6 @@ def test_invalid_token(request, navigator, access_token):
     api_docs = navigator.navigate(APIDocsView)
     token = request.getfixturevalue(access_token)[0]
     code = request.getfixturevalue(access_token)[1]
-    status_code = api_docs.endpoint("Authentication Providers Admin Portal List").send_request(
-        rawobj.ApiDocParams(token)
-    )
-    assert status_code == code
+    endpoint = api_docs.endpoint("GET", "/admin/api/account/authentication_providers.xml")
+    endpoint.execute({"access_token": token})
+    assert endpoint.status_code == code

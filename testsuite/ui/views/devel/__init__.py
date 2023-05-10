@@ -2,7 +2,7 @@
 from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 
 from testsuite.ui.navigation import Navigable, step
-from testsuite.ui.widgets import ActiveDocV3Section
+from testsuite.ui.widgets.oas3 import Endpoint
 
 
 class Navbar(View, Navigable):
@@ -143,7 +143,7 @@ class DocsView(BaseDevelView):
     """View for Documentation page of devel portal"""
 
     path_pattern = "/docs"
-    active_docs_section = ActiveDocV3Section()
+    endpoint = View.nested(Endpoint)
 
     def __init__(self, parent, path=None):
         super().__init__(parent)
@@ -156,8 +156,4 @@ class DocsView(BaseDevelView):
 
     @property
     def is_displayed(self):
-        return (
-            BaseDevelView.is_displayed.fget(self)
-            and self.path in self.browser.url
-            and self.active_docs_section.is_displayed
-        )
+        return BaseDevelView.is_displayed.fget(self) and self.path in self.browser.url

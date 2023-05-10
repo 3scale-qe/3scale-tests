@@ -68,12 +68,16 @@ def test_active_docs_v3_generate_endpoints(navigator, ui_active_doc, service, ap
         - Assert that try endpoint works as expected
     """
     preview_page = navigator.navigate(ActiveDocsDetailView, product=service, active_doc=ui_active_doc)
-    navigator.browser.selenium.refresh()
     preview_page.wait_displayed()
-    assert preview_page.oas3.active_docs_section.endpoints == ["/pets", "/pets", "/pets/{id}", "/pets/{id}"]
+
+    endpoints = preview_page.oas3.endpoint
+    assert len(endpoints) == 4
+    for endpoint, path in zip(endpoints, ["/pets", "/pets", "/pets/{id}", "/pets/{id}"]):
+        assert endpoint.path.text == path
+
     key = f"{application.entity_name} - {service['name']}"
-    preview_page.oas3.make_request("GET", "/pets", key)
-    assert preview_page.oas3.active_docs_section.get_response_code() == "200"
+    preview_page.oas3.endpoint("GET", "/pets").execute({"user_key": key})
+    assert preview_page.oas3.endpoint("GET", "/pets").status_code == "200"
 
 
 @pytest.mark.usefixtures("active_doc")

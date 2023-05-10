@@ -4,8 +4,9 @@ from widgetastic.widget import View, Text
 
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, ThreescaleEditButton
-from testsuite.ui.widgets import ActiveDocV2Section, ActiveDocV3Section
+from testsuite.ui.widgets import ActiveDocV2Section
 from testsuite.ui.navigation import step
+from testsuite.ui.widgets.oas3 import Endpoint
 
 
 class ActiveDocsView(BaseProductView):
@@ -64,18 +65,8 @@ class ActiveDocsDetailView(BaseProductView):
     class oas3(View):
         """OAS version 3 section"""
 
-        active_docs_section = ActiveDocV3Section()
         server = Text("//label[@for='servers']/select/option")
-
-        def make_request(self, method, path, key):
-            """
-            Make request on preview page
-            :param path string eg. /post, /get
-            :param method string eg. GET, POST
-            :param key string name of application
-            :return:
-            """
-            self.active_docs_section.try_it_out(method, path, key)
+        endpoint = View.nested(Endpoint)
 
     def prerequisite(self):
         return ActiveDocsView

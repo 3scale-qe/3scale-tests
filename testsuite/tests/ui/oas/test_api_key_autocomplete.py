@@ -81,5 +81,6 @@ def test_api_key_autocomplete(
     custom_devel_login(account)
     view = navigator.open(DocsView, path=api_doc_page)
     key = f"{application.entity_name} - {service['name']}"
-    view.active_docs_section.try_it_out("GET", "/", key)
-    assert view.active_docs_section.get_response_code() == "200"
+    endpoint = view.endpoint("GET", "/")
+    endpoint.execute({"user_key": key})
+    assert endpoint.status_code == "200"
