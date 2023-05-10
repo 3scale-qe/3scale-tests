@@ -3,18 +3,29 @@ from datetime import datetime
 
 import pytest
 
+from testsuite.billing import Braintree
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.braintree import BraintreeCCView
 from testsuite.utils import warn_and_skip
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def require_braintree_patch(openshift):
     """Braintree requires patched deployment"""
     ocp = openshift()
     if "payments.yml" not in ocp.config_maps["system"]:
         warn_and_skip("Braintree requires patched deployment. No payments.yml in system configmap", "fail")
+
+
+@pytest.fixture(scope="session")
+def braintree(testconfig):
+    """Braintree API"""
+    braintree_credentials = testconfig["braintree"]
+    merchant_id = braintree_credentials["merchant_id"]
+    public_key = braintree_credentials["public_key"]
+    private_key = braintree_credentials["private_key"]
+    return Braintree(merchant_id, public_key, private_key)
 
 
 @pytest.fixture(scope="module")
