@@ -939,7 +939,11 @@ def custom_tenant(testconfig, master_threescale, request):
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
 
-        master_threescale.accounts.read_by_name(user_name).users.read_by_name(user_name).activate()
+        tenant.account.users.read_by_name(user_name).activate()
+
+        plan_upgrade = weakget(testconfig)["fixtures"]["custom_tenant"]["plan_upgrade"] % False
+        if plan_upgrade:
+            tenant.plan_upgrade(plan_upgrade)
 
         return tenant
 
