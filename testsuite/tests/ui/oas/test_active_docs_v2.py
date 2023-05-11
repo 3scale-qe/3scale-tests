@@ -1,4 +1,7 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
+from string import Template
+from urllib.parse import urlsplit
+
 import pytest
 import importlib_resources as resources
 
@@ -18,7 +21,7 @@ def application(service, custom_application, custom_app_plan, lifecycle_hooks, r
 
 
 @pytest.mark.usefixtures("login")
-def test_active_docs_v2_generate_endpoints(navigator, service, request):
+def test_active_docs_v2_generate_endpoints(navigator, service, private_base_url, request):
     """
     Test:
         - Create service via API
@@ -28,7 +31,9 @@ def test_active_docs_v2_generate_endpoints(navigator, service, request):
     """
     name = blame(request, "active_doc_v2")
     system_name = blame(request, "system_name")
-    oas_spec = resources.files("testsuite.resources.oas2").joinpath("swagger.json").read_text()
+    oas_spec = Template(
+        resources.files("testsuite.resources.oas2").joinpath("swagger.json").read_text()
+    ).safe_substitute(host=urlsplit(private_base_url()).netloc)
     edit = navigator.navigate(ActiveDocsNewView)
     edit.create_spec(
         name=name,

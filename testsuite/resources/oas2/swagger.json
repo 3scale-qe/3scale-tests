@@ -5,7 +5,7 @@
     "description": "API Management facade for a very handy and free online HTTP tool.",
     "version": "1.0"
   },
-  "host": "httpbin.org",
+  "host": "$host",
   "basePath": "",
   "schemes": [
     "http",
