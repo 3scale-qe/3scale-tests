@@ -27,7 +27,7 @@ pytest = "*"
 pytest-cases = "*"
 pytest-asyncio = "*"
 requests = "*"
-3scale-api = ">=0.20.0"
+3scale-api = ">=0.30.0"
 dynaconf = "*"
 # python_keycloak = "*"
 # Waiting for https://github.com/marcospereirampj/python-keycloak/pull/201 and https://github.com/marcospereirampj/python-keycloak/pull/200
