@@ -420,8 +420,9 @@ def pytest_exception_interact(node, call, report):
             extra = getattr(report, "extra", [])
             extra.append(pytest_html.extras.image(filepath))
             report.extra = extra
+            LOGGER.info("Screenshot %s was created for the URL: %s", dir_path, browser.url)
 
-            global html_report  # pylint: disable=global-statement,invalid-name
+            global html_report  # pylint: disable=global-statement
             html_report = node.config.getoption("--html")
 
         except InvalidSessionIdException:
