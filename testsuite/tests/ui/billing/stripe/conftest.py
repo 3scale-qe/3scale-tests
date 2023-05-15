@@ -1,6 +1,7 @@
 """Conftest for Stripe gateway billing tests"""
 import pytest
 
+from testsuite.billing import Stripe
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
@@ -13,6 +14,12 @@ def stripe_gateway(custom_admin_login, navigator, testconfig):
     billing = navigator.navigate(BillingSettingsView)
     billing.charging(True)
     billing.stripe(testconfig["stripe"]["secret_key"], testconfig["stripe"]["publishable_key"], "empty-webhook")
+
+
+@pytest.fixture(scope="session")
+def stripe(testconfig):
+    """Stripe API"""
+    return Stripe(testconfig["stripe"]["api_key"])
 
 
 @pytest.fixture(scope="module")
