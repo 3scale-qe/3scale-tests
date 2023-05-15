@@ -2,8 +2,6 @@
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from weakget import weakget
-
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 WARN_MESSAGES = [
@@ -24,7 +22,7 @@ pytestmark = [
 @pytest.fixture
 def status_code(testconfig):
     """Expected status code based on testing environment"""
-    if weakget(testconfig)["threescale"]["deployment_type"] == "rhoam":
+    if testconfig["threescale"]["deployment_type"] == "rhoam":
         return 503
     return 414
 
