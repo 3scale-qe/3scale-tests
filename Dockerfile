@@ -15,7 +15,7 @@ ADD https://gist.githubusercontent.com/mdujava/c87f687cbb9bbed0144ddc136758292c/
 RUN update-ca-trust
 
 RUN useradd --no-log-init -u 1000 -g root -m default
-RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.29/openshift-client-linux.tar.gz | tar xz -C /usr/local/bin
+RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-linux.tar.gz | tar xz -C /usr/local/bin
 
 RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
     chmod +x /usr/local/bin/cfssl
