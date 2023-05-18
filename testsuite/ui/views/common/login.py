@@ -10,9 +10,9 @@ class LoginForm(View):
     """
 
     username_field = TextInput(id="session_username")
-    username_label = Text('//input[@id="session_username"]/preceding-sibling::label')
+    username_label = Text('.//label[@for="session_username"]')
     password_field = TextInput(id="session_password")
-    password_label = Text('//input[@id="session_password"]/preceding-sibling::label')
+    password_label = Text('.//label[@for="session_password"]')
     submit = ThreescaleSubmitButton()
 
     def fill_passwd(self, passwd: str):
