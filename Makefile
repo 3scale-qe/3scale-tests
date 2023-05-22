@@ -214,7 +214,8 @@ testsuite/resources/apicast.yml: FORCE
 	$(RUNSCRIPT)env-version-check
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/$(VERSION).GA/apicast-gateway/apicast.yml > $@ || \
 	curl -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/apicast-gateway/apicast.yml > $@
-	sed -i "s/imagePullPolicy:.*/imagePullPolicy: Always/g" $@
+	sed -i -e "s/imagePullPolicy:.*/imagePullPolicy: Always/g" \
+	       -e "/^apiVersion:/s^:.*^: template.openshift.io/v1^" $@
 
 release: ## Create branch of new VERSION (optionally tag VERSION)
 release: tag_release ?= no
