@@ -46,7 +46,7 @@ def mapping_rules(service, backend_bin, backend_echo):
         - Add mapping rule with path "/anything/bin"
     """
     proxy = service.proxy.list()
-    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+    proxy.mapping_rules.list()[0].delete()
 
     test_metric = backend_echo.metrics.list()[0]
     bin_metric = backend_bin.metrics.list()[0]
