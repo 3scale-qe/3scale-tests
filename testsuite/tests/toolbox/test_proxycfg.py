@@ -134,7 +134,7 @@ def test_list1(service, hits, empty_list_staging, create_cmd):
 
     mapping_rules = proxy.mapping_rules.list()
     for mapping_rule in mapping_rules:
-        proxy.mapping_rules.delete(mapping_rule["id"])
+        mapping_rule.delete()
 
     proxy.mapping_rules.create(rawobj.Mapping(hits, "/ip"))
     proxy.mapping_rules.create(rawobj.Mapping(hits, "/anything", "POST"))
