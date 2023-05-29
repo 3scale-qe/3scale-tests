@@ -33,7 +33,7 @@ dynaconf = "*"
 # Waiting for https://github.com/marcospereirampj/python-keycloak/pull/201 and https://github.com/marcospereirampj/python-keycloak/pull/200
 python-keycloak = ">=2.13"
 backoff = "*"
-websocket_client = "*"
+websocket_client = "==1.5.1"
 httpx = {version = "*", extras = ["http2"]}
 selenium = ">=4.0.0"
 webdriver-manager = "*"
