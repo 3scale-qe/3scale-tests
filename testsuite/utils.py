@@ -62,7 +62,7 @@ def blame(request: "FixtureRequest", name: str, tail: int = 5) -> str:
     if "." in context:
         context = context.split(".")[0]
 
-    return randomize(f"{name[:8]}-{_whoami()[:8]}-{context[:9]}", tail=tail)
+    return randomize(f"{name[:8]}-{_whoami()[:6]}-{context[:9]}", tail=tail)
 
 
 def blame_desc(request: "FixtureRequest", text: str = None):
