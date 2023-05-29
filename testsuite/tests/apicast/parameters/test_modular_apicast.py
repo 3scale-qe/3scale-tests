@@ -96,6 +96,7 @@ def set_gateway_image(openshift, staging_gateway, request):
     openshift_client.start_build(build_name_copy)
 
     staging_gateway.set_image(f"{openshift_client.image_stream_repository(image_stream_name)}:latest")
+    return staging_gateway
 
 
 @pytest.fixture(scope="module")

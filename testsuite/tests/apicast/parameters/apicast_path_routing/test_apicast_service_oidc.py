@@ -24,10 +24,11 @@ def gateway_kind():
 
 
 @pytest.fixture(scope="module")
-def production_gateway(request, gateway_environment):
+def production_gateway(request, gateway_environment, testconfig):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=False, name=blame(request, "gw"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     if len(gateway_environment) > 0:
@@ -41,6 +42,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
 
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
+    return lifecycle_hooks
 
 
 @pytest.fixture(scope="module")
@@ -78,17 +80,24 @@ def service_proxy_settings(private_base_url):
     return rawobj.Proxy(private_base_url("httpbin"))
 
 
+@pytest.fixture(scope="module")
+def clients(prod_client, application, application2):
+    """API clients for test"""
+    api_client1 = prod_client(application, redeploy=False)
+    api_client2 = prod_client(application2)
+
+    return api_client1, api_client2
+
+
 # pylint: disable=unused-argument
-def test_filter_by_url(application, application2, production_gateway, prod_client):
+def test_filter_by_url(production_gateway, clients):
     """
     Send request to first service using rhsso OIDC authentication
     Send request to second service using rhsso OIDC authentication
 
     Assert that both requests have status_code == 200
     """
-
-    api_client1 = prod_client(application, redeploy=False)
-    api_client2 = prod_client(application2)
+    api_client1, api_client2 = clients
 
     request = api_client1.get("/anything/foo")
     assert request.status_code == 200
