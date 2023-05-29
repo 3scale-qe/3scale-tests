@@ -15,6 +15,7 @@ import importlib_resources as resources
 import openshift as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
+from pytest_metadata.plugin import metadata_key
 from threescale_api import client, errors
 from weakget import weakget
 
@@ -256,9 +257,11 @@ def pytest_metadata(metadata):
 def pytest_report_header(config):
     """Report testsuite metadata"""
     header = [""]
-    for key in sorted(config._metadata.keys()):
-        header.append(f"testsuite: {key}={config._metadata[key]}")
-        _junit_testsuite_property(config, key, config._metadata[key])
+    metadata = config.stash[metadata_key]
+    config._metadata = metadata  # For compatibility with pytest-html
+    for key in sorted(metadata.keys()):
+        header.append(f"testsuite: {key}={metadata[key]}")
+        _junit_testsuite_property(config, key, metadata[key])
     header.append("")
     return header
 

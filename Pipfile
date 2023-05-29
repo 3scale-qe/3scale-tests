@@ -59,7 +59,7 @@ stripe= "*"
 braintree = "*"
 pillow = "*"
 pytest-persistence = "*"
-pytest-metadata = "*"
+pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
 
