@@ -1,7 +1,6 @@
 """Rewrite of spec/ui_specs/autocomplete_spec.rb"""
 import pytest
 
-from testsuite import rawobj
 from testsuite.ui.views.admin.settings.api_docs import APIDocsView
 
 
@@ -18,14 +17,12 @@ def test_autocomplete(navigator, service, testconfig):
     token = testconfig["threescale"]["admin"]["token"]
 
     api_docs_page = navigator.navigate(APIDocsView)
-    endpoint = api_docs_page.endpoint("Service Read")
-    endpoint.fill(rawobj.ApiDocParams(token))
-    endpoint.get_param("service_ids").click()
+    endpoint = api_docs_page.endpoint("GET", "/admin/api/services/{id}.xml")
+    endpoint.set_param("access_token", token)
+    endpoint.set_param("id", service["name"])
 
-    product_id_element = api_docs_page.get_id_input_by_name(service["name"])
-    auto_comp_prod_id = product_id_element.text
-    product_id_element.click()
-    assert auto_comp_prod_id == str(service["id"])
+    id_column = endpoint.get_param("id")
+    assert endpoint.extract_text(id_column) == str(service["id"])
 
-    endpoint.submit_button.click()
-    assert endpoint.status_code() == "200"
+    endpoint.execute()
+    assert endpoint.status_code == "200"
