@@ -6,9 +6,8 @@ from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
 from widgetastic.widget import GenericLocatorWidget, Widget
 from widgetastic.widget import TextInput
-from widgetastic_patternfly4 import ContextSelector, Navigation, PatternflyTable
+from widgetastic_patternfly4 import PatternflyTable
 from widgetastic_patternfly4 import Select
-from widgetastic_patternfly4.navigation import check_nav_loaded
 
 from testsuite.ui.exception import ItemNotPresentException
 
@@ -128,78 +127,6 @@ class CheckBoxGroup(GenericLocatorWidget):
         for element in self.browser.elements(self.OPTIONS):
             if element.is_selected():
                 element.click()
-
-
-class ContextMenu(ContextSelector):
-    """
-    ContextMenu that extends ContextSelector lactated in Widgetastic PF4 libraries, but briefly adjusted
-    to fit 3scale needs.
-    """
-
-    DEFAULT_LOCATOR = './/div[contains(@class, "pf-c-context-selector")]'
-    BUTTON_LOCATOR = './/a[@title="Context Selector"]'
-
-
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
-class NavigationMenu(Navigation):
-    """
-    Navigation menu for 3scale Views (menu on the left side of Audience, Product, Backend and Settings Views).
-    widgetastic_patternfly4.Navigation was extended because it does not support item selection based on href
-    which brought great code simplification for this component.
-
-    As part of NavViews it handles steps to particular views. When `select_href` method is called with `href`
-    argument (this argument is usually taken from destination View in a form of `path` variable),
-    it finds right elements in Navigation, expands parent item if necessary and clicks correct item.
-    """
-
-    RELATED_RESOURCE = './/h2[@class="pf-c-nav__section-title"]'
-    LOCATOR_START = './/nav[contains(@class, "pf-c-nav"){}]'
-    # Product and backend navigation menu differs from others,
-    # hence we need different ITEMS parameter than default one is.
-    ITEMS = "./section/ul/li/a| ./ul/li/a"
-    # We need NAVIGATION_ITEMS due to navigation in subitems which cannot be done From ITEMS locator
-    NAVIGATION_ITEMS = "./ul/li|./section/ul/li"
-    SUB_ITEMS = './section/ul/li[contains(@class, "pf-c-nav__item")]'
-    HREF_LOCATOR = SUB_ITEMS + '/a[contains(@href, "{}")]'
-
-    @check_nav_loaded
-    def currently_selected_item(self):
-        """Returns the current navigation item."""
-        return self.currently_selected[0]
-
-    @check_nav_loaded
-    def currently_selected_sub_item(self):
-        """Returns the current navigation item."""
-        return self.currently_selected[1]
-
-    @check_nav_loaded
-    def select_href(self, href):
-        """
-        Selects item from Navigation with specific href locator
-        TODO: Add an exception like in Navigation select method
-        """
-        for element in self.browser.elements(self.NAVIGATION_ITEMS):
-            element_href = element.find_element(By.TAG_NAME, "a").get_attribute("href")
-            if element_href.endswith(href):
-                self.browser.click(element)
-                return
-            item = self.browser.elements(self.HREF_LOCATOR.format(href), parent=element)
-            if item:
-                if "pf-m-expanded" not in element.get_attribute("class").split():
-                    self.browser.click(element)
-                    self.browser.wait_for_element(self.HREF_LOCATOR.format(href), parent=element, visible=True)
-                self.browser.click(item[0])
-                return
-
-    def nav_resource(self):
-        """
-        Returns navigation title. This text is shown only in Product and Backend Views and it is used
-        in `is_display` method to verify, if currently visible navigation menu (or whole View)
-        is correctly loaded for particular Product or Backend.
-        """
-        return self.browser.element(self.RELATED_RESOURCE).text
 
 
 # pylint: disable=abstract-method

@@ -1,14 +1,14 @@
 """Essential Views for Audience Views"""
 from testsuite.ui.navigation import step
 from testsuite.ui.views.master.foundation import BaseMasterView
-from testsuite.ui.widgets import NavigationMenu
+from testsuite.ui.widgets.ouia import Navigation
 
 
 class BaseMasterAudienceView(BaseMasterView):
     """Parent View for Audience Views."""
 
     NAV_ITEMS = ["Accounts", "Applications", "Messages"]
-    nav = NavigationMenu(id="mainmenu")
+    nav = Navigation()
 
     @step("@href")
     def step(self, href, **kwargs):
@@ -25,6 +25,4 @@ class BaseMasterAudienceView(BaseMasterView):
 
     @property
     def is_displayed(self):
-        return (
-            BaseMasterView.is_displayed.fget(self) and self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS
-        )
+        return self.nav.is_displayed and self.nav.nav_links() == self.NAV_ITEMS

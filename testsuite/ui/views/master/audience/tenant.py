@@ -56,7 +56,7 @@ class TenantsView(BaseMasterAudienceView):
             BaseMasterAudienceView.is_displayed.fget(self)
             and self.new_account.is_displayed
             and self.tenants_table.is_displayed
-            and self.path_pattern in self.browser.url
+            and self.path in self.browser.url
         )
 
 
@@ -108,8 +108,7 @@ class TenantDetailView(BaseMasterAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseMasterAudienceView.is_displayed.fget(self)
-            and self.path_pattern in self.browser.url
+            self.path in self.browser.url
             and self.applications_button.is_displayed
             and self.admin_domain.is_displayed
             and self.public_domain.is_displayed
@@ -147,7 +146,7 @@ class TenantNewView(BaseMasterAudienceView):
             and self.username.is_displayed
             and self.email.is_displayed
             and self.organization.is_displayed
-            and self.path_pattern in self.browser.url
+            and self.path in self.browser.url
         )
 
 

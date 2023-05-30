@@ -4,7 +4,7 @@ from widgetastic.widget import Text, TextInput, GenericLocatorWidget
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import NavigationMenu
+from testsuite.ui.widgets.ouia import Navigation
 
 
 class BackendsView(BaseAdminView):
@@ -52,7 +52,7 @@ class BaseBackendView(BaseAdminView):
     """
 
     NAV_ITEMS = ["Overview", "Analytics", "Methods and Metrics", "Mapping Rules"]
-    nav = NavigationMenu(id="mainmenu")
+    nav = Navigation()
 
     def __init__(self, parent, backend, **kwargs):
         super().__init__(parent, backend_id=backend.entity_id, **kwargs)

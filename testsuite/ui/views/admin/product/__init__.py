@@ -4,7 +4,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import NavigationMenu
+from testsuite.ui.widgets.ouia import Navigation
 
 
 class ProductsView(BaseAdminView):
@@ -47,7 +47,7 @@ class BaseProductView(BaseAdminView):
     """
 
     NAV_ITEMS = ["Overview", "Analytics", "Applications", "ActiveDocs", "Integration"]
-    nav = NavigationMenu(id="mainmenu")
+    nav = Navigation()
     outdated_config = GenericLocatorWidget(locator="//*/li/a[contains(@class, 'outdated-config')]")
 
     def __init__(self, parent, product, **kwargs):
