@@ -2,7 +2,7 @@
 This module contains wrapper for the Mailhog API
 """
 
-from typing import List, Optional
+from typing import Set, Optional
 import backoff
 import pytest
 import requests
@@ -36,7 +36,7 @@ class MailhogClient:
             else:
                 warn_and_skip("Can't find mailhog, skipping mailhog related tests")
 
-        self._searched_messages_ids: List[str] = []
+        self._searched_messages_ids: Set[str] = set()
         self._session = requests.Session()
 
     @property
@@ -48,9 +48,6 @@ class MailhogClient:
         """Requests the mailhog API"""
         params = params or {}
 
-        if not hasattr(self, "_session"):
-            self._session = requests.Session()
-
         full_url = f"{self._url}/{endpoint}"
         response = self._session.request(method=method, url=full_url, params=params)
         assert response.status_code == 200, f"The request to mailhog failed: {response.status_code} {response.text}"
@@ -60,7 +57,7 @@ class MailhogClient:
         """Append message ID to list for cleanup
         @param message: message to be cleaned
         """
-        self._searched_messages_ids.append(message["ID"])
+        self._searched_messages_ids.add(message["ID"])
 
     def all_messages(self):
         """Return all messages
@@ -95,7 +92,7 @@ class MailhogClient:
             for message in messages:
                 if subject in message["Content"]["Headers"]["Subject"]:
                     matching_messages.append(message)
-                    self._searched_messages_ids.append(message["ID"])
+                    self.append_to_searched_messages(message)
         return {"count": len(matching_messages), "items": matching_messages}
 
     def find_by_content(self, content):
@@ -105,7 +102,7 @@ class MailhogClient:
             for message in messages:
                 if content in message["Content"]["Body"]:
                     matching_messages.append(message)
-                    self._searched_messages_ids.append(message["ID"])
+                    self.append_to_searched_messages(message)
         return {"count": len(matching_messages), "items": matching_messages}
 
     def delete(self, mail_id=None):
@@ -123,7 +120,7 @@ class MailhogClient:
         if len(self._searched_messages_ids) > 0:
             self.delete(mail_id=self._searched_messages_ids)
             # Clear the list of searched message IDs
-            self._searched_messages_ids = []
+            self._searched_messages_ids.clear()
 
     @backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
     def assert_message_received(self, expected_count=1, subject=None, content=None):

@@ -6,8 +6,7 @@ from testsuite.ui.widgets.oas3 import Endpoint
 
 
 class Navbar(View, Navigable):
-    """Represents top navigation menu for logged in Devel Views
-    TODO: When browser is not maximized, this menu is collapsed. Add dynamical interaction"""
+    """Represents top navigation menu for logged in Devel Views"""
 
     ROOT = "//nav[@role='navigation']"
 
@@ -22,6 +21,11 @@ class Navbar(View, Navigable):
     def settings(self):
         """Settings"""
         self.settings_btn.click()
+
+    @step("InboxView")
+    def messages(self):
+        """Messages"""
+        self.messages_btn.click()
 
     @property
     def is_displayed(self):

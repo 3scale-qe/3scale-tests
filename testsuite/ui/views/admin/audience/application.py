@@ -1,13 +1,13 @@
 """View representations of Applications pages"""
 
-from widgetastic.widget import TextInput, Text
+from widgetastic.widget import View, TextInput, Text, GenericLocatorWidget
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, ThreescaleSelect
+from testsuite.ui.widgets import AudienceTable, ThreescaleSelect, ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import (
     ThreescaleUpdateButton,
     ThreescaleDeleteButton,
@@ -17,11 +17,50 @@ from testsuite.ui.widgets.buttons import (
 )
 
 
+class ApplicationsBulkEmailWindow(View):
+    """Bulk emails window in on applications page"""
+
+    sub_input = TextInput(id="send_emails_subject")
+    body_input = TextInput(id="send_emails_body")
+    send_btn = GenericLocatorWidget(locator='.//*[(self::button) and (normalize-space(.)="Send")]')
+    number_of_applications = TextInput(id="send_emails_to")
+
+    def send_email(self, subject=None, body=None):
+        """Fill email values and send mail"""
+        self.sub_input.wait_displayed(delay=0.5)
+        if subject:
+            self.sub_input.fill(subject)
+        if body:
+            self.body_input.fill(body)
+        self.send_btn.click(handle_alert=True)
+
+    @property
+    def is_displayed(self):
+        return self.sub_input.is_displayed and self.body_input.is_displayed
+
+
 class ApplicationsView(BaseAudienceView):
     """View representation of Application Listing page"""
 
     path_pattern = "/p/admin/applications"
     table = AudienceTable("//*[@class='data']")
+    all_app_checkbox = ThreescaleCheckBox(locator="//input[@class='select-all']")
+    send_email_btn = GenericLocatorWidget(".//button[text()='Send email']")
+    email_window = View.nested(ApplicationsBulkEmailWindow)
+
+    def send_email_to_all_apps(self, subject=None, body=None):
+        """Send message to all selected applications
+        @param subject: message subject
+        @param body: message body
+        @return number of selected application (to verify correct number of messages)"""
+        self.all_app_checkbox.check()
+        self.send_email_btn.wait_displayed(delay=3)
+        self.send_email_btn.click()
+        self.email_window.wait_displayed(delay=0.5)
+        # magic to get number of applications
+        apps_count = int(self.email_window.number_of_applications.value.split(" ", 1)[0])
+        self.email_window.send_email(subject, body)
+        return apps_count
 
     @step("ApplicationDetailView")
     def detail(self, application):
