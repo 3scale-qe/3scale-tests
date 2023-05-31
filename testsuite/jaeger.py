@@ -2,8 +2,11 @@
 A simple interface to get data from Jaeger using the rest http api
 Note: jaeger http rest api is not officially supported and may be a subject of a change
 """
+from string import Template
+from urllib.parse import urlparse
 import backoff
 import requests
+import importlib_resources as resources
 
 
 class Jaeger:
@@ -58,3 +61,19 @@ class Jaeger:
                 },
             }
         }
+
+    def apicast_config_open_telemetry(self, configmap_name, service_name):
+        """
+        :param configmap_name name of the configmap
+        :param service_name how apicast using this configmap will be named in jaeger
+        """
+        collector_url = urlparse(self.custom_config["reporter"]["localCollectorHostPort"])
+        config_file = resources.files("testsuite.resources.opentelemetry").joinpath("opentelemetry_config.ini")
+        config_value = Template(config_file.read_text()).safe_substitute(
+            {
+                "host": collector_url.hostname,
+                "port": collector_url.port,
+                "service_name": service_name,
+            }
+        )
+        return {configmap_name: config_value}

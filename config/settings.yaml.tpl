@@ -20,8 +20,8 @@ default:
       default:
         kind: "SystemApicast"
         openshift:  # Only needed if run without OpenShift
-            project_name: ""{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
-            kind: "OpenShiftClient"
+          project_name: "{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
+          kind: "OpenShiftClient"
       WASMGateway:
         image: "{WASM_IMAGE}"  # wasm image build for pulling
         pull_secret: "{PULL_SECRET}"  # name of pull secret resource in same namespace as httpbin
@@ -59,9 +59,10 @@ default:
       url: "" # route to the jaeger-query service for the querying of traces
       config:
         reporter:
-            localAgentHostPort: "" # route to the jaeger-agent (may be internal)
+          localAgentHostPort: "" # route to the jaeger-agent (may be internal)
+          localCollectorHostPort: "" # url to the jaeger-collector (only hostname and port is parsed, may be internal)
         baggage_restrictions:
-            hostPort: "" # route to the jaeger-query (may be internal)
+          hostPort: "" # route to the jaeger-query (may be internal)
     ui:
       browser:
         source: "" #local ,remote or binary

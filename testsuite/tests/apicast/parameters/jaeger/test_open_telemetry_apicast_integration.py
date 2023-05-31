@@ -12,23 +12,14 @@ from testsuite.capabilities import Capability
 pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 
 
-@pytest.fixture(scope="module")
-def jaeger_service_name(staging_gateway, jaeger):
-    """
-    Deploys apicast gateway configured with jaeger.
-    """
-    return staging_gateway.connect_jaeger(jaeger)
-
-
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5669")
-def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735")
+def test_open_telemetry_apicast_integration(api_client, jaeger, jaeger_service_name):
     """
     Makes a request to a random endpoint
     Tests that:
-     1) data from the jaeger contain a trace where with the http.url tag in the span
-        with the '/' operationName has the value containing the randomized endpoint
-     2) both the backend service url and original request uri are available as the jaeger tags
-        "http.url" and "original_request_uri" respectively
+     1) data from the jaeger contain a span with operation "apicast", where
+        http.targer tag has the value containing the randomized endpoint
+     2) original request uri is available as the jaeger tag "original_request_uri"
     """
     endpoint = f"/anything/{randomize('random-endpoint')}"
     response = api_client().get(endpoint)
@@ -37,28 +28,28 @@ def test_jaeger_apicast_integration(api_client, jaeger, jaeger_service_name):
     @backoff.on_predicate(backoff.fibo, lambda x: not x, max_tries=8, jitter=None)
     def request_traced():
         """Let's retry as the tracing might be 'lazy'"""
-        traces = jaeger.traces(jaeger_service_name, "/")
+        traces = jaeger.traces(jaeger_service_name, "apicast")
         for trace in traces["data"]:
             for span in trace["spans"]:
-                if span["operationName"] == "/":
+                if span["operationName"] == "apicast":
                     for tag in span["tags"]:
-                        if tag["key"] == "http.url" and endpoint in tag["value"]:
+                        if tag["key"] == "http.target" and endpoint in tag["value"]:
                             return True
         return False
 
     assert request_traced()
 
-    traces = jaeger.traces(jaeger_service_name, "/")
+    traces = jaeger.traces(jaeger_service_name, "apicast")
     url_and_uri = True
     for trace in traces["data"]:
         for span in trace["spans"]:
-            if span["operationName"] == "/":
-                http_url = False
+            if span["operationName"] == "apicast":
+                http_target = False
                 original_request_uri = False
                 for tag in span["tags"]:
-                    if tag["key"] == "http.url":
-                        http_url = True
-                    if tag["key"] == "original_request_uri":
+                    if tag["key"] == "http.target" and endpoint in tag["value"]:
+                        http_target = True
+                    if tag["key"] == "original_request_uri" and endpoint in tag["value"]:
                         original_request_uri = True
-                url_and_uri = url_and_uri and http_url and original_request_uri
+                url_and_uri = url_and_uri and http_target and original_request_uri
     assert url_and_uri
