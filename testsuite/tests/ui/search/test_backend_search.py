@@ -2,14 +2,15 @@
 Test for backend search
 """
 import pytest
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.ui.views.admin.backend import BackendsView
 from testsuite.utils import blame
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.usefixtures("login")
+pytestmark = [pytest.mark.usefixtures("login"), pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")]
 
 
-@pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8562")
 def test_search_backend(navigator, request, custom_ui_backend):
     """
