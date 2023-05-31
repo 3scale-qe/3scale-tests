@@ -5,6 +5,7 @@
 import inspect
 import logging
 import os
+import secrets
 import signal
 import threading
 import warnings
@@ -374,7 +375,12 @@ def threescale(testconfig, request):
 
     if weakget(testconfig)["fixtures"]["threescale"]["private_tenant"] % False:
         custom_tenant = request.getfixturevalue("custom_tenant")
-        tenant = custom_tenant()
+        password = secrets.token_urlsafe(16)
+        tenant = custom_tenant(username="admin", password=password)
+
+        testconfig["threescale"]["admin"]["username"] = "admin"
+        testconfig["threescale"]["admin"]["password"] = password
+
         return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=0)
 
     return client.ThreeScaleClient(
@@ -934,15 +940,18 @@ def custom_tenant(testconfig, master_threescale, request):
     Custom Tenant
     """
 
-    def _custom_tenant(name="t", autoclean=True):
-        user_name = blame(request, name)
-        tenant = master_threescale.tenants.create(rawobj.CustomTennant(user_name))
+    def _custom_tenant(name="t", autoclean=True, username=None, password=None):
+        org_name = blame(request, name)
+        if not username:
+            username = org_name
+
+        tenant = master_threescale.tenants.create(rawobj.CustomTenant(username, password, org_name))
         tenant.wait_tenant_ready()
 
         if autoclean and not testconfig["skip_cleanup"]:
             request.addfinalizer(tenant.delete)
 
-        tenant.account.users.read_by_name(user_name).activate()
+        tenant.account.users.read_by_name(username).activate()
 
         plan_upgrade = weakget(testconfig)["fixtures"]["custom_tenant"]["plan_upgrade"] % False
         if plan_upgrade:

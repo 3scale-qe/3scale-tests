@@ -127,14 +127,17 @@ def AccessToken(name: str, permission: str, scopes: List[str]):
     return obj
 
 
-def CustomTennant(username: str):
+def CustomTenant(username: str, password: str = None, org_name: str = None, email: str = "anything@invalid.invalid"):
     """Builder of params to create a new tenant
     Args:
         :param username: the username of the tenant
         :param password: the password of the tenant
+        :param orgname: If the orgname is not set username is used (backward compatibility)
     """
-    org_name = username  # pylint: disable=possibly-unused-variable
-    email = "anything@invalid.invalid"  # pylint: disable=possibly-unused-variable
+    if not org_name:
+        org_name = username
+    if not password:
+        del password
     return locals()
 
 
