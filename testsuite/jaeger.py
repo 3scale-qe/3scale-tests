@@ -32,36 +32,6 @@ class Jaeger:
 
         return response.json()
 
-    def apicast_config(self, configmap_name, service_name):
-        """
-        :param configmap_name name of the configmap
-        :param service_name how apicast using this configmap will be named in jaeger
-        """
-        return {
-            configmap_name: {
-                "service_name": service_name,
-                "disabled": "false",
-                "sampler": {"type": "const", "param": 1},
-                "reporter": {
-                    "queueSize": 100,
-                    "buffer_flush_interval": 10,
-                    "logSpans": False,
-                    "localAgentHostPort": self.custom_config["reporter"]["localAgentHostPort"],
-                },
-                "headers": {
-                    "jaegerDebugHeader": "debug-id",
-                    "jaegerBaggageHeader": "baggage",
-                    "TraceContextHeaderName": "uber-trace-id",
-                    "traceBaggageHeaderPrefix": "testctx-",
-                },
-                "baggage_restrictions": {
-                    "denyBaggageOnInitializationFailure": False,
-                    "hostPort": self.custom_config["baggage_restrictions"]["hostPort"],
-                    "refreshInterval": 60,
-                },
-            }
-        }
-
     def apicast_config_open_telemetry(self, configmap_name, service_name):
         """
         :param configmap_name name of the configmap
