@@ -1,8 +1,9 @@
 """ Representation of Login specific views"""
-from widgetastic.widget import View, Text
+from widgetastic.widget import View, Text, TextInput
+from widgetastic_patternfly4.ouia import Button
 
 from testsuite.ui.exception import UIException
-from testsuite.ui.navigation import Navigable
+from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.views.auth import Auth0View, RhssoView
 from testsuite.ui.views.common.login import LoginForm
@@ -22,6 +23,11 @@ class LoginView(View, Navigable):
     auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
     rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
     skip_wait_displayed = True
+
+    @step("ResetAdminPasswordView")
+    def reset_password(self):
+        """Process to next page"""
+        self.password_reset_link.click()
 
     def do_login(self, name, password):
         """
@@ -75,3 +81,30 @@ class LoginView(View, Navigable):
             and "Log in to your account" in self.header.text
             and self.login_widget.is_displayed
         )
+
+
+class ResetAdminPasswordView(View, Navigable):
+    """
+    Reset password view page object
+    """
+    path = "/p/password/reset"
+    password_reset_field = TextInput(id="email")
+    passwd_reset_btn = Button(component_id="OUIA-Generated-Button-primary-1")
+
+    def reset_password(self, email):
+        """Reset password of email address user"""
+        self.password_reset_field.fill(email)
+        self.passwd_reset_btn.click()
+
+    def prerequisite(self):
+        """Page prerequisite used by navigator"""
+        return LoginView
+
+    @property
+    def is_displayed(self):
+        return (
+                self.password_reset_field.is_displayed
+                and self.path in self.browser.url
+                and self.passwd_reset_btn.is_displayed
+        )
+
