@@ -3,7 +3,7 @@ import pytest
 
 from testsuite.utils import blame
 from testsuite.config import settings
-from testsuite.ui.views.devel.messages import InboxView, ComposeView
+from testsuite.ui.views.devel.messages import InboxView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.login import ResetAdminPasswordView, LoginView
 
@@ -31,14 +31,14 @@ def test_bulk_messages(custom_devel_login, account, navigator, request, mailhog_
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9707")
 @pytest.mark.xfail
-def test_admin_forgotten_password(account, browser, mailhog_client, navigator):
+def test_admin_forgotten_password(account, mailhog_client, navigator):
     """
     Test:
         - Create new user account
         - Send reset password
         -
     """
-    mail = f'{account.entity_name}@example.com'
+    mail = f"{account.entity_name}@example.com"
 
     navigator.open(LoginView, url=settings["threescale"]["admin"]["url"])
     reset_view = navigator.navigate(ResetAdminPasswordView)

@@ -85,24 +85,22 @@ class MailhogClient:
             messages = response.json()["items"]
             yield messages
 
-    def find_by_subject(self, subject):
-        """Searches for messages by subject"""
+    # pylint: disable=too-many-arguments, too-many-boolean-expressions
+    def find_message(self, subject=None, content=None, sender=None, receiver=None):
+        """Searches for messages by content, subject, sender, receiver
+        CHeck presence of all provided values"""
         matching_messages = []
         for messages in self.get_messages_by_chunk():
             for message in messages:
-                if subject in message["Content"]["Headers"]["Subject"]:
-                    matching_messages.append(message)
-                    self.append_to_searched_messages(message)
-        return {"count": len(matching_messages), "items": matching_messages}
-
-    def find_by_content(self, content):
-        """Searches for messages by content"""
-        matching_messages = []
-        for messages in self.get_messages_by_chunk():
-            for message in messages:
-                if content in message["Content"]["Body"]:
-                    matching_messages.append(message)
-                    self.append_to_searched_messages(message)
+                if (
+                    (content is not None and content not in message["Content"]["Body"])
+                    or (subject is not None and subject not in message["Content"]["Headers"]["Subject"])
+                    or (sender is not None and sender not in message["Content"]["Headers"]["From"])
+                    or (receiver is not None and receiver not in message["Content"]["Headers"]["To"])
+                ):
+                    continue
+                matching_messages.append(message)
+                self.append_to_searched_messages(message)
         return {"count": len(matching_messages), "items": matching_messages}
 
     def delete(self, mail_id=None):
@@ -123,18 +121,14 @@ class MailhogClient:
             self._searched_messages_ids.clear()
 
     @backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
-    def assert_message_received(self, expected_count=1, subject=None, content=None):
+    def assert_message_received(self, expected_count=1, subject=None, content=None, sender=None, receiver=None):
         """Resilient test on presence of expected message with retry,
         checks only subject or only content of message
-        @param expected_count: number of expected messages
+        @param receiver: "To" part of message - receiver email of message
+        @param sender: "From" part of message - sender email address
         @param subject: subject of message to search for
         @param content: content of message to search for
+        @param expected_count: number of expected messages
         """
-        messages = {}
-        if subject and not content:
-            messages = self.find_by_subject(subject)
-        if content and not subject:
-            messages = self.find_by_content(content)
-        if not (subject or content):
-            raise ValueError("No identifier defined to search for messages")
+        messages = self.find_message(subject, content, sender, receiver)
         assert messages["count"] == expected_count, f"Expected {expected_count} mail, found {messages['count']}"

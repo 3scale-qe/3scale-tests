@@ -87,6 +87,7 @@ class ResetAdminPasswordView(View, Navigable):
     """
     Reset password view page object
     """
+
     path = "/p/password/reset"
     password_reset_field = TextInput(id="email")
     passwd_reset_btn = Button(component_id="OUIA-Generated-Button-primary-1")
@@ -103,8 +104,7 @@ class ResetAdminPasswordView(View, Navigable):
     @property
     def is_displayed(self):
         return (
-                self.password_reset_field.is_displayed
-                and self.path in self.browser.url
-                and self.passwd_reset_btn.is_displayed
+            self.password_reset_field.is_displayed
+            and self.path in self.browser.url
+            and self.passwd_reset_btn.is_displayed
         )
-
