@@ -104,6 +104,11 @@ class Navigator:
         Args:
             :param page_cls: currently processed View class
         """
+        if cls is None:
+            raise ValueError(
+                f"An error occurred during backtracking of {self.page_chain.popleft()}. "
+                f"None prerequisite was found for {self.page_chain.pop()}"
+            )
         page = self.new_page(cls, **kwargs)
         self.page_chain.append(page)
         if page.is_displayed:
