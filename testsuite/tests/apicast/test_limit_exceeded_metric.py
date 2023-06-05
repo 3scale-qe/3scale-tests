@@ -54,3 +54,4 @@ def test_anything_else_is_ok(api_client):
     """Call to /anything/else should return 200 OK."""
 
     assert api_client().get("/anything/else").status_code == 200
+
