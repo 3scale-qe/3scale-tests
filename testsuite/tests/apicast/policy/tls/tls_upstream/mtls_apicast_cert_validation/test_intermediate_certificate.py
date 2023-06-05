@@ -24,7 +24,7 @@ def upstream_authority(valid_authority):
 
 
 @pytest.fixture(scope="module")
-def intermediate_authority(request, manager, valid_authority):
+def intermediate_authority(request, manager, valid_authority, testconfig):
     """
     Intermediate_authority
     valid_authority -> intermediate_authority
@@ -32,7 +32,8 @@ def intermediate_authority(request, manager, valid_authority):
     authority = manager.get_or_create_ca(
         "intermediate_authority", hosts=["*.com"], certificate_authority=valid_authority
     )
-    request.addfinalizer(authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(authority.delete_files)
     return authority
 
 

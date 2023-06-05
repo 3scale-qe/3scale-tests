@@ -9,7 +9,6 @@ from testsuite.utils import randomize
 
 pytestmark = pytest.mark.required_capabilities(Capability.LOGS)
 
-
 LOG_MESSAGE = randomize("custom_and_unique_access_log")
 
 
@@ -31,6 +30,7 @@ def policy_settings():
     )
 
 
+@pytest.mark.nopersistence  # Test checks changes during test run hence is incompatible with persistence plugin
 def test_logging(api_client, staging_gateway):
     """
     Tests that the logs contain the log only after a 200 response

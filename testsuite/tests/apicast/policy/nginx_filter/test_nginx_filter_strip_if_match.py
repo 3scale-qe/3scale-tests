@@ -39,6 +39,7 @@ def service(service, append_header):
     return service
 
 
+@pytest.mark.nopersistence  # Test checks changes during test run hence is incompatible with persistence plugin
 def test_nginx_filter_if_match(api_client, append_header):
     """
     Asserts that the header is or is not present in the request to upstream

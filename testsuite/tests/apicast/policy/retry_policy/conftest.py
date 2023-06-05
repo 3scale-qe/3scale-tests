@@ -17,10 +17,11 @@ def require_openshift(testconfig):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request):
+def staging_gateway(request, testconfig):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     return gw

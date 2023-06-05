@@ -18,20 +18,20 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Cap
 
 
 @pytest.fixture(scope="session")
-def invalid_authority(request, manager) -> Certificate:
+def invalid_authority(request, manager, testconfig) -> Certificate:
     """To be used in tests validating server certificates"""
     certificate_authority = manager.get_or_create_ca("invalid_ca", hosts=["*.com"])
-    request.addfinalizer(certificate_authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(
-    request,
-):
+def staging_gateway(request, testconfig):
     """Standard gateway, copied from root conftest."""
     gateway = gateways.gateway(staging=True)
-    request.addfinalizer(gateway.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gateway.destroy)
     gateway.create()
 
     return gateway

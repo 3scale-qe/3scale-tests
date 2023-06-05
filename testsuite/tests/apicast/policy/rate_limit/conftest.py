@@ -42,7 +42,7 @@ def application(service_plus, custom_app_plan, custom_application, lifecycle_hoo
 
 
 @pytest.fixture
-def prod_client(production_gateway, application, request):
+def prod_client(production_gateway, application, request, testconfig):
     """
     Duplicate with different scope, the reasoning behind duplicate is that if called prod_client from root conftest
     it didn't behave as expected.
@@ -73,7 +73,8 @@ def prod_client(production_gateway, application, request):
 
         client = app.api_client(endpoint="endpoint")
         if hasattr(client, "close"):
-            request.addfinalizer(client.close)
+            if not testconfig["skip_cleanup"]:
+                request.addfinalizer(client.close)
         return client
 
     return _prod_client

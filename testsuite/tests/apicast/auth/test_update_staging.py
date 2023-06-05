@@ -4,6 +4,7 @@ Rewrite: 3scale-amp-tests/spec/functional_specs/update_staging_spec.rb
 import pytest
 
 pytestmark = [pytest.mark.nopersistence]
+# Test checks changes during test run hence is incompatible with persistence plugin
 
 
 def test_updated_auth_param(api_client, service):
@@ -21,7 +22,6 @@ def test_updated_auth_param(api_client, service):
     service.proxy.deploy()
 
     new_api_client = api_client()
-
     old_param_response = old_api_client.get("/anything")
     new_param_response = new_api_client.get("/anything")
 

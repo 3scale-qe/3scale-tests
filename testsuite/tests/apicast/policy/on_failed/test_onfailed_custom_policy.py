@@ -18,7 +18,7 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def set_gateway_image(openshift, staging_gateway, request):
+def set_gateway_image(openshift, staging_gateway, request, testconfig):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -47,18 +47,21 @@ def set_gateway_image(openshift, staging_gateway, request):
     def _delete_builds():
         openshift_client.delete_template(github_template, github_params)
 
-    request.addfinalizer(_delete_builds)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(_delete_builds)
 
     openshift_client.new_app(github_template, github_params)
     openshift_client.start_build(build_name_github)
+    return staging_gateway
 
 
 # pylint: disable=unused-argument
 @pytest.fixture(scope="module")
-def staging_gateway(request) -> SelfManagedApicast:
+def staging_gateway(request, testconfig) -> SelfManagedApicast:
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=SelfManagedApicast, staging=True, name=blame(request, "gw"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
     return gw
 

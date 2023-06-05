@@ -34,17 +34,18 @@ def superdomain(testconfig):
 
 
 @pytest.fixture(scope="session")
-def server_authority(request, superdomain, manager):
+def server_authority(request, superdomain, manager, testconfig):
     """CA Authority to be used in the gateway"""
     wildcard_domain = "*." + superdomain
     authority = manager.get_or_create_ca("server-ca", hosts=[wildcard_domain])
-    request.addfinalizer(authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(authority.delete_files)
     return authority
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def staging_gateway(request, server_authority, superdomain, manager, gateway_options, gateway_environment):
+def staging_gateway(request, server_authority, superdomain, manager, gateway_options, gateway_environment, testconfig):
     """Deploy tls apicast gateway. We need APIcast listening on https port"""
     kwargs = {
         "name": blame(request, "tls-gw"),
@@ -55,7 +56,8 @@ def staging_gateway(request, server_authority, superdomain, manager, gateway_opt
     kwargs.update(gateway_options)
     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
 
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     if len(gateway_environment) > 0:
@@ -65,38 +67,41 @@ def staging_gateway(request, server_authority, superdomain, manager, gateway_opt
 
 
 @pytest.fixture(scope="session")
-def create_cert(request, superdomain, manager):
+def create_cert(request, superdomain, manager, testconfig):
     """Creates certificate that is valid for entire 3scale subdomain"""
     host = "*." + superdomain
 
     def _create(name: str, certificate_authority: Certificate) -> Certificate:
         cert = manager.get_or_create(name, common_name=host, hosts=[host], certificate_authority=certificate_authority)
 
-        request.addfinalizer(cert.delete_files)
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(cert.delete_files)
         return cert
 
     return _create
 
 
 @pytest.fixture(scope="session")
-def chainify(request):
+def chainify(request, testconfig):
     """Creates chain from certificate and his certificate authorities"""
 
     def _chain(certificate: Certificate, *authorities: Certificate) -> Certificate:
         entire_chain = [certificate]
         entire_chain.extend(authorities)
         chain = Certificate(certificate="".join(cert.certificate for cert in entire_chain), key=certificate.key)
-        request.addfinalizer(chain.delete_files)
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(chain.delete_files)
         return chain
 
     return _chain
 
 
 @pytest.fixture(scope="session")
-def valid_authority(request, manager) -> Certificate:
+def valid_authority(request, manager, testconfig) -> Certificate:
     """To be used in tests validating server certificates"""
     certificate_authority = manager.get_or_create_ca("valid_ca", hosts=["*.com"])
-    request.addfinalizer(certificate_authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 
 
@@ -119,7 +124,7 @@ def invalid_certificate(invalid_authority, create_cert) -> Certificate:
 
 
 @pytest.fixture(scope="module")
-def mount_certificate_secret(request, staging_gateway):
+def mount_certificate_secret(request, staging_gateway, testconfig):
     """Mount volume from TLS secret on staging gateway."""
 
     def _mount(mount_path, certificate):
@@ -128,7 +133,8 @@ def mount_certificate_secret(request, staging_gateway):
         def turn_down():
             staging_gateway.openshift.delete("secret", secret_name)
 
-        request.addfinalizer(turn_down)
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(turn_down)
 
         staging_gateway.openshift.secrets.create(secret_name, SecretKinds.TLS, certificate=certificate)
         staging_gateway.deployment.add_volume(secret_name, mount_path, secret_name)

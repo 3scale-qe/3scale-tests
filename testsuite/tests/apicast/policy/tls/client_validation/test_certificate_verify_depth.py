@@ -25,24 +25,26 @@ def valid_authority(staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def authority_a(request, manager, valid_authority):
+def authority_a(request, manager, valid_authority, testconfig):
     """
     Intermediate authority_a
     valid_authority -> authority_a
     """
     authority = manager.get_or_create_ca("authority_a", hosts=["*.com"], certificate_authority=valid_authority)
-    request.addfinalizer(authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(authority.delete_files)
     return authority
 
 
 @pytest.fixture(scope="module")
-def authority_b(request, manager, authority_a):
+def authority_b(request, manager, authority_a, testconfig):
     """
     Intermediate authority_a
     valid_authority -> authority_a -> authority_b
     """
     authority = manager.get_or_create_ca("authority_b", hosts=["*.com"], certificate_authority=authority_a)
-    request.addfinalizer(authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(authority.delete_files)
     return authority
 
 
@@ -110,6 +112,7 @@ def certificates_and_code(request, staging_gateway):
     return [request.getfixturevalue(request.param[1])], request.getfixturevalue(request.param[2]), request.param[3]
 
 
+@pytest.mark.nopersistence
 def test_certificate_depth(api_client, certificates_and_code):
     """Test that TLS validation returns expected result when using client certificate with certain maximum depth"""
     _, certificate, code = certificates_and_code

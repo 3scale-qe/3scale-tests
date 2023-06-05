@@ -31,6 +31,7 @@ def app_plan(service, custom_app_plan, request):
     return plan
 
 
+@pytest.mark.nopersistence  # Test checks changes during test run hence is incompatible with persistence plugin
 def test_multiple_limits(api_client):
     """
     - sends five requests

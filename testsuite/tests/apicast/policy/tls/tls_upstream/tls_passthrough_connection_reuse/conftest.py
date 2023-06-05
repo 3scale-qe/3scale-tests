@@ -27,14 +27,15 @@ def policy_settings(certificate):
 
 
 @pytest.fixture(scope="session")
-def staging_gateway(request):
+def staging_gateway(request, testconfig):
     """
     Standard staging gateway.
     We are testing the communication between the APIcast and API backend,
     the TLS certificates are configured in the backends.
     """
     gateway = gateways.gateway(staging=True)
-    request.addfinalizer(gateway.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gateway.destroy)
     gateway.create()
 
     return gateway
@@ -109,6 +110,8 @@ def mapping_rules(service, backend_orig, backend_new):
     backend_orig.mapping_rules.create(rawobj.Mapping(orig_metric, "/"))
     backend_new.mapping_rules.create(rawobj.Mapping(new_metric, "/"))
     proxy.deploy()
+
+    return proxy
 
 
 @pytest.fixture(scope="module")
