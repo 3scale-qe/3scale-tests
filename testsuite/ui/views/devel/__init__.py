@@ -22,7 +22,7 @@ class Navbar(View, Navigable):
         """Settings"""
         self.settings_btn.click()
 
-    @step("InboxView")
+    @step("MessagesTabs")
     def messages(self):
         """Messages"""
         self.messages_btn.click()
