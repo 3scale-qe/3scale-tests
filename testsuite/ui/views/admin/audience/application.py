@@ -8,7 +8,7 @@ from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, ThreescaleSelect, ThreescaleCheckBox
+from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import (
     ThreescaleUpdateButton,
     ThreescaleDeleteButton,
@@ -89,7 +89,7 @@ class ApplicationDetailView(BaseProductView):
     )
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
-    plan_dropdown = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
+    plan_dropdown = Select(component_id="OUIA-Generated-Select-typeahead-1")
     change_plan_button = ThreescaleSubmitButton()
 
     def __init__(self, parent, product, application):
