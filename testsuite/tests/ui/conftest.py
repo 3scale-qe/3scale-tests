@@ -195,7 +195,7 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
         """
         tenant = navigator.navigate(TenantDetailView, account=tenant)
         with browser.new_tab(tenant.impersonate):
-            assert _wait_displayed_with_refresh(lambda: DashboardView.is_displayed)
+            assert _wait_displayed_with_refresh(lambda: DashboardView(browser).is_displayed)
             assert _wait_displayed_with_refresh(
                 lambda: navigator.navigate(AccountsView).table.row()[0].text != "No results."
             )
