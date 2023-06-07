@@ -1,14 +1,15 @@
 """Essential Views for Audience Views"""
+
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import NavigationMenu
+from testsuite.ui.widgets.ouia import Navigation
 
 
 class BaseAudienceView(BaseAdminView):
     """Parent View for Audience Views."""
 
     NAV_ITEMS = ["Accounts", "Applications", "Billing", "Developer Portal", "Messages"]
-    nav = NavigationMenu(id="mainmenu")
+    nav = Navigation()
 
     def visit_portal(self):
         """

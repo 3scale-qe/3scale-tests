@@ -2,31 +2,28 @@
 Module contains Base View used for all Admin Views. This View is further extended by: Dashboard, Audience,
 Product, Backend, and AccountSettings Views. All of them creates basic page structure for respective
 Admin portal pages.
-:TODO Add locators/menus for basic pages
 """
 
 from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly4 import Button
+from widgetastic_patternfly4.ouia import Dropdown
 
 from testsuite.ui.navigation import step, Navigable
-from testsuite.ui.widgets import ContextMenu
 
 
 class BaseAdminView(View, Navigable):
     """
     Basic representation of logged in admin portal page.
-    All admin portal page should inherits from this class.
+    All admin portal pages should inherit from this class.
     """
 
     path_pattern = ""
-    explorer_menu = Text("//div[@id='api_selector']//a[@title='Context Selector']/span")
-    threescale_menu_logo = GenericLocatorWidget('//*[@id="user_widget"]/a/div')
-    support_link = Text("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
-    user_session = GenericLocatorWidget("//a[@title='Session']")
-    user_logout_link = Text("//a[@href='/p/logout']")
+    logo = GenericLocatorWidget(".//a[@href='/p/admin/dashboard']")
+    support_link = Text(".//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
+    context_menu = Dropdown(component_id="context-selector")
+    documentation = Dropdown(component_id="OUIA-Generated-Dropdown-2")
+    user_session = Dropdown(component_id="OUIA-Generated-Dropdown-3")
     threescale_version = Text("//*[contains(@class,'powered-by-3scale')]/span")
-
-    context_menu = ContextMenu()
 
     def __init__(self, parent, logger=None, **kwargs):
         super().__init__(parent, logger=logger, **kwargs)
@@ -34,8 +31,7 @@ class BaseAdminView(View, Navigable):
 
     def logout(self):
         """Method which logouts current user from admin portal"""
-        self.user_session.click()
-        self.user_logout_link.click()
+        self.user_session.item_select("Sign Out")
 
     @step("BaseAudienceView")
     def audience(self):
@@ -65,9 +61,11 @@ class BaseAdminView(View, Navigable):
     @property
     def is_displayed(self):
         return (
-            self.threescale_menu_logo.is_displayed
+            self.logo.is_displayed
+            and self.documentation.is_displayed
             and self.support_link.is_displayed
-            and self.explorer_menu.is_displayed
+            and self.context_menu.is_displayed
+            and self.user_session.is_displayed
         )
 
 

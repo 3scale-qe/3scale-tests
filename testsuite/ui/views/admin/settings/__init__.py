@@ -1,14 +1,14 @@
 """Essential Views for Settings Views"""
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets import NavigationMenu
+from testsuite.ui.widgets.ouia import Navigation
 
 
 class BaseSettingsView(BaseAdminView):
     """Parent View for Audience Views."""
 
     NAV_ITEMS = ["Overview", "Personal", "Users", "Integrate", "Export"]
-    nav = NavigationMenu(id="mainmenu")
+    nav = Navigation()
 
     @step("@href")
     def step(self, href, **kwargs):
