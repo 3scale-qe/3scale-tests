@@ -15,10 +15,11 @@ class APIDocsView(BaseSettingsView):
     """
 
     path_pattern = "/p/admin/api_docs"
+    ROOT = ".//div[@id='api-containers']"
     page_title = Text(locator='//*[@id="content"]/h1')
-    service_management_api_category = Text(locator='//*[@data-name="service_management_api"]')
-    account_management_api_category = Text(locator='//*[@data-name="account_management_api"]')
-    policy_registry_api_category = Text(locator='//*[@data-name="policy_registry_api"]')
+    service_management_api_category = Text(locator='.//div[@id="service-management-api"]')
+    account_management_api_category = Text(locator='.//div[@id="account-management-api"]')
+    policy_registry_api_category = Text(locator='.//div[@id="policy-registry-api"]')
     endpoint = View.nested(Endpoint)
 
     def prerequisite(self):
@@ -35,9 +36,7 @@ class APIDocsView(BaseSettingsView):
     @property
     def is_displayed(self):
         return (
-            BaseSettingsView.is_displayed.fget(self)
-            and self.path in self.browser.url
-            and self.page_title.is_displayed
+            self.path in self.browser.url
             and self.service_management_api_category.is_displayed
             and self.account_management_api_category.is_displayed
             and self.policy_registry_api_category.is_displayed
