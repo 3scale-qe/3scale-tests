@@ -378,10 +378,17 @@ def threescale(testconfig, request):
         password = secrets.token_urlsafe(16)
         tenant = custom_tenant(username="admin", password=password)
 
-        testconfig["threescale"]["admin"]["username"] = "admin"
-        testconfig["threescale"]["admin"]["password"] = password
+        admin = tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=0)
+        token = admin.access_tokens.create(
+            rawobj.AccessToken(
+                blame(request, "token"), "rw", ["account_management", "cms", "finance", "policy_registry", "stats"]
+            )
+        )
 
-        return tenant.admin_api(ssl_verify=testconfig["ssl_verify"], wait=0)
+        admin.rest._token = token["value"]
+        testconfig["threescale"]["admin"].update(username="admin", password=password, token=token["value"])
+
+        return admin
 
     return client.ThreeScaleClient(
         testconfig["threescale"]["admin"]["url"],
