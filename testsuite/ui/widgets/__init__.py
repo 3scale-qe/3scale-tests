@@ -277,12 +277,6 @@ class PolicySection(Widget):
         self.browser.click(self.item_element(item))
 
 
-class ThreescaleSelect(Select):
-    """Specific select for 3scale pages"""
-
-    BUTTON_LOCATOR = "./div/button"
-
-
 class APIDocsSelect(Select):
     """Specific select for 3scale API doc page"""
 

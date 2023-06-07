@@ -2,12 +2,13 @@
 
 from widgetastic.widget import View, TextInput, Text, GenericLocatorWidget
 from widgetastic_patternfly4 import PatternflyTable
+from widgetastic_patternfly4.ouia import Select
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, ThreescaleSelect, ThreescaleCheckBox
+from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import (
     ThreescaleUpdateButton,
     ThreescaleDeleteButton,
@@ -88,7 +89,7 @@ class ApplicationDetailView(BaseProductView):
     )
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
-    plan_dropdown = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
+    plan_dropdown = Select(component_id="OUIA-Generated-Select-typeahead-1")
     change_plan_button = ThreescaleSubmitButton()
 
     def __init__(self, parent, product, application):
@@ -144,9 +145,8 @@ class ApplicationNewView(BaseAudienceView):
     path_pattern = "/buyers/accounts/{account_id}/applications/new"
     username = TextInput(id="cinstance[name]")
     description = TextInput(id="cinstance[description]")
-    app_plan = ThreescaleSelect(locator="//label[@for='cinstance_plan_id']/../div[1]")
-    product = ThreescaleSelect(locator="//label[@for='product']/../div[1]")
-    service_plan = ThreescaleSelect(locator="//label[@for='cinstance_service_plan_id']/../div[1]")
+    product = Select(component_id="OUIA-Generated-Select-typeahead-1")
+    app_plan = Select(component_id="OUIA-Generated-Select-typeahead-2")
     create_button = ThreescaleCreateButton()
 
     def __init__(self, parent, account):

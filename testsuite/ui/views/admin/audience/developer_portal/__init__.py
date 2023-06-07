@@ -163,7 +163,7 @@ class DeveloperPortalContentView(BaseAudienceView):
     """View representation of Developer Portal Content page"""
 
     # path can be different when clicking from dashboard is '/p/admin/cms' and from menu is '/p/admin/cms/templates'
-    path_pattern = "/p/admin/cms"
+    path_pattern = "/p/admin/cms/templates"
     quick_links = Text("//a[@href='#quick-links']")
     snippets = Text("//a[@href='#tips-and-tricks']")
     button_group = ThreescaleButtonGroup(locator=".//*[@id='cms-new-content-button']")
@@ -197,7 +197,7 @@ class DeveloperPortalContentView(BaseAudienceView):
             BaseAudienceView.is_displayed.fget(self)
             and self.quick_links.is_displayed
             and self.snippets.is_displayed
-            and self.path in self.browser.url
+            and (self.path in self.browser.url or "/p/admin/cms" in self.browser.url)
         )
 
 
