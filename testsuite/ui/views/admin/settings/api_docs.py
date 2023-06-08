@@ -16,7 +16,6 @@ class APIDocsView(BaseSettingsView):
 
     path_pattern = "/p/admin/api_docs"
     ROOT = ".//div[@id='api-containers']"
-    page_title = Text(locator='//*[@id="content"]/h1')
     service_management_api_category = Text(locator='.//div[@id="service-management-api"]')
     account_management_api_category = Text(locator='.//div[@id="account-management-api"]')
     policy_registry_api_category = Text(locator='.//div[@id="policy-registry-api"]')
@@ -40,5 +39,4 @@ class APIDocsView(BaseSettingsView):
             and self.service_management_api_category.is_displayed
             and self.account_management_api_category.is_displayed
             and self.policy_registry_api_category.is_displayed
-            and self.page_title.text == "3scale API Documentation"
         )
