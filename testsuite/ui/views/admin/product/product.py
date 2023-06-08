@@ -1,6 +1,7 @@
 """View representations of Product pages"""
 
-from widgetastic.widget import TextInput, Text, ConditionalSwitchableView, GenericLocatorWidget, View
+from widgetastic.widget import TextInput, ConditionalSwitchableView, GenericLocatorWidget, View
+from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
@@ -68,7 +69,8 @@ class ProductDetailView(BaseProductView):
     """View representation of Product detail page (Overview page)"""
 
     path_pattern = "/apiconfig/services/{product_id}"
-    edit_button = Text(locator="//*[@id='content']/section/div/a")
+    ROOT = ".//main[@id='content']"
+    edit_button = Button("edit")
 
     @step("ProductEditView")
     def edit(self):

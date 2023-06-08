@@ -13,7 +13,7 @@ class ActiveDocsView(BaseProductView):
     """View representation of Active Docs list page"""
 
     path_pattern = "/apiconfig/services/{product_id}/api_docs"
-    active_docs_table = PatternflyTable(locator="//*[@id='content']/table")
+    active_docs_table = PatternflyTable(locator=".//table")
 
     @step("ActiveDocsDetailView")
     def detail(self, active_doc):
