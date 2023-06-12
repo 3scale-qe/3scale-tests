@@ -120,7 +120,7 @@ class MailhogClient:
             # Clear the list of searched message IDs
             self._searched_messages_ids.clear()
 
-    @backoff.on_exception(backoff.fibo, AssertionError, max_tries=8, jitter=None)
+    @backoff.on_exception(backoff.fibo, AssertionError, max_tries=10, jitter=None)
     def assert_message_received(self, expected_count=1, subject=None, content=None, sender=None, receiver=None):
         """Resilient test on presence of expected message with retry,
         checks only subject or only content of message
