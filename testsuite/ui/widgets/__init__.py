@@ -6,6 +6,7 @@ from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
 from widgetastic.widget import GenericLocatorWidget, Widget
 from widgetastic.widget import TextInput
+from widgetastic.xpath import quote
 from widgetastic_patternfly4 import PatternflyTable
 from widgetastic_patternfly4 import Select
 
@@ -375,3 +376,30 @@ class ThreescaleButtonGroup(GenericLocatorWidget):
                 self.browser.element(self.DROPDOWN_TOGGLE).click()
                 item.click()
                 return
+
+
+class HorizontalNavigation(Widget):
+    """
+    Represents the PatternFly horizontal navigation
+
+    https://www.patternfly.org/v4/components/navigation#horizontal-subnav
+    """
+
+    ROOT = ParametrizedLocator("{@locator}")
+    LOCATOR_START = './/nav[@class="pf-c-nav pf-m-horizontal pf-m-tertiary"]'
+    ITEMS = "./ul/li/[self::a or self::button]"
+    ITEM_MATCHING = "./ul/li/a[contains(normalize-space(.), {})]"
+
+    def __init__(self, parent=None, locator=None, logger=None):
+        super().__init__(parent, logger=logger)
+
+        if locator:
+            self.locator = locator
+        else:
+            self.locator = self.LOCATOR_START
+
+    def select(self, item):
+        """Selects an item in the navigation."""
+        self.logger.info("Selecting %r in vertical navigation", item)
+        item = self.browser.element(self.ITEM_MATCHING.format(quote(item)))
+        item.click()

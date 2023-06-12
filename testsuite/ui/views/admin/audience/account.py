@@ -6,7 +6,13 @@ from widgetastic_patternfly4 import PatternflyTable
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
-from testsuite.ui.widgets import ThreescaleDropdown, AudienceTable, ThreescaleCheckBox, CheckBoxGroup
+from testsuite.ui.widgets import (
+    ThreescaleDropdown,
+    AudienceTable,
+    ThreescaleCheckBox,
+    CheckBoxGroup,
+    HorizontalNavigation,
+)
 from testsuite.ui.widgets.buttons import (
     ThreescaleUpdateButton,
     ThreescaleDeleteButton,
@@ -61,10 +67,7 @@ class AccountsDetailView(BaseAudienceView):
     edit_button = ThreescaleEditButton()
     plan_dropdown = ThreescaleDropdown("//*[@id='account_contract_plan_id']")
     change_plan_button = GenericLocatorWidget("//*[@value='Change']")
-    applications_button = Text("//*[contains(@title,'applications')]")
-    users_button = Text("//*[contains(@title,'users')]")
-    invoices_button = Text("//*[contains(@title,'invoices')]")
-    group_button = Text("//*[contains(@title,'group memberships')]")
+    account_navigation = HorizontalNavigation()
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -82,34 +85,29 @@ class AccountsDetailView(BaseAudienceView):
     @step("AccountApplicationsView")
     def applications(self):
         """Open account's applications"""
-        self.applications_button.click()
+        self.account_navigation.select("Application")
 
     @step("AccountUserView")
     def users(self):
         """Open account's users"""
-        self.users_button.click()
-
-    @step("AccountInvoicesView")
-    def invoices(self):
-        """Open account's users"""
-        self.invoices_button.click()
+        self.account_navigation.select("User")
 
     @step("AccountUserGroupView")
     def group(self):
         """Open account's groups"""
-        self.group_button.click()
+        self.account_navigation.select("Group Memberships")
+
+    @step("AccountInvoicesView")
+    def invoices(self):
+        """Open account's users"""
+        self.account_navigation.select("Invoices")
 
     def prerequisite(self):
         return AccountsView
 
     @property
     def is_displayed(self):
-        return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.path in self.browser.url
-            and self.edit_button.is_displayed
-            and self.applications_button.is_displayed
-        )
+        return self.path in self.browser.url and self.edit_button.is_displayed and self.account_navigation.is_displayed
 
 
 class AccountNewView(BaseAudienceView):
