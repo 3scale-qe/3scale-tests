@@ -11,6 +11,7 @@ import openshift as oc
 import yaml
 
 from testsuite.openshift.crd.apimanager import APIManager
+from testsuite.openshift.crd.operator import Operator
 from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
 from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
 from testsuite.openshift.scaler import Scaler
@@ -233,7 +234,7 @@ class OpenShiftClient:
                 or apiobject.get_label("rht.subcomp") == "3scale_operator"
             )
 
-        return self.select_resource("pods", narrow_function=select_operator).object()
+        return self.select_resource("pods", narrow_function=select_operator).object(cls=Operator)
 
     @property
     def apicast_operator(self):
@@ -249,7 +250,7 @@ class OpenShiftClient:
                 or apiobject.get_label("rht.subcomp") == "apicast_operator"
             )
 
-        return self.select_resource("pods", narrow_function=select_operator).object()
+        return self.select_resource("pods", narrow_function=select_operator).object(cls=Operator)
 
     @property
     def apicast_operator_subscription(self):
