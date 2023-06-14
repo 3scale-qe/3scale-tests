@@ -117,3 +117,27 @@ class TLSApicast(AbstractApicast):
         if hasattr(self.gateway, item):
             return getattr(self.gateway, item)
         raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")
+
+    def __getstate__(self):
+        """
+        Custom serializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__getstate__
+        """
+        return {
+            "gateway": self.gateway,
+            "secret_name": self.secret_name,
+            "superdomain": self.superdomain,
+            "server_authority": self.server_authority,
+            "manager": self.manager,
+        }
+
+    def __setstate__(self, state):
+        """
+        Custom deserializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
+        """
+        self.gateway = state["gateway"]
+        self.secret_name = state["secret_name"]
+        self.superdomain = state["superdomain"]
+        self.server_authority = state["server_authority"]
+        self.manager = state["manager"]

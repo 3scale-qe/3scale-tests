@@ -26,10 +26,11 @@ from testsuite.utils import blame
         ),
     ],
 )
-def production_gateway(request):
+def production_gateway(request, testconfig):
     """Production gateway for caching tests"""
     gw = gateway(kind=request.param, staging=False, name=blame(request, "production"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     return gw

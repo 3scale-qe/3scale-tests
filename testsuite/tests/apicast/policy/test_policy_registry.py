@@ -58,7 +58,8 @@ def custom_policies(threescale, schema, request, testconfig):
             for policy in policies:
                 threescale.policy_registry.delete(policy["id"])
 
-        request.addfinalizer(_cleanup)
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(_cleanup)
 
 
 @pytest.fixture(scope="module")

@@ -32,10 +32,11 @@ def authority_and_code(request):
 
 
 @pytest.fixture(scope="module")
-def staging_gateway(request):
+def staging_gateway(request, testconfig):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     return gw
@@ -53,10 +54,11 @@ def setup_gateway(request, mount_certificate_secret, staging_gateway, certificat
 
 
 @pytest.fixture(scope="session")
-def invalid_authority(request, manager) -> Certificate:
+def invalid_authority(request, manager, testconfig) -> Certificate:
     """To be used in tests validating server certificates"""
     certificate_authority = manager.get_or_create_ca("invalid_ca", hosts=["*.com"])
-    request.addfinalizer(certificate_authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 
 

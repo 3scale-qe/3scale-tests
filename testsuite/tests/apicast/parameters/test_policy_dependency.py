@@ -43,7 +43,7 @@ def gateway_kind(request):
 
 
 @pytest.fixture(scope="module")
-def set_gateway_image(openshift, staging_gateway, request):
+def set_gateway_image(openshift, staging_gateway, request, testconfig):
     """
     Builds images defined by a template specified in the image template applied with parameter
     amp_release.
@@ -72,7 +72,8 @@ def set_gateway_image(openshift, staging_gateway, request):
     def _delete_builds():
         openshift_client.delete_template(template, params)
 
-    request.addfinalizer(_delete_builds)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(_delete_builds)
 
     openshift_client.new_app(template, params)
     openshift_client.start_build(build_name)

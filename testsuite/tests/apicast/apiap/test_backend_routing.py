@@ -113,6 +113,8 @@ def isolated_backends(backend_echo, backend_quotes, proxy):
 
     proxy.deploy()
 
+    return proxy
+
 
 @pytest.fixture(scope="module")
 def empty_path(isolated_backends, backend_echo, proxy, backend_usages):  # pylint: disable=unused-argument
@@ -135,6 +137,8 @@ def empty_path(isolated_backends, backend_echo, proxy, backend_usages):  # pylin
     backend_usages[0].update({"path": "/"})
 
     proxy.deploy()
+
+    return proxy
 
 
 @pytest.fixture(scope="module")
@@ -159,6 +163,8 @@ def path_extension(empty_path, backend_usages, backend_quotes, proxy):  # pylint
     backend_quotes.mapping_rules.create(rawobj.Mapping(quotes_metric, "/anything/test"))
 
     proxy.deploy()
+
+    return proxy
 
 
 def hits(app, analytics):
@@ -186,6 +192,8 @@ def hits(app, analytics):
         ),
     ],
 )
+@pytest.mark.nopersistence  # This is a complex test that checks changes during test run hence is
+# incompatible with persistence plugin
 # pylint: disable=too-many-arguments
 def test(request, backend_usages, application, client, setup, expect_ok, expect_not_found):
     """

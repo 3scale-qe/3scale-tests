@@ -20,6 +20,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     Sets the credentials_location to headers
     """
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info, credentials_location="headers"))
+    return rhsso_service_info
 
 
 def test_access_token(token):

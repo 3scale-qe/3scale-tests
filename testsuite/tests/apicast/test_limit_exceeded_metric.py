@@ -2,8 +2,8 @@
 Test that limit exceeded metric returns status 429 or 403 if using WASMGateway
 """
 
-
 import pytest
+
 from testsuite import rawobj
 
 pytestmark = [
@@ -30,17 +30,27 @@ def application(application):
     return application
 
 
+@pytest.fixture(scope="module")
+def exceed_limit(api_client):
+    """
+    Apicast allows more request to pass than is the actual limit, hence we need to exceed limit of /anything/exceeded
+    endpoint to ensure that test will pass as expected. Extraction of this functionality to a separate fixture is due
+    to the persistence plugin
+    """
+    assert api_client().get("/anything/exceeded").status_code == 200
+
+    return True
+
+
+@pytest.mark.usefixtures("exceed_limit")
 def test_limit_exceeded(api_client):
     """Call to /anything/exceeded should return 429 Too Many Requests."""
     client = api_client()
-
-    assert client.get("/anything/exceeded").status_code == 200
-    # Apicast allows more request to pass than is the actual limit, other gateway do not
     client.get("/anything/exceeded")
     assert client.get("/anything/exceeded").status_code == 429
 
 
 def test_anything_else_is_ok(api_client):
-    """Call to /anything/else should returns 200 OK."""
+    """Call to /anything/else should return 200 OK."""
 
     assert api_client().get("/anything/else").status_code == 200

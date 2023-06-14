@@ -32,7 +32,7 @@ def upstream_cert_hostname(staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def upstream_certificate(request, manager, valid_authority, upstream_cert_hostname) -> Certificate:
+def upstream_certificate(request, manager, valid_authority, upstream_cert_hostname, testconfig) -> Certificate:
     """
     Certificate sent from upstream (httpbin) to be validated by APIcast
     """
@@ -41,15 +41,17 @@ def upstream_certificate(request, manager, valid_authority, upstream_cert_hostna
         label, common_name=upstream_cert_hostname, hosts=[upstream_cert_hostname], certificate_authority=valid_authority
     )
 
-    request.addfinalizer(cert.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(cert.delete_files)
     return cert
 
 
 @pytest.fixture(scope="session")
-def invalid_host_authority(request, manager) -> Certificate:
+def invalid_host_authority(request, manager, testconfig) -> Certificate:
     """To be used in tests validating server certificates"""
     certificate_authority = manager.get_or_create_ca("invalid_host_ca", hosts=["*.com"])
-    request.addfinalizer(certificate_authority.delete_files)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(certificate_authority.delete_files)
     return certificate_authority
 
 
@@ -88,13 +90,15 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
             "IMAGE": httpbin_image,
         }
 
-        request.addfinalizer(lambda: staging_gateway.openshift.delete_template(path, parameters))
+        if not testconfig["skip_cleanup"]:
+            request.addfinalizer(lambda: staging_gateway.openshift.delete_template(path, parameters))
         staging_gateway.openshift.new_app(path, parameters)
         # pylint: disable=protected-access
         staging_gateway.openshift.deployment(f"dc/{name}").wait_for()
 
         if tls_route_type is not None:
-            request.addfinalizer(lambda: staging_gateway.openshift.delete("route", name))
+            if not testconfig["skip_cleanup"]:
+                request.addfinalizer(lambda: staging_gateway.openshift.delete("route", name))
             staging_gateway.openshift.routes.create(name, tls_route_type, service=name)
             routes = staging_gateway.openshift.routes[name]
             return f"https://{routes['spec']['host']}:443"

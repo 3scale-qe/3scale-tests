@@ -20,6 +20,8 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
+    return rhsso_service_info
+
 
 @pytest.fixture(scope="module")
 def access_token(application, rhsso_service_info):
@@ -67,6 +69,7 @@ def update_policies(service, application, rhsso_service_info):
 
 
 # pylint: disable=unused-argument
+@pytest.mark.nopersistence  # Test checks changes during test run hence is incompatible with persistence plugin
 def test_rhsso_logout(client, access_token, rhsso_service_info, update_policies):
     """
     Makes a request using rhsso auth.

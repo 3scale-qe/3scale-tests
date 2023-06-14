@@ -28,6 +28,8 @@ def mapping_rules(service):
     service.proxy.list().mapping_rules.create(rawobj.Mapping(metric, "/test"))
     service.proxy.deploy()
 
+    return service
+
 
 @pytest.fixture(scope="module")
 def api_client(api_client, service):

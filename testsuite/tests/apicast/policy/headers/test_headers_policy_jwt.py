@@ -18,6 +18,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
 
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info, credentials_location="query"))
+    return rhsso_service_info
 
 
 @pytest.fixture(scope="module")

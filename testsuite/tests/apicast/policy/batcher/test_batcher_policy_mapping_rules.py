@@ -44,7 +44,11 @@ def service(service):
 @pytest.fixture(scope="module")
 def client(api_client):
     """We are testing path that doesn't match mapping rule so we need to disable retry"""
-    assert api_client().get("/get").status_code == 200
+    assert api_client().get("/get").status_code == 200  # Ensures that service is set up correctly
+
+    # Due to the batcher policy, hits to the service are only shown every 50 seconds,
+    # so we have to wait 50 seconds to ensure that this call does not affect the test.
+    sleep(50)
 
     return api_client(disable_retry_status_list={404})
 
@@ -67,4 +71,4 @@ def test_batcher_policy_append(client, application):
     sleep(50)
 
     usage_after = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
-    assert usage_after == usage_before + 4
+    assert usage_after == usage_before + 3
