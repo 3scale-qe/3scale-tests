@@ -29,11 +29,23 @@ async def many_services(
     return await asyncio.gather(*(asyncio.to_thread(_create_services) for _ in range(505)))
 
 
+@pytest.fixture(scope="module")
+def client(api_client):
+    """Client should retry also on 504 error
+
+    Due to large amount of services apicast may be slower sometimes and there
+    is a danger of proxy (openshift gateway) timeout.
+    """
+    client = api_client()
+    client._status_forcelist.add(504)  # pylint: disable=protected-access
+    return client
+
+
 @pytest.mark.disruptive  # this generates high load on 3scale with impact on other tests
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8373")
 @pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 @pytest.mark.usefixtures("staging_gateway")
-def test_apicast_pagination(api_client):
+def test_apicast_pagination(client):
     """
     Preparation:
         - Create 500+ services
@@ -42,6 +54,5 @@ def test_apicast_pagination(api_client):
         - Send request to the last created service
         - Assert that response status code is 200
     """
-    client = api_client()
     response = client.get("/")
     assert response.status_code == 200
