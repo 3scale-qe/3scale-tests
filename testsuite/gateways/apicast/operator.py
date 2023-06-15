@@ -215,7 +215,7 @@ class OperatorApicast(OpenshiftApicast):
         self.apicast.modify_and_apply(_update)
         self.reload()
 
-    def connect_jaeger(self, jaeger):
+    def connect_open_telemetry(self, jaeger):
         """
         Modifies the APIcast to send information to jaeger.
         Creates configmap and a volume, mounts the configmap into the volume
@@ -224,17 +224,18 @@ class OperatorApicast(OpenshiftApicast):
         :returns Name of the jaeger service
         """
         secret_name = f"{self.name}-jaeger"
-        self.openshift.secrets.create(name=secret_name, string_data=jaeger.apicast_config("config", self.name))
+        self.openshift.secrets.create(
+            name=secret_name, string_data=jaeger.apicast_config_open_telemetry("config", self.name)
+        )
         self._to_delete.append(("secret", secret_name))
 
-        def _add_jaeger(apicast):
-            apicast["openTracing"] = {
+        def _add_open_telemetry(apicast):
+            apicast["openTelemetry"] = {
                 "enabled": True,
-                "tracingLibrary": "jaeger",
                 "tracingConfigSecretRef": {"name": secret_name},
             }
 
-        self.apicast.modify_and_apply(_add_jaeger)
+        self.apicast.modify_and_apply(_add_open_telemetry)
         self.reload()
         return self.name
 

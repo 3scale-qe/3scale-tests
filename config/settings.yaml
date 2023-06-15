@@ -45,7 +45,7 @@ default:
     jaeger:
       config:
         reporter:
-          localAgentHostPort: "@format jaeger-agent.{this.FIXTURES.tools.namespace}.svc:6831"
+          localCollectorHostPort: "@format //jaeger-collector.{this.FIXTURES.tools.namespace}.svc:4317"
         baggage_restrictions:
           hostPort: "@format jaeger-query.{this.FIXTURES.tools.namespace}.svc:5778"
     ui:

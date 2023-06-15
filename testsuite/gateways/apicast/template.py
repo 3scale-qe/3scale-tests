@@ -110,18 +110,3 @@ class TemplateApicast(OpenshiftApicast):
                 "APICAST_HTTPS_CERTIFICATE_KEY": f"{mount_path}/tls.key",
             }
         )
-
-    def connect_jaeger(self, jaeger):
-        """
-        Modifies the APIcast to send information to jaeger.
-        Creates configmap and a volume, mounts the configmap into the volume
-        Updates the required env vars
-        :param jaeger instance of the Jaeger class carrying the information about the apicast_configuration
-        :returns Name of the jaeger service
-        """
-        config_map_name = f"{self.name}-jaeger"
-        self.openshift.config_maps.add(config_map_name, jaeger.apicast_config(config_map_name, self.name))
-        self._to_delete.append(("configmap", config_map_name))
-        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
-        self.environ.set_many({"OPENTRACING_TRACER": "jaeger", "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
-        return self.name

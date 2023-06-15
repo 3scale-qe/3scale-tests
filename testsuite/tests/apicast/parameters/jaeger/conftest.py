@@ -22,6 +22,6 @@ def jaeger(testconfig, tools):
 @pytest.fixture(scope="module")
 def jaeger_service_name(staging_gateway, jaeger):
     """
-    Deploys template apicast gateway configured with jaeger.
+    Deploys apicast gateway configured with jaeger.
     """
-    return staging_gateway.connect_jaeger(jaeger)
+    return staging_gateway.connect_open_telemetry(jaeger)
