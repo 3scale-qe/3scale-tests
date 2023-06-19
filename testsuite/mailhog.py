@@ -1,7 +1,6 @@
 """
 This module contains wrapper for the Mailhog API
 """
-
 from typing import Set, Optional
 import backoff
 import pytest
@@ -123,7 +122,7 @@ class MailhogClient:
     @backoff.on_exception(backoff.fibo, AssertionError, max_tries=10, jitter=None)
     def assert_message_received(self, expected_count=1, subject=None, content=None, sender=None, receiver=None):
         """Resilient test on presence of expected message with retry,
-        checks only subject or only content of message
+        by provided attributes
         @param receiver: "To" part of message - receiver email of message
         @param sender: "From" part of message - sender email address
         @param subject: subject of message to search for
