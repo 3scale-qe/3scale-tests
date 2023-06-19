@@ -132,3 +132,4 @@ class MailhogClient:
         """
         messages = self.find_message(subject, content, sender, receiver)
         assert messages["count"] == expected_count, f"Expected {expected_count} mail, found {messages['count']}"
+        return messages

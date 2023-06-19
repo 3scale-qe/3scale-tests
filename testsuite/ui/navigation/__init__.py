@@ -79,17 +79,20 @@ class Navigator:
         filtered_kwargs = {key: value for key, value in kwargs.items() if key in signature.parameters}
         return cls(self.browser, **filtered_kwargs)
 
-    def open(self, cls: Type[CustomView] = None, url: str = None, **kwargs) -> Optional[CustomView]:
+    def open(self, cls: Type[CustomView] = None, url: str = None, exact: bool = None, **kwargs) -> Optional[CustomView]:
         """
         Directly opens desired View, by inserting its `path` in to browser or url
         Args:
             :param cls: Class of desired View
             :param url: New host URL for the View
             :return: Instance of the opened View
+            :param exact open exact url without page path
         """
         page = self.new_page(cls, **kwargs)
-        if url:
+        if url and not exact:
             self.browser.url = url + page.path
+        elif url and exact:
+            self.browser.url = url
         else:
             self.browser.set_path(page.path)
         page.post_navigate(**kwargs)

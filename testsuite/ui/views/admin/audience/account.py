@@ -102,6 +102,11 @@ class AccountsDetailView(BaseAudienceView):
         """Open account's users"""
         self.account_navigation.select("Invoices")
 
+    @step("AccountInvitationsView")
+    def invitations(self):
+        """Open account's invitation"""
+        self.account_navigation.select("Invitations")
+
     def prerequisite(self):
         return AccountsView
 
@@ -202,7 +207,7 @@ class AccountApplicationsView(BaseAudienceView):
 
 
 class AccountInvoicesView(BaseAudienceView):
-    """View representation of Account's Applications page"""
+    """View representation of Account's Invoices page"""
 
     path_pattern = "/buyers/accounts/{account_id}/invoices"
     create_button = Text(".action.new")
@@ -233,6 +238,51 @@ class AccountInvoicesView(BaseAudienceView):
             and self.create_button.is_displayed
             and self.path in self.browser.url
         )
+
+
+class AccountInvitationsView(BaseAudienceView):
+    """View representation of Account's invitation page"""
+
+    path_pattern = "/buyers/accounts/{account_id}/invitations"
+    invite_link = Text(".action.add")
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
+
+    @step("AccountInvitationNewView")
+    def invite(self):
+        """Invite new user"""
+        self.invite_link.click()
+
+    def prerequisite(self):
+        return AccountsDetailView
+
+    @property
+    def is_displayed(self):
+        return self.invite_link.is_displayed and self.path in self.browser.url
+
+
+class AccountInvitationNewView(BaseAudienceView):
+    """View representation of Account's new invitation page"""
+
+    path_pattern = "/buyers/accounts/{account_id}/invitations/new"
+    invite_email = TextInput(id="invitation_email")
+    send_button = ThreescaleSubmitButton()
+
+    def __init__(self, parent, account):
+        super().__init__(parent, account_id=account.entity_id)
+
+    def invite_user(self, email):
+        """Invites new user by email"""
+        self.invite_email.fill(email)
+        self.send_button.click()
+
+    def prerequisite(self):
+        return AccountInvitationsView
+
+    @property
+    def is_displayed(self):
+        return self.invite_email.is_displayed and self.send_button.is_displayed and self.path in self.browser.url
 
 
 class LineItemForm(View):
