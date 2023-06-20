@@ -6,12 +6,15 @@ It is necessary to have the jaeger url config value set
 import backoff
 import pytest
 
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+from testsuite import APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.utils import randomize
 from testsuite.capabilities import Capability
 
 pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 
 
+@pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.5')")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735")
 def test_open_telemetry_apicast_integration(api_client, jaeger, jaeger_service_name):
     """
