@@ -1,9 +1,19 @@
 """3scale specific buttons"""
 
-from widgetastic_patternfly4 import Button
-
-
+# Following ignore is needed otherwise: Method 'fill' is abstract in class 'Widget' but is not overridden ...
 # pylint: disable=abstract-method
+
+import widgetastic_patternfly4
+
+
+class Button(widgetastic_patternfly4.Button):
+    """Some buttons in 3scale have 'pf-c-button' class missing"""
+
+    def _generate_locator(self, *text, **kwargs):
+        locator = super()._generate_locator(*text, **kwargs)
+        return locator.replace("and contains(@class, 'pf-c-button')", "", 1)
+
+
 class ThreescaleCreateButton(Button):
     """Specific Create button of 3scale pages"""
 

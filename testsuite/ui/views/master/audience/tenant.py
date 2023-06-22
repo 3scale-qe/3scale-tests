@@ -1,11 +1,11 @@
 """View representations of Tenants pages"""
 from widgetastic.widget import TextInput, Text
-from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.master.audience import BaseMasterAudienceView
 from testsuite.ui.widgets import AudienceTable
 from testsuite.ui.widgets.buttons import (
+    Button,
     ThreescaleDeleteButton,
     ThreescaleEditButton,
     ThreescaleSubmitButton,
@@ -68,8 +68,8 @@ class TenantDetailView(BaseMasterAudienceView):
     applications_button = Text("//*[contains(@title,'applications')]")
     public_domain = Text(".//th[contains(text(),'Public domain')]/parent::*/td/a")
     admin_domain = Text(".//th[contains(text(),'Admin domain')]/parent::*/td/a")
-    resume_b = Button("Resume", classes=[Button.LINK])
-    suspend_b = Button("Suspend", classes=[Button.LINK])
+    resume_b = Button("Resume", classes=["button-to", "resume"])
+    suspend_b = Button("Suspend", classes=["button-to", "suspend"])
     impersonate_b = Text(".//a[contains(@href,'impersonation')]")
 
     def __init__(self, parent, account):
