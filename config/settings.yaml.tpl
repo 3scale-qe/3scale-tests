@@ -200,4 +200,4 @@ development:
         amd64:
         ppc64le:
         s390x:
-    threescale_operator: # Multi-arch manifest digest
+    operator: # Multi-arch manifest digest
