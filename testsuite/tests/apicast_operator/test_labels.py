@@ -13,6 +13,7 @@ pytestmark = [
     pytest.mark.sandbag,  # requires apicast operator, doesn't have to be available
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7751"),
     pytest.mark.required_capabilities(Capability.OCP4),
+    pytest.mark.nopersistence,
 ]
 
 LABELS_PRE_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
