@@ -113,6 +113,45 @@ class BasicSignUpView(SignUpView):
     def is_displayed(self):
         return (
             SignUpView.is_displayed.fget(self)
+            and self.organization.is_displayed
+            and self.path in self.browser.url
+            and self.password.is_displayed
+            and self.password2.is_displayed
+        )
+
+
+class InvitationSignupView(SignUpView):
+    """View for Invitation Sign Up into devel portal"""
+
+    path_pattern = "/signup"
+    username = TextInput(id="user_username")
+    email = TextInput(id="user_email")
+    password = TextInput(id="user_password")
+    password2 = TextInput(id="user_password_confirmation")
+    recaptcha = View.nested(ReCaptcha)
+    skip_wait_displayed = True
+
+    def sign_up(self, username: str, passwd: str, submit: bool = True):
+        """
+        Signs up an account with provided arguments in developer portal
+        """
+        if username:
+            self.username.fill(username)
+        self.password.fill(passwd)
+        self.password2.fill(passwd)
+        if submit:
+            self.signup_button.click()
+
+    def check_recaptcha(self):
+        """
+        Checks if reCaptcha exists and if it does, it execute the recaptcha verification
+        """
+        self.recaptcha.check_recaptcha()
+
+    @property
+    def is_displayed(self):
+        return (
+            self.username.is_displayed
             and self.path in self.browser.url
             and self.password.is_displayed
             and self.password2.is_displayed

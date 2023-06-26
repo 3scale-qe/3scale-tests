@@ -137,7 +137,6 @@ class SignUpView(BaseDevelView):
         return (
             BaseDevelView.is_displayed.fget(self)
             and self.path in self.browser.url
-            and self.organization.is_displayed
             and self.username.is_displayed
             and self.email.is_displayed
         )
