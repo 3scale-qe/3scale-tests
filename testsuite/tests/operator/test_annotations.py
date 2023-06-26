@@ -13,6 +13,7 @@ pytestmark = [
     pytest.mark.sandbag,  # requires operator in same namespace
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8314"),
     pytest.mark.required_capabilities(Capability.OCP4),
+    pytest.mark.nopersistence,
 ]
 
 ANNOTATIONS_PRE_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
