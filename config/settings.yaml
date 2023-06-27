@@ -57,3 +57,24 @@ default:
 
   cfssl:
     binary: "cfssl"
+
+saas:
+  warn_and_skip:
+    testsuite/tests/apicast/auth/rhsso: quiet
+    testsuite/tests/apicast/parameters/auth/test_rhsso_wrong_realm.py: quiet
+    testsuite/tests/apicast/policy/headers/test_headers_policy_jwt.py: quiet
+    testsuite/tests/apicast/policy/jwt_claim_check: quiet
+    testsuite/tests/apicast/policy/liquid_context_debug/test_debug_policy_apiap.py: quiet
+    testsuite/tests/apicast/policy/liquid_context_debug/test_debug_policy.py: quiet
+    testsuite/tests/apicast/policy/proxy/test_fuse_proxy_policy.py: quiet
+    testsuite/tests/apicast/policy/routing/test_routing_policy_jwt.py: quiet
+    testsuite/tests/apicast/policy/test_token_introspection.py: quiet
+    testsuite/tests/apicast/test_uri_too_large.py: quiet
+    testsuite/tests/system/oidc: quiet
+    testsuite/tests/system/test_proxy_endpoints_set_spec.py: quiet
+  threescale:
+    deployment_type: saas
+
+rhoam:
+  warn_and_skip:
+    testsuite/tests/ui/billing/braintree: quiet
