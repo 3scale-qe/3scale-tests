@@ -369,7 +369,7 @@ def testconfig():
     return settings
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def threescale(testconfig, request):
     "Threescale client"
 
@@ -386,7 +386,12 @@ def threescale(testconfig, request):
         )
 
         admin.rest._token = token["value"]
-        testconfig["threescale"]["admin"].update(username="admin", password=password, token=token["value"])
+        testconfig.setdefault("threescale", {}).setdefault("admin", {}).update(
+            username="admin",
+            password=password,
+            token=token["value"],
+            url=admin.url,
+        )
 
         return admin
 
