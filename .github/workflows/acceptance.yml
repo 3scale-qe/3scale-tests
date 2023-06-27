@@ -18,7 +18,7 @@ jobs:
       - name: Week number
         id: weeknum
         run: |
-          echo "::set-output name=weeknum::$(/bin/date -u "+%g.%V")"
+          echo "weeknum=$(/bin/date -u '+%g.%V')" >> $GITHUB_OUTPUT
         shell: bash
       - uses: actions/cache@v2
         with:
