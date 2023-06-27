@@ -15,6 +15,7 @@ pytestmark = pytest.mark.nopersistence
         ("threescale_backend", "amp-backend", ["backend-worker"]),
         ("threescale_zync", "amp-zync", ["zync"]),
         ("threescale_memcached", "system-memcached", ["system-memcache"]),
+        ("threescale_searchd", "system-searchd", ["system-searchd"]),
         ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
     ],
 )

@@ -201,3 +201,9 @@ development:
         ppc64le:
         s390x:
     operator: # Multi-arch manifest digest
+    threescale_searchd:
+      manifest_digest: # Multi-arch manifest digest
+      resolved_images: # Dict of resolved images
+        amd64:
+        ppc64le:
+        s390x:
