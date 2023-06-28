@@ -23,7 +23,8 @@ class Navigation(ouia.Navigation):
     """
 
     RELATED_RESOURCE = '//div[@class="pf-c-nav__current-api"]'
-    HREF_LOCATOR = './section/ul/li/a[@href="{}"]'
+    HREF_LOCATOR = './/section/ul/li/a[@href="{}"]'
+    GROUP = './/section[.//a[@href="{}"]]/../button'
 
     def __init__(
         self,
@@ -42,15 +43,24 @@ class Navigation(ouia.Navigation):
     @check_nav_loaded
     def select_href(self, href):
         """
-        Selects item from Navigation with specific href locator
+        Selects item from Navigation with specific href locator.
+
+        Item, that contains required href can be buried inside multiple navigation groups.
+        This method finds correct item and with the method `_expand_groups` expands all required groups
+        in the hierarchy from the top to the bottom.
         """
+
+        def _expand_groups(item):
+            """Expands all parent groups for the item"""
+            for group in self.browser.elements(self.GROUP.format(href), parent=item):
+                if group.get_attribute("aria-expanded") == "false":
+                    group.click()
+
         for element in self.browser.elements("./ul/li"):
             if "pf-m-expandable" in element.get_attribute("class").split():
                 nav_item = self.browser.elements(self.HREF_LOCATOR.format(href), parent=element)
                 if nav_item:
-                    if "pf-m-expanded" not in element.get_attribute("class").split():
-                        self.browser.click(element)
-                        self.browser.wait_for_element(self.HREF_LOCATOR.format(href), parent=element, visible=True)
+                    _expand_groups(nav_item)
                     self.browser.click(nav_item[0])
                     return
             else:
