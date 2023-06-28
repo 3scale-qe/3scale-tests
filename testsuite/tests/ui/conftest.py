@@ -11,7 +11,7 @@ import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
-from selenium.common import InvalidSessionIdException
+from selenium.common import InvalidSessionIdException, WebDriverException
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
@@ -424,7 +424,7 @@ def pytest_exception_interact(node, call, report):
             global html_report  # pylint: disable=global-statement
             html_report = node.config.getoption("--html")
 
-        except InvalidSessionIdException:
+        except (InvalidSessionIdException, WebDriverException):
             LOGGER.info(
                 "Can't create a screenshot. Browser session %s is already closed.",
                 browser.webdriver.session.session_id,
