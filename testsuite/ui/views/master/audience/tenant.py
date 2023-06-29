@@ -1,9 +1,9 @@
 """View representations of Tenants pages"""
 from widgetastic.widget import TextInput, Text
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.master.audience import BaseMasterAudienceView
-from testsuite.ui.widgets import AudienceTable
 from testsuite.ui.widgets.buttons import (
     Button,
     ThreescaleDeleteButton,
@@ -20,7 +20,7 @@ class TenantsView(BaseMasterAudienceView):
     # TODO search will be separated into the AudienceTable Widget later.
     path_pattern = "/buyers/accounts"
     new_account = Text("//a[@href='/p/admin/accounts/new']")
-    tenants_table = AudienceTable(
+    tenants_table = PatternflyTable(
         "//*[@id='buyer_accounts']",
         column_widgets={"Group/Org.": Text("./a"), 5: Text("./ul/li/a[contains(@class, 'actions')]")},
     )

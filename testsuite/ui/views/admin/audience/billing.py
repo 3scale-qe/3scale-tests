@@ -1,9 +1,10 @@
 """View representations of Billing pages"""
 
 from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox, ThreescaleDropdown
+from testsuite.ui.widgets import ThreescaleCheckBox, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -11,7 +12,7 @@ class BillingView(BaseAudienceView):
     """View representation of Earnings by Month page"""
 
     path_pattern = "/finance"
-    table = AudienceTable("//*[@class='data']")
+    table = PatternflyTable("//*[@class='data']")
 
     def prerequisite(self):
         return BaseAudienceView

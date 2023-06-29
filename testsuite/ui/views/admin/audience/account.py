@@ -8,7 +8,6 @@ from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets import (
     ThreescaleDropdown,
-    AudienceTable,
     ThreescaleCheckBox,
     CheckBoxGroup,
     HorizontalNavigation,
@@ -28,7 +27,7 @@ class AccountsView(BaseAudienceView):
     # TODO search will be separated into the AudienceTable Widget later.
     path_pattern = "/buyers/accounts"
     new_account = Text("//a[@href='/buyers/accounts/new']")
-    table = AudienceTable("//*[@id='buyer_accounts']", column_widgets={"Group/Org.": Text("./a")})
+    table = PatternflyTable("//*[@id='buyer_accounts']", column_widgets={"Group/Org.": Text("./a")})
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
 

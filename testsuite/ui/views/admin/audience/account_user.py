@@ -1,6 +1,6 @@
 """View representations of Account User pages"""
 
-from widgetastic.widget import TextInput
+from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
@@ -13,7 +13,7 @@ class AccountUserView(BaseAudienceView):
     """View representation of Accounts User page"""
 
     path_pattern = "buyers/accounts/{account_id}/users"
-    table = PatternflyTable("//*[@id='buyer_users']")
+    table = PatternflyTable("//*[@id='buyer_users']", column_widgets={5: Text(".//a")})
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -21,7 +21,7 @@ class AccountUserView(BaseAudienceView):
     @step("AccountUserEditView")
     def edit(self, user):
         """Edit account's user"""
-        self.table.row(_row__attr=("id", f"user_{user.entity_id}"))[5].click()
+        self.table.row(_row__attr=("id", f"user_{user.entity_id}"))[5].widget.click()
 
     @step("AccountUserDetailView")
     def user(self, user):
