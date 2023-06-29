@@ -13,8 +13,10 @@ from testsuite.ui.exception import ItemNotPresentException
 
 
 # Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
+# an abstract method. Disabling abstract-method for all widgets.
 # pylint: disable=abstract-method
+
+
 class RadioGroup(GenericLocatorWidget):
     """
     Radio group of 3scale pages.
@@ -54,9 +56,6 @@ class RadioGroup(GenericLocatorWidget):
         return None
 
 
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
 class CheckBoxGroup(GenericLocatorWidget):
     """
     CheckBox group of 3scale pages
@@ -129,9 +128,6 @@ class CheckBoxGroup(GenericLocatorWidget):
                 element.click()
 
 
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
 class ThreescaleDropdown(GenericLocatorWidget):
     """Specific dropdown of 3scale pages"""
 
@@ -151,9 +147,6 @@ class ThreescaleDropdown(GenericLocatorWidget):
         self.browser.selenium.find_element(By.XPATH, f"//select/option[normalize-space(.)='{text}']").click()
 
 
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
 class ThreescaleCheckBox(GenericLocatorWidget):
     """Specific CheckBox button of 3scale pages"""
 
@@ -169,9 +162,6 @@ class ThreescaleCheckBox(GenericLocatorWidget):
         return self.__element__().get_attribute("checked") == "true"
 
 
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
 class PolicySection(Widget):
     """Widget representing Policies table section"""
 
@@ -283,9 +273,6 @@ class DivBasedEditor(TextInput):
         self.browser.send_keys_to_focused_element(value)
 
 
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
 class ActiveDocV2Section(Widget):
     """Active Doc V2 preview section"""
 
