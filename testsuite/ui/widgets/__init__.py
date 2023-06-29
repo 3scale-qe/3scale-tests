@@ -7,7 +7,6 @@ from widgetastic.utils import ParametrizedLocator
 from widgetastic.widget import GenericLocatorWidget, Widget
 from widgetastic.widget import TextInput
 from widgetastic.xpath import quote
-from widgetastic_patternfly4 import PatternflyTable
 from widgetastic_patternfly4 import Select
 
 from testsuite.ui.exception import ItemNotPresentException
@@ -150,19 +149,6 @@ class ThreescaleDropdown(GenericLocatorWidget):
     def select_by_text(self, text):
         """Select given text from dropdown"""
         self.browser.selenium.find_element(By.XPATH, f"//select/option[normalize-space(.)='{text}']").click()
-
-
-# pylint: disable=abstract-method
-# Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
-# an abstract method
-class AudienceTable(PatternflyTable):
-    """
-    Table defined by 3scale in Accounts view contains two headers: classic table header and header dedicated
-    to search or row manipulation. This widget specifies correct header columns. It may extend already existing
-    search implementation from PF4 in the future.
-    """
-
-    HEADERS = "./thead/tr[1]/th"
 
 
 # pylint: disable=abstract-method

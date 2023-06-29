@@ -8,7 +8,7 @@ from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import AudienceTable, ThreescaleCheckBox
+from testsuite.ui.widgets import ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import (
     ThreescaleUpdateButton,
     ThreescaleDeleteButton,
@@ -44,7 +44,7 @@ class ApplicationsView(BaseAudienceView):
     """View representation of Application Listing page"""
 
     path_pattern = "/p/admin/applications"
-    table = AudienceTable("//*[@class='data']")
+    table = PatternflyTable("//*[@class='data']")
     all_app_checkbox = ThreescaleCheckBox(locator="//input[@class='select-all']")
     send_email_btn = GenericLocatorWidget(".//button[text()='Send email']")
     email_window = View.nested(ApplicationsBulkEmailWindow)

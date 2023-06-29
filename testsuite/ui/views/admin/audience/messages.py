@@ -1,19 +1,18 @@
 """View representations of Messages pages"""
 from widgetastic.widget import GenericLocatorWidget, View
 from widgetastic_patternfly import TextInput
-from widgetastic_patternfly4 import Button
+from widgetastic_patternfly4 import Button, PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
-from testsuite.ui.widgets import AudienceTable
 
 
 class MessagesView(BaseAudienceView):
     """View representation of accounts messages inbox page"""
 
     path_pattern = "/p/admin/messages"
-    table = AudienceTable("//*[@class='data']")
+    table = PatternflyTable("//*[@class='data']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
 
     def prerequisite(self):
