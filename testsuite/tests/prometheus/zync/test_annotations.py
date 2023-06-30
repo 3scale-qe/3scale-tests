@@ -10,6 +10,7 @@ from testsuite.configuration import openshift
 
 pytestmark = [
     pytest.mark.sandbag,  # requires openshift
+    pytest.mark.nopersistence,  # fixture saves pod name, which changes with pod redeployment
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6509"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
 ]
