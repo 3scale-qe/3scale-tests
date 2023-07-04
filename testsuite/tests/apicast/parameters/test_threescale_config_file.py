@@ -55,7 +55,7 @@ def setup_apicast_configuration(service, staging_gateway, configmap_name):
 
 
 @pytest.fixture(scope="module")
-def service(request, service, staging_gateway):
+def service(request, service, staging_gateway, testconfig):
     """Set this service's configuration as the only configuration available on apicast.
 
     It's possible by setting `THREESCALE_CONFIG_FILE`. Requests to other services
@@ -67,7 +67,8 @@ def service(request, service, staging_gateway):
 
     yield service
 
-    del staging_gateway.openshift.config_maps[configmap_name]
+    if not testconfig["skip_cleanup"]:
+        del staging_gateway.openshift.config_maps[configmap_name]
 
 
 @pytest.fixture(scope="module")
