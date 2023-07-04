@@ -3,6 +3,14 @@ import pytest
 
 from testsuite import resilient
 from testsuite.ui.views.admin.product.product import ProductNewView
+from testsuite.utils import warn_and_skip
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_rhoam(testconfig):
+    """Service discovery requires special setup unavailable on RHOAM"""
+    if testconfig["threescale"]["deployment_type"] == "rhoam":
+        warn_and_skip(skip_rhoam.__doc__)
 
 
 @pytest.fixture(scope="module")

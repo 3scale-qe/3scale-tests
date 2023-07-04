@@ -4,6 +4,14 @@ import pytest
 import importlib_resources as resources
 
 from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalLogoView
+from testsuite.utils import warn_and_skip
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_rhoam(testconfig):
+    """Logo upload does not work on RHOAM for some reason"""
+    if testconfig["threescale"]["deployment_type"] == "rhoam":
+        warn_and_skip(skip_rhoam.__doc__)
 
 
 @pytest.mark.sandbag  # doesn't work on RHOAM
