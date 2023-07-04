@@ -4,10 +4,17 @@ import pytest
 from testsuite import settings, rawobj
 from testsuite.ui.views.admin.audience.developer_portal import SpamProtection
 from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, SuccessfulAccountCreationView, ForgotPasswordView
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
 
 # requires special setup, internet access
 pytestmark = [pytest.mark.sandbag, pytest.mark.usefixtures("login"), pytest.mark.usefixtures("spam_protection_setup")]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_rhoam(testconfig):
+    """Recaptcha requires special setup unavailable on RHOAM"""
+    if testconfig["threescale"]["deployment_type"] == "rhoam":
+        warn_and_skip(skip_rhoam.__doc__)
 
 
 @pytest.fixture(scope="function")
