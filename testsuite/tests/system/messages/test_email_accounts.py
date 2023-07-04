@@ -14,6 +14,9 @@ import backoff
 from testsuite import rawobj
 from testsuite.utils import blame
 
+# the creation of an account triggers a one-time email to be sent; this is not affected by an upgrade
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):

@@ -5,6 +5,10 @@ When sending message to a developer account, the email is send
 
 import pytest
 
+# fixture fires a one-time event that triggers an email to be sent,
+# this event (sending message to account) is not affected by an upgrade
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def message_body(threescale, account):
