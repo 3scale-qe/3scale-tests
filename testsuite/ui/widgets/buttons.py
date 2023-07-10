@@ -43,6 +43,14 @@ class ThreescaleDeleteButton(ThreescaleButton):
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, "Delete", classes=["delete"], **kwargs)
 
+    def click(self, handle_alert=True):
+        """Change handle_alert to True by default
+
+        Deletion requires and confirmation that an object should be really
+        deleted, alert is always displayed and needs to be covered
+        """
+        super().click(handle_alert)
+
 
 class ThreescaleUpdateButton(ThreescaleButton):
     """Specific Update button of 3scale pages"""
