@@ -1,10 +1,11 @@
 """Essential Views for Backends Views"""
 from widgetastic_patternfly4 import PatternflyTable
-from widgetastic.widget import Text, TextInput, GenericLocatorWidget
+from widgetastic.widget import Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.widgets.ouia import Navigation
+from testsuite.ui.widgets.searchinput import ThreescaleSearchInput
 
 
 class BackendsView(BaseAdminView):
@@ -13,13 +14,11 @@ class BackendsView(BaseAdminView):
     path_pattern = "p/admin/backend_apis"
     create_backend_button = Text("//a[@href='/p/admin/backend_apis/new']")
     table = PatternflyTable("//*[@id='backend-apis']/section/table", column_widgets={"Name": Text("./a")})
-    search_bar = TextInput(locator="//input[@type='search']")
-    search_button = GenericLocatorWidget("//button[contains(@aria-label,'search')]")
+    search_input = ThreescaleSearchInput()
 
     def search(self, value: str):
         """Search in backend table by given value"""
-        self.search_bar.fill(value)
-        self.search_button.click()
+        self.search_input.fill_and_search(value)
 
     @step("BaseBackendView")
     def detail(self, backend):
