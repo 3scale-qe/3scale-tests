@@ -19,6 +19,14 @@ class Certificate(TmpFilePersist):
     def persist(self):
         return self._persist(key=self.key, certificate=self.certificate)
 
+    def __setstate__(self, state):
+        """
+        Custom deserializer for pickle module
+        more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
+        """
+        self.__init__(state["key"], state["certificate"])
+        self.persist()
+
 
 class UnsignedKey(TmpFilePersist):
     """Representing generated key that hasn't been signed yet"""
