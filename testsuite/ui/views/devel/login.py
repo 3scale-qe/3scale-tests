@@ -3,6 +3,7 @@ from time import sleep
 from widgetastic.widget import TextInput, Text, View
 
 from testsuite.ui.exception import UIException
+from testsuite.ui.navigation import step
 from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
@@ -17,8 +18,14 @@ class LoginView(BaseDevelView):
     login_widget = View.nested(LoginForm)
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
+    forgot_passwd = Text("//*[contains(text(),'Forgot password?')]")
     flash_message = View.nested(FlashMessage)
     skip_wait_displayed = True
+
+    @step("ForgotPasswordView")
+    def forgot_password(self):
+        """Navigate to forgot password view"""
+        self.forgot_passwd.click()
 
     def do_login(self, name, password):
         """Perform login"""
@@ -188,6 +195,11 @@ class ForgotPasswordView(BaseDevelView):
         """
         self.email.fill(email)
 
+    def reset_password(self, email: str):
+        """Reset password for provided email"""
+        self.email.fill(email)
+        self.reset_button.click()
+
     def check_recaptcha(self):
         """
         Checks if reCaptcha exists and if it does, it execute the recaptcha verification
@@ -197,13 +209,8 @@ class ForgotPasswordView(BaseDevelView):
         self.recaptcha.check_recaptcha()
 
     def prerequisite(self):
-        return BaseDevelView
+        return LoginView
 
     @property
     def is_displayed(self):
-        return (
-            BaseDevelView.is_displayed.fget(self)
-            and self.path in self.browser.url
-            and self.email.is_displayed
-            and self.reset_button.is_displayed
-        )
+        return self.path in self.browser.url and self.email.is_displayed and self.reset_button.is_displayed
