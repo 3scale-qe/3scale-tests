@@ -20,7 +20,7 @@ class Auth0View(View, Navigable):
 
     def login(self, email, password):
         """Login to 3scale via Auth0"""
-        self.last_login_button.wait_displayed()
+        self.last_login_button.wait_displayed(timeout="20s")
         if not self.email.is_displayed:
             if self.last_login_button_text.text == email:
                 self.last_login_button.click()
