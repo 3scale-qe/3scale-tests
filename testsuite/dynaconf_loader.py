@@ -29,7 +29,6 @@ from weakget import weakget
 from openshift import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
 
-identifier = "threescale"  # pylint: disable=invalid-name
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -315,7 +314,7 @@ def load(obj, env=None, silent=None, key=None):
         project_data = {"openshift": {"projects": {"threescale": {"name": project}}}}
 
         settings.update(project_data)
-        obj.update(data, loader_identifier=identifier)
+        obj.update(data)
         obj.update(settings)
         log.info("dynamic dynaconf loader successfully got data from openshift")
     except Exception as err:
