@@ -113,7 +113,7 @@ def test_search_non_existing_value(request, navigator, custom_account):
     accounts = navigator.navigate(AccountsView)
     accounts.search("non-existing-value")
 
-    assert next(accounts.table.rows())[0].text == "No results."
+    assert "No results found" in next(accounts.table.rows())[0].text
 
 
 @pytest.mark.xfail
