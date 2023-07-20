@@ -8,12 +8,6 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module", autouse=True)
-def braintree_gateway_3ds_disabled(braintree_gateway):
-    """Ensures Braintree billing gateway with 3D Secure verification disabled"""
-    braintree_gateway(verify_3ds=False)
-
-
-@pytest.fixture(scope="module", autouse=True)
 def card_setup(custom_card):
     """Card setup"""
     custom_card("4111111111111111")

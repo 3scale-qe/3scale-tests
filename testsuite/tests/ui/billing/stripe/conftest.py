@@ -7,8 +7,8 @@ from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
 
 
-@pytest.fixture(scope="module", autouse=True)
-def stripe_gateway(custom_admin_login, navigator, testconfig):
+@pytest.fixture(scope="module")
+def gateway_setup(custom_admin_login, navigator, testconfig):
     """Enables Stripe billing gateway"""
     custom_admin_login()
     billing = navigator.navigate(BillingSettingsView)
@@ -23,7 +23,7 @@ def stripe(testconfig):
 
 
 @pytest.fixture(scope="module")
-def custom_card(account, custom_devel_login, billing_address, navigator):
+def custom_card(gateway_setup, account, custom_devel_login, billing_address, navigator):
     """Credit card setup"""
 
     def _setup(cc_number, verify_3ds=False):
