@@ -1,5 +1,5 @@
 """ Representation of Login specific views"""
-from widgetastic.widget import View, Text, TextInput
+from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 from widgetastic_patternfly4.ouia import Button
 
 from testsuite.ui.exception import UIException
@@ -24,7 +24,7 @@ class LoginView(View, Navigable):
     rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
     skip_wait_displayed = True
 
-    @step("ResetAdminPasswordView")
+    @step("RequestAdminPasswordView")
     def reset_password(self):
         """Process to next page"""
         self.password_reset_link.click()
@@ -83,9 +83,9 @@ class LoginView(View, Navigable):
         )
 
 
-class ResetAdminPasswordView(View, Navigable):
+class RequestAdminPasswordView(View, Navigable):
     """
-    Reset password view page object
+    View page object to request password reset
     """
 
     path = "/p/password/reset"
@@ -108,3 +108,23 @@ class ResetAdminPasswordView(View, Navigable):
             and self.path in self.browser.url
             and self.passwd_reset_btn.is_displayed
         )
+
+
+class ResetPasswordView(View, Navigable):
+    """
+    Reset password view page object
+    """
+
+    password = TextInput(id="user_password")
+    passwd_confirmation = TextInput(id="user_password_confirmation")
+    change_password_btn = GenericLocatorWidget("//*[@type='submit' or @value='Change Password']")
+
+    def change_password(self, new_password):
+        """Reset password of email address user"""
+        self.password.fill(new_password)
+        self.passwd_confirmation.fill(new_password)
+        self.change_password_btn.click()
+
+    @property
+    def is_displayed(self):
+        return self.password.is_displayed and self.passwd_confirmation.is_displayed
