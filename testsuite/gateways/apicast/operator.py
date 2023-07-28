@@ -58,6 +58,7 @@ class OperatorEnviron(Properties):
         "APICAST_CACHE_MAX_TIME": "cacheMaxTime",
         "APICAST_CONFIGURATION_LOADER": "configurationLoadMode",
         "APICAST_CONFIGURATION_CACHE": "cacheConfigurationSeconds",
+        "APICAST_LOG_LEVEL": "logLevel",
     }
 
     REGEX_NAMES: RegexMatcher = {re.compile(r"APICAST_SERVICE_(\d+)_CONFIGURATION_VERSION"): set_configuration_version}
