@@ -19,6 +19,16 @@ pytestmark = [pytest.mark.nopersistence]
 
 
 @pytest.fixture(scope="module")
+def test_account(custom_account, request):
+    """Account without cleanup to test delete notifications"""
+    name = blame(request, "acc")
+
+    params = {"name": name, "username": name, "org_name": f"org-{name}", "email": f"{name}@anything.invalid"}
+    account = custom_account(params, autoclean=False)
+    return account
+
+
+@pytest.fixture(scope="module")
 def application(service, custom_application, custom_app_plan, lifecycle_hooks, request):
     """Application bound to the account and service with specific description that don't break yaml parsing"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
@@ -109,3 +119,12 @@ def test_emails_subjects_after_account_creation(mailhog_client, application):
         subject=f"{application['org_name']} from {application['org_name']} signed up"
     )
     mailhog_client.assert_message_received(subject=f"{application['name']} created on {application['service_name']}")
+
+
+def test_account_deleted_automatic_email(mailhog_client, test_account):
+    """Test to check mail notification about deleting user account
+    Delete account
+    Assert that a delete email has been sent
+    """
+    test_account.delete()
+    mailhog_client.assert_message_received(subject=f"Account {test_account.entity_name} deleted", expected_count=1)
