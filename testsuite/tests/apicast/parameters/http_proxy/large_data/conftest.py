@@ -24,12 +24,14 @@ def gateway_environment(gateway_environment, testconfig, tools):
     """
     rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
     proxy_endpoint = testconfig["proxy"]
+    superdomain = testconfig["threescale"]["superdomain"]
 
     gateway_environment.update(
         {
             "HTTP_PROXY": proxy_endpoint["http"],
             "HTTPS_PROXY": proxy_endpoint["https"],
-            "NO_PROXY": f"backend-listener,system-master,system-provider,{rhsso_url}",
+            "NO_PROXY": "backend-listener,system-master,system-provider,"
+            f"backend-3scale.{superdomain},3scale-admin.{superdomain},{rhsso_url}",
             "APICAST_CONFIGURATION_LOADER": "boot",
             "APICAST_CONFIGURATION_CACHE": 1000,
         }
