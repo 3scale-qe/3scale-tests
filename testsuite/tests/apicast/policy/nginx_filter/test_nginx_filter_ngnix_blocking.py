@@ -7,14 +7,22 @@ The nginx filter policy should ensure that those requests will not be blocked.
 
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
+from weakget import weakget
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
 
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704"),
 ]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_saas(testconfig):
+    """This tests depends on behavior of default openshift router & name resolving"""
+    if weakget(testconfig)["threescale"]["deployment_type"] % None == "saas":
+        warn_and_skip(skip_saas.__doc__)
 
 
 @pytest.fixture(
