@@ -72,6 +72,7 @@ saas:
     testsuite/tests/apicast/test_uri_too_large.py: quiet
     testsuite/tests/system/oidc: quiet
     testsuite/tests/system/test_proxy_endpoints_set_spec.py: quiet
+    testsuite/tests/ui/billing/braintree: quiet
   threescale:
     deployment_type: saas
 

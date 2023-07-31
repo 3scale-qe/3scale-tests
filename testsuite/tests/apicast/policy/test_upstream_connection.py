@@ -5,8 +5,16 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.utils import warn_and_skip
 
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.6')")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def skip_saas(testconfig):
+    """upstream_connection not available on SaaS"""
+    if testconfig["threescale"]["deployment_type"] == "saas":
+        warn_and_skip(skip_saas.__doc__)
 
 
 @pytest.fixture(scope="module")

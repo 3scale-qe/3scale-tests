@@ -2,6 +2,7 @@
 from datetime import datetime
 
 import pytest
+import openshift as oc
 
 from testsuite.billing import Braintree
 from testsuite.ui.objects import CreditCard
@@ -12,10 +13,13 @@ from testsuite.utils import warn_and_skip
 
 @pytest.fixture(scope="session", autouse=True)
 def require_braintree_patch(openshift):
-    """Braintree requires patched deployment"""
-    ocp = openshift()
-    if "payments.yml" not in ocp.config_maps["system"]:
-        warn_and_skip("Braintree requires patched deployment. No payments.yml in system configmap", "fail")
+    """Braintree requires patched deployment. No payments.yml in system configmap"""
+    try:
+        ocp = openshift()
+        if "payments.yml" not in ocp.config_maps["system"]:
+            warn_and_skip(require_braintree_patch.__doc__)
+    except oc.OpenShiftPythonException:
+        warn_and_skip(require_braintree_patch.__doc__)
 
 
 @pytest.fixture(scope="session")
