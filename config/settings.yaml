@@ -75,6 +75,8 @@ saas:
     testsuite/tests/ui/billing/braintree: quiet
   threescale:
     deployment_type: saas
+  reporting:
+    print_app_logs: false
 
 rhoam:
   warn_and_skip:
