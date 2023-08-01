@@ -74,6 +74,8 @@ saas:
     testsuite/tests/system/test_proxy_endpoints_set_spec.py: quiet
   threescale:
     deployment_type: saas
+  reporting:
+    print_app_logs: false
 
 rhoam:
   warn_and_skip:
