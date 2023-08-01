@@ -32,7 +32,7 @@ def braintree(testconfig):
     return Braintree(merchant_id, public_key, private_key)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def gateway_setup(braintree_gateway):
     """Ensures Braintree billing gateway with 3D Secure verification disabled"""
     braintree_gateway(verify_3ds=False)
@@ -65,7 +65,7 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
 
 
 @pytest.fixture(scope="module")
-def custom_card(gateway_setup, account, custom_devel_login, billing_address, navigator):
+def custom_card(account, custom_devel_login, billing_address, navigator):
     """Add credit card and billing address for the user in Developer portal"""
 
     def _setup(cc_number, verify_3ds=False):

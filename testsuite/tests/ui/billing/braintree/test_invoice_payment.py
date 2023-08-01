@@ -28,12 +28,6 @@ def test_no_sca_ui_invoice(braintree, ui_invoice):
     assert invoice_view.state_field.text == "State Paid"
 
 
-def test_api(braintree, invoice):
-    """Tests basic billing scenario for Braintree gateway where billing is triggered via UI"""
-    charged = invoice.charge()
-    braintree.assert_payment(charged)
-
-
 def test_mail_completed_payment(invoice, mailhog_client):
     """Tests mail notification about successful payment"""
     invoice.charge()

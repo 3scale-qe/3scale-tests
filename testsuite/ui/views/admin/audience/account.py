@@ -318,6 +318,7 @@ class InvoiceDetailView(BaseAudienceView):
     paid_field = Text("//div[text()='Paid']")
     add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
     line_item_form = View.nested(LineItemForm)
+    transactions_table = PatternflyTable("//table[@aria-label='Transactions table']")
 
     def __init__(self, parent, account, invoice):
         super().__init__(parent, account_id=account.entity_id, invoice_id=invoice.entity_id)
@@ -343,6 +344,12 @@ class InvoiceDetailView(BaseAudienceView):
 
         # Wait until charge is done
         self.browser.wait_for_element(self.paid_field, timeout=5)
+
+    def assert_transaction(self, invoice):
+        """Asserts that correct payment transaction is displayed to the user"""
+        transaction = invoice.payment_transactions.list()[0]
+        assert self.transactions_table[0].message.text == transaction["message"]
+        assert self.transactions_table[0].reference.text == transaction["reference"]
 
     def prerequisite(self):
         return AccountInvoicesView
