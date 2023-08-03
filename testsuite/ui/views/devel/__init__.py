@@ -27,6 +27,11 @@ class Navbar(View, Navigable):
         """Messages"""
         self.messages_btn.click()
 
+    @step("ApplicationsListView")
+    def applications(self):
+        """Applications"""
+        self.applications_btn.click()
+
     @property
     def is_displayed(self):
         return (
