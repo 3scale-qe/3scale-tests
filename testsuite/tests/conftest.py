@@ -782,12 +782,25 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
 
 
 @pytest.fixture(scope="module")
-def backends_mapping():
+def backend_default(service_proxy_settings, custom_backend):
+    """
+    Default backend with url from service_proxy_settings.
+
+    Args:
+        :param service_proxy_settings: private base url from service_proxy_settings
+            which is used/changed by other fixtures
+        :param custom_backend: function for creating custom backend
+    """
+    return custom_backend("backend_default", endpoint=service_proxy_settings["api_backend"])
+
+
+@pytest.fixture(scope="module")
+def backends_mapping(backend_default):
     """
     Due to the new 3Scale feature, we need to be able to create  custom backends and backend usages and then pass them
     to creation of custom service. By default, it does nothing, just lets you skip creating a backend in test files.
     """
-    return {}
+    return {"/": backend_default}
 
 
 @pytest.fixture(scope="module")
@@ -818,6 +831,8 @@ def custom_service(threescale, request, testconfig, logger):
             annotate=True,
             threescale_client=threescale,
         ):
+            if not proxy_params:
+                proxy_params = {}
             params = params.copy()
             for hook in _select_hooks("before_service", hooks):
                 params = hook(params)
@@ -866,9 +881,10 @@ def custom_service(threescale, request, testconfig, logger):
             if backends:
                 for path, backend in backends.items():
                     svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
-                proxy_params = {}
                 for hook in _select_hooks("before_proxy", hooks):
                     proxy_params = hook(svc, proxy_params)
+                proxy_params.pop("api_backend", None)
+                proxy_params.pop("api_test_path", None)
 
                 svc.proxy.list().update(params=proxy_params)
             elif proxy_params:
@@ -893,6 +909,8 @@ def custom_service(threescale, request, testconfig, logger):
 def _backend_delete(backend):
     """reliable backend delete"""
 
+    for usage in backend.usages():
+        usage.delete()
     backend.delete()
 
 
