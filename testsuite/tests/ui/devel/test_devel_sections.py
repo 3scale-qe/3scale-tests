@@ -10,35 +10,28 @@ from testsuite.ui.views.admin.audience.developer_portal import (
     CMSNewPageView,
     CMSNewSectionView,
     DeveloperPortalGroupView,
-    CMSEditSectionView,
 )
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")
-def dev_portal_section(navigator, request, custom_admin_login):
+def dev_portal_section(navigator, request, threescale):
     """Creates a new section in developer portal"""
-    custom_admin_login()
     view = navigator.navigate(CMSNewSectionView)
     section_name = blame(request, "TestSection")
     section_path = blame(request, "section")
     view.create(section_name, section_path, False)
     section_id = navigator.browser.url.split("/")[-2]
 
-    def cleanup():
-        custom_admin_login()
-        view = navigator.navigate(CMSEditSectionView, section_id=section_id)
-        view.delete()
+    request.addfinalizer(lambda: threescale.cms_sections.delete(section_id))
 
-    request.addfinalizer(cleanup)
     return section_name
 
 
 @pytest.fixture(scope="module")
-def dev_portal_page(navigator, request, dev_portal_section, custom_admin_login):
+def dev_portal_page(navigator, request, dev_portal_section, threescale):
     """Creates a new page in developer portal and assign it to section"""
-    custom_admin_login()
     view = navigator.navigate(CMSNewPageView)
     page_name = blame(request, "TestPage")
     page_path = blame(request, "/test")
@@ -46,12 +39,7 @@ def dev_portal_page(navigator, request, dev_portal_section, custom_admin_login):
     view.create(page_name, "|— " + dev_portal_section, page_path, "<h1>Test</h1>")
     page_id = navigator.browser.url.split("/")[-2]
 
-    def cleanup():
-        custom_admin_login()
-        view = navigator.navigate(CMSEditPageView, page_id=page_id)
-        view.delete()
-
-    request.addfinalizer(cleanup)
+    request.addfinalizer(lambda: threescale.cms_pages.delete(page_id))
 
     view = navigator.new_page(CMSEditPageView, page_id=page_id)
     view.publish()
@@ -82,6 +70,7 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-836")
 @pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")
 @pytest.mark.usefixtures("dev_portal_group")
+@pytest.mark.usefixtures("login")
 def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):
     """
     Preparation:
