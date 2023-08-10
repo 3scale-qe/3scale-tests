@@ -1,10 +1,10 @@
 """Test of automatic mails functionality connected to applications in UI"""
 import pytest
+from threescale_api.resources import Service
 
 from testsuite import rawobj
 from testsuite.utils import blame
 
-from threescale_api.resources import Service
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 from testsuite.ui.views.devel.applications import DevelApplicationDetailView
 
@@ -63,8 +63,6 @@ def test_app_key_delete_mails_notification(app_id_key_service, application, navi
     )
 
 
-
-@pytest.mark.usefixtures("login")
 def test_mail_application_plan_changed(navigator, service, application, extra_plan, mailhog_client):
     """
     Test:

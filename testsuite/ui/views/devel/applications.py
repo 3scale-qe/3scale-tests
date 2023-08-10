@@ -40,7 +40,9 @@ class DevelApplicationDetailView(BaseDevelView):
         self.change_plan_link.click()
         plan_link = Text(self, f"//a[@data-plan-id='{plan_id}']")
         plan_link.click()
-        request_btn = ThreescaleButton(self, classes=["plan-change-button"], element_id=f"change-plan-{plan_id}")
+        request_btn = ThreescaleButton(
+            self, "Request Plan Change", classes=["plan-change-button"], id=f"change-plan-{plan_id}"
+        )
         request_btn.click()
 
     def prerequisite(self):

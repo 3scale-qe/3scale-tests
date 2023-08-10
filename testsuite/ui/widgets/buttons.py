@@ -23,12 +23,16 @@ class ThreescaleButton(widgetastic_patternfly4.Button):
     therefore a class with custom locator is needed.
     """
 
-    def __init__(self, parent, text, classes, elm_id=None, **kwargs):
+    def __init__(self, parent, text, classes, **kwargs):
         base = "(self::a or self::button or (self::input and (@type='button' or @type='submit')))"
-        classes = " and ".join(f"contains(@class, {quote(i)})" for i in classes)
-        elm_id = f"and [@id={quote(elm_id)}]"
-        conditions = f"(({classes}) or {elm_id} or contains(text(), {quote(text)}))"
-        super().__init__(parent, locator=f".//*[{base} and {conditions}]", **kwargs)
+        class_conditions = " and ".join(f"contains(@class, {quote(cls)})" for cls in classes)
+
+        conditions = f"({class_conditions} or contains(text(), {quote(text)}))"
+        if "id" in kwargs:
+            conditions = f"({conditions} and @id={quote(kwargs['id'])})"
+
+        locator = f".//*[{base} and {conditions}]"
+        super().__init__(parent, locator=locator, **kwargs)
 
 
 class ThreescaleCreateButton(ThreescaleButton):
