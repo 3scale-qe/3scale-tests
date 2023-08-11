@@ -210,7 +210,7 @@ class AccountInvoicesView(BaseAudienceView):
 
     path_pattern = "/buyers/accounts/{account_id}/invoices"
     create_button = Text(".action.new")
-    table = PatternflyTable(".data")
+    table = PatternflyTable("//table[@aria-label='Invoices table']")
 
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
@@ -315,7 +315,7 @@ class InvoiceDetailView(BaseAudienceView):
     notification = View.nested(FlashMessage)
 
     # Selector which we can use to check if the charge has finished
-    paid_field = Text("//td[@id='field-state' and text()='Paid']")
+    paid_field = Text("//div[text()='Paid']")
     add_item_btn = GenericLocatorWidget("//a[contains(@class,'action add')]")
     line_item_form = View.nested(LineItemForm)
 
@@ -343,12 +343,6 @@ class InvoiceDetailView(BaseAudienceView):
 
         # Wait until charge is done
         self.browser.wait_for_element(self.paid_field, timeout=5)
-
-    def assert_issued(self):
-        """Assert that invoice was correctly issued"""
-        assert self.notification.is_displayed, "No notification was displayed after issuing an invoice."
-        assert self.notification.string_in_flash_message("invoice issued."), "Issuing the invoice through UI failed"
-        assert self.charge_button.wait_displayed, "Issuing the invoice through UI failed"
 
     def prerequisite(self):
         return AccountInvoicesView

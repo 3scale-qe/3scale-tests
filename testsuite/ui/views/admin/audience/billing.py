@@ -12,7 +12,7 @@ class BillingView(BaseAudienceView):
     """View representation of Earnings by Month page"""
 
     path_pattern = "/finance"
-    table = PatternflyTable("//*[@class='data']")
+    table = PatternflyTable("//table[@aria-label='Earnings by month table']")
 
     def prerequisite(self):
         return BaseAudienceView

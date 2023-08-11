@@ -15,7 +15,7 @@ class SSOIntegrationsView(BaseSettingsView):
 
     path_pattern = "/p/admin/account/authentication_providers"
     new_integration = Text("//a[@href='/p/admin/account/authentication_providers/new']")
-    table = PatternflyTable("//table[@class='data']")
+    table = PatternflyTable("//table[@aria-label='Authentication providers table']")
 
     @step("NewSSOIntegrationView")
     def new(self):

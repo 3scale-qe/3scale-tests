@@ -12,7 +12,7 @@ class MessagesView(BaseAudienceView):
     """View representation of accounts messages inbox page"""
 
     path_pattern = "/p/admin/messages"
-    table = PatternflyTable("//*[@class='data']")
+    table = PatternflyTable("//table[@aria-label='Messages table']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
 
     def prerequisite(self):

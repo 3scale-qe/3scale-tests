@@ -31,7 +31,7 @@ def test_no_sca_ui_invoice(braintree, ui_invoice):
     invoice_view = ui_invoice()
     invoice_view.charge()
     braintree.assert_payment(invoice_view.invoice.read())
-    assert invoice_view.state_field.text == "Paid"
+    assert invoice_view.state_field.text == "State Paid"
 
 
 def test_api(braintree, invoice):

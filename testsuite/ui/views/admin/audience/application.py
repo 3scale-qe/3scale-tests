@@ -44,7 +44,7 @@ class ApplicationsView(BaseAudienceView):
     """View representation of Application Listing page"""
 
     path_pattern = "/p/admin/applications"
-    table = PatternflyTable("//*[@class='data']")
+    table = PatternflyTable("//table[@aria-label='Applications table']", column_widgets={"Name": Text("./a")})
     all_app_checkbox = ThreescaleCheckBox(locator="//input[@class='select-all']")
     send_email_btn = GenericLocatorWidget(".//button[text()='Send email']")
     email_window = View.nested(ApplicationsBulkEmailWindow)
@@ -66,7 +66,7 @@ class ApplicationsView(BaseAudienceView):
     @step("ApplicationDetailView")
     def detail(self, application):
         """Opens detail app by ID"""
-        self.table.row(_row__attr=("id", f"contract_{application.entity_id}")).name.click()
+        self.table.row(_row__attr=("id", f"contract_{application.entity_id}")).name.widget.click()
 
     def prerequisite(self):
         return BaseAudienceView

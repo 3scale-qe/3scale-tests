@@ -16,7 +16,7 @@ class ProductTrafficView(BaseProductView):
 
     def read_metric(self):
         """Read specific metric and parse it to integer"""
-        return int(self.traffic_dropdown.text().split(".")[0])
+        return int(self.traffic_dropdown.text().split(" ")[0])
 
     def prerequisite(self):
         return BaseProductView

@@ -360,7 +360,8 @@ class DeveloperPortalGroupView(BaseAudienceView):
 
     path_pattern = "/p/admin/cms/groups"
     table = PatternflyTable(
-        ".//table[@class='data']", column_widgets={3: GenericLocatorWidget("./a[contains(@class, 'delete')]")}
+        "//table[@aria-label='Groups table']",
+        column_widgets={3: GenericLocatorWidget("./a[contains(@class, 'delete')]")},
     )
     create_button = GenericLocatorWidget(".//*[@href='/p/admin/cms/groups/new']")
 

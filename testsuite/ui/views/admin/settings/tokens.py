@@ -50,7 +50,7 @@ class TokenNewView(BaseSettingsView):
     scopes = CheckBoxGroup("//*[@id='access_token_scopes_input']")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
     create_button = ThreescaleSubmitButton()
-    token_value = Text(".//code[contains(@class,'AccessTokenBox-token')]")
+    token_value = Text(".//div/dt/span[text()='Token']/ancestor::dt/following-sibling::dd")
 
     def create(self, name: str, scopes: List[Scopes], write: bool):
         """Create Token"""
