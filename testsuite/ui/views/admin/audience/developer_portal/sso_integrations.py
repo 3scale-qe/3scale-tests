@@ -12,17 +12,19 @@ class SSOIntegrationsView(BaseAudienceView):
     """View representation of SSO Integrations page for developer portal"""
 
     path_pattern = "/p/admin/authentication_providers"
-    table = PatternflyTable("//table[@class='data']")
+    table = PatternflyTable(
+        "//table[@aria-label='Authentication providers table']", column_widgets={"Integration": Text("./a")}
+    )
 
     @step("Auth0IntegrationDetailView")
     def auth0(self):
         """Open Auth0 integration"""
-        self.table.row(integration__contains="Auth0").integration.click()
+        self.table.row(integration__contains="Auth0").integration.widget.click()
 
     @step("RHSSOIntegrationDetailView")
     def rhsso(self):
         """Open RHSSO integration"""
-        self.table.row(integration__contains="Red Hat Single Sign-On").integration.click()
+        self.table.row(integration__contains="Red Hat Single Sign-On").integration.widget.click()
 
     def prerequisite(self):
         return BaseAudienceView

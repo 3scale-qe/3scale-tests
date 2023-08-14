@@ -14,7 +14,8 @@ class ProductBackendsView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/backend_usages"
     add_backend_button = Text("//*[contains(@href,'/backend_usages/new')]")
     backend_table = PatternflyTable(
-        "//*[@id='backend_api_configs']", column_widgets={3: GenericLocatorWidget("./a[contains(@class, 'delete')]")}
+        "//table[@aria-label='Backends table']",
+        column_widgets={3: GenericLocatorWidget("//div/a[contains(@class, 'delete')]")},
     )
 
     @step("ProductAddBackendView")
@@ -24,7 +25,7 @@ class ProductBackendsView(BaseProductView):
 
     def remove_backend(self, backend):
         """Remove backend"""
-        next(row for row in self.backend_table.rows() if row[0].text == backend["name"])[3].widget.click(True)
+        self.backend_table.row(name__contains=backend["name"])[3].widget.click(True)
 
     def prerequisite(self):
         return BaseProductView

@@ -48,7 +48,7 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
         invoice_view = navigator.navigate(InvoiceDetailView, account=account, invoice=invoice[0])
         invoice_view.add_items(line_items)
         invoice_view.issue()
-        invoice_view.assert_issued()
+        assert invoice_view.charge_button.wait_displayed(), "Issuing the invoice through UI failed"
         return invoice_view
 
     return _ui_invoice
