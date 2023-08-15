@@ -10,6 +10,7 @@ from testsuite.utils import warn_and_skip
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.6')")
 
 
+# https://github.com/3scale/apicast-cloud-hosted
 @pytest.fixture(scope="module", autouse=True)
 def skip_saas(testconfig):
     """upstream_connection not available on SaaS"""
