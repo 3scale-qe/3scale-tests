@@ -8,7 +8,7 @@ from testsuite.ui.views.devel.settings.stripe import StripeCCView
 
 
 @pytest.fixture(scope="module", autouse=True)
-def stripe_gateway(custom_admin_login, navigator, testconfig):
+def gateway_setup(custom_admin_login, navigator, testconfig):
     """Enables Stripe billing gateway"""
     custom_admin_login()
     billing = navigator.navigate(BillingSettingsView)

@@ -43,7 +43,6 @@ class Stripe:
         assert stripe_invoice["charges"]["data"][0]["paid"]
 
 
-# pylint: disable=too-few-public-methods
 class Braintree:
     """API for braintree"""
 
@@ -67,11 +66,33 @@ class Braintree:
         merchant_accounts = list(self.gateway.merchant_account.all().merchant_accounts.items)
         return [x for x in merchant_accounts if x.default is True][0].currency_iso_code
 
+    def _assert(self, invoice):
+        """Compares 3scale invoice and Braintree transaction"""
+        transaction = self._transaction_search(invoice).first
+        currency = transaction.currency_iso_code
+        cost = float(transaction.amount)
+        invoice_transaction = invoice.payment_transactions.list()[0]
+
+        assert invoice["currency"] == currency
+        assert invoice["cost"] == cost
+        code, message = invoice_transaction["message"].split(" ", 1)
+        assert code == transaction.processor_response_code
+        assert message == transaction.processor_response_text
+
     def assert_payment(self, invoice):
-        """Compare 3scale invoice and Braintree transaction"""
-        transaction = self._transaction_search(invoice)
-        currency = transaction.first.currency_iso_code
-        cost = float(transaction.first.amount)
+        """
+        Asserts successful payment invoice payment.
+        This assert is used for transaction amount between 0.01 and 1999.9.
+        """
         assert invoice["state"] == InvoiceState.PAID.value
-        assert currency == invoice["currency"]
-        assert cost == invoice["cost"]
+        self._assert(invoice)
+
+    def assert_declined_payment(self, invoice):
+        """
+        Asserts declined payment invoice payment.
+        This assert is used for transaction amount between 2000.00 and 2999.99.
+        Transaction amount of 5001, 5001.01, and 5001.02 leads to Processor Declined as well,
+        but with different response codes and messages.
+        """
+        assert invoice["state"] == InvoiceState.PENDING.value
+        self._assert(invoice)

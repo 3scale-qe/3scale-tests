@@ -32,6 +32,12 @@ def braintree(testconfig):
     return Braintree(merchant_id, public_key, private_key)
 
 
+@pytest.fixture(scope="module", autouse=True)
+def gateway_setup(braintree_gateway):
+    """Ensures Braintree billing gateway with 3D Secure verification disabled"""
+    braintree_gateway(verify_3ds=False)
+
+
 @pytest.fixture(scope="module")
 def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
     """

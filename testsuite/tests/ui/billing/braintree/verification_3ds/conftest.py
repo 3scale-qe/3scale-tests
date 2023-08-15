@@ -2,7 +2,7 @@
 import pytest
 
 
-@pytest.fixture(scope="module", autouse=True)
-def braintree_gateway_3ds_enabled(braintree_gateway):
+@pytest.fixture(scope="module")
+def gateway_setup(braintree_gateway):
     """Ensures Braintree billing gateway with 3D Secure verification enabled"""
     braintree_gateway(verify_3ds=True)

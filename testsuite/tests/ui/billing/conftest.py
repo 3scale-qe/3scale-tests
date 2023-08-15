@@ -8,32 +8,34 @@ from testsuite.ui.views.admin.audience.account import InvoiceDetailView, Account
 from testsuite.utils import randomize
 
 
-@pytest.fixture(scope="module")
-def cost():
-    """A fixture that provides variable cost for the line item, thus the price of the invoice"""
-    return 10
-
-
-@pytest.fixture(scope="module")
-def line_items(cost):
-    """List of all items to be added to an invoice"""
-    return [{"name": "test-item", "description": "test_item", "quantity": "1", "cost": cost}]
+@pytest.fixture
+def invoice(custom_invoice):
+    """Creates a new invoice via API"""
+    return custom_invoice(10)
 
 
 @pytest.fixture
-def invoice(account, threescale, line_items):
-    """Creates a new invoice via API."""
-    account_invoices = threescale.invoices.list_by_account(account)
-    invoice = threescale.invoices.create({"account_id": account["id"]})
-    for line_item in line_items:
-        invoice.line_items.create(line_item)
-    invoice = invoice.state_update(InvoiceState.PENDING)
-    assert len(threescale.invoices.list_by_account(account)) - len(account_invoices) == 1
-    return invoice
+def custom_invoice(threescale, account):
+    """
+    Parametrized Invoice
+
+    Args:
+        :param cost: total invoice cost
+    """
+
+    def _custom_invoice(cost):
+        account_invoices = threescale.invoices.list_by_account(account)
+        invoice = threescale.invoices.create({"account_id": account["id"]})
+        invoice.line_items.create({"name": "test-item", "description": "test_item", "quantity": "1", "cost": cost})
+        invoice = invoice.state_update(InvoiceState.PENDING)
+        assert len(threescale.invoices.list_by_account(account)) - len(account_invoices) == 1
+        return invoice
+
+    return _custom_invoice
 
 
 @pytest.fixture(scope="module")
-def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
+def ui_invoice(custom_admin_login, navigator, account, threescale):
     """
     Creates and charges invoice through UI.
     Asserts if a new invoice was created and charged.
@@ -46,7 +48,7 @@ def ui_invoice(custom_admin_login, navigator, account, line_items, threescale):
         assert len(invoice) == 1, "More than one invoice was created for an Account"
 
         invoice_view = navigator.navigate(InvoiceDetailView, account=account, invoice=invoice[0])
-        invoice_view.add_items(line_items)
+        invoice_view.add_items([{"name": "test-item", "description": "test_item", "quantity": "1", "cost": 10}])
         invoice_view.issue()
         assert invoice_view.charge_button.wait_displayed(), "Issuing the invoice through UI failed"
         return invoice_view
