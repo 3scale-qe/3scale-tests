@@ -1,12 +1,33 @@
 """Test of automatic email associated to accounts in UI"""
 import re
 
+import pytest
+
+from testsuite import rawobj
 from testsuite.config import settings
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.login import RequestAdminPasswordView, LoginView, ResetPasswordView
 from testsuite.ui.views.devel import Navbar
 from testsuite.ui.views.devel.login import ForgotPasswordView, LoginView as DevelLoginView
-from testsuite.utils import randomize
+from testsuite.utils import randomize, blame
+
+
+@pytest.fixture(scope="module")
+def account(custom_account, request, account_password):
+    """
+    Account scoped for module (rather than session) because account password is updated in this module.
+    """
+    iname = blame(request, "id")
+    account = rawobj.Account(org_name=iname, monthly_billing_enabled=False, monthly_charging_enabled=False)
+    account.update(
+        {
+            "name": iname,
+            "username": iname,
+            "email": f"{iname}@example.com",
+            "password": account_password,
+        }
+    )
+    return custom_account(params=account)
 
 
 def test_admin_forgotten_password(
