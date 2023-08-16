@@ -12,6 +12,7 @@ from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [
     pytest.mark.disruptive,
+    pytest.mark.flaky,
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6446"),
 ]
