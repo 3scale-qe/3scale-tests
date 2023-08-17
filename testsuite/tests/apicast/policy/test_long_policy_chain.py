@@ -2,7 +2,9 @@
 
 import pytest
 
-from testsuite import rawobj
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+
+from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 @pytest.fixture()
