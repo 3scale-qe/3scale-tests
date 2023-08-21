@@ -203,7 +203,7 @@ def pytest_metadata(metadata):
 
     metadata.update(
         {
-            "env_for_dynaconf": settings["env_for_dynaconf"],
+            'settings["env_for_dynaconf"]': settings["env_for_dynaconf"],
             "testsuite-version": testsuite_version,
             "_3SCALE_TESTS_threescale__admin__url": admin_url,
             "_3SCALE_TESTS_threescale__version": version,
@@ -245,6 +245,10 @@ def pytest_metadata(metadata):
 
     metadata["toolbox-version"] = toolboxversion
     metadata["_3SCALE_TESTS_toolbox__podman_image"] = toolboximage
+
+    for key in os.environ:
+        if "dynaconf" in key.lower():
+            metadata[key] = os.environ[key]
 
     for key in sorted(k for k in os.environ if k.startswith("_3SCALE_TESTS")):
         ikey = key.lower()
