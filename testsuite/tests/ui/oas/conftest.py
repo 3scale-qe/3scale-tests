@@ -27,9 +27,13 @@ def ui_active_doc(custom_admin_login, request, navigator, service, oas3_spec):
 @pytest.fixture(scope="module")
 def prod_client(prod_client):
     """
-    Production client so tests can send request to service production endpoint
+    Production client to promote configs. The client isn't used in tests.
     """
-    client = prod_client()
+    # redeploy=False enables relevant tests to run also on environment without
+    # access to openshift
+    client = prod_client(redeploy=False)
+    # this might be bit pointless without redeploy, however it gives few seconds
+    # to update the env. It doesn't harm.
     response = client.get("/get")
     assert response.status_code == 200
     return client
