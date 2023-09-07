@@ -376,3 +376,21 @@ class HorizontalNavigation(Widget):
         self.logger.info("Selecting %r in vertical navigation", item)
         item = self.browser.element(self.ITEM_MATCHING.format(quote(item)))
         item.click()
+
+
+class ThreescaleDeleteEditGroup(GenericLocatorWidget):
+    """Special Delete Edit group for 3scale"""
+
+    DELETE_LOCATOR = ".//button[contains(@class, delete)]"
+    EDIT_LOCATOR = ".//a[@title='Edit']"
+
+    def __init__(self, parent=None, locator=".//*[@class='pf-c-overflow-menu']", logger=None):
+        super().__init__(parent=parent, locator=locator, logger=logger)
+
+    def delete(self):
+        """Click on delete button"""
+        self.browser.element(self.DELETE_LOCATOR).click()
+
+    def edit(self):
+        """Click on edit button"""
+        self.browser.element(self.EDIT_LOCATOR).click()
