@@ -9,7 +9,8 @@ import pytest
         ("4242424242424242", False),
     ],
 )
-def test_3ds_challenge(custom_card, cc_number, verify_3ds, stripe, invoice):
+# pylint: disable=too-many-arguments
+def test_3ds_challenge(custom_card, cc_number, verify_3ds, stripe, invoice, account):
     """
     Tests basic billing scenario for Stripe gateway:
         - Add CC details for an account
@@ -20,4 +21,4 @@ def test_3ds_challenge(custom_card, cc_number, verify_3ds, stripe, invoice):
     custom_card(cc_number, verify_3ds)
 
     charged = invoice.charge()
-    stripe.assert_payment(charged)
+    stripe.assert_payment(charged, account)
