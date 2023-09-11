@@ -17,30 +17,33 @@ class Stripe:
         stripe.api_key = api_key
 
     @staticmethod
-    def read_payment(invoice):
-        """Read Stripe payment"""
-        return [x for x in stripe.PaymentIntent.list() if x["metadata"]["order_id"] == str(invoice["id"])][0]
+    @backoff.on_predicate(backoff.fibo, lambda x: x == [], max_tries=10, jitter=None)
+    def read_charge(customer):
+        """Retrieves the details of the charge"""
+        return stripe.Charge.search(query=f"customer:'{customer['id']}'").get("data")
 
     @staticmethod
     def read_customer_by_account(account):
-        """Read Stripe customer"""
-        return [
-            x
-            for x in stripe.Customer.list()
-            if str(account.entity_id) in x["metadata"].get("3scale_account_reference", [])
-        ][0]
+        """
+        Read Stripe customer.
+        Different 3scale deployments can have customers with the same id, which is reflected to the
+        `3scale_account_reference` Stripe Customer variable. This method reads just the last one.
+        """
+        return stripe.Customer.search(
+            query=f"metadata['3scale_account_reference']:'3scale-2-{str(account.entity_id)}'"
+        ).get("data")[0]
 
-    def assert_payment(self, invoice):
+    def assert_payment(self, invoice, account):
         """Compare 3scale and Stripe invoices"""
-        stripe_invoice = self.read_payment(invoice)
-        currency = stripe_invoice["currency"]
-        # Stripe amount is Integer, e.g. 10,50$ is as 1050 so we need to divide it by 100 to get wanted cost
-        cost = stripe_invoice["amount"] / 100
-        # Compare 3scale invoice values and Stripe invoice values and check whether Stripe invoice is marked as paid
+        customer = self.read_customer_by_account(account)
+        charge = self.read_charge(customer)[0]
+
+        assert charge["customer"] == customer["id"]
+        assert charge["paid"]
+
         assert invoice["state"] == InvoiceState.PAID.value
-        assert currency == invoice["currency"].lower()
-        assert cost == invoice["cost"]
-        assert stripe_invoice["charges"]["data"][0]["paid"]
+        assert invoice["currency"].lower() == charge["currency"]
+        assert invoice["cost"] == charge["amount"] / 100  # Stripe stores the cost without decimal point: 10,50$ is 1050
 
 
 class Braintree:
