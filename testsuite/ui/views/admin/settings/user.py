@@ -2,12 +2,12 @@
 import enum
 from typing import List
 
-from widgetastic.widget import TextInput, Text
+from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import CheckBoxGroup, RadioGroup
+from testsuite.ui.widgets import CheckBoxGroup, RadioGroup, ThreescaleDeleteEditGroup
 from testsuite.ui.widgets.buttons import ThreescaleUpdateButton
 
 
@@ -30,17 +30,17 @@ class UsersView(BaseSettingsView):
     path_pattern = "/p/admin/account/users"
     table = PatternflyTable(
         '//*[@id="users"]',
-        column_widgets={4: Text("./a[contains(@class, 'delete')]"), 5: Text("./a[contains(@class, 'edit')]")},
+        column_widgets={"Invite a New User": ThreescaleDeleteEditGroup()},
     )
 
     @step("UserDetailView")
     def detail(self, user):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[5].widget.click()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.edit()
 
     def delete(self, user):
         """Delete user by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.click()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.delete()
 
     def prerequisite(self):
         return BaseSettingsView
