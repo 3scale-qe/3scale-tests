@@ -62,4 +62,4 @@ def test_log_with_random_username_password(refreshed_browser):
     login_view.login_widget.fill_passwd("password")
     assert login_view.login_widget.submit.is_enabled
     login_view.login_widget.submit.click()
-    assert "Incorrect email or password. Please try again" in login_view.error_message.text
+    assert "Incorrect email or password. Please try again." in login_view.error_message.text

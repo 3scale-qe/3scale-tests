@@ -17,7 +17,7 @@ class LoginView(View, Navigable):
     path = "/p/login"
     ROOT = "/html//div[@id='pf-login-page-container']"
     header = Text("//main/header/h2")
-    error_message = Text("//p[@class='pf-c-form__helper-text pf-m-error']")
+    error_message = Text("//h4[@class='pf-c-alert__title']")
     login_widget = View.nested(LoginForm)
     password_reset_link = Text("//a[@href='/p/password/reset']")
     auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
