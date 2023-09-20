@@ -4,6 +4,8 @@ import re
 
 import pytest
 
+pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")]
+
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7942")
 def test_apicast_logs_tmp_file(staging_gateway):
