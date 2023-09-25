@@ -19,7 +19,7 @@ def service(custom_service, service_settings):
     """
     Create a custom service without backend
     """
-    return custom_service(service_settings)
+    return custom_service(service_settings, proxy_params={}, backends={})
 
 
 def test_proxy_config(service, private_base_url):
