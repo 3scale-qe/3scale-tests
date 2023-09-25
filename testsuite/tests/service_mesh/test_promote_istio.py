@@ -27,7 +27,7 @@ def service_settings(service_settings):
 @pytest.fixture(scope="module")
 def service2(backends_mapping, custom_service, service_settings):
     """Custom service, separated from the default one to have better control on the exact parameters"""
-    return custom_service(service_settings, {}, backends_mapping, hooks=None)
+    return custom_service(service_settings, proxy_params=None, backends=backends_mapping, hooks=None)
 
 
 def test_promote_istio_service(service2):

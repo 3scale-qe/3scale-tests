@@ -21,10 +21,13 @@ pytestmark = [pytest.mark.sandbag, pytest.mark.skipif("TESTED_VERSION < Version(
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Websocket are only available on httpbin go"""
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Websocket are only available on httpbin go
+    """
     url = private_base_url("httpbin_go").replace("https://", "wss://", 1)
-    return rawobj.Proxy(url)
+    return custom_backend("backend_default", endpoint=url)
 
 
 @pytest.fixture

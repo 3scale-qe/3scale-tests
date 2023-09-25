@@ -12,13 +12,16 @@ from testsuite.utils import blame
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
 
+# pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def listed_service(service_proxy_settings, custom_service, request, lifecycle_hooks, staging_gateway):
+def listed_service(service_proxy_settings, custom_service, request, lifecycle_hooks, staging_gateway, backends_mapping):
     """Create custom service to be listed
 
     Adds list of services to environment"""
 
-    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
     staging_gateway.environ["APICAST_SERVICES_LIST"] = service["id"]
 

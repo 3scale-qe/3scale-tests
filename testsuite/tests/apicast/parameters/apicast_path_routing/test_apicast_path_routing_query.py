@@ -24,9 +24,9 @@ def gateway_environment(gateway_environment):
 
 
 @pytest.fixture(scope="module")
-def service2_proxy_settings(private_base_url):
+def private_base_url2(private_base_url):
     """Websocket are only available on httpbin"""
-    return rawobj.Proxy(private_base_url("httpbin"))
+    return private_base_url("httpbin")
 
 
 @pytest.fixture(scope="module")

@@ -7,7 +7,6 @@ import pytest
 
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
-from testsuite import rawobj
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT)]
@@ -20,10 +19,13 @@ def extra_path():
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url, extra_path):
-    """Set https:// private backend with extra path fragment"""
+def backend_default(private_base_url, custom_backend, extra_path):
+    """
+    Default backend with url from private_base_url.
+    Set https:// private backend with extra path fragment.
+    """
     url = urlparse(private_base_url("httpbin_go"))
-    return rawobj.Proxy(f"https://{url.hostname}{extra_path}")
+    return custom_backend("backend_default", endpoint=f"https://{url.hostname}{extra_path}")
 
 
 @pytest.fixture(scope="module")

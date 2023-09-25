@@ -7,13 +7,14 @@ in the response body or in the response header
 
 import backoff
 import pytest
-from testsuite import rawobj
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings():
-    """Set backend url"""
-    return rawobj.Proxy("https://echo-api.example.local")
+def backend_default(custom_backend):
+    """
+    Default backend.
+    """
+    return custom_backend("backend_default", endpoint="https://echo-api.example.local")
 
 
 @pytest.fixture(scope="module")

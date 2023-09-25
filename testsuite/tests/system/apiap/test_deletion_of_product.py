@@ -25,7 +25,10 @@ def test_products_with_same_backend(service, custom_service, threescale, backend
         - both products have same backend
         - second product still have backend after deletion of first product
     """
-    service2 = custom_service({"name": blame(request, "svc")}, backends=backends_mapping, autoclean=False)
+    service2 = custom_service(
+        {"name": blame(request, "svc")}, proxy_params=None, backends=backends_mapping, autoclean=False
+    )
+
     backends1 = service.backend_usages.list()
     backends2 = service2.backend_usages.list()
     backend1 = threescale.backends.read(backends1[0]["backend_id"])

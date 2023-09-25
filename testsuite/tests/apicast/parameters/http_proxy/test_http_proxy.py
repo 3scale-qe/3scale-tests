@@ -5,7 +5,6 @@ Apicast should use all traffic through the defined proxy via HTTP_PROXY env var.
 
 import pytest
 
-from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 
@@ -13,9 +12,11 @@ pytestmark = [pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Cap
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    "Dict of proxy settings to be used when service created"
-    return rawobj.Proxy(private_base_url("go-httpbin"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("go-httpbin"))
 
 
 @pytest.fixture(scope="module")

@@ -25,13 +25,15 @@ pytestmark = [
 
 
 @pytest_cases.fixture
-def service(custom_service, service_proxy_settings, request, lifecycle_hooks):
+def service(custom_service, service_proxy_settings, request, lifecycle_hooks, backends_mapping):
     """
     Function-scoped service with the rate limit headers policy
     The caching policy is added, so the reported numbers will be 100% accurate
     """
 
-    svc = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    svc = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
     proxy = svc.proxy.list()
     proxy.policies.insert(0, rawobj.PolicyConfig("rate_limit_headers", {}))

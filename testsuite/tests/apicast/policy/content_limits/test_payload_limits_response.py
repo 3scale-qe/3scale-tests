@@ -25,9 +25,12 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Use httpbin as backend url"""
-    return rawobj.Proxy(private_base_url("httpbin"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Use httpbin as backend url
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("httpbin"))
 
 
 @pytest.mark.parametrize("num_bytes,status_code", [(10, 200), (100, 200), (101, 413)])

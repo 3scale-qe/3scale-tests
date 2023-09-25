@@ -35,12 +35,13 @@ def private_base_url_and_expected_port(private_base_url, request):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url_and_expected_port):
+def backend_default(private_base_url_and_expected_port, custom_backend):
     """
+    Default backend with url from private_base_url.
     Sets the backend api url based on the parameter from the
     private_base_url_and_expected_port
     """
-    return rawobj.Proxy(private_base_url_and_expected_port[0])
+    return custom_backend("backend_default", endpoint=private_base_url_and_expected_port[0])
 
 
 # pylint: disable=unused-argument

@@ -6,7 +6,6 @@ APICAST_PATH_ROUTING is in use
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
@@ -34,12 +33,6 @@ def service_mapping():
 def service2_mapping():
     """Change mapping rule for service2"""
     return "/ip/{anything}"
-
-
-@pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Change api_backend to echo-api for service."""
-    return rawobj.Proxy(private_base_url("echo_api"))
 
 
 # pylint: disable=unused-argument

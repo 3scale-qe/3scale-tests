@@ -19,10 +19,12 @@ def skip_saas(testconfig):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Have httpbin backend due to /delay implementation"""
-
-    return rawobj.Proxy(private_base_url("httpbin"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Have httpbin backend due to /delay implementation
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("httpbin"))
 
 
 @pytest.fixture(scope="module")

@@ -20,10 +20,13 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url, protocol):
-    """Url for service that is configured with http version of echo api"""
+def backend_default(private_base_url, custom_backend, protocol):
+    """
+    Default backend with url from private_base_url.
+    Url for service that is configured with http version of httpbin_go.
+    """
     url = urlparse(private_base_url("httpbin_go"))
-    return rawobj.Proxy(f"{protocol}://{url.hostname}")
+    return custom_backend("backend_default", endpoint=f"{protocol}://{url.hostname}")
 
 
 @pytest.mark.parametrize("num_bytes", [1000, 10000, 20000, 35000, 50000, 100000, 500000, 999999])

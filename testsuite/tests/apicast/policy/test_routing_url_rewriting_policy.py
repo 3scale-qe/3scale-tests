@@ -10,11 +10,12 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def backend_default(private_base_url, custom_backend):
     """
+    Default backend with url from private_base_url.
     Use 3scale echo-api as backend due to various URLs
     """
-    return rawobj.Proxy(private_base_url("echo_api"))
+    return custom_backend("backend_default", endpoint=private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

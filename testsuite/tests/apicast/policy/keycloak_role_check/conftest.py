@@ -9,11 +9,13 @@ from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import randomize, blame
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, too-many-arguments
 @pytest_cases.fixture
-def service(rhsso_setup, service_proxy_settings, custom_service, lifecycle_hooks, request):
+def service(rhsso_setup, service_proxy_settings, custom_service, lifecycle_hooks, request, backends_mapping):
     """Service configured with config"""
-    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
     proxy = service.proxy.list()
     metric = service.metrics.list()[0]

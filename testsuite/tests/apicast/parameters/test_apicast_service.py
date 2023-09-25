@@ -15,9 +15,11 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def service_pass(request, service_proxy_settings, custom_service, lifecycle_hooks):
+def service_pass(request, service_proxy_settings, custom_service, lifecycle_hooks, backends_mapping):
     """Create custom service that should pass upon request"""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
 
 @pytest.fixture(scope="module")
@@ -34,9 +36,11 @@ def api_client_pass(application_pass, api_client):
 
 
 @pytest.fixture(scope="module")
-def service_fail(request, service_proxy_settings, custom_service, lifecycle_hooks):
+def service_fail(request, service_proxy_settings, custom_service, lifecycle_hooks, backends_mapping):
     """Create custom service that should fail upon request"""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
 
 @pytest.fixture(scope="module")
