@@ -82,5 +82,5 @@ class Mockserver:
             verify=self.verify,
         )
         if response.status_code == 400:
-            raise HTTPError("Invalid matcher format", response=response)
+            raise HTTPError("Invalid matcher format", response=response, request=expected_requests)
         return response.status_code == 202
