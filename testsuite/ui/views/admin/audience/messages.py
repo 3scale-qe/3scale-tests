@@ -33,7 +33,7 @@ class ComposeMessageView(BaseAudienceView):
 
     subject = TextInput(id="message_subject")
     body = TextInput(id="message_body")
-    send_btn = Button("Send", classes=[Button.PRIMARY])
+    send_btn = Button("Send message", classes=[Button.PRIMARY])
     notification = View.nested(FlashMessage)
 
     def prerequisite(self):
