@@ -62,6 +62,7 @@ def my_metrics(service, testconfig):
 
     yield metric1, metric2
     if not testconfig["skip_cleanup"]:
+        proxy.deploy()
         metric1.delete()
         metric2.delete()
 

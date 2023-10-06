@@ -54,15 +54,18 @@ def my_metrics(service, testconfig):
     hits.methods.create(rawobj.Method("method2", "Method 2"))
 
     metric1 = service.metrics.create(rawobj.Metric("metric1"))
-    proxy.mapping_rules.create(rawobj.Mapping(metric1, pattern="/test3", http_method="GET"))
+    map1 = proxy.mapping_rules.create(rawobj.Mapping(metric1, pattern="/test3", http_method="GET"))
 
     metric2 = service.metrics.create(rawobj.Metric("metric2"))
-    proxy.mapping_rules.create(rawobj.Mapping(metric2, pattern="/test4", http_method="GET"))
+    map2 = proxy.mapping_rules.create(rawobj.Mapping(metric2, pattern="/test4", http_method="GET"))
 
     proxy.deploy()
 
     yield metric1, metric2
     if not testconfig["skip_cleanup"]:
+        map1.delete()
+        map2.delete()
+        proxy.deploy()
         metric1.delete()
         metric2.delete()
 
