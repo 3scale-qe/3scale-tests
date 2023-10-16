@@ -1,6 +1,7 @@
 """ 3scale specific widgets"""
 
 import backoff
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
@@ -165,12 +166,13 @@ class ThreescaleCheckBox(GenericLocatorWidget):
 class PolicySection(Widget):
     """Widget representing Policies table section"""
 
-    ROOT = ParametrizedLocator("//*[@id='policies']/div/section")
-    POLICY_LIST = "./ul/li"
-    ITEMS_LOCATOR = "./ul/li/article/h3"
-    ITEM_LOCATOR = "./ul/li/article/h3[text()='{}']"
-    ADD_POLICY_LOC = ".PolicyChain-addPolicy"
-    CANCEL_LOC = ".PolicyChain-addPolicy--cancel"
+    ROOT = "//div[@class='PoliciesWidget']/section"
+    POLICY_LIST = ".//ul/li"
+    REGISTRY_ITEMS_LOCATOR = "//ul/li/article/h3"
+    REGISTRY_ITEM_LOCATOR = "//ul/li/article/h3[text()='{}']"
+    CHAIN_ITEMS_LOCATOR = ".//ul/li//article/h3"
+    CHAIN_ITEM_LOCATOR = "//ul/li//article/h3[text()='{}']"
+    ADD_POLICY_LOC = ".//button[normalize-space(.)='Add policy']"
 
     def __init__(self, parent=None, logger=None):
         Widget.__init__(self, parent, logger=logger)
@@ -178,51 +180,56 @@ class PolicySection(Widget):
     @property
     def items(self):
         """Returns a list of all policy registry items as strings."""
-        return [self.browser.text(el) for el in self.browser.elements(self.ITEMS_LOCATOR, parent=self)]
+        return [self.browser.text(el) for el in self.browser.elements(self.CHAIN_ITEMS_LOCATOR, parent=self)]
+
+    @property
+    def registry_items(self):
+        """Returns a list of all policy registry items as strings."""
+        return [self.browser.text(el) for el in self.browser.elements(self.REGISTRY_ITEMS_LOCATOR)]
 
     @property
     def is_policy_registry_displayed(self):
-        """Returns opened state of the kebab."""
+        """Check if policy registry list is displayed.
+        :return: True if displayed, False otherwise.
+        """
         return self.browser.is_displayed(self.ADD_POLICY_LOC)
 
     @property
     def first_policy(self):
         """
-        Get First policy name in policy chain
-        :return: Name of policy
+        Get the name of the first policy in the policy chain.
+        :return: Name of the policy
         """
-        return self.browser.elements("./ul/li[1]/article/h3")[0].text
+        return self.browser.text(self.browser.element(self.CHAIN_ITEMS_LOCATOR, parent=self))
 
     def add_policy(self, policy_name):
-        """Opens Policy registry list and add policy by its name
-        :param policy_name: name of the policy to be added
+        """Opens the Policy registry list and adds a policy by its name.
+        :param policy_name: Name of the policy to be added
         """
-        if not self.is_policy_registry_displayed:
-            self.browser.click(self.CANCEL_LOC, parent=self)
         self.browser.click(self.ADD_POLICY_LOC, parent=self)
-        self.item_select(policy_name)
+        self.add_item(policy_name)
 
     def edit_policy(self, policy_name):
         """
         :param policy_name:
         """
-        if not self.is_policy_registry_displayed:
-            self.browser.click(self.CANCEL_LOC, parent=self)
         if self.has_item(policy_name):
             self.item_select(policy_name)
         else:
             raise ItemNotPresentException("Item {!r} not found.".format(policy_name))
 
     def drag_and_drop_policy(self, source, destination):
-        """Drag and drop element from source element to destination
+        """Drag and drop element from source element to destination,
+        builtin drag_and_drop function is not working hence this workaround.
         :param
             source: string : name of source Policy
             destination: string : name of destination Policy
         """
-        self.browser.drag_and_drop(
-            source="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(source),
-            target="./ul/li/article/h3[text()='{}']/ancestor::li/div/i".format(destination),
-        )
+        ac = ActionChains(self.browser.selenium)
+        ac.click_and_hold(self.browser.element("./ul/li//article/h3[text()='{}']/../p/span".format(source)))
+        ac.move_to_element(self.browser.element("./ul/li//article/h3[text()='{}']/../p/span".format(destination)))
+        ac.release(self.browser.element("./ul/li//article/h3[text()='{}']/../p/span".format(destination)))
+        ac.perform()
 
     def has_item(self, item):
         """Returns whether the items exists.
@@ -239,9 +246,17 @@ class PolicySection(Widget):
         :return WebElement
         """
         try:
-            return self.browser.element(self.ITEM_LOCATOR.format(item), parent=self)
+            return self.browser.element(self.CHAIN_ITEM_LOCATOR.format(item), parent=self)
         except NoSuchElementException:
             raise ItemNotPresentException("Item {!r} not found.".format(item))
+
+    # pylint: disable=raise-missing-from
+    def add_item(self, item):
+        """Add policy from policy registry"""
+        self.logger.info("Selecting %r", item)
+        if item not in self.registry_items:
+            raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
+        self.browser.click(self.item_element(item))
 
     def item_select(self, item):
         """Opens the Policy registry and selects the desired policy.

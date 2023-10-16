@@ -100,6 +100,7 @@ def test_move_policy(navigator, policy_service, api_client, policy_application):
     policies_page.echo_policy_view.edit_echo_policy(status_code=333)
 
     assert policies_page.policy_section.first_policy == Policies.THREESCALE_APICAST.value
+    assert policies_page.update_policy_chain_button.is_enabled
     policies_page.update_policy_chain_button.click()
 
     configuration_page = navigator.navigate(ProductConfigurationView, product=policy_service)
