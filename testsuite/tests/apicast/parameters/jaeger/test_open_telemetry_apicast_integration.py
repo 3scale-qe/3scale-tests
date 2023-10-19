@@ -14,8 +14,9 @@ from testsuite.capabilities import Capability
 pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.5')")
+@pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.6')")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735")
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9539")
 def test_open_telemetry_apicast_integration(api_client, jaeger, jaeger_service_name):
     """
     Makes a request to a random endpoint
