@@ -8,7 +8,7 @@ from widgetastic_patternfly4 import Button
 from testsuite.certificates import Certificate
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import PolicySection, ThreescaleDropdown
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleSubmitButton
+from testsuite.ui.widgets.buttons import ThreescaleButton
 
 
 class Policies(enum.Enum):
@@ -25,7 +25,7 @@ class EchoPolicyView(View):
 
     status_code_input = TextInput(id="root_status")
     exit_mode_input = TextInput(id="root_exit")
-    update_policy_btn = ThreescaleSubmitButton()
+    update_policy_btn = Button(locator=".//button[text()='Update Policy']")
 
     def edit_echo_policy(self, status_code):
         """Edit values in Echo policy and update it"""
@@ -45,13 +45,13 @@ class TlsTerminationPolicyView(View):
     """
 
     NAME = "TLS Termination"
-    remove_policy_btn = Button("//*[contains(@class, 'PolicyConfiguration-remove')]")
+    remove_policy_btn = Button("Remove", classes=[Button.DANGER])
     add_cert_btn = Button(locator=".//button[contains(@class, 'btn-add')]")
     local_cert_key = FileInput(id="root_certificate_key_path")
     local_cert = FileInput(id="root_certificate_path")
     embedded_cert_path = TextInput(id="root_certificate")
     embedded_cert_key_path = TextInput(id="root_certificate_key")
-    update_policy_btn = ThreescaleSubmitButton()
+    update_policy_btn = Button(locator=".//button[text()='Update Policy']")
     cert_type_select = ThreescaleDropdown('//*[@id="root_certificates_0_anyof_select"]')
 
     def add_local_certs(self, mount_path):
@@ -83,7 +83,7 @@ class URLRewritePolicyView(View):
     regex_input = TextInput(id="root_commands_0_regex")
     replace_input = TextInput(id="root_commands_0_replace")
     operation_select = ThreescaleDropdown('//*[@id="root_commands_0_op"]')
-    update_policy_btn = ThreescaleSubmitButton()
+    update_policy_btn = Button(locator=".//button[text()='Update Policy']")
 
     def add_rewriting_command(self, regex, replace, operation: Literal["sub", "gsub"]):
         """Add new command to URL Rewrite policy, edit command values and update policy"""
@@ -106,7 +106,9 @@ class ProductPoliciesView(BaseProductView):
     path_pattern = "/apiconfig/services/{product_id}/policies/edit"
     staging_url = TextInput(id="service_proxy_attributes_sandbox_endpoint")
     production_url = TextInput(id="service_proxy_attributes_endpoint")
-    update_policy_chain_button = ThreescaleUpdateButton()
+    update_policy_chain_button = ThreescaleButton(
+        text="Update Policy Chain", classes=["pf-m-primary"], id="policies-button-sav"
+    )  # type: ignore[call-arg]
     remove_policy_btn = Button(locator="//*[contains(text(), 'Remove')]")
     policy_section = PolicySection()
     echo_policy_view = View.nested(EchoPolicyView)
