@@ -114,7 +114,7 @@ class ApplicationDetailView(BaseProductView):
 
     def delete_app_key(self, key: str):
         """Delete given app key"""
-        self.api_credentials_table.row(_row__attr=("id", f"application_key_{key}"))[1].widget.click()
+        self.api_credentials_table.row(_row__attr=("data-key", key))[1].widget.click()
 
     def change_plan(self, value):
         """Change application plan"""
