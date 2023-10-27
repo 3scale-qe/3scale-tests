@@ -1,5 +1,5 @@
 """View representations of Messages pages"""
-from widgetastic.widget import GenericLocatorWidget, View
+from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly import TextInput
 from widgetastic_patternfly4 import Button, PatternflyTable
 
@@ -14,6 +14,7 @@ class MessagesView(BaseAudienceView):
     path_pattern = "/p/admin/messages"
     table = PatternflyTable("//table[@aria-label='Messages table']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
+    empty_inbox = Text("//div[text()='Your inbox is empty, there are no new messages.']")
 
     def prerequisite(self):
         return BaseAudienceView
@@ -25,7 +26,11 @@ class MessagesView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url
+        return (
+            BaseAudienceView.is_displayed.fget(self)
+            and self.path in self.browser.url
+            and (self.table.is_displayed or self.empty_inbox.is_displayed)
+        )
 
 
 class ComposeMessageView(BaseAudienceView):
