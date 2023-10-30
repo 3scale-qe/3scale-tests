@@ -20,11 +20,11 @@ def normalize_url(url):
     return url
 
 
-def test_no_sca_ui_invoice(braintree, ui_invoice):
+def test_no_sca_ui_invoice(braintree, ui_invoice, account):
     """Tests basic billing scenario for Braintree gateway where billing is triggered via UI"""
     invoice_view = ui_invoice()
-    invoice_view.charge()
-    braintree.assert_payment(invoice_view.invoice.read())
+    transaction = braintree.ensure_single_transaction(invoice_view.charge, account)
+    braintree.assert_payment(invoice_view.invoice.read(), transaction)
     assert invoice_view.state_field.text == "State Paid"
 
 

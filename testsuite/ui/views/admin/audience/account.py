@@ -357,8 +357,7 @@ class InvoiceDetailView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.id_field.is_displayed
+            self.id_field.is_displayed
             and (self.issue_button.is_displayed or self.charge_button.wait_displayed)
             and self.path in self.browser.url
         )

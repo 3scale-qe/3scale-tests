@@ -68,12 +68,14 @@ def braintree_gateway(custom_admin_login, navigator, testconfig, braintree):
 def custom_card(account, custom_devel_login, billing_address, navigator):
     """Add credit card and billing address for the user in Developer portal"""
 
-    def _setup(cc_number, verify_3ds=False):
+    def _setup(cc_number, verify_3ds=False, challenge_accept=True):
         custom_devel_login(account=account)
         cc_view = navigator.navigate(BraintreeCCView)
         cc_view.add_cc_details(billing_address, CreditCard(cc_number, 123, 1, datetime.today().year + 3))
-        if verify_3ds:
+        if verify_3ds and challenge_accept:
             cc_view.challenge_form.complete()
+        if verify_3ds and not challenge_accept:
+            cc_view.challenge_form.cancel()
         return cc_view
 
     return _setup
