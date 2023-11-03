@@ -1,6 +1,8 @@
 """Settings Devel portal View containing credit card details for Braintree payment gateway"""
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 from wait_for import TimedOutError
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 from widgetastic_patternfly import Button
@@ -58,8 +60,8 @@ class BraintreeCCForm(View):
         )
 
     def _iframe_fill(self, frame_id, widget, value):
-        frame = self.browser.selenium.find_element(By.XPATH, f"//iframe[@name='{frame_id}']")
-        self.browser.selenium.switch_to.frame(frame)
+        wait_for = WebDriverWait(self.browser.selenium, 10)
+        wait_for.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, f".//iframe[@name='{frame_id}']")))
         widget.fill(value)
         self.browser.selenium.switch_to.default_content()
 

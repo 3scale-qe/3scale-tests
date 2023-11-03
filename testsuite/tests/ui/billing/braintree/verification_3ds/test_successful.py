@@ -4,23 +4,28 @@ https://developer.paypal.com/braintree/docs/guides/3d-secure/testing-go-live
 """
 import pytest
 
+pytestmark = pytest.mark.usefixtures("login")
 
-@pytest.mark.parametrize(
-    "cc_number,verify_3ds",
-    [
-        ("4000000000001091", True),
-        ("4000000000001000", False),
+
+@pytest.fixture(
+    scope="module",
+    autouse=True,
+    params=[
+        pytest.param(("4000000000001091", True), id="3DS verification"),
+        pytest.param(("4000000000001000", False), id="Without 3DS verification"),
     ],
-    ids=["with challenge", "no-challenge"],
 )
-def test_successful(custom_card, braintree, cc_number, verify_3ds, invoice):
+def card_setup(custom_card, request):
+    """Card setup"""
+    custom_card(request.param[0], verify_3ds=request.param[1])
+
+
+def test_successful(braintree, account, invoice):
     """
     Tests basic billing scenario with 3DS integration for Braintree gateway:
         - Add CC details for an account
         - Complete 3DS challenge
         - Trigger billing via API
     """
-    custom_card(cc_number, verify_3ds=verify_3ds)
-
-    invoice = invoice.charge()
-    braintree.assert_payment(invoice)
+    transaction = braintree.ensure_single_transaction(invoice.charge, account)
+    braintree.assert_payment(invoice.read(), transaction)

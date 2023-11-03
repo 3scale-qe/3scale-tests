@@ -47,7 +47,7 @@ def ui_invoice(custom_admin_login, navigator, account, threescale):
         invoice = threescale.invoices.list_by_account(account)
         assert len(invoice) == 1, "More than one invoice was created for an Account"
 
-        invoice_view = navigator.navigate(InvoiceDetailView, account=account, invoice=invoice[0])
+        invoice_view = navigator.open(InvoiceDetailView, account=account, invoice=invoice[0])
         invoice_view.add_items([{"name": "test-item", "description": "test_item", "quantity": "1", "cost": 10}])
         invoice_view.issue()
         assert invoice_view.charge_button.wait_displayed(), "Issuing the invoice through UI failed"

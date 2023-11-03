@@ -1,4 +1,5 @@
 """APIs for Stripe and Braintree"""
+
 import backoff
 import braintree
 import stripe
@@ -60,8 +61,13 @@ class Braintree:
         )
 
     @backoff.on_exception(backoff.fibo, (ServiceUnavailableError, RequestTimeoutError), max_tries=8, jitter=None)
-    def _transaction_search(self, invoice):
-        return self.gateway.transaction.search(braintree.TransactionSearch.order_id == str(invoice["id"]))
+    def get_customer_transactions(self, account):
+        """Finds all transactions for account"""
+        transactions = list(
+            self.gateway.transaction.search(braintree.TransactionSearch.customer_id == self.customer_id(account)).items
+        )
+
+        return transactions
 
     # pylint: disable=no-member
     def merchant_currency(self):
@@ -69,9 +75,14 @@ class Braintree:
         merchant_accounts = list(self.gateway.merchant_account.all().merchant_accounts.items)
         return [x for x in merchant_accounts if x.default is True][0].currency_iso_code
 
-    def _assert(self, invoice):
+    @staticmethod
+    def customer_id(account):
+        """Returns Braintree customer id. It is in a form `3scale-2-{account_id}-1`"""
+        return f"3scale-2-{account.entity_id}-1"
+
+    @staticmethod
+    def _assert_transaction(invoice, transaction):
         """Compares 3scale invoice and Braintree transaction"""
-        transaction = self._transaction_search(invoice).first
         currency = transaction.currency_iso_code
         cost = float(transaction.amount)
         invoice_transaction = invoice.payment_transactions.list()[0]
@@ -82,15 +93,30 @@ class Braintree:
         assert code == transaction.processor_response_code
         assert message == transaction.processor_response_text
 
-    def assert_payment(self, invoice):
+    def ensure_single_transaction(self, charge, account):
+        """
+        Counts number of transactions for account before and after charging the invoice.
+
+        Args:
+            :param charge: method reference that charges the invoice
+            :param account: account that invoice will be charged for
+        """
+        old = self.get_customer_transactions(account)
+        charge()
+        new = self.get_customer_transactions(account)
+        assert len(new) == len(old) + 1
+
+        return new[0]
+
+    def assert_payment(self, invoice, transaction):
         """
         Asserts successful payment invoice payment.
         This assert is used for transaction amount between 0.01 and 1999.9.
         """
         assert invoice["state"] == InvoiceState.PAID.value
-        self._assert(invoice)
+        self._assert_transaction(invoice, transaction)
 
-    def assert_declined_payment(self, invoice):
+    def assert_declined_payment(self, invoice, transaction):
         """
         Asserts declined payment invoice payment.
         This assert is used for transaction amount between 2000.00 and 2999.99.
@@ -98,4 +124,4 @@ class Braintree:
         but with different response codes and messages.
         """
         assert invoice["state"] == InvoiceState.PENDING.value
-        self._assert(invoice)
+        self._assert_transaction(invoice, transaction)
