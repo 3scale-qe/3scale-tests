@@ -245,7 +245,7 @@ class WizardResponseView(WizardCommonView, Navigable):
     page_title = Text("//main/h1")
     what_next_btn = Button(locator="//a[@href='/p/admin/onboarding/wizard/outro']")
     base_url = TextInput(id="request_api_base_url")
-    try_again_btn = Text('//*[contains(@class,"request")]/fieldset/ol/input')
+    try_again_btn = GenericLocatorWidget("//input[@value='Try again!']")
 
     def try_again(self, url):
         """Fill backend api url with 'url' and click to navigate to next page"""

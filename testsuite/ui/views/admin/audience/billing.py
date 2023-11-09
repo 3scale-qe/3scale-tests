@@ -68,7 +68,7 @@ class GatewayForm(View):
         public_key = TextInput(id="account_payment_gateway_options_public_key")
         merchant_id = TextInput(id="account_payment_gateway_options_merchant_id")
         private_key = TextInput(id="account_payment_gateway_options_private_key")
-        three_ds = ThreescaleCheckBox('//input[@id="account_payment_braintree_blue_three_ds_enabled"]')
+        three_ds = ThreescaleCheckBox('//input[@id="account_payment_gateway_options_three_ds_enabled"]')
 
     @property
     def is_displayed(self):
