@@ -365,5 +365,6 @@ class OpenShiftClient:
     def arch(self):
         """Openshift architecture"""
         lookup = self.do_action("cluster-info", ["dump", "-o", "yaml"], no_namespace=True)
-        cluster_info = list(yaml.safe_load_all(lookup.out()))
-        return cluster_info[0]["items"][0]["metadata"]["labels"]["kubernetes.io/arch"]
+        # only first yaml object is needed, rest of the output might contain logs where yaml parser might give up
+        cluster_info = yaml.safe_load(lookup.out().split("---", 1)[0])
+        return cluster_info["items"][0]["metadata"]["labels"]["kubernetes.io/arch"]
