@@ -9,9 +9,7 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.prometheus import get_metrics_keys
 
 METRICS_MASTER = [
-    # new metrics introduced in THREESCALE-4743
     "rails_requests_total",
-    # existing metrics prior to THREESCALE-4743
     "sidekiq_enqueued_jobs",
     "sidekiq_retry_jobs",
     "sidekiq_queue_enqueued_jobs",
@@ -34,7 +32,7 @@ METRICS_DEVELOPER = [
     # 'sidekiq_queue_max_processing_time_seconds'
 ]
 
-METRICS_MASTER_HISTOGRAM = ["rails_request_duration_seconds", "rails_view_runtime_seconds", "rails_db_runtime_seconds"]
+METRICS_MASTER_HISTOGRAM = ["rails_request_duration_seconds"]
 
 METRICS_SIDEKIQ = [
     "sidekiq_jobs_executed_total",
@@ -58,6 +56,7 @@ METRICS_SIDEKIQ_HISTOGRAM = [
 pytestmark = [
     pytest.mark.sandbag,  # requires openshfit
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4743"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9934"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
 ]
 
