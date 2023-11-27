@@ -56,6 +56,7 @@ def backend_metrics(backend):
 
 @pytest.mark.parametrize("methods_or_metrics", ["methods", "metrics", "backend_methods", "backend_metrics"])
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7112")
+@pytest.mark.nopersistence  # Test deletes method/metric hence test is not compatible with persistence plugin
 def test_methods_and_metrics_with_mapping(request, service, api_client, methods_or_metrics):
     """
     Test:
