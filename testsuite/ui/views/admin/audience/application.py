@@ -89,7 +89,7 @@ class ApplicationDetailView(BaseProductView):
     )
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
-    plan_dropdown = Select(component_id="Change plan")
+    plan_dropdown = Select(component_id="OUIA-Generated-Select-typeahead-1")
     change_plan_button = ThreescaleSubmitButton()
 
     def __init__(self, parent, product, application):
@@ -145,8 +145,8 @@ class ApplicationNewView(BaseAudienceView):
     path_pattern = "/buyers/accounts/{account_id}/applications/new"
     username = TextInput(id="cinstance[name]")
     description = TextInput(id="cinstance[description]")
-    product = Select(component_id="Product")
-    app_plan = Select(component_id="Application plan")
+    product = Select(component_id="OUIA-Generated-Select-typeahead-1")
+    app_plan = Select(component_id="OUIA-Generated-Select-typeahead-2")
     create_button = ThreescaleCreateButton()
 
     def __init__(self, parent, account):

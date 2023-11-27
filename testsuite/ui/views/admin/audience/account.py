@@ -17,8 +17,8 @@ from testsuite.ui.widgets.buttons import (
     ThreescaleDeleteButton,
     ThreescaleEditButton,
     ThreescaleSubmitButton,
+    ThreescaleSearchButton,
 )
-from testsuite.ui.widgets.searchinput import ThreescaleSearchInput
 
 
 class AccountsView(BaseAudienceView):
@@ -28,11 +28,13 @@ class AccountsView(BaseAudienceView):
     path_pattern = "/buyers/accounts"
     new_account = Text("//a[@href='/buyers/accounts/new']")
     table = PatternflyTable("//*[@id='buyer_accounts']", column_widgets={"Group/Org.": Text("./a")})
-    search_bar = ThreescaleSearchInput()
+    search_button = ThreescaleSearchButton()
+    search_bar = TextInput(id="search_query")
 
     def search(self, value: str):
         """Search in account table by given value"""
-        self.search_bar.fill_and_search(value)
+        self.search_bar.fill(value)
+        self.search_button.click()
 
     @step("AccountNewView")
     def new(self):
