@@ -66,6 +66,16 @@ class Deployment(ABC):
             deployment = selector.objects()[0]
             return deployment.model.spec.replicas
 
+    def get_generation(self):
+        """
+        Return generation of Deployment
+        """
+        with ExitStack() as stack:
+            self.openshift.prepare_context(stack)
+            selector = oc.selector(self.resource)
+            deployment = selector.objects()[0]
+            return deployment.model.metadata.generation
+
     # pylint: disable=too-many-arguments
     def add_volume(self, volume_name: str, mount_path: str, secret_name: str = None, configmap_name: str = None):
         """Add volume to a given deployment.
