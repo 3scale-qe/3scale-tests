@@ -26,11 +26,11 @@ def stripe(testconfig):
 def custom_card(account, custom_devel_login, billing_address, navigator):
     """Credit card setup"""
 
-    def _setup(cc_number, verify_3ds=False, postal_required=False):
+    def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
         cc_details = CreditCard(cc_number, 123, 10, 25)
         cc_view = navigator.navigate(StripeCCView)
-        cc_view.add_cc_details(billing_address, cc_details, postal_required)
+        cc_view.add_cc_details(billing_address, cc_details)
         if verify_3ds:
             cc_view.challenge_form.complete_auth()
         return cc_view

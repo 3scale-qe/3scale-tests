@@ -61,8 +61,7 @@ class StripeCCForm(View):
         self.cc_details.cardnumber.fill(credit_card.number)
         self.cc_details.expiration.fill(f"{credit_card.exp_month}{credit_card.exp_year}")
         self.cc_details.cvc.fill(credit_card.cvc)
-        if postal:
-            self.cc_details.postal.fill(postal)
+        self.cc_details.postal.fill(postal)
         self.submit_btn.click()
 
     @property
@@ -107,7 +106,7 @@ class StripeCCView(BaseDevelView):
     cc_form = View.nested(StripeCCForm)
     challenge_form = View.nested(OTPForm)
 
-    def add_cc_details(self, address: BillingAddress, credit_card: CreditCard, postal_required: bool):
+    def add_cc_details(self, address: BillingAddress, credit_card: CreditCard):
         """Adds credit card details for the user"""
         self.add_billing_address_btn.wait_displayed()
         self.add_billing_address_btn.click()
@@ -116,10 +115,7 @@ class StripeCCView(BaseDevelView):
         if self.add_cc_details_btn.is_displayed:
             self.add_cc_details_btn.click()
         self.cc_form.wait_displayed()
-
-        postal = address.zip if postal_required else None
-
-        self.cc_form.add(credit_card, postal)
+        self.cc_form.add(credit_card, address.zip)
 
     def prerequisite(self):
         return SettingsTabs
