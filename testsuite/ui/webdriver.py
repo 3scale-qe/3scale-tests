@@ -23,6 +23,13 @@ class _Chrome:
         self.webdriver = None
         self.options = ChromeOptions()
         self.options.set_capability("acceptInsecureCerts", accept_insecure_certs)
+        # Allow mixed content in browser HTTP + HTTPS
+        self.options.add_experimental_option(
+            "prefs",
+            {
+                "profile.content_settings": {"exceptions": {"mixed_script": {"*": {"setting": 1}}}},
+            },
+        )
 
     def install(self):
         """Installs the web driver"""
@@ -56,6 +63,7 @@ class _Firefox:
         self.options = FirefoxOptions()
         self.options.set_preference("browser.link.open_newwindow", 3)
         self.options.set_preference("webdriver_accept_untrusted_certs", accept_insecure_certs)
+        self.options.set_preference("security.mixed_content.block_active_content", False)
 
     def install(self):
         """Installs the web driver"""
