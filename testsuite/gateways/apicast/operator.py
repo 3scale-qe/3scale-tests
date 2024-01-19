@@ -216,6 +216,12 @@ class OperatorApicast(OpenshiftApicast):
         self.apicast.modify_and_apply(_update)
         self.reload()
 
+    def disconnect_open_telemetry(self, *args):
+        """
+        Current tests delete apicast after opentelemetry tests, cleanup of the
+        apicast itself will clean all configuration for opentelemetry as well
+        """
+
     def connect_open_telemetry(self, jaeger):
         """
         Modifies the APIcast to send information to jaeger.
