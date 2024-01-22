@@ -308,13 +308,12 @@ class ActiveDocsNewView(BaseAudienceView):
         )
 
 
-class SpamProtection(BaseAudienceView):
+class BotProtection(BaseAudienceView):
     """View representation of Developer Portal's Spam Protection setup"""
 
     path_pattern = "/site/spam_protection/edit"
     no_protection = Text('//*[@id="settings_spam_protection_level_none"]')
-    sus_protection = Text('//*[@id="settings_spam_protection_level_auto"]')
-    always_protection = Text('//*[@id="settings_spam_protection_level_captcha"]')
+    recaptcha_protection = Text('//*[@id="settings_spam_protection_level_captcha"]')
     submit_button = ThreescaleSubmitButton()
 
     def prerequisite(self):
@@ -330,18 +329,11 @@ class SpamProtection(BaseAudienceView):
         self.no_protection.click()
         self._submit_change()
 
-    def enable_sus_protection(self):
-        """
-        Enables SPAM protection by selecting `Suspicious only` in UI and submits it.
-        """
-        self.sus_protection.click()
-        self._submit_change()
-
-    def enable_always_protection(self):
+    def enable_protection(self):
         """
         Enables SPAM protection by selecting `Always` in UI and submits it.
         """
-        self.always_protection.click()
+        self.recaptcha_protection.click()
         self._submit_change()
 
     @property
@@ -350,8 +342,7 @@ class SpamProtection(BaseAudienceView):
             BaseAudienceView.is_displayed.fget(self)
             and self.path in self.browser.url
             and self.no_protection.is_displayed
-            and self.sus_protection.is_displayed
-            and self.always_protection.is_displayed
+            and self.recaptcha_protection.is_displayed
         )
 
 

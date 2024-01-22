@@ -1,6 +1,5 @@
 """Representation of login specific Views"""
-from time import sleep
-from widgetastic.widget import TextInput, Text, View
+from widgetastic.widget import TextInput, Text, View, GenericLocatorWidget
 
 from testsuite.ui.exception import UIException
 from testsuite.ui.navigation import step
@@ -9,6 +8,17 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 from testsuite.ui.views.auth import RhssoView, Auth0View
 from testsuite.ui.views.devel import BaseDevelView, SignUpView
 from testsuite.ui.views.common.login import LoginForm
+
+
+class ReCaptcha(View):
+    """View that represents the reCAPTCHA box"""
+
+    # Frame variable is needed due to implementation of Recaptcha via IFrame and nested view in test(works as ROOT)
+    invisible_recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
+
+    @property
+    def is_displayed(self):
+        return self.invisible_recaptcha.is_displayed
 
 
 class LoginView(BaseDevelView):
@@ -20,6 +30,7 @@ class LoginView(BaseDevelView):
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
     forgot_passwd = Text("//*[contains(text(),'Forgot password?')]")
     flash_message = View.nested(FlashMessage)
+    recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
     skip_wait_displayed = True
 
     @step("ForgotPasswordView")
@@ -67,27 +78,6 @@ class LoginView(BaseDevelView):
         )
 
 
-class ReCaptcha(View):
-    """View that represents the reCAPTCHA box"""
-
-    # Frame variable is needed due to implementation of Recaptcha via IFrame and nested view in test(works as ROOT)
-    FRAME = "//iframe[@title='reCAPTCHA']"
-    check_box = Text("//div[contains(@class, 'recaptcha-checkbox-borderAnimation')]")
-
-    def check_recaptcha(self):
-        """
-        Clicks in recaptcha box to successfully pass the recaptcha
-        """
-        self.check_box.click()
-        # Recaptcha check confirmation needs waits at least 0.5 sec to finish recaptcha confirmation flow to enable
-        # the verify button
-        sleep(1)
-
-    @property
-    def is_displayed(self):
-        return self.check_box.is_displayed
-
-
 class BasicSignUpView(SignUpView):
     """View for Sign Up into devel portal as developer with default sign up flow"""
 
@@ -106,12 +96,6 @@ class BasicSignUpView(SignUpView):
         self.password2.fill(password)
         if submit:
             self.signup_button.click()
-
-    def check_recaptcha(self):
-        """
-        Checks if reCaptcha exists and if it does, it execute the recaptcha verification
-        """
-        self.recaptcha.check_recaptcha()
 
     def prerequisite(self):
         return LoginView
@@ -135,7 +119,7 @@ class InvitationSignupView(SignUpView):
     email = TextInput(id="user_email")
     password = TextInput(id="user_password")
     password2 = TextInput(id="user_password_confirmation")
-    recaptcha = View.nested(ReCaptcha)
+    recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
     skip_wait_displayed = True
 
     def sign_up(self, username: str, passwd: str, submit: bool = True):
@@ -148,12 +132,6 @@ class InvitationSignupView(SignUpView):
         self.password2.fill(passwd)
         if submit:
             self.signup_button.click()
-
-    def check_recaptcha(self):
-        """
-        Checks if reCaptcha exists and if it does, it execute the recaptcha verification
-        """
-        self.recaptcha.check_recaptcha()
 
     @property
     def is_displayed(self):
@@ -185,7 +163,7 @@ class ForgotPasswordView(BaseDevelView):
 
     path_pattern = "/admin/account/password/new"
     email = TextInput(id="email")
-    recaptcha = View.nested(ReCaptcha)
+    recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
     reset_button = ThreescaleSubmitButton()
     flash_message = View.nested(FlashMessage)
 
@@ -199,14 +177,6 @@ class ForgotPasswordView(BaseDevelView):
         """Reset password for provided email"""
         self.email.fill(email)
         self.reset_button.click()
-
-    def check_recaptcha(self):
-        """
-        Checks if reCaptcha exists and if it does, it execute the recaptcha verification
-        """
-        if not self.recaptcha.is_displayed:
-            raise UIException("Recaptcha was not found on the website")
-        self.recaptcha.check_recaptcha()
 
     def prerequisite(self):
         return LoginView

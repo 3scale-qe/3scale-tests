@@ -1,8 +1,9 @@
 """Test for login into devel portal with spam protection enabled"""
 import pytest
+from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import settings, rawobj
-from testsuite.ui.views.admin.audience.developer_portal import SpamProtection
+from testsuite import settings, rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.ui.views.admin.audience.developer_portal import BotProtection
 from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, SuccessfulAccountCreationView, ForgotPasswordView
 from testsuite.utils import blame, warn_and_skip
 
@@ -10,7 +11,7 @@ from testsuite.utils import blame, warn_and_skip
 pytestmark = [pytest.mark.sandbag, pytest.mark.usefixtures("login"), pytest.mark.usefixtures("spam_protection_setup")]
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def skip_rhoam(testconfig):
     """Recaptcha requires special setup unavailable on RHOAM"""
     if testconfig["threescale"]["deployment_type"] == "rhoam":
@@ -36,14 +37,13 @@ def spam_protection_setup(navigator):
     """
     Opens the developer portal and passes in the access code.
     """
-    spam_page = navigator.open(SpamProtection)
-    assert spam_page.sus_protection.is_enabled, "Missing recaptcha setup in 3scale"
-    assert spam_page.always_protection.is_enabled, "Missing recaptcha setup in 3scale"
-    spam_page.enable_always_protection()
+    spam_page = navigator.open(BotProtection)
+    assert spam_page.recaptcha_protection.is_enabled, "Missing recaptcha setup in 3scale"
+    spam_page.enable_protection()
 
     yield
 
-    page = navigator.open(SpamProtection, url=settings["threescale"]["admin"]["url"])
+    page = navigator.open(BotProtection, url=settings["threescale"]["admin"]["url"])
     page.disable_protection()
 
 
@@ -63,8 +63,7 @@ def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
     """
     Test
         - Navigates and fills up the Sign Up page on developer portal
-        - Checks, whether the form can be submitted without the recaptcha checkbox checked
-        - Checks the checkbox
+        - Assert that invisible recaptcha badge is present
         - Submits the form and checks that the success website appears
     """
     signup_view = navigator.open(
@@ -75,10 +74,8 @@ def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
     email = f"{username}@anything.invalid"
     signup_view.sign_up(username, username, email, username, submit=False)
 
-    assert not signup_view.signup_button.is_enabled
-    assert signup_view.recaptcha.is_displayed, "Recaptcha was not found on the developer sign up page"
-    signup_view.check_recaptcha()
     assert signup_view.signup_button.is_enabled
+    assert signup_view.recaptcha.is_displayed, "Recaptcha was not found on the developer sign up page"
 
     signup_view.signup_button.click()
 
@@ -90,25 +87,25 @@ def test_devel_forgot_password_recaptcha(custom_account, navigator, params):
     """
     Test
         - Navigates and fills up the Lost password page on developer portal
-        - Checks, whether the form can be submitted without the recaptcha checkbox checked
-        - Checks the checkbox
-        - Submits the form and checks that the success website appears
+        - Assert that invisible recaptcha badge is present
+        - Submits the form and assert that the success website appears
     """
     custom_account(params=params)
     forgot_pass = navigator.open(ForgotPasswordView)
 
     assert not forgot_pass.flash_message.is_displayed
-    assert forgot_pass.recaptcha.is_displayed, "Recaptcha was not found on the developer sign up page"
-    forgot_pass.reset_button.click()
+    assert forgot_pass.recaptcha.is_displayed, "Recaptcha was not found on the developer forgot password page"
 
-    assert forgot_pass.flash_message.is_displayed
-    assert forgot_pass.flash_message.string_in_flash_message("spam protection failed")
 
-    forgot_pass.check_recaptcha()
-    forgot_pass.fill_form(f"{params['email']}")
-    forgot_pass.reset_button.click()
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10579")
+@pytest.mark.skipif("TESTED_VERSION < Version('2.15')")
+def test_devel_login_recaptcha(custom_account, navigator, params):
+    """
+    Test
+        - Navigates to the developer portal login view
+        - Assert that invisible recaptcha badge is present
+    """
+    custom_account(params=params)
+    login_view = navigator.open(LoginView)
 
-    login_view = LoginView(navigator.browser)
-
-    assert login_view.flash_message.is_displayed
-    assert login_view.flash_message.string_in_flash_message("a password reset link has been emailed to you")
+    assert login_view.recaptcha.is_displayed, "Recaptcha was not found on the developer login page"
