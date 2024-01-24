@@ -3,9 +3,12 @@ from typing import TYPE_CHECKING
 
 import backoff
 
+from openshift import OpenShiftPythonException
+
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.env import Properties
+from testsuite.utils import randomize
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -47,7 +50,16 @@ class SystemApicast(AbstractApicast):
     def get_logs(self, since_time=None):
         return self.deployment.get_logs(since_time=since_time)
 
-    def connect_open_telemetry(self, jaeger, open_telemetry_randomized_name):
+    def disconnect_open_telemetry(self, config_map_name):
+        """
+        Remove volume attached for jaeger config
+        """
+        del self.environ["OPENTELEMETRY"]
+        del self.environ["OPENTELEMETRY_CONFIG"]
+        self.deployment.remove_volume("jaeger-config-vol")
+        del self.openshift.config_maps[f"{config_map_name}.ini"]
+
+    def connect_open_telemetry(self, jaeger, open_telemetry_randomized_name=None):
         """
         Modifies the APIcast to send information to jaeger.
         Creates configmap and a volume, mounts the configmap into the volume
@@ -56,13 +68,21 @@ class SystemApicast(AbstractApicast):
         :param open_telemetry_randomized_name: randomized name used for the name of the configmap and for
                the identifying name of the service in jaeger
         """
+        if not open_telemetry_randomized_name:
+            open_telemetry_randomized_name = randomize("open-telemetry-config")
         config_map_name = f"{open_telemetry_randomized_name}.ini"
         service_name = open_telemetry_randomized_name
         self.openshift.config_maps.add(
             config_map_name, jaeger.apicast_config_open_telemetry(config_map_name, service_name)
         )
+
+        try:
+            self.deployment.remove_volume("jaeger-config-vol")
+        except OpenShiftPythonException:
+            pass
         self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
-        self.environ.set_many({"OPENTELEMETRY": "True", "OPENTRACING_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+        self.environ.set_many({"OPENTELEMETRY": "True", "OPENTELEMETRY_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+        return service_name
 
     def _wait_for_apicasts(self):
         """Waits until changes to APIcast have been applied"""

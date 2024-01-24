@@ -7,16 +7,43 @@ import backoff
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.gateways.apicast.operator import OperatorApicast
+from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.utils import randomize
 from testsuite.capabilities import Capability
 
 pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.6')")
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735")
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9539")
+@pytest.fixture(
+    scope="module",
+    params=[
+        pytest.param(
+            SystemApicast,
+            id="system",
+            marks=[
+                pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
+                pytest.mark.skipif("TESTED_VERSION < Version('2.14')"),
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735"),
+            ],
+        ),
+        pytest.param(
+            OperatorApicast,
+            id="operator",
+            marks=[
+                pytest.mark.required_capabilities(Capability.OCP4),
+                pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.6')"),
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9539"),
+            ],
+        ),
+    ],
+)
+def gateway_kind(request):
+    """Gateway class to use for tests"""
+    return request.param
+
+
 def test_open_telemetry_apicast_integration(api_client, jaeger, jaeger_service_name):
     """
     Makes a request to a random endpoint

@@ -24,4 +24,6 @@ def jaeger_service_name(staging_gateway, jaeger):
     """
     Deploys apicast gateway configured with jaeger.
     """
-    return staging_gateway.connect_open_telemetry(jaeger)
+    name = staging_gateway.connect_open_telemetry(jaeger)
+    yield name
+    staging_gateway.disconnect_open_telemetry(name)
