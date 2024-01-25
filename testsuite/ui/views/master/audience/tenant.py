@@ -22,14 +22,14 @@ class TenantsView(BaseMasterAudienceView):
     new_account = Text("//a[@href='/p/admin/accounts/new']")
     tenants_table = PatternflyTable(
         "//*[@id='buyer_accounts']",
-        column_widgets={"Group/Org.": Text("./a"), "Create": Text("./ul/li/a[contains(@class, 'action bolt')]")},
+        column_widgets={"Group/Org.": Text("./a"), 5: Text("./ul/li/a[contains(@class, 'action bolt')]")},
     )
     search_button = ThreescaleSearchButton()
     search_bar = TextInput(id="search_query")
 
     def impersonate(self, account):
         """Impersonate tenant and switch browser context to new tab"""
-        self.tenants_table.row(_row__attr=("id", f"account_{account.entity_id}")).create.widget.click()
+        self.tenants_table.row(_row__attr=("id", f"account_{account.entity_id}"))[5].widget.click()
         self.parent_browser.switch_to_window(self.parent_browser.window_handles[-1])
 
     def search(self, value: str):
