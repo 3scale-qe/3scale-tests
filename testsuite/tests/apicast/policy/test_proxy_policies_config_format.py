@@ -1,6 +1,7 @@
 """
 Test proxy policies config format
 """
+
 import json
 
 import pytest

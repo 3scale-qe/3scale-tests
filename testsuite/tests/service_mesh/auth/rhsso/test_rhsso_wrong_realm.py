@@ -1,5 +1,6 @@
 """Tests that accessing APIcast with token from a different RHSSO realm does not work
 Modified copy of testsuite/tests/apicast/auth/rhsso/openid_rhsso/test_rhsso_wrong_realm.py"""
+
 import pytest
 
 from testsuite.rhsso import Token

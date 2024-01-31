@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/incorrect_policy_name_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

@@ -1,4 +1,5 @@
 """Module that helps certificates with temporary persistence"""
+
 import os
 import shutil
 import tempfile

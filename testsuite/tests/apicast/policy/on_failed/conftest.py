@@ -1,4 +1,5 @@
 """Default conftest for on_failed """
+
 import pytest
 
 from testsuite import rawobj

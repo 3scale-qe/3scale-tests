@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/ip_check/ip_check_real_ip_blacklist_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

@@ -1,4 +1,5 @@
 """Conftest for billing tests"""
+
 import pytest
 from threescale_api.resources import InvoiceState
 

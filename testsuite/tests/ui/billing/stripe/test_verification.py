@@ -1,4 +1,5 @@
 """Billing tests for Stripe payment gateway"""
+
 import pytest
 
 

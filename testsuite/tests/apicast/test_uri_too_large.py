@@ -1,4 +1,5 @@
 """Test for apicast logs with 414 Request-URI Too Large response"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

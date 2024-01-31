@@ -2,6 +2,7 @@
 When the logging policy is configured to show logs only on a responses with
 particular status code, only those responses are logged.
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability

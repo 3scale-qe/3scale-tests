@@ -2,6 +2,7 @@
 Creates an amount (50) of services in openshift with a name starting with 'apicast'
 Then asserts that the gateway has been correctly deployed.
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

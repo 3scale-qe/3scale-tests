@@ -1,6 +1,7 @@
 """
 Rewrite: ./spec/ui_specs/wizard_spec.rb
 """
+
 from urllib.parse import urlparse
 
 import pytest

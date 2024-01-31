@@ -1,4 +1,5 @@
 """Test for field definitions issue"""
+
 import pytest
 from widgetastic.widget import TextInput
 

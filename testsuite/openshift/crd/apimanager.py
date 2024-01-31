@@ -1,4 +1,5 @@
 """Module containing APIManager object"""
+
 from typing import Optional, Set
 
 from openshift import APIObject, Missing

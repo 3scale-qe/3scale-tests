@@ -2,6 +2,7 @@
 When a routing policy is set with an empty condition, it should be loaded correctly and should route all
 the requests to a correct backend.
 """
+
 from urllib.parse import urlparse
 import pytest
 

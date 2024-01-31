@@ -1,4 +1,5 @@
 """Tests that APICAST_LOAD_SERVICES_WHEN_NEEDED loads all mapping rules"""
+
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import

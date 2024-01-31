@@ -1,4 +1,5 @@
 """Essential Views for Settings Views"""
+
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.widgets.ouia import Navigation

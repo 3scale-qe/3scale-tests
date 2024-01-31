@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/routing/routing_with_multiple_conditions_or_spec.rb
 """
+
 from urllib.parse import urlparse
 import pytest
 from testsuite import rawobj

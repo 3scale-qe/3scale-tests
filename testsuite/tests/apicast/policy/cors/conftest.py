@@ -1,6 +1,7 @@
 """
 Conftest for the cors policy
 """
+
 import pytest
 from testsuite import rawobj
 

@@ -1,4 +1,5 @@
 """Tests for active docs OAS3"""
+
 import json
 
 import importlib_resources as resources

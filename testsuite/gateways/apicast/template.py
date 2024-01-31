@@ -1,4 +1,5 @@
 """Self managed apicast deployed from apicast template"""
+
 import logging
 import os
 

@@ -1,4 +1,5 @@
 """View representations of Email pages"""
+
 from widgetastic.widget import TextInput
 
 from testsuite.ui.views.admin.audience import BaseAudienceView

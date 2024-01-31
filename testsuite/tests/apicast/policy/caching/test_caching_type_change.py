@@ -2,6 +2,7 @@
 Test caching policy policy. Changing caching type to None. Policy remains active but caching is disabled.
 https://issues.redhat.com/browse/THREESCALE-4464
 """
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import

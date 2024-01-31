@@ -1,6 +1,7 @@
 """
 Test for Account search based on spec/ui_specs/users/users_search_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

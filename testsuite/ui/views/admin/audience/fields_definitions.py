@@ -1,4 +1,5 @@
 """View representations of Fields Definitons pages"""
+
 from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import Button
 

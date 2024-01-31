@@ -1,4 +1,5 @@
 """Test for login into devel portal via Auth0"""
+
 import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import (

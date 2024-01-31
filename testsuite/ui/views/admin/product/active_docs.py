@@ -1,4 +1,5 @@
 """View representations of Product Active docs pages"""
+
 from widgetastic_patternfly4 import PatternflyTable
 from widgetastic.widget import View, Text
 

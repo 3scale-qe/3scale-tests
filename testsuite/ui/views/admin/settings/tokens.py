@@ -1,4 +1,5 @@
 """View representations of Token pages"""
+
 import enum
 from typing import List
 

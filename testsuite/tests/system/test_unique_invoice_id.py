@@ -4,6 +4,7 @@ rewrite of /spec/ui_specs/billing/unique_invoice_id_spec.rb
 Test automatically created invoices will not have duplicate 'friendly_id'
 For testing this issue, we don't need to use UI, as all can be done trough API
 """
+
 from datetime import date, timedelta
 import backoff
 import pytest

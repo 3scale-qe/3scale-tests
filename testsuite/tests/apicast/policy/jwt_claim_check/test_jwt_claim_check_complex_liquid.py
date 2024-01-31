@@ -1,6 +1,7 @@
 """
 Test that invalid JWT is rejected
 """
+
 import pytest
 
 from testsuite import rawobj

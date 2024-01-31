@@ -3,6 +3,7 @@ Service requires credentials (app_id, app_key) to be passed using the Basic Auth
 
 Rewrite ./spec/functional_specs/auth/basic_auth_app_id_spec.rb
 """
+
 import pytest
 
 from threescale_api.resources import Service

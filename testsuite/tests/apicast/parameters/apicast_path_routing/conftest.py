@@ -1,4 +1,5 @@
 """Path routing-based tests fixtures."""
+
 import pytest
 
 from testsuite import rawobj

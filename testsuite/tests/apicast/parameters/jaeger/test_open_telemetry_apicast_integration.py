@@ -3,6 +3,7 @@ Tests the apicast integration with jaeger, information about the requests
 made through apicast is available in jaeger
 It is necessary to have the jaeger url config value set
 """
+
 import backoff
 import pytest
 

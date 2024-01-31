@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/dashboard_spec.rb"""
+
 import pytest
 
 from testsuite import TESTED_VERSION

@@ -1,4 +1,5 @@
 """Apicast with TLS certificates configured"""
+
 import logging
 from datetime import datetime
 from typing import Optional

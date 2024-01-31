@@ -1,6 +1,7 @@
 """
 Default conftest for rate limit tests
 """
+
 import warnings
 import pytest
 import pytest_cases

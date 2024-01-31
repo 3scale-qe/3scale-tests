@@ -1,6 +1,7 @@
 """
 View representations of Webhook pages
 """
+
 from widgetastic.widget import TextInput, GenericLocatorWidget
 
 from testsuite.ui.views.admin.settings import BaseSettingsView

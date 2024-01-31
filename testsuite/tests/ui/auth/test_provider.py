@@ -2,6 +2,7 @@
 Tests for admin portal SSO integrations
 Rewrite of spec/ui_specs/oauth/provider_rhsso_spec.rb and provider_auth0_spec.rb
 """
+
 import pytest
 
 from testsuite.ui.views.admin.foundation import BaseAdminView

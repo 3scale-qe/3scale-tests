@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
+
 from string import Template
 from urllib.parse import urlsplit
 

@@ -1,6 +1,7 @@
 """
 Test for logging policy with custom date format
 """
+
 from datetime import datetime, timezone
 
 import pytest

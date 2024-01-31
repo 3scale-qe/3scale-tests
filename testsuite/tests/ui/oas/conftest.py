@@ -1,4 +1,5 @@
 """Conftest for active doc tests"""
+
 import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal import ActiveDocsNewView

@@ -1,6 +1,7 @@
 """
 Rewrite of spec/functional_specs/auth/app_id_spec.rb
 """
+
 import pytest
 import pytest_cases
 from pytest_cases import fixture_ref

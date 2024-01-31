@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/upstream_rewrite/nil_added_when_empty_params_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

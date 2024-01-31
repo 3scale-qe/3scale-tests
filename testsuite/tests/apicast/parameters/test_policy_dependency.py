@@ -1,6 +1,7 @@
 """
 Tests that an apicast custom policy with lua dependency can be built and used
 """
+
 import importlib_resources as resources
 import pytest
 

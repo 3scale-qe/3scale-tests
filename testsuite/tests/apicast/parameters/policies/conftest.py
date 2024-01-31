@@ -1,4 +1,5 @@
 """Conftest for all policies tests"""
+
 import pytest
 
 

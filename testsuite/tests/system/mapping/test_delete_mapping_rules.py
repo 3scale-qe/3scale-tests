@@ -1,4 +1,5 @@
 """Test for https://issues.redhat.com/browse/THREESCALE-7112"""
+
 import pytest
 from threescale_api.errors import ApiClientError
 

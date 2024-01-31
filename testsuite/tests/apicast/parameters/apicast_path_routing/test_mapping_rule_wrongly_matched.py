@@ -2,6 +2,7 @@
 Test that URL with space in a parameter will be sent to the correct service when the
 APICAST_PATH_ROUTING is in use
 """
+
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import

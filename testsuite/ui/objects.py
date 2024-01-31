@@ -1,4 +1,5 @@
 """File contains objects that store various information for UI testing"""
+
 from typing import NamedTuple
 
 

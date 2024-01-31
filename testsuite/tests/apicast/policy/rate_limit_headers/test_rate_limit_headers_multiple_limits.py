@@ -2,6 +2,7 @@
 Tests that when an app plan has two limits with different time frame, the RateLimit information for
 the currently more constrained limit are sent.
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 from testsuite.utils import blame, wait_interval, wait_until_next_minute, wait_interval_hour

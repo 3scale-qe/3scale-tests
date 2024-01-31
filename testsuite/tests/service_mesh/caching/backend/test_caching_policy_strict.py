@@ -1,6 +1,7 @@
 """
 Tests strict backend caching (unknown credentials are forbidden) in the adapter
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

@@ -1,6 +1,7 @@
 """
 Test if APIAP routing only match paths that start with the routing path of the backend
 """
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import

@@ -1,4 +1,5 @@
 """Essential Views for Audience Views"""
+
 from testsuite.ui.navigation import step
 from testsuite.ui.views.master.foundation import BaseMasterView
 from testsuite.ui.widgets.ouia import Navigation

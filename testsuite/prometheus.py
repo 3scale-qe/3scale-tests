@@ -1,4 +1,5 @@
 """Provide a small client for interacting with Prometheus REST API."""
+
 import logging
 import time
 from datetime import datetime, timedelta

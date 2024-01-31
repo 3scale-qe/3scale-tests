@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/headers/headers_policy_delete_spec.rb
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest

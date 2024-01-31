@@ -1,4 +1,5 @@
 """Module containing Operator object"""
+
 import openshift as oc
 from openshift import APIObject
 

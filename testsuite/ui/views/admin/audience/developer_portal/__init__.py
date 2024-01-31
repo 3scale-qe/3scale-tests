@@ -1,4 +1,5 @@
 """View representations of Developer Portal section pages"""
+
 from selenium.common.exceptions import NoSuchElementException
 from wait_for import TimedOutError, wait_for
 from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput, Image

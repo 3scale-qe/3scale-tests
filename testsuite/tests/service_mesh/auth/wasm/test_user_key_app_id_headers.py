@@ -3,6 +3,7 @@ Modified copy of ../test_user_key_app_id
 Auth tests for user_key and app_id/app_key authentication modes
 with HEADERS credential location for Service Mesh
 """
+
 import pytest
 from threescale_api.resources import Service
 

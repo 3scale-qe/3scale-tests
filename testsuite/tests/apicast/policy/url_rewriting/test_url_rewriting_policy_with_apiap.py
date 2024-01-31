@@ -1,6 +1,7 @@
 """
 Test if url rewriting policy works with APIAP
 """
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

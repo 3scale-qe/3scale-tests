@@ -1,4 +1,5 @@
 """Collection of classes for working with different ssl certificate tools."""
+
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple, Dict
 

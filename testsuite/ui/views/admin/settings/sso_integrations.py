@@ -1,4 +1,5 @@
 """View representations of SSO Integrations pages"""
+
 from urllib.parse import urlparse
 
 from widgetastic.widget import TextInput, Text
