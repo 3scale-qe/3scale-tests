@@ -45,7 +45,7 @@ class BaseProductView(BaseAdminView):
     This value is verified in `is_displayed` method.
     """
 
-    NAV_ITEMS = ["Overview", "Analytics", "Applications", "ActiveDocs", "Integration"]
+    NAV_ITEMS = ["Product Overview", "Analytics", "Applications", "ActiveDocs", "Integration"]
     nav = Navigation()
     outdated_config = GenericLocatorWidget(locator="//*/li/a[contains(@class, 'outdated-config')]")
 
