@@ -1,5 +1,6 @@
 """Test for custom policy injected through operator with secret
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

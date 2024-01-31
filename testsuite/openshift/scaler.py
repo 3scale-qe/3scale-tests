@@ -1,4 +1,5 @@
 """Module for scaling deployments"""
+
 import typing
 from contextlib import contextmanager
 

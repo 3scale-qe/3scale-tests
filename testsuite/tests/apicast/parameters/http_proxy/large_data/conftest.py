@@ -1,4 +1,5 @@
 """Conftest for http proxy large data tests"""
+
 from urllib.parse import urlparse
 
 import pytest

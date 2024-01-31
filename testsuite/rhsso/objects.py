@@ -1,4 +1,5 @@
 """This module contains object wrappers on top of python-keycloak API, since that is not object based"""
+
 from urllib.parse import urlparse
 
 from keycloak import KeycloakAdmin, KeycloakOpenID

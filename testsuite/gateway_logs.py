@@ -1,4 +1,5 @@
 """Pytest plugin for collecting gateway logs"""
+
 from datetime import datetime
 import logging
 

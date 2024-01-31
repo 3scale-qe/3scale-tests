@@ -1,6 +1,7 @@
 """
 Test for product metrics combined with routing policy.
 """
+
 import pytest
 
 from testsuite import rawobj, resilient

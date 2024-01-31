@@ -2,6 +2,7 @@
 A simple interface to get data from Jaeger using the rest http api
 Note: jaeger http rest api is not officially supported and may be a subject of a change
 """
+
 from string import Template
 from urllib.parse import urlparse
 import backoff

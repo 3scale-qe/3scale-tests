@@ -1,4 +1,5 @@
 """Test of automatic mails functionality connected to applications in UI"""
+
 import pytest
 from threescale_api.resources import Service
 

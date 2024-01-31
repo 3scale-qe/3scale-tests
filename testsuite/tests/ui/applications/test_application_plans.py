@@ -1,4 +1,5 @@
 """Tests of applications plans"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

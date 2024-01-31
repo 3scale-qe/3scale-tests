@@ -1,4 +1,5 @@
 """Conftest for Braintree gateway billing tests"""
+
 from datetime import datetime
 
 import pytest

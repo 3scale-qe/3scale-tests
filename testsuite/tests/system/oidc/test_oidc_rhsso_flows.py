@@ -9,6 +9,7 @@ After the flow of the service is changed,
 you need to update the application in order to trigger zync to update the flow on the RHSSO.
 https://issues.redhat.com/browse/THREESCALE-3025
 """
+
 import backoff
 import pytest
 from threescale_api.resources import Service

@@ -4,6 +4,7 @@ Rewrite of the spec/functional_specs/auth/rhsso/openid_rhsso_spec.rb
 When the OIDC configuration is used and the credentials location is set to query,
 only the calls with correct credentials location will pass.
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

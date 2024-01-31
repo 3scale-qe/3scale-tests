@@ -7,6 +7,7 @@ Second the ca_certificates contains mismatched certificates, which should fail w
 refusing to accept the other certificate.
 Third the no certificates are specified in ca_certificates, in which case APIcast returns 200
 """
+
 from urllib.parse import urlparse
 
 import pytest

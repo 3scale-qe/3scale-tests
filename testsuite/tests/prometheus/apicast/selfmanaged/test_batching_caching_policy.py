@@ -1,6 +1,7 @@
 """
 Test Prometheus metric for content_caching.
 """
+
 from datetime import datetime, timedelta
 import pytest
 

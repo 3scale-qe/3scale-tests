@@ -1,4 +1,5 @@
 """Provide custom gateway for tests changing apicast parameters."""
+
 from weakget import weakget
 import pytest
 

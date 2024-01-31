@@ -1,4 +1,5 @@
 """Representation of login specific Views"""
+
 from widgetastic.widget import TextInput, Text, View, GenericLocatorWidget
 
 from testsuite.ui.exception import UIException

@@ -1,6 +1,7 @@
 """
     Performance test for managed services with multiple 3scale entities (products, backends,...)
 """
+
 import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor

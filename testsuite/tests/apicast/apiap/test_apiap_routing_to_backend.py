@@ -1,6 +1,7 @@
 """
 Test if APIAP routing only match paths that contain whole routing path
 """
+
 from urllib.parse import urlparse
 
 import pytest

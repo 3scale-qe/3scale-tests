@@ -2,7 +2,6 @@
 Test that disabled method is not accessible
 """
 
-
 import pytest
 from testsuite import rawobj
 

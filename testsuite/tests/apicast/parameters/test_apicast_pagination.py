@@ -1,4 +1,5 @@
 """Test for apicast pagination"""
+
 import asyncio
 
 import pytest

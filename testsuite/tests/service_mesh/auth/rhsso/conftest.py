@@ -1,4 +1,5 @@
 """Conftest for Service Mesh RHSSO tests"""
+
 import pytest
 from threescale_api.resources import Service
 

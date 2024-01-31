@@ -2,6 +2,7 @@
 Tests that the rules in the url_rewriting_policy can match also against the
 http method of the request.
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 from testsuite.echoed_request import EchoedRequest

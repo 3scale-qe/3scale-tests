@@ -7,6 +7,7 @@ Second with mismatched certificates, which should fail with 502 due to httpbin r
 
 It tests only embedded type as path requires manipulation with the deployment
 """
+
 import pytest
 
 from testsuite import rawobj, gateways

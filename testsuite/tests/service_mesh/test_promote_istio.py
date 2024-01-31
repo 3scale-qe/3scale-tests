@@ -1,6 +1,7 @@
 """
 Tests that services with istio integration are automatically promoted to production instead of sandbox
 """
+
 import backoff
 import pytest
 

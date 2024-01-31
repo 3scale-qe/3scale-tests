@@ -1,6 +1,7 @@
 """
 Tests wasm mapping rules special handling.
 """
+
 import backoff
 import pytest
 from testsuite.capabilities import Capability

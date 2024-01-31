@@ -1,6 +1,7 @@
 """
 Smoke performance test specific fixtures
 """
+
 import pytest
 
 

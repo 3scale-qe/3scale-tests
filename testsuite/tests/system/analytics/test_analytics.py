@@ -7,6 +7,7 @@ equal to the sum of the number of requests made by all applications
 When getting analytics for individual applications, the number is equal to
 the number of requests send by the application.
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite import resilient

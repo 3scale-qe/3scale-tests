@@ -4,6 +4,7 @@ Rewrite /spec/functional_specs/do_not_send_openresty_version_spec.rb
 When requesting non existing endpoint openresty version should not be sent
 in the response body or in the response header
 """
+
 import backoff
 import pytest
 from testsuite import rawobj

@@ -1,6 +1,7 @@
 """
 Custom Auth0 resources for testsuite
 """
+
 import http.client
 import json
 

@@ -1,6 +1,7 @@
 """
 Module contains Base View used for all Views that are the same in Admin and Master.
 """
+
 from widgetastic.widget import GenericLocatorWidget, View, Text
 
 

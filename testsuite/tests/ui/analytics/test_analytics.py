@@ -1,4 +1,5 @@
 """Add test for product and backend analytics"""
+
 import pytest
 
 from testsuite import rawobj

@@ -1,4 +1,5 @@
 """Test that system is not sending mail notification to suspended users"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

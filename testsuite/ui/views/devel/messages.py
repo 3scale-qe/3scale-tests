@@ -1,4 +1,5 @@
 """Devel messages pages and tabs"""
+
 from widgetastic.widget import TextInput, View, Text
 from widgetastic_patternfly4 import PatternflyTable
 

@@ -1,4 +1,5 @@
 """Self-managed APIcast already deployed somewhere in OpenShift """
+
 import inspect
 import logging
 from typing import Union, Type

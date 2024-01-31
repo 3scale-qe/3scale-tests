@@ -10,6 +10,7 @@ tests if the certificate is accepted or not.
 
 In general tests with Length =< Depth should pass and tests with Length > Depth should fail
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

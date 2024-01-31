@@ -1,6 +1,7 @@
 """
 Test caching policy with strict mode.
 """
+
 from time import sleep
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import

@@ -1,6 +1,7 @@
 """
 Conftest for connection reuse test
 """
+
 import pytest
 
 from testsuite import rawobj, gateways

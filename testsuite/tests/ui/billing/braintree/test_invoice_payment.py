@@ -1,4 +1,5 @@
 """Braintree gateway billing tests"""
+
 import pytest
 
 

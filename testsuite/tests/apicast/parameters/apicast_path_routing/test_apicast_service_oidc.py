@@ -1,6 +1,7 @@
 """
 Test for using OIDC with apicast env_variable 'APICAST_SERVICES_FILTER_BY_URL' and 'APICAST_PATH_ROUTING'
 """
+
 import pytest
 
 from testsuite import rawobj

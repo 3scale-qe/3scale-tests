@@ -2,6 +2,7 @@
 rewritten the /spec/functional_specs/custom_tenant_spec.rb
 Creates a new tenant and tests if the tenant works
 """
+
 import pytest
 
 from testsuite import rawobj, resilient

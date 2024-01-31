@@ -2,6 +2,7 @@
 
 Test apicast with configuration from config maps.
 """
+
 import json
 
 import pytest

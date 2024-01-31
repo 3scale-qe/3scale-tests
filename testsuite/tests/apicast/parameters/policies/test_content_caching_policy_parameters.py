@@ -3,6 +3,7 @@ Test that content caching policy is working correctly with env:
     - APICAST_CACHE_STATUS_CODES = status code which should be cached
     - APICAST_CACHE_MAX_TIME = max time that content can be cached
 """
+
 import time
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

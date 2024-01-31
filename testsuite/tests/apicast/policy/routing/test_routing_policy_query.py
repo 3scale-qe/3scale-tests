@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/routing/routing_by_query_spec.rb
 """
+
 from urllib.parse import urlparse
 import pytest
 

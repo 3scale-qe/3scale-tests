@@ -3,6 +3,7 @@ Testing the propagation of internal backend api metrics to prometheus.
 When an internal backend api endpoint is requested, the increase of the respective
 metric is expected
 """
+
 import base64
 from datetime import timedelta, datetime
 from typing import Dict, Tuple

@@ -1,4 +1,5 @@
 """Tests wasm authorities filtering"""
+
 from urllib.parse import urlsplit
 import pytest
 from testsuite.capabilities import Capability

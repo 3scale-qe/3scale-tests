@@ -8,6 +8,7 @@ that this test doesn't work on openshift where
 case tests ends with 502 error.
 https://docs.openshift.com/container-platform/4.9/networking/ingress-operator.html#nw-http2-haproxy_configuring-ingress
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest

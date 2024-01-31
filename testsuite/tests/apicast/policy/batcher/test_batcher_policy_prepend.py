@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/batcher/batcher_policy_prepend_spec.rb
 """
+
 from time import sleep
 
 import pytest

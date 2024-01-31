@@ -1,6 +1,7 @@
 """
 Conftest for the liquid context debug policy
 """
+
 import pytest
 
 from testsuite import rawobj

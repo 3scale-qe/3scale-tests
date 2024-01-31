@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/proxy_endpoints_set_spec.rb
 """
+
 import pytest
 
 from testsuite.capabilities import Capability

@@ -1,4 +1,5 @@
 """CertificateStore concrete classes."""
+
 import os
 import tempfile
 from abc import ABC

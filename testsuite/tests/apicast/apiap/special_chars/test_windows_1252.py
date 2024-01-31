@@ -1,6 +1,7 @@
 """
 Test that any char from the windows-1252 encoding won't be changed by the apicast
 """
+
 from urllib.parse import urlparse
 
 import pytest

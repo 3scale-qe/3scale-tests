@@ -1,4 +1,5 @@
 """Test for login into devel portal with spam protection enabled"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

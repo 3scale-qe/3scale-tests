@@ -1,4 +1,5 @@
 """Default conftest for statuscode overwrite """
+
 import pytest
 
 from testsuite import rawobj

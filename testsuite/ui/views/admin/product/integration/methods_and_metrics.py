@@ -1,4 +1,5 @@
 """View representations of product's methods and metrics pages"""
+
 from widgetastic.widget import TextInput, Table, Text, GenericLocatorWidget, View
 from widgetastic_patternfly4 import Button
 

@@ -4,6 +4,7 @@ Test that any char from the utf-8 encoding won't be changed by the apicast
 This test is testing only subset of utf-8 chars that have different encoding than windows-1252
 https://www.w3schools.com/tags/ref_urlencode.ASP
 """
+
 from urllib.parse import urlparse, quote
 
 import pytest

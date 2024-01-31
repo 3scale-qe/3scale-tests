@@ -2,6 +2,7 @@
 When routing policy is used together with the jwt claim check, the jwt should still
 restrict the access to the resource.
 """
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

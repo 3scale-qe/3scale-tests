@@ -2,6 +2,7 @@
 Test for url rewriting captures policy with HTTP methods
 In 2.10 version the HTTP methods were added
 """
+
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
