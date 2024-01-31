@@ -50,7 +50,7 @@ class BaseBackendView(BaseAdminView):
     This value is verified in `is_displayed` method.
     """
 
-    NAV_ITEMS = ["Overview", "Analytics", "Methods and Metrics", "Mapping Rules"]
+    NAV_ITEMS = ["Backend Overview", "Analytics", "Methods and Metrics", "Mapping Rules"]
     nav = Navigation()
 
     def __init__(self, parent, backend, **kwargs):
