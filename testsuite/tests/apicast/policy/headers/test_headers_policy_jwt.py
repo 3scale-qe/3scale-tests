@@ -5,6 +5,7 @@ When the service is secured by OpenID and it uses header policy with liquid vari
 it should contain proper extra headers and the extra headers should contain correct info
 from the JWT object
 """
+
 import time
 import pytest
 

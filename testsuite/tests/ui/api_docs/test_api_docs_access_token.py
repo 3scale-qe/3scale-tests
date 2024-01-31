@@ -1,4 +1,5 @@
 """Test API Docs access token validation: https://issues.redhat.com/browse/THREESCALE-7084"""
+
 import pytest
 
 from testsuite.ui.views.admin.settings.api_docs import APIDocsView

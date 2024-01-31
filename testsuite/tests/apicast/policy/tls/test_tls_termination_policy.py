@@ -1,6 +1,7 @@
 """Test for TLS Termination Policy.
 This policy instructs APIcast to use specific certificate for communicating with client.
 Tests both embedded and path type"""
+
 import pytest
 import requests
 

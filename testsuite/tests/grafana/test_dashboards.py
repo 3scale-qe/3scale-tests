@@ -1,4 +1,5 @@
 """Tests for Grafana Dashboards definitions"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

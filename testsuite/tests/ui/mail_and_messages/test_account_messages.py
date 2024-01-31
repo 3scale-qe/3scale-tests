@@ -1,4 +1,5 @@
 """Test of automatic email associated to accounts in UI"""
+
 import re
 
 import pytest

@@ -1,4 +1,5 @@
 """Module responsible for processing configuration"""
+
 import inspect
 from typing import Dict, Any, Mapping
 

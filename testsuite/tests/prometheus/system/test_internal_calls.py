@@ -1,6 +1,7 @@
 """
 Test Prometheus metric for content_caching.
 """
+
 import base64
 
 import pytest

@@ -1,4 +1,5 @@
 """Utility classes for working with RHSSO server"""
+
 import functools
 
 import backoff

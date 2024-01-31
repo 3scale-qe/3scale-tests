@@ -1,4 +1,5 @@
 """Tokens conftest"""
+
 from urllib.parse import urljoin
 
 import pytest

@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/jwt_claim_check/jwt_claim_check_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

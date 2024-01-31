@@ -1,4 +1,5 @@
 """Tests generic HTTP Integration for Zync"""
+
 import backoff
 import pytest
 from threescale_api.resources import Service

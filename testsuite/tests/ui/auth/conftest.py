@@ -1,6 +1,7 @@
 """
 Conftest for auth tests
 """
+
 # pylint: disable=unused-argument, too-many-arguments
 import pytest
 

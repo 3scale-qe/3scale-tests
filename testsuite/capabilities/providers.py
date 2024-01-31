@@ -1,4 +1,5 @@
 """This module is where most of the capability providers should be to not have them scattered around"""
+
 from testsuite import gateways
 from testsuite.capabilities import CapabilityRegistry, Capability
 from testsuite.configuration import openshift

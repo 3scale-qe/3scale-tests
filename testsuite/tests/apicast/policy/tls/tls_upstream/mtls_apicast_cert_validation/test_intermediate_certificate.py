@@ -2,6 +2,7 @@
 Tests then when the APIcast is sending a certificate chain to the upstream API,
 all certificates in the chain are sent and the request is correctly validated.
 """
+
 import pytest
 
 from testsuite import rawobj

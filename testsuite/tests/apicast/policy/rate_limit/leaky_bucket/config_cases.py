@@ -4,6 +4,7 @@
                         returns tuple: 1st: configuration of the policies
                                        2nd: True if the condition was applied, false otherwise
 """
+
 from typing import Tuple
 
 from pytest_cases import parametrize

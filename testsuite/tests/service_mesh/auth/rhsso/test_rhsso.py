@@ -1,6 +1,7 @@
 """
 Testing service authentication using OIDC with RHSSO
 """
+
 import pytest
 from threescale_api.resources import Service
 

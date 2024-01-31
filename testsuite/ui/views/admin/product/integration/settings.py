@@ -1,4 +1,5 @@
 """View representations of products integration section pages"""
+
 from widgetastic.widget import TextInput
 
 from testsuite.ui.views.admin.product import BaseProductView

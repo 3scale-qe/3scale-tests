@@ -6,6 +6,7 @@ because it was already routed.
 If it is applied right before APIcast policy, the upstream policy will take an effect
 and it will change upstream to echo-api
 """
+
 from urllib.parse import urlparse
 
 import pytest

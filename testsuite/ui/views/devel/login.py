@@ -1,4 +1,5 @@
 """Representation of login specific Views"""
+
 from time import sleep
 from widgetastic.widget import TextInput, Text, View
 

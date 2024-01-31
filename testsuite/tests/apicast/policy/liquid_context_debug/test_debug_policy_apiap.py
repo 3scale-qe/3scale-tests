@@ -2,6 +2,7 @@
 Tests that the liquid context debug policy is active on products
 with multiple backends.
 """
+
 from urllib.parse import urlparse
 
 import pytest

@@ -1,4 +1,5 @@
 """Devel applications pages and tabs"""
+
 from widgetastic.widget import Text, Table
 
 from testsuite.ui.navigation import step

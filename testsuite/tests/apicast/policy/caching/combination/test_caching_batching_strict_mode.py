@@ -1,6 +1,7 @@
 """
 Test caching policy with resilient mode.
 """
+
 from time import sleep
 
 import pytest

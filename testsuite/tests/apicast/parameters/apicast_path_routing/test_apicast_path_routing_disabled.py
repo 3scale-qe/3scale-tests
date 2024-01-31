@@ -2,6 +2,7 @@
 
 Test apicast with path routing disabled.
 """
+
 from urllib.parse import urlparse
 
 import pytest

@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/url_rewrite/url_rewrite_capture_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj

@@ -1,4 +1,5 @@
 """HttpClient for Service mesh"""
+
 from typing import Iterable
 
 import requests

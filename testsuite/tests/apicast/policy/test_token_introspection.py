@@ -7,6 +7,7 @@ introspection endpoint, then a request using rhsso auth passes.
 After logging the user out of rhsso, the following requests fail.
 
 """
+
 import pytest
 
 from testsuite import rawobj

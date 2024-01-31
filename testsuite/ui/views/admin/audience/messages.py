@@ -1,4 +1,5 @@
 """View representations of Messages pages"""
+
 from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly import TextInput
 from widgetastic_patternfly4 import Button, PatternflyTable

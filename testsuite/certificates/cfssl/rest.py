@@ -1,4 +1,5 @@
 """CFSSL certificate implementation."""
+
 from typing import Optional
 
 import cfssl

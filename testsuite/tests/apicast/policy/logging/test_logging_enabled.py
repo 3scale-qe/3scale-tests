@@ -1,6 +1,7 @@
 """
 When the logging policy is set to enable logging, the logs are outputed as usual
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability

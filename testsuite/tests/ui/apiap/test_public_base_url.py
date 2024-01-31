@@ -1,4 +1,5 @@
 """Test for Public Base URLs as localhost"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from widgetastic.widget import Text

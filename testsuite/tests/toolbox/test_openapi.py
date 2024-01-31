@@ -94,7 +94,7 @@ def import_oas(threescale_dst1, dest_client, request, oas):
     import_cmd = f"import openapi -d {threescale_dst1} "
     import_cmd += oas["file_name"]
     import_cmd += f" --default-credentials-userkey={USER_KEY} "
-    import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-':'_', '.':'_'}))}"
+    import_cmd += f"--target_system_name={blame(request, 'svc').translate(''.maketrans({'-': '_', '.': '_'}))}"
     ret = toolbox.run_cmd(import_cmd)
     (_, service_id, service_name) = re.findall(
         r"^(Created|Updated) service id: (\d+), name: (.+)$", ret["stdout"], re.MULTILINE

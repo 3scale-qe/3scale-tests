@@ -1,6 +1,7 @@
 """
 Test valid content caching on product with multiple backends
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 

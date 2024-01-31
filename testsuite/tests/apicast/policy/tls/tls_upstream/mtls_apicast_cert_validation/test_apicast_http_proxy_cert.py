@@ -3,6 +3,7 @@ Test upstream mTLS that is set up not using any policy, but by setting environme
 APICAST_PROXY_HTTPS_CERTIFICATE_KEY and APICAST_PROXY_HTTPS_CERTIFICATE. This does the same as upstream mTLS policy,
 only globally.
 """
+
 import pytest
 
 from testsuite.certificates import Certificate

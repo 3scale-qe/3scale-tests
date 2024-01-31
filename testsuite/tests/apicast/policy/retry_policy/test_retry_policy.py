@@ -8,6 +8,7 @@ success is achieved when:
 The request will fail when:
     - the number of fail responses is greater them the max number of retries
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability

@@ -17,6 +17,7 @@ loader is defined in config/.env file). At same moment this has to be
 overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
+
 from pathlib import Path
 import logging
 import os

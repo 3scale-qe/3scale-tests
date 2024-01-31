@@ -1,4 +1,5 @@
 """View representations of Account plan pages"""
+
 from widgetastic.widget import TextInput, GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable, Dropdown
 

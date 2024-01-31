@@ -1,6 +1,7 @@
 """
 Default test for HTTP2 policy
 """
+
 import pytest
 
 import testsuite

@@ -5,6 +5,7 @@
     This test shows usage how to write test where 3scale product is secured with app id
     and app key combination.
 """
+
 import asyncio
 import os
 

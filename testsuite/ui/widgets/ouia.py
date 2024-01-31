@@ -1,4 +1,5 @@
 """Widgets that extends OUIAGenericWidget"""
+
 from logging import Logger
 from typing import Optional
 

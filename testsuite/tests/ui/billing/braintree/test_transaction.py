@@ -3,6 +3,7 @@ Tests for transaction
 https://developer.paypal.com/braintree/docs/reference/general/testing/python
 https://developer.paypal.com/braintree/docs/reference/general/statuses#transaction
 """
+
 import pytest
 from threescale_api.errors import ApiClientError
 

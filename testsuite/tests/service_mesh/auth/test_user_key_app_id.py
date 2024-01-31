@@ -2,6 +2,7 @@
 Auth tests for user_key and app_id/app_key authentication modes for Service Mesh
 Service Mesh by allows both query and headers location to be used
 """
+
 import pytest
 from threescale_api.resources import Service
 

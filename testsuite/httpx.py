@@ -1,4 +1,5 @@
 """Http client with HTTPX library supporting HTTP/1.1 and HTTP/2"""
+
 import functools
 import logging
 from typing import Iterable, Generator

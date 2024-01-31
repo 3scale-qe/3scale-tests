@@ -2,6 +2,7 @@
 Braintree gateway billing tests with 3D Secure integration for SCA compliance.
 https://developer.paypal.com/braintree/docs/guides/3d-secure/testing-go-live
 """
+
 import pytest
 
 pytestmark = pytest.mark.usefixtures("login")

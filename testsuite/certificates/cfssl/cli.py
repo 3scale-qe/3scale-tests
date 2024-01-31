@@ -1,4 +1,5 @@
 """Module containing classes for local CFSSL"""
+
 import json
 import os
 import subprocess

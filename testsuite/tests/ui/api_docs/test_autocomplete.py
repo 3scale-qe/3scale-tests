@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/autocomplete_spec.rb"""
+
 import pytest
 
 from testsuite.ui.views.admin.settings.api_docs import APIDocsView

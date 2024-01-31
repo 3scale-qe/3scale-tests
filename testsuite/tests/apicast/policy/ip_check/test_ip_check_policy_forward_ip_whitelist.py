@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/ip_check/ip_check_forward_whitelist_spec.rb
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest

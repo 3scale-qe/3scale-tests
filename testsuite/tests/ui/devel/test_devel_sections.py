@@ -1,4 +1,5 @@
 """Test for developer portal sections"""
+
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 

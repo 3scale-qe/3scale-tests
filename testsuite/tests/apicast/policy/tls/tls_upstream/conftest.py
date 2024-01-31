@@ -1,6 +1,7 @@
 """
 Configuration for tests making use of an upstream supporting TLS
 """
+
 from urllib.parse import urlparse
 
 import pytest

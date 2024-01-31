@@ -1,4 +1,5 @@
 """Provides custom service and application to add policy to policy chain with function scope"""
+
 import pytest
 
 from testsuite import rawobj

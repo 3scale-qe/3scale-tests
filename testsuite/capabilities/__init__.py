@@ -5,6 +5,7 @@ In tests you can use it with pytest.mark.required_capabilities(capability1, capa
 
 Capabilities are provider by a functions annotated with @capability_provider and should return Set of capabilities
 """
+
 import enum
 from typing import Set, Callable, Any, Tuple, List
 

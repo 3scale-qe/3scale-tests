@@ -1,4 +1,5 @@
 """Tests that accessing APIcast with token from a different RHSSO realm does not work"""
+
 import pytest
 
 from testsuite.capabilities import Capability

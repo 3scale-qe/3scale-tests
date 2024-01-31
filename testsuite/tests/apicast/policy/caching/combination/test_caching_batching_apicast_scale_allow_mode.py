@@ -1,6 +1,7 @@
 """
 Test caching policy with allow mode.
 """
+
 from time import sleep
 
 import pytest

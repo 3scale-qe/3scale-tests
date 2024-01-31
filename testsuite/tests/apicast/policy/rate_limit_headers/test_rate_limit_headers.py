@@ -5,6 +5,7 @@ Tests that:
  - the policy should work also on backend metrics
  - the combination of backend and service metrics should make no problem
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 import pytest_cases

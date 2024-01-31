@@ -1,4 +1,5 @@
 """View representations of products integration configuration section pages"""
+
 from widgetastic.widget import View, ParametrizedLocator
 from widgetastic_patternfly4 import Button
 

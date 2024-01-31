@@ -1,4 +1,5 @@
 """Developer portal smoke tests"""
+
 import pytest
 
 from testsuite import settings

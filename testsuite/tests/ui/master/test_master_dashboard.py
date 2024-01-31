@@ -3,6 +3,7 @@
 
     Tests in this file are testing the functionality of the master dashboard.
 """
+
 import pytest
 
 from testsuite.ui.views.master.foundation import MasterDashboardView

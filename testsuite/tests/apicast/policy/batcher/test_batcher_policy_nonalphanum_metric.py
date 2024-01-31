@@ -2,6 +2,7 @@
 Test checks that batcher policy is working with a metric containing a non-alphanumeric
 character in the name
 """
+
 from time import sleep
 import pytest
 

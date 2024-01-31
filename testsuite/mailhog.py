@@ -1,6 +1,7 @@
 """
 This module contains wrapper for the Mailhog API
 """
+
 from typing import Set, Optional
 import backoff
 import pytest

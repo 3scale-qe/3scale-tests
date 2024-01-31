@@ -9,6 +9,7 @@
 
     WARNING: If this service is left undeleted on older versions, it will break self managed apicasts.
 """
+
 from time import time
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import

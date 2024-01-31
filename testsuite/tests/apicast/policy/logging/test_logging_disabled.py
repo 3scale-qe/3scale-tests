@@ -1,6 +1,7 @@
 """
 When the logging policy is set to disable logging, than no access logs are created
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability

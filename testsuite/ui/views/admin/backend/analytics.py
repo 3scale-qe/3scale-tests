@@ -1,4 +1,5 @@
 """View representations of Product Analytics pages"""
+
 from testsuite.ui.views.admin.backend import BaseBackendView
 from testsuite.ui.widgets import ThreescaleAnalyticsDropdown
 

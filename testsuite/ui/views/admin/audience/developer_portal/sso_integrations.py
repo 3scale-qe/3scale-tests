@@ -1,4 +1,5 @@
 """View representations of SSO Integrations pages for developer portal"""
+
 from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
