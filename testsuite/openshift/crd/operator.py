@@ -1,7 +1,7 @@
 """Module containing Operator object"""
 
-import openshift as oc
-from openshift import APIObject
+import openshift_client as oc
+from openshift_client import APIObject
 
 
 class Operator(APIObject):

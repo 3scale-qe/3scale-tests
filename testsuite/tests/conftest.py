@@ -13,7 +13,7 @@ from itertools import chain
 
 import backoff
 import importlib_resources as resources
-import openshift as oc
+import openshift_client as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key

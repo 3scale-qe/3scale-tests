@@ -7,7 +7,7 @@ import backoff
 import pytest
 import requests
 
-from openshift import OpenShiftPythonException
+from openshift_client import OpenShiftPythonException
 
 from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient
