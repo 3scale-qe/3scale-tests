@@ -3,7 +3,7 @@ from contextlib import ExitStack
 from typing import List
 from urllib.parse import urlparse, urlunparse
 
-from openshift import Selector
+from openshift_client import Selector
 
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.env import Properties

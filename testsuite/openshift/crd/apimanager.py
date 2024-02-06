@@ -1,7 +1,7 @@
 """Module containing APIManager object"""
 from typing import Optional, Set
 
-from openshift import APIObject, Missing
+from openshift_client import APIObject, Missing
 
 
 def _locator(path, apiobj):
