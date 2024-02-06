@@ -27,7 +27,7 @@ import re
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
 
-from openshift import OpenShiftPythonException
+from openshift_client import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name

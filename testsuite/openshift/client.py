@@ -7,7 +7,7 @@ import os
 from contextlib import ExitStack
 from typing import List, Dict, Union, Any, Optional, Callable, Sequence
 
-import openshift as oc
+import openshift_client as oc
 import yaml
 
 from testsuite.openshift.crd.apimanager import APIManager
