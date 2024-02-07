@@ -62,7 +62,8 @@ class StripeCCForm(View):
         self.cc_details.cardnumber.fill(credit_card.number)
         self.cc_details.expiration.fill(f"{credit_card.exp_month}{credit_card.exp_year}")
         self.cc_details.cvc.fill(credit_card.cvc)
-        self.cc_details.postal.fill(postal)
+        if self.cc_details.postal.is_displayed:
+            self.cc_details.postal.fill(postal)
         self.submit_btn.click()
 
     @property
@@ -80,17 +81,11 @@ class OTPForm(View):
         """Nested IFrame"""
 
         FRAME = ".//iframe[@id='challengeFrame']"
-
-        @View.nested
-        class acs_frame(View):  # pylint: disable=invalid-name
-            """Nested IFrame that contains OTP elements"""
-
-            FRAME = ".//iframe[@name='acsFrame']"
-            complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-3ds']")
+        complete_auth = GenericLocatorWidget(".//button[@id='test-source-authorize-3ds']")
 
     def complete_auth(self):
         """Completes the authentication"""
-        self.browser.element(self.challenge_frame.acs_frame.complete_auth).submit()
+        self.browser.element(self.challenge_frame.complete_auth).submit()
         self.browser.selenium.switch_to.default_content()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
 
