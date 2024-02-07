@@ -37,11 +37,11 @@ class UsersView(BaseSettingsView):
     @step("UserDetailView")
     def detail(self, user):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.edit()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id))).invite_a_new_user.widget.edit()
 
     def delete(self, user):
         """Delete user by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.delete()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id))).invite_a_new_user.widget.delete()
 
     def prerequisite(self):
         return BaseSettingsView
