@@ -30,7 +30,7 @@ def ui_sso_integration(custom_admin_login, navigator, threescale, testconfig, re
 
             def _delete():
                 custom_admin_login()
-                sso_edit = navigator.navigate(SSOIntegrationEditView, integration=sso)
+                sso_edit = navigator.open(SSOIntegrationEditView, integration=sso)
                 sso_edit.delete()
 
             request.addfinalizer(_delete)
