@@ -31,6 +31,10 @@ ifdef html
 PYTEST += --html=$(resultsdir)/report-$(@F).html --self-contained-html
 endif
 
+ifdef PYTHON_VERSION
+PIPENV_ARGS += --python $(PYTHON_VERSION)
+endif
+
 ifeq ($(filter-out --store --load,$(flags)),$(flags))
 	PYTEST += -p no:persistence
 endif
@@ -154,14 +158,14 @@ export DOCKERCONFIGJSON
 endif
 
 Pipfile.lock: Pipfile
-	pipenv lock
+	pipenv lock $(PIPENV_ARGS)
 
 .make-pipenv-sync: Pipfile.lock
-	pipenv sync
+	pipenv sync $(PIPENV_ARGS)
 	touch .make-pipenv-sync
 
 .make-pipenv-sync-dev: Pipfile.lock
-	pipenv sync --dev
+	pipenv sync --dev $(PIPENV_ARGS)
 	touch .make-pipenv-sync-dev .make-pipenv-sync
 
 pipenv: .make-pipenv-sync
