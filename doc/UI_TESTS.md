@@ -20,8 +20,11 @@ latest know webdrivers and store those webdrivers in cache/tmp folders
     To run container use e.g. `podman run -d -p 4444:4444 -p 5900:5900 -v /dev/shm:/dev/shm 
     selenium/standalone-chrome:4.0.0-beta-1-20210215` 
 
-Currently supported browsers options are `firefox`, `chrome` and `edge`
-(edge only for remote webdriver or using binary path)
+`webdriver:`:
+Choose browser type -currently supported browsers options are `firefox`, `chrome`
+
+`headless:`: Run UI tests in headless mode, options are `True/False` (About 30% faster option than classic run) - default is `True`. Use False setting for debugging or run observation
+
 
 There can be also specified 3scale admin url which is used for browser 
 navigation(by default is automatically fetched from dynaconf)

@@ -45,6 +45,7 @@ def webdriver():
         source=settings["fixtures"]["ui"]["browser"]["source"],
         driver=settings["fixtures"]["ui"]["browser"]["webdriver"],
         ssl_verify=settings["ssl_verify"],
+        headless=settings["fixtures"]["ui"]["browser"]["headless"],
         remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
         binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"],
     )
