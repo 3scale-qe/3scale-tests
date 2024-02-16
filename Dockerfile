@@ -6,7 +6,7 @@ Bind kubeconfig to /opt/kubeconfig \
 Bind a dir to /test-run-results to get reports \
 Set NAMESPACE env variable"
 
-ARG cacert=https://password.corp.redhat.com/RH-IT-Root-CA.crt
+ARG cacert=https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem
 
 USER root
 
