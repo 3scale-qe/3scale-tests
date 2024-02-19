@@ -146,6 +146,7 @@ class Secrets(RemoteMapping):
         string_data: typing.Dict[str, str] = None,
         files: typing.Dict[str, str] = None,
         certificate: Certificate = None,
+        labels: typing.Dict[str, str] = None,
     ):
         """Create a new secret.
 
@@ -159,6 +160,7 @@ class Secrets(RemoteMapping):
                           in which case the given name will be used.  Specifying a directory will
                           iterate each named file in the directory that is a valid secret key.
             :param certificate: The Certificate
+            :param labels: Labels which are set to new object
         """
         opt_args = []
 
@@ -177,6 +179,9 @@ class Secrets(RemoteMapping):
             opt_args.extend(["--cert", certificate.files["certificate"], "--key", certificate.files["key"]])
 
         self.do_action("create", ["secret", kind.value, name, opt_args])
+        if labels:
+            for key, val in labels.items():
+                self.do_action("label", ["secret/" + name, f"{key}={val}"])
 
 
 class ConfigMaps(RemoteMapping):
