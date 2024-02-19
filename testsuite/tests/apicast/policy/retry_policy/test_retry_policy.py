@@ -18,10 +18,12 @@ pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capa
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(base_url):
-    """Have httpbin backend due to /fail-request implementation"""
-
-    return rawobj.Proxy(base_url)
+def backend_default(base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Have httpbin backend due to /fail-request implementation
+    """
+    return custom_backend("backend_default", endpoint=base_url)
 
 
 @pytest.fixture(scope="module")

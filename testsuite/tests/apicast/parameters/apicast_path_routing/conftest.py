@@ -42,9 +42,21 @@ def service(service, service_mapping):
 
 
 @pytest.fixture(scope="module")
-def service2_proxy_settings(private_base_url):
-    """Change api_backend to echo-api for service2."""
-    return rawobj.Proxy(private_base_url("echo_api"))
+def private_base_url2(private_base_url):
+    """Second private base url."""
+    return private_base_url("echo_api")
+
+
+@pytest.fixture(scope="module")
+def backend_default2(private_base_url2, custom_backend):
+    """Second default backend."""
+    return custom_backend("backend_default2", endpoint=private_base_url2)
+
+
+@pytest.fixture(scope="module")
+def backends_mapping2(backend_default2):
+    """Second backends mapping."""
+    return {"/": backend_default2}
 
 
 @pytest.fixture(scope="module")
@@ -55,9 +67,9 @@ def service2_mapping():
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service2(request, custom_service, lifecycle_hooks, service2_proxy_settings, service2_mapping):
+def service2(request, custom_service, lifecycle_hooks, backends_mapping2, service2_mapping):
     """Create second service and mapping rule."""
-    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings, hooks=lifecycle_hooks)
+    service2 = custom_service({"name": blame(request, "svc")}, backends=backends_mapping2, hooks=lifecycle_hooks)
 
     metric = service2.metrics.list()[0]
     proxy = service2.proxy.list()

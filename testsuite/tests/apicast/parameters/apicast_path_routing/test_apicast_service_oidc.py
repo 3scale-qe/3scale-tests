@@ -4,7 +4,6 @@ Test for using OIDC with apicast env_variable 'APICAST_SERVICES_FILTER_BY_URL' a
 
 import pytest
 
-from testsuite import rawobj
 from testsuite.gateways import gateway
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.template import TemplateApicast
@@ -76,9 +75,9 @@ def gateway_environment(gateway_environment):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def private_base_url2(private_base_url):
     """Change api_backend to httpbin for service."""
-    return rawobj.Proxy(private_base_url("httpbin"))
+    return private_base_url("httpbin")
 
 
 @pytest.fixture(scope="module")

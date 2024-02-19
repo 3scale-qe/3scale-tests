@@ -17,7 +17,7 @@ pytestmark = [
 @pytest.fixture(scope="module")
 def service(custom_service, service_settings):
     """
-    Create a custom service withou backend
+    Create a custom service without backend
     """
     return custom_service(service_settings)
 

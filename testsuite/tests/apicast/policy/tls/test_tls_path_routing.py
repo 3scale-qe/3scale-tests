@@ -53,9 +53,12 @@ def delete_all_mapping_rules(proxy):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Change api_backend to echo-api for service2."""
-    return rawobj.Proxy(f"{private_base_url('echo_api')}/service1")
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Change api_backend to echo-api for service2.
+    """
+    return custom_backend("backend_default", endpoint=f"{private_base_url('echo_api')}/service1")
 
 
 @pytest.fixture(scope="module")
@@ -86,18 +89,28 @@ def service2_mapping():
 
 
 @pytest.fixture(scope="module")
-def service2_proxy_settings(private_base_url):
-    """Change api_backend to echo-api for service2."""
-    return rawobj.Proxy(f"{private_base_url('echo_api')}/service2")
+def backend_default2(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Change api_backend to echo-api for service2.
+    """
+    return custom_backend("backend_default", endpoint=f"{private_base_url('echo_api')}/service2")
+
+
+@pytest.fixture(scope="module")
+def backends_mapping2(backend_default2):
+    """
+    Due to the new 3Scale feature, we need to be able to create  custom backends and backend usages and then pass them
+    to creation of custom service. By default, it does nothing, just lets you skip creating a backend in test files.
+    """
+    return {"/": backend_default2}
 
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def service2(
-    request, custom_service, lifecycle_hooks, service2_proxy_settings, service2_mapping, tls_policy, logging_policy
-):
+def service2(request, custom_service, lifecycle_hooks, service2_mapping, tls_policy, logging_policy, backends_mapping2):
     """Create second service and mapping rule."""
-    service2 = custom_service({"name": blame(request, "svc")}, service2_proxy_settings, hooks=lifecycle_hooks)
+    service2 = custom_service({"name": blame(request, "svc")}, backends=backends_mapping2, hooks=lifecycle_hooks)
 
     service2.proxy.list().policies.append(tls_policy)
     service2.proxy.list().policies.append(logging_policy)

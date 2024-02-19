@@ -8,18 +8,24 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def backends_mapping(custom_backend, private_base_url):
+def backends_mapping(custom_backend, private_base_url, backends_mapping):
     """Creates custom backends with paths "/bin", "/lib"""
-    return {
-        "/bin": custom_backend("backend", private_base_url("httpbin")),
-        "/lib": custom_backend("backend2", private_base_url("httpbin")),
-    }
+    backends_mapping.update(
+        {
+            "/bin": custom_backend("backend", private_base_url("httpbin")),
+            "/lib": custom_backend("backend2", private_base_url("httpbin")),
+        }
+    )
+    return backends_mapping
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Have httpbin backend due to implementation /response-headers"""
-    return rawobj.Proxy(private_base_url("httpbin"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Have httpbin backend due to implementation /response-headers
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("httpbin"))
 
 
 @pytest.fixture(scope="module")

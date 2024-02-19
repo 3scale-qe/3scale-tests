@@ -15,7 +15,7 @@ def only_service(custom_service, request):
     """
     Create a custom service without backend and cleanup
     """
-    return custom_service({"name": blame(request, "svc")}, autoclean=False)
+    return custom_service({"name": blame(request, "svc")}, proxy_params=None, backends={}, autoclean=False)
 
 
 def test_service_deleted_automatic_email(mailhog_client, only_service):

@@ -21,24 +21,28 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def backend_default(private_base_url, custom_backend):
     """
+    Default backend with url from private_base_url.
     Change api_backend to httpbin for service, as the test uses utilities provided
     only by http_bin ("/response_headers" endpoint)"
     """
-    return rawobj.Proxy(private_base_url("httpbin"))
+    return custom_backend("backend_default", endpoint=private_base_url("httpbin"))
 
 
+# pylint: disable=too-many-arguments
 @pytest_cases.fixture
 @parametrize_with_cases("case_data", cases=config_cases)
-def config(custom_service, case_data, request, service_proxy_settings, lifecycle_hooks):
+def config(custom_service, case_data, request, backends_mapping, lifecycle_hooks, service_proxy_settings):
     """
     Configuration for the custom metric policy
     Creates a service
     Creates metrics based on the case_data
     Adds the policy with the setting based on the case_data
     """
-    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    service = custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends=backends_mapping, hooks=lifecycle_hooks
+    )
 
     policy_config, calls, metrics = case_data
     proxy = service.proxy.list()

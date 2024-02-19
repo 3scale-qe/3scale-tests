@@ -586,9 +586,9 @@ def rhsso_service_info(request, testconfig, tools):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def service_proxy_settings():
     "dict of proxy settings to be used when service created"
-    return rawobj.Proxy(private_base_url())
+    return rawobj.Proxy()
 
 
 @pytest.fixture(scope="module")
@@ -782,12 +782,25 @@ def custom_application(account, custom_app_plan, request, testconfig):  # pylint
 
 
 @pytest.fixture(scope="module")
-def backends_mapping():
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+
+    Args:
+        :param private_base_url: private base url
+            which is used/changed by other fixtures
+        :param custom_backend: function for creating custom backend
+    """
+    return custom_backend("backend_default", endpoint=private_base_url())
+
+
+@pytest.fixture(scope="module")
+def backends_mapping(backend_default):
     """
     Due to the new 3Scale feature, we need to be able to create  custom backends and backend usages and then pass them
     to creation of custom service. By default, it does nothing, just lets you skip creating a backend in test files.
     """
-    return {}
+    return {"/": backend_default}
 
 
 @pytest.fixture(scope="module")
@@ -818,6 +831,8 @@ def custom_service(threescale, request, testconfig, logger):
             annotate=True,
             threescale_client=threescale,
         ):
+            if not proxy_params:
+                proxy_params = {}
             params = params.copy()
             for hook in _select_hooks("before_service", hooks):
                 params = hook(params)
@@ -837,44 +852,20 @@ def custom_service(threescale, request, testconfig, logger):
                         except Exception:  # pylint: disable=broad-except
                             pass
 
-                    implicit = []
-                    if not backends and proxy_params:  # implicit backend created
-                        bindings = svc.backend_usages.list()
-                        bindings = [svc.threescale_client.backends[i["backend_id"]] for i in bindings]
-                        implicit = [
-                            i
-                            for i in bindings
-                            if i["name"] == f"{svc['name']} Backend" and i["description"] == f"Backend of {svc['name']}"
-                        ]
-
                     svc.delete()
-
-                    try:
-                        if len(implicit) == 1:
-                            _backend_delete(implicit[0])
-                        else:
-                            logger.debug("Unexpected count of candidates for implicit backend: %s", str(implicit))
-                    except Exception as err:  # pylint: disable=broad-except
-                        logger.debug("An error occurred during attempt to delete implicit backend: %s", str(err))
 
                 with self._lock:
                     if autoclean:
                         request.addfinalizer(finalizer)
                     else:
                         self.orphan_finalizers.append(finalizer)
-
             if backends:
                 for path, backend in backends.items():
                     svc.backend_usages.create({"path": path, "backend_api_id": backend["id"]})
-                proxy_params = {}
-                for hook in _select_hooks("before_proxy", hooks):
-                    proxy_params = hook(svc, proxy_params)
+            for hook in _select_hooks("before_proxy", hooks):
+                proxy_params = hook(svc, proxy_params)
 
-                svc.proxy.list().update(params=proxy_params)
-            elif proxy_params:
-                for hook in _select_hooks("before_proxy", hooks):
-                    proxy_params = hook(svc, proxy_params)
-
+            if proxy_params:
                 resilient.proxy_update(svc, params=proxy_params)
             svc.proxy.deploy()
 
@@ -893,6 +884,8 @@ def custom_service(threescale, request, testconfig, logger):
 def _backend_delete(backend):
     """reliable backend delete"""
 
+    for usage in backend.usages():
+        usage.delete()
     backend.delete()
 
 

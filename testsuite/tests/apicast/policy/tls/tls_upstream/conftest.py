@@ -8,7 +8,6 @@ import pytest
 
 import importlib_resources as resources
 
-from testsuite import rawobj
 from testsuite.certificates import Certificate
 from testsuite.utils import blame
 
@@ -110,6 +109,9 @@ def custom_httpbin(staging_gateway, request, upstream_certificate, upstream_auth
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(httpbin):
-    """Dict of proxy settings to be used when service created"""
-    return rawobj.Proxy(httpbin)
+def backend_default(httpbin, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Backend url to be used when service created
+    """
+    return custom_backend("backend_default", endpoint=httpbin)

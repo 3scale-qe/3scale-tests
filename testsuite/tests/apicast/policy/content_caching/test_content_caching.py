@@ -31,9 +31,12 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    "content caching endpoint to be used"
-    return rawobj.Proxy(private_base_url("echo_api"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Content caching endpoint to be used
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

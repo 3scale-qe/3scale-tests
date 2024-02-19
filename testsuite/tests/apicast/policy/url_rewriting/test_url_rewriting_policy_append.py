@@ -9,7 +9,16 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service(service, private_base_url):
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Content caching endpoint to be used
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("echo_api"))
+
+
+@pytest.fixture(scope="module")
+def service(service):
     "Add url_rewriting policy, configure metrics/mapping"
     proxy = service.proxy.list()
 
@@ -22,7 +31,7 @@ def service(service, private_base_url):
     proxy.mapping_rules.create({"http_method": "GET", "pattern": "/hello", "metric_id": metric["id"], "delta": 5})
 
     # proxy needs to be updated to apply added mapping
-    proxy.update(rawobj.Proxy(private_base_url("echo_api")))
+    proxy.update(rawobj.Proxy())
     proxy.deploy()
 
     return service

@@ -14,7 +14,7 @@ pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 
 @pytest.fixture(scope="module")
-def service(service, private_base_url):
+def service(service):
     """Add url_rewriting policy, configure metrics/mapping"""
     proxy = service.proxy.list()
 
@@ -35,7 +35,7 @@ def service(service, private_base_url):
     proxy.mapping_rules.create(rawobj.Mapping(hello_metric, pattern="/anything/initial", http_method="POST"))
 
     # proxy needs to be updated to apply added mapping
-    proxy.update(rawobj.Proxy(private_base_url()))
+    proxy.update(rawobj.Proxy())
     proxy.deploy()
 
     return service

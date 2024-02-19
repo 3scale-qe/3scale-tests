@@ -223,9 +223,13 @@ def matching_rule(request):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """A tool that implements delayed request is needed"""
-    return rawobj.Proxy(private_base_url("mockserver"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Change api_backend to httpbin for service, as the test uses utilities provided
+    only by http_bin ("/response_headers" endpoint)"
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("mockserver"))
 
 
 @pytest.fixture

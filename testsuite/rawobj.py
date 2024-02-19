@@ -18,11 +18,9 @@ def PolicyConfig(name: str, configuration: dict, version: str = "builtin", enabl
 
 
 # pylint: disable=unused-argument
-def Proxy(api_backend: str, api_test_path: str = "/get", credentials_location: str = "query") -> dict:
+def Proxy(credentials_location: str = "query") -> dict:
     """builder of params to create a service proxy
     Args:
-        :param api_backend: URL to API backend
-        :param api_test_path: URL relpath to be used for test requests; default '/get'
         :param credentials_location: Where to expected credentials; default 'query'"""
     return locals()
 

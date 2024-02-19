@@ -26,9 +26,12 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    """Websocket are only available on httpbin go"""
-    return rawobj.Proxy(private_base_url("httpbin_go"))
+def backend_default(private_base_url, custom_backend):
+    """
+    Default backend with url from private_base_url.
+    Websocket are only available on httpbin go
+    """
+    return custom_backend("backend_default", endpoint=private_base_url("httpbin_go"))
 
 
 @pytest.fixture

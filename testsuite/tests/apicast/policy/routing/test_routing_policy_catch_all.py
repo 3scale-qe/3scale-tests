@@ -17,11 +17,12 @@ pytestmark = [
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def backend_default(private_base_url, custom_backend):
     """
+    Default backend with url from private_base_url.
     Asserts, that echo api is used as the default backend
     """
-    return rawobj.Proxy(private_base_url("echo_api"))
+    return custom_backend("backend_default", endpoint=private_base_url("echo_api"))
 
 
 @pytest.fixture(scope="module")

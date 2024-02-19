@@ -72,9 +72,11 @@ def service(request, service, staging_gateway):
 
 
 @pytest.fixture(scope="module")
-def service2(request, service_proxy_settings, custom_service, lifecycle_hooks):
+def service2(request, service_proxy_settings, custom_service, lifecycle_hooks, backends_mapping):
     """Create service2 whose configuration will not be set to apicast."""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, hooks=lifecycle_hooks)
+    return custom_service(
+        {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+    )
 
 
 @pytest.fixture(scope="module")

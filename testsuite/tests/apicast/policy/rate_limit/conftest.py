@@ -23,10 +23,10 @@ def policy_settings():
 
 
 @pytest_cases.fixture
-def service_plus(custom_service, service_proxy_settings, request, policy_settings):
+def service_plus(custom_service, service_proxy_settings, request, policy_settings, backends_mapping):
     """Usual service with policy_settings added to the policy_chain. function-scoped"""
 
-    svc = custom_service({"name": blame(request, "svc")}, service_proxy_settings)
+    svc = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends=backends_mapping)
     if isinstance(policy_settings, dict):
         svc.proxy.list().policies.append(policy_settings)
     elif policy_settings is not None:

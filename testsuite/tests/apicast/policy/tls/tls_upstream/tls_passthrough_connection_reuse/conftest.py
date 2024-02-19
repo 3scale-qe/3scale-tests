@@ -116,8 +116,9 @@ def mapping_rules(service, backend_orig, backend_new):
 
 
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
+def backend_default(private_base_url, custom_backend):
     """
-    Overrides the service_proxy_settings from mtls conftest so another httpbin won't be created
+    Default backend with url from private_base_url.
+    Overrides the backend_default from mtls conftest so another httpbin won't be created
     """
-    return rawobj.Proxy(private_base_url())
+    return custom_backend("backend_default", endpoint=private_base_url())
