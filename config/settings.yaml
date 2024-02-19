@@ -50,6 +50,7 @@ default:
           hostPort: "@format jaeger-query.{this.FIXTURES.tools.namespace}.svc:5778"
     ui:
       browser:
+        headless: true
         source: local
         webdriver: chrome
         remote_url: http://127.0.0.1:4444
