@@ -59,23 +59,23 @@ testsuite/%: FORCE pipenv check-secrets.yaml
 
 test: ## Run test
 test pytest tests: pipenv check-secrets.yaml
-	$(PYTEST) -n4 -m 'not flaky' --dist loadfile $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' $(flags) testsuite
 
 speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv check-secrets.yaml
-	$(PYTEST) -n4 -m 'not flaky' --drop-sandbag $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag $(flags) testsuite
 
 sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
 sandbag: pipenv
-	$(PYTEST) -n4 -m 'not flaky' --sandbag $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag $(flags) testsuite
 
 persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv check-secrets.yaml
-	$(PYTEST) -n4 -m 'not flaky' --drop-nopersistence $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) testsuite
 
 persistence-store persistence-load: export _3SCALE_TESTS_skip_cleanup=true
 persistence-store persistence-load: pipenv check-secrets.yaml
-	$(subst -p no:persistence,,$(PYTEST)) -n4 -m 'not flaky' --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
+	$(subst -p no:persistence,,$(PYTEST)) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
