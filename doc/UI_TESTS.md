@@ -1,13 +1,11 @@
 # UI testing guide
 
-## Before You Run It
-
-###Configuration
+## Configuration
 First, you need to specify:
  * secrets in `secreets.yaml` or local version of secrets file
  * settings in in `settings.yaml` or local version of settings file
 
-####Settings
+### Settings
 In settings there are three options to run testsuite using option `source:`:
 * `local` settings  will use webdrivers from library which refers to 
 latest know webdrivers and store those webdrivers in cache/tmp folders
@@ -36,10 +34,10 @@ threescale:
      
 Testsuite also can save screenshots to folder defined in env variable `resultsdir`
      
-####Secrets
+### Secrets
 Contains  `username` and user `password` which is used for UI login into tenant
 
-###Writing tests
+## Writing tests
 
 We use Widgetastic library for developing our tests. 
 Widgetastic contains following separated repository dependant on used UI technology:
@@ -55,7 +53,7 @@ This may help other teams and speed up development of library.
 At first you need to create page objects for handling elements on page, 
 then specify navigation to desired page and after that you can write tests with some expectations.
 
-####Views/Page objects
+### Views/Page objects
 We have 4 basic Views in Admin portal, from these views should inherit  all other views. 
 * `AudienceView` - audience menu contains
 * `ProductView` - product specific menu
@@ -85,8 +83,8 @@ def is_displayed(self):
 Method check if elements are present on page and path is in current url.
 
 
-####Widgets
-Every page object is composed from widgets.
+### Widgets
+Every page object is composed of widgets.
 Most components can be used from widgetastic libraries, 
 there you can find examples and usage(using selectors, actions etc.)
 But there are also 3scale specific widgets/elements which have to be implemented separately or can be
@@ -94,9 +92,32 @@ inherited and changed.
 
 3scale specified widgets are located in `testsuite/ui/widgets/__init__.py`
 
-####Navigation
+### Navigation
 
-####Conftest
+Navigator takes responsibility of navigation process during UI testing.
+It uses two basic structures (prerequisites and steps) in order to construct logical path (or sequence of actions)
+from root View to desired location. This simulates user actions during system navigation.
+
+Navigation process consists of two parts:
+   * 1. **Backtrace** - Views should extend NavigateStep class which defines simple method `prerequisite`.
+        This method should specify View that is ancestor of accessible from(is navigable from).
+        Backtrace process then create queue that consists of View sequence that describes path from root
+        to desired View.
+   * 2. **Perform of steps** - Sequentially pops Views from mentioned queue and invoke methods that are decorated
+        as steps for navigation.
+
+**Navigating to desired View**
+
+Navigator class can navigate to desired view with two methods:
+* **Navigator.navigate**  - perform navigation to specific View. If required by particular steps, args and kwargs
+        should be specified. They are later passed to every step method and mapped to
+        correct View parameters.
+* Navigator.open - Directly opens desired View, by inserting its `path` in to browser url. (There is an optional argument `exact` which enables to open exact provided url.)
+
+For more details see implementation.
+
+
+### Conftest
 
 * `browser` - represents browser instance with admin portal address  
 which can be passed to View and make tweaks
@@ -117,7 +138,7 @@ credentials from secret file will be used.
     param: `finalizer_request=None` can override default finalizer which is invoked at the end of the
     fixture scope, if not set default scope (module) will be applied
   
-######Notice :
+###### Notice :
 * UI tests which using login fixture should use decorator @pytest.mark.usefixtures("login")
   
 See example
@@ -130,10 +151,10 @@ def test_custom_login_example(navigator, custom_login, request):
 
 * `navigator`
 
-###Debugging
+## Debugging
 
 For debugging is recommended way to use [web_pdb](https://pypi.org/project/web-pdb/)
-Using other debuggers like built in debugger in PyCharm may cause unexpected results.
+or built in debugger in PyCharm or another dev tool.
 
 To stop the execution on specific point, the following statement can be added in the code:
 ```python
@@ -143,7 +164,7 @@ web_pdb.set_trace()
 
 After that you need to visit `localhost:5555` where is interactive console and other related information from debugger.
 
-###Reporting
+## Reporting
 
 If a UI test fails, it will generate a screenshot from a moment, when the test was marked as failed. 
 This is being handled by `pytest_exception_interact`. You can specify the output location by
@@ -151,7 +172,7 @@ setting `resultsdir` environmental variable or by passing an `--junitxml` argume
 The name of a screenshot is fixed to `failed-test-screenshot.png`, the only thing that changes
 is a directory, where we will save the screenshot in.
 
-####Cases of reporting:
+### Cases of reporting:
 
 * if no option is selected, the `resultsdir` will be considered to be `.`. In this case, failing test `test1` 
   will put the screenshot into the `./attachments/ui/test1/` directory.
@@ -177,7 +198,7 @@ Note: If a test is parametrized, the output will be the same, except the test na
 failing variables (for example: `test1` with `param1` and `param2` will have the directory `test1[param1-param2]`) 
 and not the `test1`.
 
-###Example test 
+## Example test 
 
 ```python
 from testsuite.ui.views.admin import AccountsView, UsersView
