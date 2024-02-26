@@ -220,6 +220,10 @@ def load(obj, env=None, silent=None, key=None):
 
         ocp_setup = obj.get("openshift", {}).get("servers", {}).get("default", {})
 
+        ocp_tools_setup = obj.get("fixtures", {}).get("tools", {})
+        if not ocp_tools_setup:
+            ocp_tools_setup = ocp_setup
+
         ocp = OpenShiftClient(
             project_name=project, server_url=ocp_setup.get("server_url"), token=ocp_setup.get("token")
         )
@@ -308,7 +312,7 @@ def load(obj, env=None, silent=None, key=None):
                 "threescale": {"openshift": threescale_operator_ocp},
                 "apicast": {"openshift": apicast_operator_ocp},
             },
-            "rhsso": {"password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))},
+            "rhsso": {"password": _rhsso_password(ocp_tools_setup.get("server_url"), ocp_tools_setup.get("token"))},
         }
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated
