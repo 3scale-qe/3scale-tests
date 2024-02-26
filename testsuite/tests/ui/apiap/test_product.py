@@ -20,10 +20,11 @@ def product(request, custom_service):
 
 
 @pytest.fixture(scope="function")
-def service(custom_service, service_proxy_settings, lifecycle_hooks, request):
+def service(custom_service, custom_backend, private_base_url, lifecycle_hooks, request):
     """Preconfigured service with backend defined existing over one test run"""
     name = {"name": blame(request, "svc")}
-    return custom_service(name, service_proxy_settings, hooks=lifecycle_hooks)
+    backend = custom_backend("backend_default", endpoint=private_base_url("echo_api"))
+    return custom_service(name, backends={"/": backend}, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="function")
@@ -151,7 +152,6 @@ def test_remove_backend_from_product(service, navigator, threescale):
     backends = navigator.navigate(ProductBackendsView, product=service)
     backend = threescale.backends.read(service.backend_usages.list()[0]["backend_id"])
     backends.remove_backend(backend)
-    backend.delete()
     service = threescale.services.read_by_name(service.entity_name)
 
     assert len(service.backend_usages.list()) == 0
