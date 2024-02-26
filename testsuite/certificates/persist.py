@@ -18,7 +18,7 @@ class TmpFilePersist(ABC):
     @property
     def _directory(self):
         if not self._dir:
-            self._dir = tempfile.mkdtemp()
+            self._dir = tempfile.mkdtemp(prefix="tls_certs_", dir=os.environ.get("resultsdir"))
         return self._dir
 
     @abstractmethod

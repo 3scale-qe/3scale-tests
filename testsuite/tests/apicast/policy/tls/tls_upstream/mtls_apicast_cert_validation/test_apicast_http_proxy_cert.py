@@ -52,6 +52,7 @@ def setup_gateway(request, mount_certificate_secret, staging_gateway, certificat
     staging_gateway.environ.set_many(
         {"APICAST_PROXY_HTTPS_CERTIFICATE_KEY": f"{path}/tls.key", "APICAST_PROXY_HTTPS_CERTIFICATE": f"{path}/tls.crt"}
     )
+    return staging_gateway
 
 
 @pytest.fixture(scope="session")
