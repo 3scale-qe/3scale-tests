@@ -27,6 +27,7 @@ abstract, however that would cause huge disruption in usage of the testsuite.
 
 from testsuite.config import settings
 from testsuite.configuration import openshift
+from testsuite.openshift.client import OpenShiftClient
 
 _tr = {
     "echo_api": "mockserver+ssl",
@@ -61,13 +62,16 @@ def _url(openshift, key, namespace):
 class OpenshiftProject:
     """Get testenv tools from dedicated openshift namespace"""
 
-    def __init__(self, namespace):
+    def __init__(self, namespace, server_url=None, token=None):
         self._cache = {}
         self._namespace = namespace
-        try:
-            self._oc = openshift(project=namespace)
-        except Exception:
-            self._oc = None
+        if server_url and token:
+            self._oc = OpenShiftClient(project_name=namespace, server_url=server_url, token=token)
+        else:
+            try:
+                self._oc = openshift(project=namespace)
+            except Exception:
+                self._oc = None
 
     def __getitem__(self, name):
         if self._oc is None:
