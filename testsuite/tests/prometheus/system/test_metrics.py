@@ -10,26 +10,10 @@ from testsuite.prometheus import get_metrics_keys
 
 METRICS_MASTER = [
     "rails_requests_total",
-    "sidekiq_enqueued_jobs",
-    "sidekiq_retry_jobs",
-    "sidekiq_queue_enqueued_jobs",
-    "sidekiq_processed_jobs_total",
-    "sidekiq_failed_jobs_total",
-    "sidekiq_workers",
-    "sidekiq_processes",
-    "sidekiq_cron_jobs",
-    "sidekiq_busy_workers",
-    "sidekiq_scheduled_jobs",
-    "sidekiq_dead_jobs",
-    "sidekiq_queue_latency_seconds",
-    # most of the time its not set
-    # 'sidekiq_queue_max_processing_time_seconds',
 ]
 
 METRICS_DEVELOPER = [
     "rails_requests_total",
-    # most of the time its not set
-    # 'sidekiq_queue_max_processing_time_seconds'
 ]
 
 METRICS_MASTER_HISTOGRAM = ["rails_request_duration_seconds"]
