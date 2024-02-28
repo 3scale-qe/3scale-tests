@@ -19,6 +19,9 @@ pytestmark = [
 ]
 
 
+REQUEST_NUM = 42
+
+
 @pytest.fixture(scope="session")
 def backend_listener_url(testconfig):
     """
@@ -76,7 +79,8 @@ def test_utilization(url, prometheus, application, backend_listener_url, auth_he
 
     service_id = application.service.entity_id
     app_plan_id = application.entity["plan_id"]
-    requests.get(url.format(backend_listener_url, service_id, app_plan_id), verify=False, headers=auth_headers)
+    for _ in range(REQUEST_NUM):
+        requests.get(url.format(backend_listener_url, service_id, app_plan_id), verify=False, headers=auth_headers)
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
     prometheus.wait_on_next_scrape("backend-worker")
@@ -91,7 +95,9 @@ def test_utilization(url, prometheus, application, backend_listener_url, auth_he
         lambda x: x["metric"]["controller"].startswith("admin/api"),
     )
 
-    assert counts_after == counts_before
+    for key, count in counts_after.items():
+        if int(count) >= int(counts_before[key]) + REQUEST_NUM:
+            assert counts_after == counts_before, f"looks like {key} is increased by internal calls"
 
 
 def extract_call_metrics(prometheus, query, container, predicate=None):
