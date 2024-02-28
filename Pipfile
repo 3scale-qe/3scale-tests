@@ -29,9 +29,7 @@ pytest-asyncio = "*"
 requests = "*"
 3scale-api = ">=0.30.0"
 dynaconf = "*"
-# python_keycloak = "*"
-# Waiting for https://github.com/marcospereirampj/python-keycloak/pull/201 and https://github.com/marcospereirampj/python-keycloak/pull/200
-python-keycloak = ">=2.13"
+python-keycloak = "*"
 backoff = "*"
 websocket_client = "==1.5.1"
 httpx = {version = "*", extras = ["http2"]}
