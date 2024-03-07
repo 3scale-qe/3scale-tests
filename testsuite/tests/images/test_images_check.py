@@ -2,25 +2,36 @@
 
 import pytest
 
+from packaging.version import Version  # noqa # pylint: disable=unused-import
+
+from openshift_client import OpenShiftPythonException
+
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.utils import blame
+from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+
 
 pytestmark = pytest.mark.nopersistence
 
 
-@pytest.mark.parametrize(
-    ("image", "image_stream", "deployment_configs"),
-    [
-        ("threescale_system", "amp-system", ["system-app"]),
-        ("threescale_backend", "amp-backend", ["backend-worker"]),
-        ("threescale_zync", "amp-zync", ["zync"]),
-        ("threescale_memcached", "system-memcached", ["system-memcache"]),
-        ("threescale_searchd", "system-searchd", ["system-searchd"]),
-        ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
-    ],
-)
-def test_deployment_image(images, openshift, image, image_stream, deployment_configs):
+PARAMETERS = [
+    ("threescale_system", "amp-system", ["system-app"]),
+    ("threescale_backend", "amp-backend", ["backend-worker"]),
+    ("threescale_zync", "amp-zync", ["zync"]),
+    ("threescale_memcached", "system-memcached", ["system-memcache"]),
+    ("threescale_searchd", "system-searchd", ["system-searchd"]),
+    ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
+]
+
+IS_PARAMETERS = [(image, image_stream) for image, _, image_stream in PARAMETERS]
+COMPONENTS_PARAMETERS = [(image, deployment_configs) for image, deployment_configs, _ in PARAMETERS]
+
+
+@pytest.mark.parametrize(("image", "image_stream"), IS_PARAMETERS)
+# INFO: image streams are no longer used (starting with 2.15-dev)
+@pytest.mark.skipif("TESTED_VERSION > Version('2.14')")
+def test_imagesource_image(images, openshift, image, image_stream):
     """
     Test:
         - load expected images from settings
@@ -32,8 +43,22 @@ def test_deployment_image(images, openshift, image, image_stream, deployment_con
     lookup = openshift.do_action("get", [f"is/{image_stream}", "-o", "yaml"], parse_output=True)
     digest = lookup.model.spec.tags[-1]["from"].name.split(":")[-1]
     assert digest == expected_image["manifest_digest"]
+
+
+@pytest.mark.parametrize(("image", "deployment_configs"), COMPONENTS_PARAMETERS)
+def test_deployment_image(images, openshift, image, deployment_configs):
+    """
+    Test:
+        - load expected images from settings
+        - assert that expected image and image in deployment config are the same
+    """
+    expected_image = images[image]
+    openshift = openshift()
     for deployment_config in deployment_configs:
-        lookup = openshift.do_action("get", [f"dc/{deployment_config}", "-o", "yaml"], parse_output=True)
+        try:
+            lookup = openshift.do_action("get", [f"dc/{deployment_config}", "-o", "yaml"], parse_output=True)
+        except (StopIteration, OpenShiftPythonException):
+            lookup = openshift.do_action("get", [f"deployment/{deployment_config}", "-o", "yaml"], parse_output=True)
         for container in lookup.model.spec.template.spec.containers:
             digest = container.image.split(":")[-1]
             assert digest == expected_image["resolved_images"].get(openshift.arch)

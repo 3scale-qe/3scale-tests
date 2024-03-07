@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import Optional, List, Dict, Tuple
 import logging
 
+from openshift_client import OpenShiftPythonException
+
 from threescale_api.resources import Service
 
 from testsuite.capabilities import Capability
@@ -82,7 +84,12 @@ class OpenshiftApicast(AbstractApicast, ABC):
     @property
     def deployment(self) -> Deployment:
         """Gateway deployment"""
-        return self.openshift.deployment(f"dc/{self.name}")
+        # dc are replaced with deployments in 2.15-dev
+        try:
+            self.openshift.do_action("get", [f"deployment/{self.name}"])
+            return self.openshift.deployment(f"deployment/{self.name}")
+        except OpenShiftPythonException:
+            return self.openshift.deployment(f"dc/{self.name}")
 
     def _routename(self, service):
         """name of route for given service"""

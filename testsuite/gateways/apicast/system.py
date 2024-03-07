@@ -39,7 +39,13 @@ class SystemApicast(AbstractApicast):
     @property
     def deployment(self):
         """Return deployment config name of this apicast"""
-        return self.openshift.deployment("dc/apicast-staging" if self.staging else "dc/apicast-production")
+        # dc are replaced with deployments in 2.15-dev
+        name = "apicast-staging" if self.staging else "apicast-production"
+        try:
+            self.openshift.do_action("get", [f"deployment/{name}"])
+            return self.openshift.deployment(f"deployment/{name}")
+        except OpenShiftPythonException:
+            return self.openshift.deployment(f"dc/{name}")
 
     @property
     def environ(self) -> Properties:

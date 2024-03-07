@@ -60,6 +60,7 @@ def _guess_version(ocp, namespace):
     """Attempt to determine version from amp-system imagestream"""
 
     version = None
+    # TODO: ImageStreams are no longer used by 3scale; https://github.com/3scale-qe/3scale-tests/issues/816
     try:
         version = ocp.image_stream_tag_from_trigger("dc/apicast-production")
         Version(version)
@@ -99,8 +100,13 @@ def _guess_apicast_operator_version(ocp, settings):
 
 def _apicast_image(ocp):
     """Find source of amp-apicast image"""
-    lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"], parse_output=True)
-    return lookup.model.spec.template.spec.containers[0].image
+    # dc are replaced with deployments in 2.15-dev
+    try:
+        lookup = ocp.do_action("get", ["deployment/apicast-production", "-o", "yaml"], parse_output=True)
+        return lookup.model.spec.template.spec.containers[0].image
+    except OpenShiftPythonException:
+        lookup = ocp.do_action("get", ["dc/apicast-production", "-o", "yaml"], parse_output=True)
+        return lookup.model.spec.template.spec.containers[0].image
 
 
 def _rhsso_password(tools_config, rhsso_config):
