@@ -4,6 +4,8 @@ import re
 import time
 from typing import Dict, Callable, Pattern, Any, Match, Union
 
+from openshift_client import OpenShiftPythonException
+
 from weakget import weakget
 
 from testsuite import settings
@@ -153,7 +155,12 @@ class OperatorApicast(OpenshiftApicast):
 
     @property
     def deployment(self):
-        return self.openshift.deployment(f"deployment/apicast-{self.name}")
+        # dc are replaced with deployments in 2.15-dev
+        try:
+            self.openshift.do_action("get", [f"deployment/apicast-{self.name}"])
+            return self.openshift.deployment(f"deployment/apicast-{self.name}")
+        except OpenShiftPythonException:
+            return self.openshift.deployment(f"dc/apicast-{self.name}")
 
     @property
     def environ(self) -> Properties:

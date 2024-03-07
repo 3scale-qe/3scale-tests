@@ -12,11 +12,13 @@ import backoff
 import importlib_resources as resources
 import pytest
 
+from openshift_client import OpenShiftPythonException
+
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.template import TemplateApicast
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
@@ -61,7 +63,11 @@ def set_gateway_image(openshift, staging_gateway, request, testconfig):
     github_template = resources.files("testsuite.resources.modular_apicast").joinpath("example_policy.yml")
     copy_template = resources.files("testsuite.resources.modular_apicast").joinpath("example_policy_copy.yml")
 
-    amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
+    try:
+        amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
+    except OpenShiftPythonException:
+        warn_and_skip("ImageStream not found.")
+
     project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
     build_name_copy = blame(request, "apicast-example-policy-copy")
