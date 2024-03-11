@@ -2,7 +2,7 @@
 
 from urllib.parse import urlparse
 
-from keycloak import KeycloakAdmin, KeycloakOpenID
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakPostError
 
 
 class Realm:
@@ -16,7 +16,6 @@ class Realm:
             realm_name=name,
             user_realm_name="master",
             verify=False,
-            auto_refresh_token=["get", "put", "post", "delete"],
         )
         self.name = name
 
@@ -81,15 +80,24 @@ class RHSSO:
     def __init__(self, server_url, username, password) -> None:
         # python-keycloak API requires url to be pointed at auth/ endpoint
         # pylint: disable=protected-access
-        self.server_url = urlparse(server_url)._replace(path="auth/").geturl()
-        self.master = KeycloakAdmin(
-            server_url=self.server_url,
-            username=username,
-            password=password,
-            realm_name="master",
-            verify=False,
-            auto_refresh_token=["get", "put", "post", "delete"],
-        )
+        try:
+            self.master = KeycloakAdmin(
+                server_url=server_url,
+                username=username,
+                password=password,
+                realm_name="master",
+                verify=False,
+            )
+            self.server_url = server_url
+        except KeycloakPostError:
+            self.server_url = urlparse(server_url)._replace(path="auth/").geturl()
+            self.master = KeycloakAdmin(
+                server_url=self.server_url,
+                username=username,
+                password=password,
+                realm_name="master",
+                verify=False,
+            )
 
     def create_realm(self, name: str, **kwargs) -> Realm:
         """Creates new realm"""
