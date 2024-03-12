@@ -9,6 +9,8 @@ SHELL = /bin/bash
 TB ?= short
 LOGLEVEL ?= INFO
 
+export resultsdir
+
 ifdef WORKSPACE  # Yes, this is for jenkins
 resultsdir = $(WORKSPACE)
 else
