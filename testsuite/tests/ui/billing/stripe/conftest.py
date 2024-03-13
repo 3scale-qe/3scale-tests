@@ -6,6 +6,7 @@ from testsuite.billing import Stripe
 from testsuite.ui.objects import CreditCard
 from testsuite.ui.views.admin.audience.billing import BillingSettingsView
 from testsuite.ui.views.devel.settings.stripe import StripeCCView
+from testsuite.utils import warn_and_skip
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -17,10 +18,15 @@ def gateway_setup(custom_admin_login, navigator, testconfig):
     billing.stripe(testconfig["stripe"]["secret_key"], testconfig["stripe"]["publishable_key"], "empty-webhook")
 
 
+# warn_and_skip ends the test, pylint can't recognize it obviously
+# pylint: disable=inconsistent-return-statements
 @pytest.fixture(scope="session")
 def stripe(testconfig):
     """Stripe API"""
-    return Stripe(testconfig["stripe"]["api_key"])
+    try:
+        return Stripe(testconfig["stripe"]["api_key"])
+    except KeyError:
+        warn_and_skip("Stripe api_key not in config", "fail")
 
 
 @pytest.fixture(scope="module")
