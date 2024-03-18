@@ -194,7 +194,11 @@ class KubernetesDeployment(Deployment):
     def get_pods(self):
         """Kubernetes Deployment doesnt have a nice universal way how to get the correct pods,
         so this method relies on pods having the deployment label"""
-        return self.openshift.select_resource("pods", labels={"deployment": self.name})
+
+        def select_pod(apiobject):
+            return apiobject.get_label("deployment") == self.name
+
+        return self.openshift.select_resource("pods", narrow_function=select_pod)
 
 
 class DeploymentConfig(Deployment):
