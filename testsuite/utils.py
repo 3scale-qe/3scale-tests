@@ -1,7 +1,7 @@
 "testsuite helpers"
 
 import os
-import datetime
+from datetime import datetime, timezone
 import secrets
 import time
 import typing
@@ -104,7 +104,7 @@ def wait_interval(min_sec=15, max_sec=45):
     The requests has to be send between the 15th and 45th second of the minute
     When the time is outside of this interval, waits until the start of a next one
     """
-    seconds = datetime.datetime.now().second
+    seconds = datetime.now(timezone.utc).second
     if seconds < min_sec or seconds > max_sec:
         sleep_time = (60 - seconds + min_sec) % 60
         time.sleep(sleep_time)
@@ -115,7 +115,7 @@ def wait_until_next_minute(min_sec=15, max_sec=45):
     Waits until the start of the next minute when are the limits reseted,
     then waits until the start of the interval allowed to sent requests
     """
-    seconds = datetime.datetime.now().second
+    seconds = datetime.now(timezone.utc).second
     time.sleep(60 - seconds)
     if min_sec < seconds < max_sec:
         wait_interval()
@@ -126,7 +126,7 @@ def wait_interval_hour(max_min, min_min=0):
     Prevents sending the request in the beginning or at the end of an hour
     Prevents refreshing the limits during the test
     """
-    minutes = datetime.datetime.now().minute
+    minutes = datetime.now(timezone.utc).minute
     if minutes < min_min or minutes > max_min:
         sleep_time = ((60 - minutes + min_min) % 60) * 60 + 10
         time.sleep(sleep_time)

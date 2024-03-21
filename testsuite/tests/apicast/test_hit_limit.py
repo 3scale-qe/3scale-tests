@@ -13,7 +13,7 @@ After waiting for the time in the 'retry-after' header, the request should
 be accepted.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 
 import backoff
@@ -140,7 +140,7 @@ def test_retry_after(silver_client):
     """
 
     # wait for the beginning of next minute
-    time.sleep(61 - datetime.utcnow().second)
+    time.sleep(61 - datetime.now(timezone.utc).second)
 
     response = make_requests(silver_client)
 

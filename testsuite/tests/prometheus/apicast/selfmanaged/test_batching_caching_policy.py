@@ -2,7 +2,7 @@
 Test Prometheus metric for content_caching.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
@@ -78,7 +78,7 @@ def pod_monitor(prometheus, openshift, staging_gateway):
     )
 
     #  wait a little more so operator will get this config and have time to do a first scrape
-    prometheus.wait_on_next_scrape(apicast_deployment, datetime.utcnow() + timedelta(seconds=60))
+    prometheus.wait_on_next_scrape(apicast_deployment, datetime.now(timezone.utc) + timedelta(seconds=60))
 
     yield
 
@@ -104,7 +104,9 @@ def test_batcher_policy(prometheus, pod_monitor, api_client, staging_gateway, ap
     for _ in range(NUM_OF_REQUESTS):
         client.get("/get")
 
-    prometheus.wait_on_next_scrape(apicast_deployment, datetime.utcnow() + timedelta(seconds=BATCH_REPORT_SECONDS))
+    prometheus.wait_on_next_scrape(
+        apicast_deployment, datetime.now(timezone.utc) + timedelta(seconds=BATCH_REPORT_SECONDS)
+    )
     metrics_keys = get_metrics_keys(prometheus.get_metrics(labels=labels))
 
     assert "batching_policy_auths_cache_hits" in metrics_keys
