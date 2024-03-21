@@ -2,7 +2,7 @@
 
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from math import ceil
 from typing import Optional, Callable, Dict
 from urllib.parse import urljoin
@@ -138,7 +138,7 @@ class PrometheusClient:
     def wait_on_next_scrape(self, target_container: str, after: Optional[datetime] = None):
         """Block until next scrape for a container is finished"""
         if after is None:
-            after = datetime.utcnow()
+            after = datetime.now(timezone.utc)
 
         def _time_of_scrape():
             for target in self.get_targets():
@@ -160,7 +160,7 @@ class PrometheusClient:
 
             till = last_scrape + timedelta(seconds=scrape_interval * num + 2)
 
-        wait_time = (till - datetime.utcnow()).seconds
+        wait_time = (till - datetime.now(timezone.utc)).seconds
         log.info("Waiting %ss for prometheus scrape", wait_time)
         time.sleep(wait_time)
 
