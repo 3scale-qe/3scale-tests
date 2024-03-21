@@ -37,8 +37,8 @@ def set_gateway_image(openshift, staging_gateway, request, testconfig):
 
     try:
         amp_release = openshift().image_stream_tag_from_trigger("dc/apicast-production")
-    except (OpenShiftPythonException, ValueError):
-        warn_and_skip("ImageStream not found.")
+    except OpenShiftPythonException:
+        warn_and_skip("ImageStream is not avaiable after 2.14-dev, templates are no longer supported")
 
     project = openshift().project_name
     build_name_github = blame(request, "apicast-example-policy-github")
