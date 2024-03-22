@@ -9,13 +9,13 @@ SHELL = /bin/bash
 TB ?= short
 LOGLEVEL ?= INFO
 
-export resultsdir
-
 ifdef WORKSPACE  # Yes, this is for jenkins
 resultsdir = $(WORKSPACE)
 else
 resultsdir ?= .
 endif
+
+export resultsdir
 
 PIPENV_VERBOSITY ?= -1
 PIPENV_IGNORE_VIRTUALENVS ?= 1
