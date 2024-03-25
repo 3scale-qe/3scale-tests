@@ -5,7 +5,7 @@ metric is expected
 """
 
 import base64
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from typing import Dict, Tuple
 
 import pytest
@@ -194,8 +194,7 @@ def test_internal_backend_listener(
 
     # wait to update metrics in prometheus
     # for some reason change is not visible right away, wait a little bit more here
-    prometheus.wait_on_next_scrape("backend-listener", datetime.utcnow() + timedelta(seconds=60))
-
+    prometheus.wait_on_next_scrape("backend-listener", datetime.now(timezone.utc) + timedelta(seconds=60))
     count_after = {}
     results = {}
 
