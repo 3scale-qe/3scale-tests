@@ -61,15 +61,20 @@ testsuite/%: FORCE pipenv check-secrets.yaml
 
 test: ## Run test
 test pytest tests: pipenv check-secrets.yaml
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-fuzz $(flags) testsuite
 
 speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv check-secrets.yaml
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz $(flags) testsuite
 
 sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
 sandbag: pipenv
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite
+
+fuzz:  ## run tests from tests/fuzz
+fuzz: pipenv
+	$(PYTEST) -n8 -m 'not flaky' $(flags) testsuite/tests/fuzz
+
 
 persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv check-secrets.yaml

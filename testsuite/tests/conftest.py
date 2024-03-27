@@ -62,6 +62,13 @@ def pytest_addoption(parser):
         "--performance", action="store_true", default=False, help="Run also performance tests (default: False)"
     )
     parser.addoption("--ui", action="store_true", default=False, help="Run also UI tests (default: False)")
+    parser.addoption("--drop-fuzz", action="store_true", default=False, help="Skip fuzzing tests (default: False)")
+    parser.addoption(
+        "--fuzz",
+        action="store_true",
+        default=False,
+        help="Run ONLY fuzzing tests skipped by --drop-fuzz (default: False)",
+    )
     parser.addoption(
         "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)"
     )
@@ -99,6 +106,12 @@ def pytest_runtest_setup(item):
         pytest.skip("Excluding UI tests")
     if "/images/" in item.nodeid and not item.config.getoption("--images"):
         pytest.skip("Excluding image check tests")
+    if item.config.getoption("--drop-fuzz"):
+        if "fuzz" in marks:
+            pytest.skip("Dropping fuzz")
+    if item.config.getoption("--fuzz"):
+        if "fuzz" not in marks:
+            pytest.skip("Running fuzz only")
     if item.config.getoption("--drop-sandbag"):
         if "sandbag" in marks or "xfail" in marks:
             pytest.skip("Dropping sandbag")
