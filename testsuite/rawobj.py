@@ -49,11 +49,21 @@ def Method(system_name: str, friendly_name: str = None, unit: str = "hit"):
 
     if friendly_name is None:
         friendly_name = system_name
+    # pylint: disable=possibly-unused-variable
+    name = system_name
     return locals()
 
 
 # pylint: disable=unused-argument
-def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: int = 1, last: str = "false"):
+# pylint: disable=too-many-arguments
+def Mapping(
+    metric: dict,
+    pattern: str = "/",
+    http_method: str = "GET",
+    delta: int = 1,
+    last: str = "false",
+    position: int = None,
+):
     """Builder of parameters to create Mapping
     Args:
         :param metric: Metric to be mapped
@@ -61,10 +71,13 @@ def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: i
         :param http_method: Method to map; default: GET
         :param delta: Incremental unit; default: 1
         :param last: If true, no other rules will be processed after
-                     matching this one; default: false"""
+                     matching this one; default: false
+        :param position: position in list of mapping rules"""
 
     metric_id = metric["id"]  # pylint: disable=possibly-unused-variable
     del metric
+    if position is None:
+        del position
     return locals()
 
 
@@ -83,7 +96,12 @@ def Application(
     if description is None:
         description = f"application {name}"
 
-    obj = {"name": name, "plan_id": application_plan["id"], "description": description}
+    obj = {
+        "name": name,
+        "plan_id": application_plan["id"],
+        "description": description,
+        "service_id": application_plan.service["id"],
+    }
 
     if account is not None:
         obj["account_id"] = account["id"]
