@@ -87,6 +87,8 @@ default:
       # should not be, this is just for env.
       sources: [ Rhoam, OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
       namespace: tools # openshift namespace/project where the testenv tools are deployed
+      server_url: # openshift url where the testenv tools are deployed (default is same openshift as 3scale is deployed)
+      token: # token for openshift where the testenv tools are deployed (unnecessary for for default openshift)
     private_base_url:
       default: echo_api # tool name to be used by default for backend
   warn_and_skip:
