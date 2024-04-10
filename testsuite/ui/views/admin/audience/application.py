@@ -1,5 +1,7 @@
 """View representations of Applications pages"""
 
+from time import sleep
+
 from widgetastic.widget import View, TextInput, Text, GenericLocatorWidget
 from widgetastic_patternfly4 import PatternflyTable
 from widgetastic_patternfly4.ouia import Select
@@ -57,6 +59,7 @@ class ApplicationsView(BaseAudienceView):
         self.all_app_checkbox.check()
         self.send_email_btn.wait_displayed(delay=3)
         self.send_email_btn.click()
+        sleep(2)
         self.email_window.wait_displayed(delay=0.5)
         # magic to get number of applications
         apps_count = int(self.email_window.number_of_applications.value.split(" ", 1)[0])
