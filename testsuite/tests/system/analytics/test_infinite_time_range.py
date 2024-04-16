@@ -7,7 +7,7 @@ https://issues.redhat.com/browse/THREESCALE-6649
 Warning: due to the nature of the problem, test might produce false negatives, but it is better than having nothing
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from threescale_api.errors import ApiClientError
@@ -61,7 +61,7 @@ def test_application_usage(api_client, request, entity_type, entity, granularity
     """Tests that usage endpoints wont fail when supplied with ridiculous date ranges"""
     # To have some usage data
     api_client().get("/test")
-    yesterday = datetime.now() - timedelta(days=1)
+    yesterday = datetime.now(timezone.utc) - timedelta(days=1)
 
     entity_id = request.getfixturevalue(entity)["id"]
     # pylint: disable=protected-access

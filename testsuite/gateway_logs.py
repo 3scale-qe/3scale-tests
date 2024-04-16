@@ -1,6 +1,6 @@
 """Pytest plugin for collecting gateway logs"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 import pytest
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_setup(item):
     """Figures out what gateways are in use and when did he test setup started"""
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     result = yield
 
     item.gateways = {}
@@ -38,7 +38,7 @@ def pytest_runtest_setup(item):
 def pytest_runtest_call(item):
     """Prints setup logs and figures out what gateways are in use and when did the test execution started"""
     # pylint: disable=protected-access
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     yield
     _print_logs(item, start_time, "call", "test-run")
 
@@ -46,7 +46,7 @@ def pytest_runtest_call(item):
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_teardown(item):
     """Collect logs and add them to the output"""
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     yield
     _print_logs(item, start_time, "teardown", "teardown")
 

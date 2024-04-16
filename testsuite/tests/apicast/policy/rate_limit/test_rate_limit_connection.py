@@ -24,7 +24,7 @@ Actually this is 'scratched'. Does 'plain-to-plain' comparison make sense?
     spec/functional_specs/policies/rate_limit/connection/plain_text/true_condition/rate_limit_connection_service_true_spec.rb
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pprint import pformat
 import asyncio
 import random
@@ -132,7 +132,9 @@ async def get(client, limit_me, relpath):
     # let's spread requests over short period; avoid all at one moment
     await asyncio.sleep(random.uniform(0, WAIT - DELAY - 2))
 
-    return await client.get(relpath, headers={"X-Limit-Me": limit_me, "Date": datetime.utcnow().strftime(DATEFMT)})
+    return await client.get(
+        relpath, headers={"X-Limit-Me": limit_me, "Date": datetime.now(timezone.utc).strftime(DATEFMT)}
+    )
 
 
 @pytest.fixture
