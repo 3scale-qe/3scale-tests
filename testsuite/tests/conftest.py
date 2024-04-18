@@ -2,7 +2,6 @@
 
 # pylint: disable=too-many-lines
 
-import inspect
 import logging
 import os
 import secrets
@@ -22,8 +21,8 @@ from weakget import weakget
 
 # to actually initialize all the providers
 # pylint: disable=unused-import
-import testsuite.capabilities.providers
-import testsuite.tools
+import testsuite.capabilities.providers  # noqa
+from testsuite.tools import Tools
 from testsuite import TESTED_VERSION, rawobj, HTTP2, gateways, configuration, resilient
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
@@ -78,6 +77,7 @@ def pytest_addoption(parser):
         help="Skip tests incompatible with persistence " "plugin (default: False)",
     )
     parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
+    parser.addoption("--tool-check", action="store_true", default=False, help="Run also tool availability check tests")
 
 
 # there are many branches as there are many options to influence test selection
@@ -125,6 +125,8 @@ def pytest_runtest_setup(item):
     else:
         if Capability.APICAST not in CapabilityRegistry():
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
+    if "/tools/" in item.nodeid and not item.config.getoption("--tool-check"):
+        pytest.skip("Excluding tools availability tests")
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -224,6 +226,10 @@ def pytest_metadata(metadata):
             "project": "3scale-" + str(version).replace(".", "")[:3],
         }
     )
+    tool_names = ["httpbin", "httpbin_nossl"]
+    tool_options = weakget(settings)["fixtures"]["tools"] % {"namespace": "tools"}
+    oc_tools = Tools(["OpenshiftProject"], tool_options)
+    metadata.update({f"OCP_TOOL_{name}": oc_tools[name] for name in tool_names})
 
     if Capability.OCP4 in CapabilityRegistry():
         metadata["_3SCALE_TESTS_threescale__gateway__OperatorApicast__openshift__project_name"] = (
@@ -299,42 +305,12 @@ def operator_apicast_openshift():
     )
 
 
-# pylint: disable=too-few-public-methods,broad-except
 @pytest.fixture(scope="session")
 def tools(testconfig):
     """dict-like object to provide testing environment tools"""
-
     options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
-
-    def _init_source(klass):
-        """dynamic __init__ args introspection"""
-
-        init_args = inspect.signature(klass.__init__).parameters.keys()
-        init_args -= ["self", "args", "kwargs"]
-        if len(init_args) == 0:
-            return klass()
-        init_args = {k: v for k, v in options.items() if k in init_args}
-        if len(init_args) == 0:
-            return klass()
-        return klass(**init_args)
-
-    class _Tools:
-        def __init__(self, sources):
-            self._sources = sources
-
-        def __getitem__(self, name):
-            for source in self._sources:
-                try:
-                    value = source[name]
-                    if value is not None:
-                        return value
-                except Exception:
-                    pass
-            raise KeyError(name)
-
     sources = options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
-    sources = [_init_source(getattr(testsuite.tools, t)) for t in sources]
-    return _Tools(sources)
+    return Tools(sources, options)
 
 
 @pytest.fixture(scope="module")
@@ -812,6 +788,7 @@ def custom_service(threescale, request, testconfig, logger):
         :param proxy_params: dict of proxy options for remote call, rawobj.Proxy should be used
         :param hooks: List of objects implementing necessary methods from testsuite.lifecycle_hook.LifecycleHook"""
 
+    # pylint: disable=too-few-public-methods
     class _CustomService:
         """Object representing original _create_service interface with access to finalizers that are not autocleaned"""
 
