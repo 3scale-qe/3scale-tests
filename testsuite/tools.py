@@ -13,7 +13,7 @@ API. It's better to think about these names as desired interface of the
 upstream API. Even that is simplified, because all the services used as
 upstream API have standardized interface thanks to EchoedRequest.
 
-So 'httpbin' key doesn't represent the httpbin instance, but rather a upstream
+So 'httpbin' key doesn't represent the httpbin instance, but rather an upstream
 API implementing calls of httpbin.
 
 Note: It may be good idea to consider change of all these keys to something
@@ -25,8 +25,11 @@ abstract, however that would cause huge disruption in usage of the testsuite.
 # to become independent. IDEA: maybe it's worth to consider separation of that
 # code that should be independent from testsuite
 
+import inspect
+import sys
 from testsuite.config import settings
 from testsuite.configuration import openshift
+
 
 _tr = {
     "echo_api": "mockserver+ssl",
@@ -112,3 +115,34 @@ class Rhoam(OpenshiftProject):
             raise KeyError(name)
         # rhoam doesn't have http:// sso route
         return super().__getitem__("keycloak+ssl")
+
+
+class Tools:
+    """Initialize tools from various sources"""
+
+    def __init__(self, sources, options):
+        self_module = sys.modules[__name__]
+        self._options = options
+        self._sources = [self._init_source(getattr(self_module, t)) for t in sources]
+
+    def __getitem__(self, name):
+        for source in self._sources:
+            try:
+                value = source[name]
+                if value is not None:
+                    return value
+            except Exception:
+                pass
+        raise KeyError(name)
+
+    def _init_source(self, klass):
+        """dynamic __init__ args introspection"""
+
+        init_args = inspect.signature(klass.__init__).parameters.keys()
+        init_args -= ["self", "args", "kwargs"]
+        if len(init_args) == 0:
+            return klass()
+        init_args = {k: v for k, v in self._options.items() if k in init_args}
+        if len(init_args) == 0:
+            return klass()
+        return klass(**init_args)
