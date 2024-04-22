@@ -68,11 +68,14 @@ def Mapping(metric: dict, pattern: str = "/", http_method: str = "GET", delta: i
     return locals()
 
 
+# pylint: disable=too-many-arguments
 def Application(
     name: str,
     application_plan: "resources.ApplicationPlan",
     description: str = None,
     account: "resources.Account" = None,
+    app_id: str = None,
+    app_key: str = None,
 ) -> dict:
     """builder of params to create an application
     Args:
@@ -87,6 +90,12 @@ def Application(
 
     if account is not None:
         obj["account_id"] = account["id"]
+
+    if app_id is not None:
+        obj["application_id"] = app_id
+
+    if app_key is not None:
+        obj["application_key"] = app_key
 
     return obj
 
