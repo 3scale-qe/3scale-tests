@@ -47,7 +47,7 @@ def test_admin_forgotten_password(
     account_name = provider_account_user.entity_name
     mail = f"{account_name}@example.com"
 
-    navigator.open(LoginView, url=settings["threescale"]["admin"]["url"])
+    navigator.open(LoginView, url=settings["threescale"]["admin"]["url"], wait_displayed=False)
     reset_view = navigator.navigate(RequestAdminPasswordView)
     reset_view.reset_password(mail)
 

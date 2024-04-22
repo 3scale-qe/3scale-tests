@@ -23,7 +23,6 @@ class LoginView(View, Navigable):
     password_reset_link = Text("//a[@href='/p/password/reset']")
     auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
     rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
-    skip_wait_displayed = True
 
     @step("RequestAdminPasswordView")
     def reset_password(self):

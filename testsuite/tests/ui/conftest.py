@@ -100,7 +100,7 @@ def custom_admin_login(navigator, browser):
         url = settings["threescale"]["admin"]["url"]
         name = name or settings["threescale"]["admin"]["username"]
         password = password or settings["threescale"]["admin"]["password"]
-        page = navigator.open(LoginView, url=url)
+        page = navigator.open(LoginView, url=url, wait_displayed=False)
 
         if fresh:
             browser.selenium.delete_all_cookies()
@@ -521,7 +521,7 @@ def custom_auth0_login(browser, navigator, threescale, request, testconfig):
         browser.selenium.delete_all_cookies()
         browser.refresh()
         browser.url = settings["threescale"]["admin"]["url"]
-        page = navigator.open(LoginView)
+        page = navigator.open(LoginView, wait_displayed=False)
         page.do_auth0_login(email, password)
 
         def _delete():
@@ -552,7 +552,7 @@ def custom_rhsso_login(browser, navigator, threescale, request, testconfig, rhss
         user_id = rhsso_service_info.realm.admin.get_user_id(username)
         rhsso_service_info.realm.admin.user_logout(user_id)
         browser.url = settings["threescale"]["admin"]["url"]
-        page = navigator.open(LoginView)
+        page = navigator.open(LoginView, wait_displayed=False)
         page.do_rhsso_login(username, password, realm=rhsso_service_info.realm.name)
 
         def _delete():
