@@ -9,12 +9,12 @@ import signal
 import threading
 import warnings
 from itertools import chain
+from typing import List
 
 import backoff
 import importlib_resources as resources
 import openshift_client as oc
 import pytest
-from typing import List
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key
 from threescale_api import client, errors
@@ -540,7 +540,7 @@ def custom_provider_account_user(request, threescale, testconfig):
 def provider_member_user(threescale, request, testconfig, account_password):
     """Create users and set permissions to sections and services by given scope"""
 
-    def _member_user(autoclean=True, allowed_services: List[int] = None, allowed_sections: List[str] = None):
+    def _member_user(autoclean=True, allowed_sections: List[str] = None, allowed_services: List[int] = None):
         """Create users and set permissions to sections and services
         Args:
             :param allowed_section: List of allowed sections one of
@@ -550,12 +550,14 @@ def provider_member_user(threescale, request, testconfig, account_password):
         username = blame(request, "pa")
         user_params = rawobj.AccountUser(username=username, email=f"{username}@example.com", password=account_password)
         user = threescale.provider_account_users.create(params=user_params)
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(user.delete)
+
         user.set_role_member()
         user.activate()
         user.permissions_update(allowed_services=allowed_services, allowed_sections=allowed_sections)
 
-        if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(user.delete)
         return user
 
     return _member_user

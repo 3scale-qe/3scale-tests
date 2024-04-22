@@ -9,40 +9,33 @@ from testsuite.ui.views.admin.audience.developer_portal import (
     CMSNewSectionView,
     ActiveDocsView,
 )
-from testsuite.ui.views.admin.backend import BackendsView
-from testsuite.ui.views.admin.foundation import DashboardView, AccessDeniedView
-from testsuite.ui.views.admin.product import ProductsView
-from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
+from testsuite.ui.views.admin.foundation import AccessDeniedView
 
 
 PERMISSION_DICT = [
-    ("portal", DeveloperPortalContentView, None, None),
-    ("portal", CMSNewPageView, None, None),
-    ("portal", CMSNewSectionView, None, None),
-    ("finance", BillingView, None, None),
-    (
+    pytest.param("portal", DeveloperPortalContentView),
+    pytest.param("portal", DeveloperPortalContentView),
+    pytest.param("portal", CMSNewPageView),
+    pytest.param("portal", CMSNewSectionView),
+    pytest.param("finance", BillingView),
+    pytest.param(
         "finance",
         BillingSettingsView,
-        pytest.mark.xfail,
-        pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3368"),
+        marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10995")],
     ),
-    ("plans", ActiveDocsView, None, None),
+    pytest.param("plans", ActiveDocsView),
 ]
-
-
-def get_views_by_permission(permission_name):
-    """Returns a list of views that has the given permission by permission name"""
-    return [view for perm, view, _, _ in PERMISSION_DICT if perm == permission_name]
 
 
 @pytest.fixture()
 def all_page_objects():
+    """Returns all page objects from permissions tuple filtered of views with same permission"""
+
     def _all_page_objects(except_permission, current_view):
-        """Returns all page objects from permissions tuple filtered of views with same permission"""
 
         all_views = [
             view
-            for perm, view, xfail_mark, issue_mark in PERMISSION_DICT
+            for perm, view in [param.values for param in PERMISSION_DICT]
             if perm != except_permission or view == current_view
         ]
 
@@ -51,7 +44,8 @@ def all_page_objects():
     return _all_page_objects
 
 
-@pytest.mark.parametrize("permission, page_view, xfail_mark, issue_mark", PERMISSION_DICT)
+# pylint: disable=too-many-arguments
+@pytest.mark.parametrize("permission, page_view", PERMISSION_DICT)
 def test_member_user_permissions_per_section(
     custom_admin_login,
     navigator,
@@ -59,10 +53,9 @@ def test_member_user_permissions_per_section(
     all_page_objects,
     permission,
     page_view,
-    xfail_mark,
-    issue_mark,
-    allowed_services=None,
+    allowed_services=False,
 ):
+    """Tests user permissions permission per permission section"""
     member_user = provider_member_user(allowed_sections=permission, allowed_services=allowed_services)
     custom_admin_login(member_user.entity_name, "123456")
 
@@ -79,6 +72,7 @@ def test_member_user_permissions_per_section(
                 page.is_displayed
             ), f"{pg_obj.__name__} should be displayed for permissions {permission} and services {allowed_services}"
         else:
-            assert AccessDeniedView(
-                navigator.browser.root_browser
-            ).is_displayed, f"{pg_obj.__name__} should not be displayed for permissions {permission} and services {allowed_services}"
+            assert AccessDeniedView(navigator.browser.root_browser).is_displayed, (
+                f"{pg_obj.__name__}"
+                f" should not be displayed for permissions {permission} and services {allowed_services}"
+            )
