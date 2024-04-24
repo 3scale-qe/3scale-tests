@@ -39,6 +39,8 @@ _tr = {
     "httpbin_service": "go-httpbin+svc",
     "httpbin_go_service": "go-httpbin+svc",
     "jaeger": "jaeger-query",
+    "true_httpbin": "httpbin",
+    "true_echo_api": "echo_api",
 }
 
 
