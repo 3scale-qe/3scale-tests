@@ -61,5 +61,8 @@ pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
 
+# 3scale Capabilities API client 
+3scale-api-crd = "*"
+
 [requires]
 python_version = "3"

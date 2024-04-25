@@ -44,7 +44,7 @@ def proxy(service):
 def delete_mapping(proxy):
     """Deletes all current mapping on the product level"""
     proxy.deploy()
-    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+    proxy.mapping_rules.list()[0].delete()
     proxy.deploy()
 
 
