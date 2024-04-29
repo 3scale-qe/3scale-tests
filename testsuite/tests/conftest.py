@@ -239,7 +239,19 @@ def pytest_metadata(metadata):
             "project": "3scale-" + str(version).replace(".", "")[:3],
         }
     )
-    tool_names = ["httpbin", "httpbin_nossl"]
+    tool_names = [
+        "true_httpbin",
+        "httpbin+ssl",
+        "go-httpbin",
+        "go-httpbin+ssl",
+        "jaeger-query",
+        "jaeger-query+ssl",
+        "echo_api",
+        "minio",
+        "minio+ssl",
+        "mockserver",
+        "mockserver+ssl",
+    ]
     tool_options = weakget(settings)["fixtures"]["tools"] % {"namespace": "tools"}
     oc_tools = Tools(["OpenshiftProject"], tool_options)
     metadata.update({f"OCP_TOOL_{name}": oc_tools[name] for name in tool_names})
