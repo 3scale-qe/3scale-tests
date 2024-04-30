@@ -74,6 +74,7 @@ class Client:
         return self.realm.oidc_client(client_id, secret)
 
 
+# pylint: disable=too-few-public-methods
 class RHSSO:
     """Helper class for RHSSO server"""
 
@@ -103,12 +104,6 @@ class RHSSO:
         """Creates new realm"""
         self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
         return Realm(self.master, name)
-
-    def create_oidc_client(self, realm, client_id, secret) -> KeycloakOpenID:
-        """Creates OIDC client"""
-        return KeycloakOpenID(
-            server_url=self.master.server_url, client_id=client_id, realm_name=realm, client_secret_key=secret
-        )
 
 
 # pylint: disable=too-few-public-methods
