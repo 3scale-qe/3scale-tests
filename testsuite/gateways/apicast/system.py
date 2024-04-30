@@ -61,10 +61,11 @@ class SystemApicast(AbstractApicast):
         """
         Remove volume attached for jaeger config
         """
-        del self.environ["OPENTELEMETRY"]
-        del self.environ["OPENTELEMETRY_CONFIG"]
-        self.deployment.remove_volume("jaeger-config-vol")
-        del self.openshift.config_maps[f"{config_map_name}.ini"]
+        self.openshift.api_manager.modify_and_apply(
+            lambda manager: manager.set_path("spec/apicast/stagingSpec/openTelemetry", {})
+        )
+
+        del self.openshift.secrets[f"{config_map_name}.ini"]
 
     def connect_open_telemetry(self, jaeger, open_telemetry_randomized_name=None):
         """
@@ -75,20 +76,30 @@ class SystemApicast(AbstractApicast):
         :param open_telemetry_randomized_name: randomized name used for the name of the configmap and for
                the identifying name of the service in jaeger
         """
+
         if not open_telemetry_randomized_name:
             open_telemetry_randomized_name = randomize("open-telemetry-config")
+
         config_map_name = f"{open_telemetry_randomized_name}.ini"
         service_name = open_telemetry_randomized_name
-        self.openshift.config_maps.add(
-            config_map_name, jaeger.apicast_config_open_telemetry(config_map_name, service_name)
+
+        self.openshift.secrets.create(
+            name=config_map_name, string_data=jaeger.apicast_config_open_telemetry(config_map_name, service_name)
         )
 
-        try:
-            self.deployment.remove_volume("jaeger-config-vol")
-        except OpenShiftPythonException:
-            pass
-        self.deployment.add_volume("jaeger-config-vol", "/tmp/jaeger/", configmap_name=config_map_name)
-        self.environ.set_many({"OPENTELEMETRY": "True", "OPENTELEMETRY_CONFIG": f"/tmp/jaeger/{config_map_name}"})
+        def _add_open_telemetry(manager):
+            manager.set_path(
+                "spec/apicast/stagingSpec/openTelemetry",
+                {
+                    "enabled": True,
+                    "tracingConfigSecretRef": {"name": config_map_name},
+                },
+            )
+
+        self.openshift.api_manager.modify_and_apply(_add_open_telemetry)
+
+        self._wait_for_apicasts()
+
         return service_name
 
     def _wait_for_apicasts(self):
