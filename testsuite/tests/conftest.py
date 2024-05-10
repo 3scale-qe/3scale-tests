@@ -199,6 +199,7 @@ def _junit_testsuite_property(config, name, value):
         xml.add_global_property(name, value)
 
 
+# pylint: disable=too-many-locals
 def pytest_metadata(metadata):
     """Update testsuite metadata"""
     _settings = weakget(settings)
@@ -257,7 +258,12 @@ def pytest_metadata(metadata):
     ]
     tool_options = weakget(settings)["fixtures"]["tools"] % {"namespace": "tools"}
     oc_tools = Tools(["OpenshiftProject"], tool_options)
-    metadata.update({f"OCP_TOOL_{name}": oc_tools[name] for name in tool_names})
+    for tool_name in tool_names:
+        try:
+            url = oc_tools[tool_name]
+        except KeyError:
+            url = "UNKNOWN"
+        metadata.update({f"OCP_TOOL_{tool_name}": url})
 
     if Capability.OCP4 in CapabilityRegistry():
         metadata["_3SCALE_TESTS_threescale__gateway__OperatorApicast__openshift__project_name"] = (
