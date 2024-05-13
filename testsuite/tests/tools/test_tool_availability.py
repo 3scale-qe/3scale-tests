@@ -4,6 +4,15 @@ import requests
 import pytest
 
 
+def test_prometheus_availability(prometheus):
+    """
+    Sends get request to project Prometheus endpoint '/api/v1/status/runtimeinfo'
+    Asserts that:
+        - Prometheus is running and returns 200
+    """
+    assert prometheus.is_available()
+
+
 @pytest.mark.parametrize(
     ("tool_name", "endpoint"),
     [
@@ -27,5 +36,5 @@ def test_tool_availability(private_base_url, tool_name, endpoint):
         - given tool is running and returns 200
     """
     endpoint = private_base_url(tool_name) + endpoint
-    response = requests.get(endpoint, verify=False)
+    response = requests.head(endpoint, verify=False)
     assert response.status_code == 200

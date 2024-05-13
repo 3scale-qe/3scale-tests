@@ -217,6 +217,8 @@ def pytest_metadata(metadata):
     if _settings["fixtures"]["threescale"]["private_tenant"] % False:
         admin_url = "(private tenant created on the fly is in use)"
 
+    prometheus_client = _resolve_prometheus_client(settings, configuration.openshift)
+
     metadata.update(
         {
             'settings["env_for_dynaconf"]': settings["env_for_dynaconf"],
@@ -238,6 +240,7 @@ def pytest_metadata(metadata):
             % "None",
             "polarion-lookup-method": "name",
             "project": "3scale-" + str(version).replace(".", "")[:3],
+            "OCP_TOOL_prometheus": prometheus_client.endpoint if prometheus_client else "UNKNOWN",
         }
     )
     tool_names = [
@@ -979,11 +982,9 @@ def custom_tenant(testconfig, master_threescale, request):
     return _custom_tenant
 
 
-@pytest.fixture(scope="session")
-def prometheus(testconfig, openshift):
+def _resolve_prometheus_client(testconfig, openshift):
     """
-    Returns an instance of Prometheus client.
-    Skips the tests when Prometheus is not present in the project.
+    Returns an instance of Prometheus client if is present in the project, null otherwise .
     """
     threescale_namespace = weakget(settings)["openshift"]["projects"]["threescale"]["name"] % None
 
@@ -993,10 +994,7 @@ def prometheus(testconfig, openshift):
         return PrometheusClient(testconfig["prometheus"]["url"], token=token, namespace=threescale_namespace)
 
     if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
-        warn_and_skip(
-            "Prometheus is not present in this project. Prometheus tests have been skipped. "
-            "Without Openshift configuration you need to set up Prometheus url. (token/namespace if needed)"
-        )
+        return None
 
     def _prepare_prometheus_endpoint(routes):
         protocol = "https://" if "tls" in routes[0]["spec"] else "http://"
@@ -1025,7 +1023,21 @@ def prometheus(testconfig, openshift):
         if prometheus_client.has_metric("rails_requests_total"):
             return prometheus_client
 
-    warn_and_skip("Prometheus is not present in this project. Prometheus tests have been skipped.")
+
+# pylint: disable=inconsistent-return-statements
+@pytest.fixture(scope="session")
+def prometheus(testconfig, openshift):
+    """
+    Returns an instance of Prometheus client.
+    Skips the tests when Prometheus is not present in the project.
+    """
+    prometheus_client = _resolve_prometheus_client(testconfig, openshift)
+    if prometheus_client is None:
+        warn_and_skip(
+            "Project with Prometheus must be configured or Prometheus url must be set. "
+            "Prometheus tests have been skipped."
+        )
+    return prometheus_client
 
 
 @pytest.fixture(scope="session")
