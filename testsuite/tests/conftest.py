@@ -244,13 +244,10 @@ def pytest_metadata(metadata):
         }
     )
     tool_names = [
-        "true_httpbin",
-        "httpbin+ssl",
         "go-httpbin",
         "go-httpbin+ssl",
         "jaeger-query",
         "jaeger-query+ssl",
-        "echo_api",
         "minio",
         "minio+ssl",
         "mockserver",
