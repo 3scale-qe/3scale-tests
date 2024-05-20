@@ -173,3 +173,8 @@ class PrometheusClient:
             return False
 
         _wait_on_next_scrape()
+
+    def is_available(self):
+        """Check whether Prometheus service is available"""
+        response = self._do_request("/api/v1/status/runtimeinfo")
+        return response.status_code == 200
