@@ -553,7 +553,13 @@ def production_gateway(request, testconfig, openshift):
 
 
 @pytest.fixture(scope="session")
-def rhsso_service_info(request, testconfig, tools):
+def rhsso_kind(request, testconfig):
+    """SSO kind, rhsso or rhbk"""
+    return testconfig["rhsso"].get("kind", "rhbk")
+
+
+@pytest.fixture(scope="session")
+def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     """
     Set up client for zync
     :return: dict with all important details
@@ -561,7 +567,10 @@ def rhsso_service_info(request, testconfig, tools):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
-    rhsso = RHSSO(server_url=tools["no-ssl-sso"], username=cnf["username"], password=cnf["password"])
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    rhsso = RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
 
     if not testconfig["skip_cleanup"]:

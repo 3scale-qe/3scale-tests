@@ -85,7 +85,7 @@ class Settings:
     """Get testenv tools from testsuite settings"""
 
     def __getitem__(self, name):
-        if name == "no-ssl-sso":
+        if name in ["no-ssl-sso", "no-ssl-rhbk"]:
             return settings["rhsso"]["url"]
         try:
             return settings["threescale"]["service"]["backends"][name]
