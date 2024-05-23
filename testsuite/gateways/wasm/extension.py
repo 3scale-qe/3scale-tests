@@ -77,6 +77,7 @@ class WASMExtension:
     def ingress_alias_url(self):
         """Returns alias url dynamically made by service mesh."""
         if not self._ingress_alias_url:
+            alias_route = None
             for route in self.mesh.routes:
                 if self.httpbin_name in route["spec"]["host"]:
                     alias_route = route
