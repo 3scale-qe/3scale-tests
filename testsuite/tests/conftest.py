@@ -994,11 +994,10 @@ def prometheus(testconfig, openshift):
     Skips the tests when Prometheus is not present in the project.
     """
     threescale_namespace = weakget(settings)["openshift"]["projects"]["threescale"]["name"] % None
-
-    if "prometheus" in testconfig and "url" in testconfig["prometheus"]:
-        if "token" in testconfig["prometheus"]:
-            token = testconfig["prometheus"]["token"]
-        return PrometheusClient(testconfig["prometheus"]["url"], token=token, namespace=threescale_namespace)
+    prometheus_url = weakget(testconfig)["prometheus"]["url"] % None
+    if prometheus_url:
+        token = weakget(testconfig)["prometheus"]["token"] % None
+        return PrometheusClient(prometheus_url, token=token, namespace=threescale_namespace)
 
     if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
         warn_and_skip(
