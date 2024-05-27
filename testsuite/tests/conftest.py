@@ -85,6 +85,7 @@ def pytest_addoption(parser):
     )
     parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
     parser.addoption("--tool-check", action="store_true", default=False, help="Run also tool availability check tests")
+    parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
 
 
 # there are many branches as there are many options to influence test selection
@@ -176,12 +177,27 @@ def pytest_collection_modifyitems(session, config, items):
     https://docs.pytest.org/en/stable/usage.html
     """
 
+    sso_only_opt = config.option.sso_only
+
+    selected_fixtures = ["rhsso_setup"]
+    selected = []
+    deselected = []
+
     for item in items:
         for marker in item.iter_markers(name="issue"):
             issue = marker.args[0]
             issue_id = issue.rstrip("/").split("/")[-1]
             item.user_properties.append(("issue", issue))
             item.user_properties.append(("issue-id", issue_id))
+
+        if sso_only_opt and not any(fixture in selected_fixtures for fixture in item.fixturenames):
+            deselected.append(item)
+        else:
+            selected.append(item)
+
+    items[:] = selected
+
+    config.hook.pytest_deselected(items=deselected)
 
 
 # https://github.com/pytest-dev/pytest/issues/7767
