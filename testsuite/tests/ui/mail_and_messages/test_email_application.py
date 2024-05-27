@@ -53,7 +53,7 @@ def test_app_key_delete_mails_notification(app_id_key_service, application, navi
     """
     app = navigator.navigate(ApplicationDetailView, application=application, product=app_id_key_service)
     app.add_random_app_key()
-    key = application.keys.list()["keys"][0]["key"]["value"]
+    key = application.keys.list()[-1]["value"]
     app.delete_app_key(key)
 
     mailhog_client.assert_message_received(

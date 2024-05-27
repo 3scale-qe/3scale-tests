@@ -49,7 +49,7 @@ def test_user_key_create_delete(service, application, requestbin, navigator):
 
     # Delete user key
     app.add_random_app_key()  # Application has to contains at least 2 keys to be able to delete one through UI
-    key = application.keys.list()["keys"][0]["key"]["value"]
+    key = application.keys.list()[-1]["value"]
     app.delete_app_key(key)
     webhook = requestbin.get_webhook("key_deleted", str(application.entity_id))
     assert webhook is not None

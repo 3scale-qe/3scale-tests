@@ -93,7 +93,7 @@ class RHSSOServiceConfiguration:
         Returns body for creation of token
         :return: body
         """
-        app_key = app.keys.list()["keys"][0]["key"]["value"]
+        app_key = app.keys.list()[-1]["value"]
         app_id = app["client_id"]
         grant_type = "client_credentials" if use_service_accounts else "password"
         user_credentials = "" if use_service_accounts else f"&username={self.username}&password={self.password}"
@@ -107,7 +107,7 @@ class RHSSOServiceConfiguration:
         """
         # Wait for application client to be created
         self.get_application_client(app)
-        app_key = app.keys.list()["keys"][0]["key"]["value"]
+        app_key = app.keys.list()[-1]["value"]
         return self.password_authorize(app["client_id"], app_key)["access_token"]
 
     def __getstate__(self):
