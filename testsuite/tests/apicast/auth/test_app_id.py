@@ -82,7 +82,7 @@ def app_id(application):
 @pytest_cases.fixture(scope="module")
 def app_key(application):
     """App key of first service"""
-    return application.keys.list()["keys"][0]["key"]["value"]
+    return application.keys.list()[-1]["value"]
 
 
 @pytest_cases.fixture(scope="module")
@@ -94,7 +94,7 @@ def app_id2(application2):
 @pytest_cases.fixture(scope="module")
 def app_key2(application2):
     """App key of second service"""
-    return application2.keys.list()["keys"][0]["key"]["value"]
+    return application2.keys.list()[-1]["value"]
 
 
 @pytest_cases.parametrize(

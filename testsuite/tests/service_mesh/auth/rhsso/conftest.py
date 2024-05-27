@@ -13,7 +13,7 @@ class ServiceMeshOIDCClientAuth(OIDCClientAuth):
 
     def __init__(self, service_rhsso_info, application, location=None) -> None:
         super().__init__(service_rhsso_info, application, location)
-        self.app_key = application.keys.list()["keys"][0]["key"]["value"]
+        self.app_key = application.keys.list()[-1]["value"]
 
     def __call__(self, request):
         request = super().__call__(request)
