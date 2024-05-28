@@ -19,8 +19,6 @@ def test_prometheus_availability(prometheus):
         ("echo_api", ""),
         ("go-httpbin", ""),
         ("go-httpbin+ssl", ""),
-        ("true_httpbin", ""),
-        ("httpbin+ssl", ""),
         ("jaeger-query", ""),
         ("jaeger-query+ssl", ""),
         ("mockserver", ""),
