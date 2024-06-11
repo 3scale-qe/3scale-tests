@@ -16,16 +16,16 @@ pytestmark = pytest.mark.nopersistence
 
 
 PARAMETERS = [
-    ("threescale_system", "amp-system", ["system-app"]),
-    ("threescale_backend", "amp-backend", ["backend-worker"]),
-    ("threescale_zync", "amp-zync", ["zync"]),
+    ("threescale_system", "amp-system", ["system-app", "system-sidekiq"]),
+    ("threescale_backend", "amp-backend", ["backend-listener", "backend-worker"]),
+    ("threescale_zync", "amp-zync", ["zync", "zync-que"]),
     ("threescale_memcached", "system-memcached", ["system-memcache"]),
     ("threescale_searchd", "system-searchd", ["system-searchd"]),
     ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
 ]
 
-IS_PARAMETERS = [(image, image_stream) for image, _, image_stream in PARAMETERS]
-COMPONENTS_PARAMETERS = [(image, deployment_configs) for image, deployment_configs, _ in PARAMETERS]
+IS_PARAMETERS = [(image, image_stream) for image, image_stream, _ in PARAMETERS]
+COMPONENTS_PARAMETERS = [(image, deployment_configs) for image, _, deployment_configs in PARAMETERS]
 
 
 @pytest.mark.parametrize(("image", "image_stream"), IS_PARAMETERS)
@@ -52,16 +52,20 @@ def test_deployment_image(images, openshift, image, deployment_configs):
         - load expected images from settings
         - assert that expected image and image in deployment config are the same
     """
-    expected_image = images[image]
+    expected_image = "UNKNOWN"
     openshift = openshift()
+
     for deployment_config in deployment_configs:
         try:
+            expected_image = images[image]["resolved_images"].get(openshift.arch)
             lookup = openshift.do_action("get", [f"dc/{deployment_config}", "-o", "yaml"], parse_output=True)
         except (StopIteration, OpenShiftPythonException):
+            expected_image = images[image]["manifest_digest"]
             lookup = openshift.do_action("get", [f"deployment/{deployment_config}", "-o", "yaml"], parse_output=True)
+
         for container in lookup.model.spec.template.spec.containers:
             digest = container.image.split(":")[-1]
-            assert digest == expected_image["resolved_images"].get(openshift.arch)
+            assert digest == expected_image
 
 
 @pytest.fixture(scope="module")
