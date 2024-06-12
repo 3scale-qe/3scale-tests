@@ -85,6 +85,7 @@ def pytest_addoption(parser):
     )
     parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
     parser.addoption("--tool-check", action="store_true", default=False, help="Run also tool availability check tests")
+    parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
 
 
 # there are many branches as there are many options to influence test selection
@@ -176,12 +177,27 @@ def pytest_collection_modifyitems(session, config, items):
     https://docs.pytest.org/en/stable/usage.html
     """
 
+    sso_only_opt = config.option.sso_only
+
+    selected_fixtures = ["rhsso_setup"]
+    selected = []
+    deselected = []
+
     for item in items:
         for marker in item.iter_markers(name="issue"):
             issue = marker.args[0]
             issue_id = issue.rstrip("/").split("/")[-1]
             item.user_properties.append(("issue", issue))
             item.user_properties.append(("issue-id", issue_id))
+
+        if sso_only_opt and not any(fixture in selected_fixtures for fixture in item.fixturenames):
+            deselected.append(item)
+        else:
+            selected.append(item)
+
+    items[:] = selected
+
+    config.hook.pytest_deselected(items=deselected)
 
 
 # https://github.com/pytest-dev/pytest/issues/7767
@@ -560,7 +576,13 @@ def production_gateway(request, testconfig, openshift):
 
 
 @pytest.fixture(scope="session")
-def rhsso_service_info(request, testconfig, tools):
+def rhsso_kind(request, testconfig):
+    """SSO kind, rhsso or rhbk"""
+    return testconfig["rhsso"].get("kind", "rhbk")
+
+
+@pytest.fixture(scope="session")
+def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     """
     Set up client for zync
     :return: dict with all important details
@@ -568,7 +590,10 @@ def rhsso_service_info(request, testconfig, tools):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
-    rhsso = RHSSO(server_url=tools["no-ssl-sso"], username=cnf["username"], password=cnf["password"])
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    rhsso = RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
 
     if not testconfig["skip_cleanup"]:
