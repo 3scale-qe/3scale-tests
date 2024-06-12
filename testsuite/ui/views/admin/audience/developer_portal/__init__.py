@@ -51,10 +51,9 @@ class CMSNewPageView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.title.is_displayed
+            self.title.is_displayed
             and self.section.is_displayed
-            and self.path.is_displayed
+            and self.path_input.is_displayed
             and self.code.is_displayed
             and self.path in self.browser.url
         )
@@ -90,8 +89,7 @@ class CMSEditPageView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.publish_button.is_displayed
+            self.publish_button.is_displayed
             and self.path_input.is_displayed
             and self.delete_button.is_displayed
             and self.path in self.browser.url
@@ -120,8 +118,7 @@ class CMSNewSectionView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.title.is_displayed
+            self.title.is_displayed
             and self.public.is_displayed
             and self.path_input.is_displayed
             and self.submit.is_displayed
@@ -151,8 +148,7 @@ class CMSEditSectionView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.title.is_displayed
+            self.title.is_displayed
             and self.public.is_displayed
             and self.path_input.is_displayed
             and self.delete_button.is_displayed
@@ -195,8 +191,7 @@ class DeveloperPortalContentView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.quick_links.is_displayed
+            self.quick_links.is_displayed
             and self.snippets.is_displayed
             and (self.path in self.browser.url or "/p/admin/cms" in self.browser.url)
         )
@@ -249,11 +244,7 @@ class ActiveDocsView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.create_new_spec_link.is_displayed
-            and self.path in self.browser.url
-        )
+        return self.create_new_spec_link.is_displayed and self.path in self.browser.url
 
 
 class ActiveDocsNewView(BaseAudienceView):

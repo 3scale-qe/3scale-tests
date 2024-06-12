@@ -34,7 +34,11 @@ def test_invitation_mail(account, navigator, mailhog_client, provider_account, r
     # extract invitation URL from invitation mail
     url = re.search(r"(?P<url>https?://[^\s]+)", mail["items"][0]["Content"]["Body"]).group("url")
     sign_page = navigator.open(
-        InvitationSignupView, url=url, exact=True, access_code=provider_account["site_access_code"]
+        InvitationSignupView,
+        url=url,
+        exact=True,
+        access_code=provider_account["site_access_code"],
+        wait_displayed=False,
     )
 
     assert sign_page.is_displayed

@@ -107,6 +107,6 @@ def test_devel_login_recaptcha(custom_account, navigator, params):
         - Assert that invisible recaptcha badge is present
     """
     custom_account(params=params)
-    login_view = navigator.open(LoginView)
+    login_view = navigator.open(LoginView, wait_displayed=False)
 
     assert login_view.recaptcha.is_displayed, "Recaptcha was not found on the developer login page"

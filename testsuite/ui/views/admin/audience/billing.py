@@ -19,7 +19,7 @@ class BillingView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return BaseAudienceView.is_displayed.fget(self) and self.table.is_displayed and self.path in self.browser.url
+        return self.table.is_displayed and self.path in self.browser.url
 
 
 class ChargingForm(View):
@@ -128,8 +128,7 @@ class BillingSettingsView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            BaseAudienceView.is_displayed.fget(self)
-            and self.browser.title.text == "Charging & Gateway"
+            self.browser.title.text == "Charging & Gateway"
             and self.charging_form.is_displayed
             and self.gateway_form.is_displayed
         )

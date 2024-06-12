@@ -9,6 +9,7 @@ import signal
 import threading
 import warnings
 from itertools import chain
+from typing import List
 
 import backoff
 import importlib_resources as resources
@@ -549,6 +550,33 @@ def custom_provider_account_user(request, threescale, testconfig):
         return user
 
     return _custom_user
+
+
+@pytest.fixture(scope="function")
+def provider_member_user(threescale, request, testconfig, account_password):
+    """Create users and set permissions to sections and services by given scope"""
+
+    def _member_user(autoclean=True, allowed_sections: List[str] = None, allowed_services: List[int] = None):
+        """Create users and set permissions to sections and services
+        Args:
+            :param allowed_section: List of allowed sections one of
+                ['portal', 'finance', 'settings', 'partners', 'monitoring', 'plans', 'policy_registry']
+            :param allowed_services: List of ids of allowed services
+        """
+        username = blame(request, "pa")
+        user_params = rawobj.AccountUser(username=username, email=f"{username}@example.com", password=account_password)
+        user = threescale.provider_account_users.create(params=user_params)
+
+        if autoclean and not testconfig["skip_cleanup"]:
+            request.addfinalizer(user.delete)
+
+        user.set_role_member()
+        user.activate()
+        user.permissions_update(allowed_services=allowed_services, allowed_sections=allowed_sections)
+
+        return user
+
+    return _member_user
 
 
 @pytest.fixture(scope="session")

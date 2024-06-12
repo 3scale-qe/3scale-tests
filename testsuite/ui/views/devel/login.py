@@ -32,7 +32,6 @@ class LoginView(BaseDevelView):
     forgot_passwd = Text("//*[contains(text(),'Forgot password?')]")
     flash_message = View.nested(FlashMessage)
     recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
-    skip_wait_displayed = True
 
     @step("ForgotPasswordView")
     def forgot_password(self):
@@ -121,7 +120,6 @@ class InvitationSignupView(SignUpView):
     password = TextInput(id="user_password")
     password2 = TextInput(id="user_password_confirmation")
     recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
-    skip_wait_displayed = True
 
     def sign_up(self, username: str, passwd: str, submit: bool = True):
         """

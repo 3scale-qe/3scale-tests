@@ -25,7 +25,7 @@ def custom_devel_auth0_login(browser, navigator, provider_account, threescale, t
         url = settings["threescale"]["devel"]["url"]
         browser.url = url
         browser.selenium.delete_all_cookies()
-        page = navigator.open(LoginView, access_code=provider_account["site_access_code"])
+        page = navigator.open(LoginView, access_code=provider_account["site_access_code"], wait_displayed=False)
         page.do_auth0_login(email, password)
         cleanup.append(email)
 
@@ -54,7 +54,7 @@ def custom_devel_rhsso_login(browser, navigator, provider_account, threescale, t
         url = settings["threescale"]["devel"]["url"]
         browser.url = url
         browser.selenium.delete_all_cookies()
-        page = navigator.open(LoginView, access_code=provider_account["site_access_code"])
+        page = navigator.open(LoginView, access_code=provider_account["site_access_code"], wait_displayed=False)
         page.do_rhsso_login(name, password)
         cleanup.append(rhsso_username)
         signup_view = SignUpView(navigator.browser)
