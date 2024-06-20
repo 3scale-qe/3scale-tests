@@ -70,5 +70,7 @@ def test_3scale_version_in_ui(navigator):
     assert dashboard.threescale_version.is_displayed
     if settings["threescale"]["deployment_type"] == "rhoam":
         assert dashboard.threescale_version.text == "Version RHOAM -"
+    elif settings["threescale"]["deployment_type"] == "saas":
+        assert dashboard.threescale_version.text == "Version 2.x -"
     else:
         assert dashboard.threescale_version.text == f"Version {TESTED_VERSION.release[0]}.{TESTED_VERSION.release[1]} -"

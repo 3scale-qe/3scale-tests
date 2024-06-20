@@ -73,11 +73,21 @@ saas:
     testsuite/tests/apicast/test_uri_too_large.py: quiet
     testsuite/tests/system/oidc: quiet
     testsuite/tests/system/test_proxy_endpoints_set_spec.py: quiet
+    testsuite/tests/ui/auth/test_provider.py: quiet
     testsuite/tests/ui/billing/braintree: quiet
+    testsuite/tests/ui/billing/stripe/test_verification.py: quiet
+    testsuite/tests/ui/devel/auth/test_login_rhsso.py: quiet
+    testsuite/tests/ui/mail_and_messages: quiet
+    testsuite/tests/ui/master/test_master_dashboard.py::test_dashboard_is_loaded_correctly: quiet
+    testsuite/tests/ui/master/test_tenant.py::test_create_tenant: quiet
   threescale:
     deployment_type: saas
   reporting:
     print_app_logs: false
+  braintree:
+    public_key: NOTSET
+    merchant_id: NOTSET
+    private_key: NOTSET
 
 rhoam:
   warn_and_skip:
