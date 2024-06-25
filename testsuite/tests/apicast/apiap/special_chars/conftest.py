@@ -1,4 +1,5 @@
 """Conftest for special char tests"""
+
 import pytest
 
 PATHS = ["/", "/foo/"]

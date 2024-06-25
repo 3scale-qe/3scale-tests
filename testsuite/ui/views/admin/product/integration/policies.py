@@ -1,4 +1,5 @@
 """View representations of products integration policies section pages"""
+
 import enum
 from typing import Literal
 

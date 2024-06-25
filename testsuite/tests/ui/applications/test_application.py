@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/create_application_spec.rb"""
+
 import pytest
 
 from testsuite import rawobj

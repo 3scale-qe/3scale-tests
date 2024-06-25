@@ -2,6 +2,7 @@
 
 Test if apicast is able to serve requests only to listed services.
 """
+
 import pytest
 
 from testsuite import rawobj

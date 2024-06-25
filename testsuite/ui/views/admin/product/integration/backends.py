@@ -1,4 +1,5 @@
 """View representations of products integration backends section pages"""
+
 from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable, Button
 from widgetastic_patternfly4.ouia import Select

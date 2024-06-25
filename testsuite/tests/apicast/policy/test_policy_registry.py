@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/policies/policy_registry_spec.rb
 
 Test if we are able to create custom policies through registers and use them.
 """
+
 import pytest
 
 from testsuite import rawobj

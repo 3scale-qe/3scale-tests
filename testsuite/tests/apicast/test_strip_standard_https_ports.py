@@ -1,6 +1,7 @@
 """
 When APIcast sends a request to a standard port, it should strip the port from the 'host' header.
 """
+
 import pytest
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import

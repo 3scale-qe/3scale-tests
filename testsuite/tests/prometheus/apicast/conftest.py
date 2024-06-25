@@ -1,4 +1,5 @@
 """Set of fixtures for Prometheus-related tests."""
+
 import pytest
 
 from testsuite.utils import warn_and_skip

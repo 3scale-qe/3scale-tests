@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/combination/caching_batching_policy_spec.rb
 """
+
 from time import sleep
 
 import pytest

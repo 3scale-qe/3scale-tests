@@ -7,6 +7,7 @@ Second with mismatched certificates, which should fail with 502 due to httpbin r
 
 It also tests both embedded and path type policies, so in total it runs 4 combinations of tests
 """
+
 import pytest
 
 from testsuite import rawobj

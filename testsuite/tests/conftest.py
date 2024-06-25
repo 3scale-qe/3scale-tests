@@ -13,7 +13,7 @@ from itertools import chain
 
 import backoff
 import importlib_resources as resources
-import openshift as oc
+import openshift_client as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key
@@ -553,7 +553,13 @@ def production_gateway(request, testconfig, openshift):
 
 
 @pytest.fixture(scope="session")
-def rhsso_service_info(request, testconfig, tools):
+def rhsso_kind(request, testconfig):
+    """SSO kind, rhsso or rhbk"""
+    return testconfig["rhsso"].get("kind", "rhbk")
+
+
+@pytest.fixture(scope="session")
+def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     """
     Set up client for zync
     :return: dict with all important details
@@ -561,7 +567,10 @@ def rhsso_service_info(request, testconfig, tools):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
-    rhsso = RHSSO(server_url=tools["no-ssl-sso"], username=cnf["username"], password=cnf["password"])
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    rhsso = RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
 
     if not testconfig["skip_cleanup"]:
@@ -985,11 +994,10 @@ def prometheus(testconfig, openshift):
     Skips the tests when Prometheus is not present in the project.
     """
     threescale_namespace = weakget(settings)["openshift"]["projects"]["threescale"]["name"] % None
-
-    if "prometheus" in testconfig and "url" in testconfig["prometheus"]:
-        if "token" in testconfig["prometheus"]:
-            token = testconfig["prometheus"]["token"]
-        return PrometheusClient(testconfig["prometheus"]["url"], token=token, namespace=threescale_namespace)
+    prometheus_url = weakget(testconfig)["prometheus"]["url"] % None
+    if prometheus_url:
+        token = weakget(testconfig)["prometheus"]["token"] % None
+        return PrometheusClient(prometheus_url, token=token, namespace=threescale_namespace)
 
     if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
         warn_and_skip(

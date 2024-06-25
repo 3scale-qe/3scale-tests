@@ -38,7 +38,7 @@ def application_app_id_key(custom_application, custom_app_plan, service_app_id_k
             {
                 "auth_type": "app_id_and_app_key",
                 "app_id": app["application_id"],
-                "app_key": app.keys.list()["keys"][0]["key"]["value"],
+                "app_key": app.keys.list()[-1]["value"],
             },
         ),
     )

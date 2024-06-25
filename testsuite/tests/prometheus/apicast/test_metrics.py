@@ -2,6 +2,7 @@
 
 Test metrics provided by apicast to Prometheus.
 """
+
 import backoff
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import

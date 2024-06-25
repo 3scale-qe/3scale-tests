@@ -1,5 +1,6 @@
 """Check for openshift configuration"""
-from openshift import Missing
+
+from openshift_client import Missing
 from weakget import weakget
 import pytest
 

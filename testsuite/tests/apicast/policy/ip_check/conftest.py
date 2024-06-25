@@ -1,4 +1,5 @@
 """ip_check conftest"""
+
 import pytest
 import requests
 

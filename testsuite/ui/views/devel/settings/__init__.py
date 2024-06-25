@@ -1,4 +1,5 @@
 """Devel account settings"""
+
 from widgetastic.widget import View, Text
 
 from testsuite.ui.navigation import step, Navigable

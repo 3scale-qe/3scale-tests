@@ -2,6 +2,7 @@
 Successful Challenge Authentication:
 Cardholder enrolled, authentication successful, and signature verification successful.
 """
+
 import pytest
 from threescale_api.errors import ApiClientError
 

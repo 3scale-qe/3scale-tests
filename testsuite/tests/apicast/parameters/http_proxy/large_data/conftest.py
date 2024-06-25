@@ -1,4 +1,5 @@
 """Conftest for http proxy large data tests"""
+
 from urllib.parse import urlparse
 
 import pytest
@@ -14,7 +15,7 @@ def protocol(request):
 
 
 @pytest.fixture(scope="module")
-def gateway_environment(gateway_environment, testconfig, tools):
+def gateway_environment(gateway_environment, testconfig, tools, rhsso_kind):
     """
     Adds HTTP proxy to the staging gateway
 
@@ -22,7 +23,10 @@ def gateway_environment(gateway_environment, testconfig, tools):
       Tinyproxy has a problem with http openshift routes
     - To not load configuration every time, we set APIcast to load configuration on boot instead
     """
-    rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    rhsso_url = urlparse(tools[key]).hostname
     proxy_endpoint = testconfig["proxy"]
     superdomain = testconfig["threescale"]["superdomain"]
 

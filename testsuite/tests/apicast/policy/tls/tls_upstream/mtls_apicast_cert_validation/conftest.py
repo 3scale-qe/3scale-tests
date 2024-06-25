@@ -1,4 +1,5 @@
 """Configuration for mTLS tests"""
+
 import pytest
 
 

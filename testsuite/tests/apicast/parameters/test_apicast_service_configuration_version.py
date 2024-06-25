@@ -3,6 +3,7 @@
 Force apicast to use a specific configuration version by setting
 `APICAST__SERVICE_<SERVICE ID>_CONFIGURATION_VERSION` environment variable.
 """
+
 import pytest
 
 
@@ -11,7 +12,7 @@ from testsuite import rawobj
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-    pytest.mark.nopersistence  # Don't know why this test is failing with persistence plugin,
+    pytest.mark.nopersistence,  # Don't know why this test is failing with persistence plugin,
     # and it needs more investigation
 ]
 

@@ -1,6 +1,6 @@
 """APIcast CRD object"""
-from openshift import APIObject, Context
 
+from openshift_client import APIObject, Context
 from testsuite.openshift.client import OpenShiftClient
 
 

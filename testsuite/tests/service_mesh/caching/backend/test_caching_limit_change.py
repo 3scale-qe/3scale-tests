@@ -1,4 +1,5 @@
 """Checks that adapter can use updated values for limits with caching enabled"""
+
 import time
 
 import pytest

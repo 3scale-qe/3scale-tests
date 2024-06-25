@@ -1,6 +1,7 @@
 """
 This file contains methods that are used in performance testing
 """
+
 import os
 from urllib.parse import urlparse
 import importlib_resources as resources
@@ -90,7 +91,7 @@ class HyperfoilUtils:
         for application in applications:
             url = authority(application.service.proxy.list()["endpoint"])
             app_id = application["application_id"]
-            app_key = application.keys.list()["keys"][0]["key"]["value"]
+            app_key = application.keys.list()[-1]["value"]
             rows.append([url, app_id, app_key])
         self.factory.csv_data(filename, rows)
 

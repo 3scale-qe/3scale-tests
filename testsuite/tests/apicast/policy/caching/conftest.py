@@ -1,4 +1,5 @@
 """Module containing all caching tests"""
+
 import pytest
 
 from testsuite.gateways import gateway

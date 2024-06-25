@@ -1,6 +1,7 @@
 """
 When no limit is specified, the RateLimit headers should not be contained in the response
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
 from testsuite.utils import blame

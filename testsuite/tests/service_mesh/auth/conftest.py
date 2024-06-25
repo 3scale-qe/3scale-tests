@@ -1,4 +1,5 @@
 """Common conftest for all auth tests for ServiceMesh"""
+
 import pytest
 
 from testsuite.gateways.wasm import WASMGateway

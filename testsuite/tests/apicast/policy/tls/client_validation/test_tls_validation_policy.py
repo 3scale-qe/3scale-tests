@@ -1,5 +1,6 @@
 """Tests for TLS validation policy.
 This policy checks client certificates against whitelist of certificates or CAs"""
+
 import pytest
 
 from testsuite.capabilities import Capability

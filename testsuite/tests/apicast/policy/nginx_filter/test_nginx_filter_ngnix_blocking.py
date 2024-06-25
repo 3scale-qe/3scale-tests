@@ -4,7 +4,6 @@ with 412 response code.
 The nginx filter policy should ensure that those requests will not be blocked.
 """
 
-
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from weakget import weakget

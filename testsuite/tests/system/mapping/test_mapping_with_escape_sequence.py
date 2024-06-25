@@ -3,7 +3,6 @@ Test that URL with escape sequence(s) is processed correctly
 and relevant mapping/metric is applied
 """
 
-
 import pytest
 from testsuite import rawobj
 

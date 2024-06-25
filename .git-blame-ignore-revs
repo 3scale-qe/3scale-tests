@@ -1,0 +1,9 @@
+# When making commits that are strictly formatting/style changes, add the
+# commit hash here, so git blame can ignore the change.
+#
+# For more details, see:
+# https://git-scm.com/docs/git-config#Documentation/git-config.txt-blameignoreRevsFile
+# https://github.com/pydata/pydata-sphinx-theme/pull/713
+#
+
+fcf8b541437252ef53da895174648b1f95062b85 # black 24.1.1 changes

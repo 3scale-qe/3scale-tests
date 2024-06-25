@@ -1,4 +1,5 @@
 """Essential Views for Product Views"""
+
 from widgetastic.widget import GenericLocatorWidget, Text
 from widgetastic_patternfly4 import PatternflyTable
 

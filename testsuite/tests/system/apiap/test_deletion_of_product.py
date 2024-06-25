@@ -1,6 +1,7 @@
 """
 Test that deletion of product don't delete backend used by another product
 """
+
 import pytest
 
 from testsuite.utils import blame

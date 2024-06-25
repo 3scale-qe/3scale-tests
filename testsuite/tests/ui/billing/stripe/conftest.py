@@ -1,4 +1,5 @@
 """Conftest for Stripe gateway billing tests"""
+
 import pytest
 
 from testsuite.billing import Stripe

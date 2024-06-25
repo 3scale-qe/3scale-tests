@@ -1,6 +1,7 @@
 """
 Rewrite spec/ui_specs/webhooks/webhooks_accounts_spec.rb
 """
+
 import xml.etree.ElementTree as Et
 
 import pytest

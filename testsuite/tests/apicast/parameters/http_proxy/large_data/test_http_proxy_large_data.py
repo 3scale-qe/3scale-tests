@@ -1,6 +1,7 @@
 """
 Test large data in post request when using http and https proxies
 """
+
 from urllib.parse import urlparse
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import

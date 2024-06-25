@@ -1,4 +1,5 @@
 """Service mesh gateway"""
+
 from typing import Dict
 
 from threescale_api.resources import Service, Application

@@ -1,9 +1,10 @@
 """System Apicast that comes deployed with 3scale"""
+
 from typing import TYPE_CHECKING
 
 import backoff
 
-from openshift import OpenShiftPythonException
+from openshift_client import OpenShiftPythonException
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast

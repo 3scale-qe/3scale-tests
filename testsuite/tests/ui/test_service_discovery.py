@@ -1,4 +1,5 @@
 """Test for service discovery"""
+
 import pytest
 
 from testsuite import resilient

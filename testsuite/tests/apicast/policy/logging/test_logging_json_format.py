@@ -2,6 +2,7 @@
 When the logging policy is configured to show logs in a json format,
 the logs are shown that way
 """
+
 import pytest
 
 from testsuite import rawobj

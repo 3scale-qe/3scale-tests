@@ -1,6 +1,7 @@
 """
 Sets up gateway defined in testsuite settings
 """
+
 import importlib
 import inspect
 import logging

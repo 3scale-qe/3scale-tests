@@ -27,11 +27,9 @@ pytest = "*"
 pytest-cases = "*"
 pytest-asyncio = "*"
 requests = "*"
-3scale-api = ">=0.30.0"
+3scale-api = ">=0.35.0"
 dynaconf = "*"
-# python_keycloak = "*"
-# Waiting for https://github.com/marcospereirampj/python-keycloak/pull/201 and https://github.com/marcospereirampj/python-keycloak/pull/200
-python-keycloak = ">=2.13"
+python-keycloak = "*"
 backoff = "*"
 websocket_client = "==1.5.1"
 httpx = {version = "*", extras = ["http2"]}
@@ -45,7 +43,7 @@ widgetastic-patternfly = "*"
 # 3scale-api = {editable = true,path = "./../3scale-api-python"}
 # 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
-openshift-client = ">=1.0.14"
+openshift-client = ">=2.0.1"
 hyperfoil-client="*"
 paramiko = "*"
 docker = "*"

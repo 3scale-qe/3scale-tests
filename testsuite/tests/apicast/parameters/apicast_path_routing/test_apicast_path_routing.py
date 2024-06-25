@@ -5,6 +5,7 @@ in addition to the default host-based routing.
 The API request will be routed to the first service that has a matching mapping rule,
 from the list of services for which the value of the Host header of the request matches the Public Base URL.
 """
+
 from urllib.parse import urlparse
 
 import pytest

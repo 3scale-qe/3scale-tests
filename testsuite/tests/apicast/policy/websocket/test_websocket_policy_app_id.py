@@ -8,6 +8,7 @@ that this test doesn't work on openshift where
 case tests ends with 502 error.
 https://docs.openshift.com/container-platform/4.9/networking/ingress-operator.html#nw-http2-haproxy_configuring-ingress
 """
+
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 import pytest
@@ -24,7 +25,7 @@ pytestmark = [pytest.mark.sandbag, pytest.mark.skipif("TESTED_VERSION < Version(
 def app_id_app_key(application):
     """App id and app key for an application"""
     app_id = application["application_id"]
-    app_key = application.keys.list()["keys"][0]["key"]["value"]
+    app_key = application.keys.list()[-1]["value"]
     return f"?app_id={app_id}&app_key={app_key}"
 
 

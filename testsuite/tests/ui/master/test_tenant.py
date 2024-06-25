@@ -1,6 +1,7 @@
 """
     Tests that test the tenant modification such as creation, deletion, edit or resume.
 """
+
 import pytest
 
 from testsuite import resilient

@@ -1,6 +1,7 @@
 """
 Conftest for performance tests
 """
+
 import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor

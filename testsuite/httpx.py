@@ -1,4 +1,5 @@
 """Http client with HTTPX library supporting HTTP/1.1 and HTTP/2"""
+
 import functools
 import logging
 from typing import Iterable, Generator
@@ -343,7 +344,7 @@ class HttpxAppIdKeyAuth(HttpxBaseClientAuth):
         proxy = self.app.service.proxy.list()
         self.credentials = {
             proxy["auth_app_id"]: self.app["application_id"],
-            proxy["auth_app_key"]: self.app.keys.list()["keys"][0]["key"]["value"],
+            proxy["auth_app_key"]: self.app.keys.list()[-1]["value"],
         }
 
 

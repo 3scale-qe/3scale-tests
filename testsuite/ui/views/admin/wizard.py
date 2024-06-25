@@ -1,4 +1,5 @@
 """ Introduction wizard pages module"""
+
 from widgetastic.widget import View, GenericLocatorWidget, TextInput
 from widgetastic_patternfly import Text
 from widgetastic_patternfly4 import Button

@@ -1,4 +1,5 @@
 """Login portion which is the same for admin and master"""
+
 from widgetastic.widget import TextInput, View, Text
 
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton

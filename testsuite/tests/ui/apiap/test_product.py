@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_service_spec.rb"""
+
 import pytest
 
 from testsuite.ui.views.admin.product.product import ProductEditView

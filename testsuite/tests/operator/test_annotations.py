@@ -1,6 +1,7 @@
 """
 Check if annotations of operator pod are present
 """
+
 from typing import Tuple, List, Union
 
 import pytest

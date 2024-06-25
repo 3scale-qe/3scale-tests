@@ -1,4 +1,5 @@
 """Conftest for websocket policy tests"""
+
 import contextlib
 import ssl
 from urllib.parse import urljoin

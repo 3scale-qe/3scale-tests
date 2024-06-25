@@ -1,12 +1,13 @@
 """
 This module contains wrapper for the Mailhog API
 """
+
 from typing import Set, Optional
 import backoff
 import pytest
 import requests
 
-from openshift import OpenShiftPythonException
+from openshift_client import OpenShiftPythonException
 
 from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient

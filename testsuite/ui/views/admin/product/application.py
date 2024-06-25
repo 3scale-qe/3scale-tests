@@ -1,4 +1,5 @@
 """View representations of products application section pages"""
+
 from widgetastic.widget import Text, TextInput, View
 from widgetastic_patternfly4 import PatternflyTable, Select
 

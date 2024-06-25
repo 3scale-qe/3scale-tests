@@ -17,6 +17,7 @@ loader is defined in config/.env file). At same moment this has to be
 overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
+
 from pathlib import Path
 import logging
 import os
@@ -26,7 +27,7 @@ import re
 from packaging.version import Version, InvalidVersion
 from weakget import weakget
 
-from openshift import OpenShiftPythonException
+from openshift_client import OpenShiftPythonException
 from testsuite.openshift.client import OpenShiftClient
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -102,24 +103,41 @@ def _apicast_image(ocp):
     return lookup.model.spec.template.spec.containers[0].image
 
 
-def _rhsso_password(server_url, token):
+def _rhsso_password(tools_config, rhsso_config):
     """Search for SSO admin password"""
+    server_url = tools_config.get("server")
+    project = tools_config.get("namespace")
+    token = tools_config.get("token")
+    kind = rhsso_config.get("kind", "rhbk")
     try:
         # is this RHOAM?
         tools = OpenShiftClient(project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
         return tools.secrets["credential-rhssouser"]["ADMIN_PASSWORD"].decode("utf-8")
     except (OpenShiftPythonException, KeyError):
+        pass
+
+    tools = OpenShiftClient(project_name=project, server_url=server_url, token=token)
+    if kind == "rhbk":
         try:
             # was it deployed as part of tools?
-            tools = OpenShiftClient(project_name="tools", server_url=server_url, token=token)
+            return tools.secrets["rhbk-initial-admin"]["password"].decode("utf-8")
+        except (OpenShiftPythonException, KeyError):
+            pass
+
+    if kind == "rhsso":
+        try:
             # first RHSSO 7.5 way
             return tools.secrets["credential-sso"]["ADMIN_PASSWORD"].decode("utf-8")
         except (OpenShiftPythonException, KeyError):
-            try:
-                # try 7.4 known deployment if previous fails
-                return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
-            except (OpenShiftPythonException, KeyError):
-                return None
+            pass
+
+        try:
+            # try 7.4 known deployment if previous fails
+            return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
+        except (OpenShiftPythonException, KeyError):
+            pass
+
+    return None
 
 
 def _threescale_operator_ocp(ocp):
@@ -219,6 +237,12 @@ def load(obj, env=None, silent=None, key=None):
 
         ocp_setup = obj.get("openshift", {}).get("servers", {}).get("default", {})
 
+        ocp_tools_setup = obj.get("fixtures", {}).get("tools", {})
+        if not ocp_tools_setup:
+            ocp_tools_setup = ocp_setup
+
+        rhsso_setup = obj.get("rhsso", {})
+
         ocp = OpenShiftClient(
             project_name=project, server_url=ocp_setup.get("server_url"), token=ocp_setup.get("token")
         )
@@ -307,7 +331,7 @@ def load(obj, env=None, silent=None, key=None):
                 "threescale": {"openshift": threescale_operator_ocp},
                 "apicast": {"openshift": apicast_operator_ocp},
             },
-            "rhsso": {"password": _rhsso_password(ocp_setup.get("server_url"), ocp_setup.get("token"))},
+            "rhsso": {"password": _rhsso_password(ocp_tools_setup, rhsso_setup)},
         }
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated

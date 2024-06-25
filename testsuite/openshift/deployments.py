@@ -1,11 +1,12 @@
 """Module containing Deployment related classes"""
+
 import os
 import typing
 from abc import ABC, abstractmethod
 from contextlib import ExitStack
 from datetime import timezone
 
-import openshift as oc
+import openshift_client as oc
 from testsuite.openshift.env import Environ
 
 if typing.TYPE_CHECKING:

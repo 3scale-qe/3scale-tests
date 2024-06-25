@@ -1,4 +1,5 @@
 """Test for API key autocomplete in dev portal active docs"""
+
 import importlib_resources as resources
 import pytest
 

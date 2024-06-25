@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/url_rewrite_query/query_rewrite_policy_invalid_liquid_spec.rb
 """
+
 import pytest
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest

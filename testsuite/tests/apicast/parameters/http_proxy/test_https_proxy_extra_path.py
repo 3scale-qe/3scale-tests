@@ -27,13 +27,16 @@ def service_proxy_settings(private_base_url, extra_path):
 
 
 @pytest.fixture(scope="module")
-def gateway_environment(gateway_environment, testconfig, tools):
+def gateway_environment(gateway_environment, testconfig, tools, rhsso_kind):
     """
     Set apicast environment:
         - HTTPS_PROXY parameter
         - NO_PROXY - needed to skip proxy for internal services: system, backend, sso
     """
-    rhsso_url = urlparse(tools["no-ssl-sso"]).hostname
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    rhsso_url = urlparse(tools[key]).hostname
     https_proxy = testconfig["proxy"]["https"]
 
     gateway_environment.update(

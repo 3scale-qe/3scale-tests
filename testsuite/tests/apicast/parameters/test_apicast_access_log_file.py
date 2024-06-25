@@ -3,6 +3,7 @@
 Set `APICAST_ACCESS_LOG_FILE` parameter to apicast.
 All access logs must be appended to the file set to the parameter.
 """
+
 import re
 from typing import Tuple
 from urllib.parse import urlparse

@@ -1,4 +1,5 @@
 """Rewrite of spec/ui_specs/policies_spec.rb"""
+
 import pytest
 
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView

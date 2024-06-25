@@ -1,4 +1,5 @@
 """Test of automatic mails functionality in UI"""
+
 import re
 import pytest
 

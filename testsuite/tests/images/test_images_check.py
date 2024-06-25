@@ -1,4 +1,5 @@
 """Image checkt tests"""
+
 import pytest
 
 from testsuite.gateways import gateway

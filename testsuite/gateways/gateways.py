@@ -1,4 +1,5 @@
 """Module containing all basic gateways"""
+
 from abc import ABC, abstractmethod
 from typing import Set, Type, TypeVar, Union
 

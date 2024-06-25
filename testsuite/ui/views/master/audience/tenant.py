@@ -1,4 +1,5 @@
 """View representations of Tenants pages"""
+
 from widgetastic.widget import TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 

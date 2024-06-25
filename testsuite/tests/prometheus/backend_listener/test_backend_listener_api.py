@@ -4,6 +4,7 @@ When an authorization / reporting backend api endpoint is requested,
 the increase of the metric, respective to the endpoint and returned
 status code, is expected in prometheus.
 """
+
 from typing import Tuple, Dict
 
 import pytest

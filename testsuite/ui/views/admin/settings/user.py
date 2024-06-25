@@ -1,4 +1,5 @@
 """View representations of User Account pages"""
+
 import enum
 from typing import List
 

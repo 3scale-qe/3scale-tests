@@ -1,6 +1,7 @@
 """
 Conftest for the backend listener prometheus tests
 """
+
 import pytest
 import requests
 

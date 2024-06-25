@@ -1,4 +1,5 @@
 """Test of messages and mails functionality in UI"""
+
 import pytest
 
 from testsuite.ui.views.admin.audience.messages import MessagesView, ComposeMessageView

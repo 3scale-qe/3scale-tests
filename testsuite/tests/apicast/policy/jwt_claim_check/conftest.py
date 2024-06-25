@@ -1,4 +1,5 @@
 """Conftest for jwt claim check policy"""
+
 import pytest
 
 from testsuite import rawobj

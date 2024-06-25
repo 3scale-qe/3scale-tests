@@ -3,6 +3,7 @@ Testing the custom metric policy
 The policy enables to decide whether to increase a
 metric based on the response from the upstream API
 """
+
 import pytest
 import pytest_cases
 from packaging.version import Version  # noqa # pylint: disable=unused-import

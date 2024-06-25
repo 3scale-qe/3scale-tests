@@ -1,4 +1,5 @@
 """Represents mockserver calls used in tests"""
+
 from urllib.parse import urljoin
 import json
 

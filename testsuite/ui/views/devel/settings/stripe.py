@@ -1,4 +1,5 @@
 """Settings Devel portal View containing credit card details for Stripe payment gateway"""
+
 import logging
 
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text

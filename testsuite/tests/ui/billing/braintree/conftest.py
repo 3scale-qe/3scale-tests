@@ -1,8 +1,9 @@
 """Conftest for Braintree gateway billing tests"""
+
 from datetime import datetime
 
 import pytest
-import openshift as oc
+import openshift_client as oc
 
 from testsuite.billing import Braintree
 from testsuite.ui.objects import CreditCard

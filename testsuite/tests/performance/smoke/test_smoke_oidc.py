@@ -4,6 +4,7 @@
     Run the test and assert results.
     This test shows usage how to write test where 3scale product is secured with oidc.
 """
+
 import os
 
 import backoff

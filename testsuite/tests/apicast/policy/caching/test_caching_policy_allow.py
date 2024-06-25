@@ -1,6 +1,7 @@
 """
 Rewrite spec/functional_specs/policies/caching/caching_allow_policy_spec.rb
 """
+
 import pytest
 
 from testsuite import rawobj
