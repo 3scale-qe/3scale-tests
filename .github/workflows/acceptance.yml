@@ -2,7 +2,9 @@ name: acceptance
 on:
   push:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - 'stable-*'
 jobs:
   check:
     runs-on: ubuntu-latest

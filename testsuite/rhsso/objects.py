@@ -33,6 +33,8 @@ class Realm:
         """Creates new user"""
         kwargs["username"] = username
         kwargs["enabled"] = True
+        kwargs.setdefault("firstName", "John")
+        kwargs.setdefault("lastName", "Doe")
         kwargs["email"] = f"{username}@anything.invalid"
         self.admin.create_user(kwargs)
         user_id = self.admin.get_user_id(username)
