@@ -1,6 +1,6 @@
 """View representations of Billing pages"""
 
-from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput
+from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput, Text
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -13,13 +13,14 @@ class BillingView(BaseAudienceView):
 
     path_pattern = "/finance"
     table = PatternflyTable("//table[@aria-label='Earnings by month table']")
+    title = Text("//h1")
 
     def prerequisite(self):
         return BaseAudienceView
 
     @property
     def is_displayed(self):
-        return self.table.is_displayed and self.path in self.browser.url
+        return self.title.text == "Earnings by Month" and self.table.is_displayed and self.path in self.browser.url
 
 
 class ChargingForm(View):
@@ -81,6 +82,7 @@ class BillingSettingsView(BaseAudienceView):
     path_pattern = "/finance/settings"
     charging_form = View.nested(ChargingForm)
     gateway_form = View.nested(GatewayForm)
+    title = Text("//h1")
 
     def charging(self, enable: bool):
         """Enable/disable charging"""
@@ -128,7 +130,8 @@ class BillingSettingsView(BaseAudienceView):
     @property
     def is_displayed(self):
         return (
-            self.browser.title.text == "Charging & Gateway"
+            self.title.text == "Charging & Gateway"
             and self.charging_form.is_displayed
             and self.gateway_form.is_displayed
+            and self.path in self.browser.url
         )
