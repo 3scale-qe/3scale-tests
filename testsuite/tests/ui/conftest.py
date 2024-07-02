@@ -153,7 +153,9 @@ def custom_devel_login(navigator, provider_account, account_password, browser):
         if fresh:
             browser.selenium.delete_all_cookies()
             browser.selenium.refresh()
-        page = navigator.open(DeveloperLoginView, url=url, access_code=provider_account["site_access_code"])
+        page = navigator.open(
+            DeveloperLoginView, url=url, wait_displayed=False, access_code=provider_account["site_access_code"]
+        )
         if page.is_displayed:
             page.do_login(name, password)
 
