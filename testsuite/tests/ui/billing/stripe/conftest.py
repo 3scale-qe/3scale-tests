@@ -1,5 +1,7 @@
 """Conftest for Stripe gateway billing tests"""
 
+from datetime import datetime
+
 import pytest
 
 from testsuite.billing import Stripe
@@ -29,7 +31,7 @@ def custom_card(account, custom_devel_login, billing_address, navigator):
 
     def _setup(cc_number, verify_3ds=False):
         custom_devel_login(account=account)
-        cc_details = CreditCard(cc_number, 123, 10, 25)
+        cc_details = CreditCard(cc_number, 123, 10, (datetime.today().year + 3) % 100)
         cc_view = navigator.navigate(StripeCCView)
         cc_view.add_cc_details(billing_address, cc_details)
         if verify_3ds:
