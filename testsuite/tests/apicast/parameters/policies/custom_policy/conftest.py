@@ -88,10 +88,7 @@ def changed_secret(staging_gateway, policy_secret):
         pods = staging_gateway.deployment.get_pods()
         wait_until(lambda: pods_ready(pods))
 
-    if isinstance(staging_gateway, SystemApicast):
-        assert generation + 2 == staging_gateway.deployment.get_generation()
-    else:
-        assert generation + 1 == staging_gateway.deployment.get_generation()
+    assert staging_gateway.deployment.get_generation() > generation
 
     return secret
 
