@@ -15,8 +15,8 @@ latest know webdrivers and store those webdrivers in cache/tmp folders
     `remote_url` url and port for remote selenium webdriver instance, if not specified
 `http://127.0.0.1:4444` will be used
 
-    To run container use e.g. `podman run -d -p 4444:4444 -p 5900:5900 -v /dev/shm:/dev/shm 
-    selenium/standalone-chrome:4.0.0-beta-1-20210215` 
+    To run container use e.g. `podman run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" --rm
+    selenium/standalone-chrome:latest` 
 
 `webdriver:`:
 Choose browser type -currently supported browsers options are `firefox`, `chrome`
