@@ -56,9 +56,9 @@ def test_caching_policy_allow_mod(prod_client, openshift, application, productio
 
     openshift = openshift()
 
-    replicas = openshift.scaler._scale_component("apicast-production", 0)
+    production_gateway.deployment.scale(0)
     with openshift.scaler.scale("backend-listener", 0):
-        openshift.scaler._scale_component("apicast-production", replicas, wait_for_replicas=replicas)
+        production_gateway.deployment.scale(1)
         analytics = application.threescale_client.analytics
         usage_before = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
 
