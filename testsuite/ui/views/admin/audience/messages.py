@@ -1,8 +1,13 @@
 """View representations of Messages pages"""
 
+import time
+import re
+
 from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly import TextInput
-from widgetastic_patternfly4 import Button, PatternflyTable
+
+from widgetastic_patternfly4 import Button, PatternflyTable, Dropdown
+from widgetastic_patternfly4.ouia import Dropdown as OUIADropdown
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -16,6 +21,52 @@ class MessagesView(BaseAudienceView):
     table = PatternflyTable("//table[@aria-label='Messages table']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
     empty_inbox = Text("//div[text()='Your inbox is empty, there are no new messages.']")
+    # select_all_checkbox = Checkbox('id="bulk-select"')
+    select_dropdown = OUIADropdown(component_id="OUIA-Generated-Dropdown-1")
+    # This dropdown does not have page unique component id
+    actions_dropdown = Dropdown(
+        None, locator="//div[@id='pf-random-id-0']//div[@data-ouia-component-id='OUIA-Generated-Dropdown-2']"
+    )
+    delete_dialog_button = Button(locator='//div[@id="colorbox"]//button[contains(text(), "Delete")]')
+
+    def delete_all(self):
+        """
+        Deletes all massages from the inbox
+        """
+        if self.empty_inbox.is_displayed:
+            return
+        items = self.select_dropdown.items
+        select_all_item = [s for s in items if re.match("Select all.*", s)][0]
+        self.select_dropdown.item_select(select_all_item)  # item_select does not have better selector than exact text
+        self.actions_dropdown.open()
+        self.actions_dropdown.item_select("Delete")
+        time.sleep(1)
+        self.delete_dialog_button.click()
+
+    def get_unread_msg_link(self, subject=None):
+        """Returns link to the first unread message, None if such message does not exist
+        :param str subject: Specify unread message, with given subject
+        """
+        links = self.browser.elements("//tr[contains(@class, 'unread')]//td[@data-label='Subject']/a")
+        if links:
+            if subject:
+                for link in links:
+                    if link.text == subject:
+                        return link
+            else:
+                return links[0]
+        return None
+
+    def get_first_unread_msg_link_gen(self):
+        """
+        Returns generator, that returns link to the first unread message until, such message exists.
+        """
+        while True:
+            link = self.get_unread_msg_link()
+            if link:
+                yield link
+            else:
+                break
 
     def prerequisite(self):
         return BaseAudienceView
