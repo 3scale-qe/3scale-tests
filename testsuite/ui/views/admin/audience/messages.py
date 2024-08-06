@@ -21,7 +21,6 @@ class MessagesView(BaseAudienceView):
     table = PatternflyTable("//table[@aria-label='Messages table']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
     empty_inbox = Text("//div[text()='Your inbox is empty, there are no new messages.']")
-    # select_all_checkbox = Checkbox('id="bulk-select"')
     select_dropdown = OUIADropdown(component_id="OUIA-Generated-Dropdown-1")
     # This dropdown does not have page unique component id
     actions_dropdown = Dropdown(
@@ -43,19 +42,24 @@ class MessagesView(BaseAudienceView):
         time.sleep(1)
         self.delete_dialog_button.click()
 
+    def delete_message(self, subject):
+        """
+        Deletes first message with given subject
+        """
+        delete_button = self.browser.elements(f"//table[@id='messages']//tr[descendant::a[text()='{subject}']]//button")
+        if delete_button:
+            delete_button[0].click()
+
     def get_unread_msg_link(self, subject=None):
         """Returns link to the first unread message, None if such message does not exist
         :param str subject: Specify unread message, with given subject
         """
         links = self.browser.elements("//tr[contains(@class, 'unread')]//td[@data-label='Subject']/a")
-        if links:
-            if subject:
-                for link in links:
-                    if link.text == subject:
-                        return link
-            else:
-                return links[0]
-        return None
+        if not links:
+            return None
+        if subject:
+            links = [link for link in links if link.text == subject]
+        return links[0]
 
     def get_first_unread_msg_link_gen(self):
         """
