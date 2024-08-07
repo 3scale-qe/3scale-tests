@@ -30,7 +30,7 @@ class APIcast(APIObject):
         # Ensure that the object is created with the correct execution context
         context = Context()
         context.project_name = openshift.project_name
-        context.api_url = openshift.server_url
+        context.api_server = openshift.server_url
         context.token = openshift.token
 
         return cls(model, context=context)
