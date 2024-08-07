@@ -115,7 +115,7 @@ class Rhoam(OpenshiftProject):
         super().__init__("redhat-rhoam-user-sso")
 
     def __getitem__(self, name):
-        if name != "no-ssl-sso":
+        if name not in ["no-ssl-sso", "no-ssl-rhbk"]:
             raise KeyError(name)
         # rhoam doesn't have http:// sso route
         return super().__getitem__("keycloak+ssl")
