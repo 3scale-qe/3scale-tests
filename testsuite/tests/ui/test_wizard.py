@@ -16,7 +16,10 @@ from testsuite.ui.views.admin.wizard import (
 )
 from testsuite.utils import blame
 
-pytestmark = pytest.mark.usefixtures("login")
+pytestmark = [
+    pytest.mark.usefixtures("login"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-11067"),
+]
 
 
 def test_wizard_correct_request(navigator, request, private_base_url):
