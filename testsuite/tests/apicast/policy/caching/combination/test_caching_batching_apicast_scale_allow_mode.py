@@ -32,6 +32,8 @@ def service(service):
     return service
 
 
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-11213")
+@pytest.mark.xfail
 # pylint: disable=protected-access
 def test_caching_policy_allow_mod(prod_client, openshift, application, production_gateway):
     """
