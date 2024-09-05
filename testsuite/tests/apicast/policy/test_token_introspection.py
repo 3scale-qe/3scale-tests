@@ -69,8 +69,9 @@ def update_policies(service, application, rhsso_service_info):
     service.proxy.deploy()
 
 
-# pylint: disable=unused-argument
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10831")
 @pytest.mark.nopersistence  # Test checks changes during test run hence is incompatible with persistence plugin
+# pylint: disable=unused-argument
 def test_rhsso_logout(client, access_token, rhsso_service_info, update_policies):
     """
     Makes a request using rhsso auth.
