@@ -60,7 +60,7 @@ class WASMExtension:
         )
         self.credentials = None
 
-        self.httpbin.deployment(f"dc/{self.httpbin_name}").wait_for()
+        self.httpbin.deployment(f"deployment/{self.httpbin_name}").wait_for()
 
     @property
     def ingress_url(self):
@@ -235,7 +235,7 @@ class WASMExtension:
 
         self.httpbin.patch("wasmplugin", self.extension_name, ops, patch_type="json")
         if wait:
-            self.httpbin.deployment(f"dc/{self.httpbin_name}").rollout()
+            self.httpbin.deployment(f"deployment/{self.httpbin_name}").rollout()
 
     def delete(self):
         """Deletes extension and all that it created from openshift"""
