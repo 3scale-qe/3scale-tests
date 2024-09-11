@@ -121,8 +121,8 @@ class RHSSOServiceConfiguration:
             "realm": self.realm.name,
             "rhsso": {
                 "url": self.rhsso.server_url,
-                "username": self.rhsso.master.username,
-                "password": self.rhsso.master.password,
+                "username": self.rhsso.master.connection.username,
+                "password": self.rhsso.master.connection.password,
             },
             "user": self.user,
             "username": self.username,
