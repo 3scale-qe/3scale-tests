@@ -235,6 +235,7 @@ def pytest_metadata(metadata):
         admin_url = "(private tenant created on the fly is in use)"
 
     prometheus_client = _resolve_prometheus_client(settings, configuration.openshift)
+    rhsso = _resolve_rhsso(settings, _resolve_tools(settings), _rhsso_kind(settings))
 
     metadata.update(
         {
@@ -258,6 +259,7 @@ def pytest_metadata(metadata):
             "polarion-lookup-method": "name",
             "project": "3scale-" + str(version).replace(".", "")[:3],
             "OCP_TOOL_prometheus": prometheus_client.endpoint if prometheus_client else "UNKNOWN",
+            "SSO": rhsso.server_url if rhsso else "UNKNOWN",
         }
     )
     tool_names = [
@@ -353,12 +355,16 @@ def operator_apicast_openshift():
     )
 
 
-@pytest.fixture(scope="session")
-def tools(testconfig):
-    """dict-like object to provide testing environment tools"""
+def _resolve_tools(testconfig):
     options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
     sources = options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
     return Tools(sources, options)
+
+
+@pytest.fixture(scope="session")
+def tools(testconfig):
+    """dict-like object to provide testing environment tools"""
+    return _resolve_tools(testconfig)
 
 
 @pytest.fixture(scope="module")
@@ -603,10 +609,24 @@ def production_gateway(request, testconfig, openshift):
     return gateway
 
 
-@pytest.fixture(scope="session")
-def rhsso_kind(request, testconfig):
-    """SSO kind, rhsso or rhbk"""
+def _rhsso_kind(testconfig):
     return testconfig["rhsso"].get("kind", "rhbk")
+
+
+@pytest.fixture(scope="session")
+def rhsso_kind(testconfig):
+    """SSO kind, rhsso or rhbk"""
+    return _rhsso_kind(testconfig)
+
+
+def _resolve_rhsso(testconfig, tools, rhsso_kind):
+    cnf = testconfig["rhsso"]
+    if "password" not in cnf:
+        return None
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    return RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
 
 
 @pytest.fixture(scope="session")
@@ -615,13 +635,9 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     Set up client for zync
     :return: dict with all important details
     """
-    cnf = testconfig["rhsso"]
-    if "password" not in cnf:
+    rhsso = _resolve_rhsso(testconfig, tools, rhsso_kind)
+    if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
-    key = "no-ssl-rhbk"
-    if rhsso_kind == "rhsso":
-        key = "no-ssl-sso"
-    rhsso = RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
 
     if not testconfig["skip_cleanup"]:
@@ -636,6 +652,7 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind):
         standardFlowEnabled=False,
     )
 
+    cnf = testconfig["rhsso"]
     username = cnf["test_user"]["username"]
     password = cnf["test_user"]["password"]
     user = realm.create_user(username, password)
