@@ -106,7 +106,7 @@ class WASMGateway(AbstractGateway):
     def _create_api_client(self, application, endpoint, verify, cert=None, disable_retry_status_list=None):
         ext = self.extensions[application.service["id"]]
         if ext.synchronise_credentials():
-            ext.httpbin.deployment(f"dc/{ext.httpbin_name}").rollout()
+            ext.httpbin.deployment(f"deployment/{ext.httpbin_name}").rollout()
 
         return ServiceMeshHttpClient(
             app=application,

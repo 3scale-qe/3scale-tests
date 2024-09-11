@@ -3,8 +3,8 @@ kind: Template
 metadata:
   name: servicemesh-httpbin
 objects:
-- apiVersion: v1
-  kind: DeploymentConfig
+- apiVersion: apps/v1
+  kind: Deployment
   metadata:
     name: ${NAME}
     labels:
@@ -12,13 +12,15 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: ${LABEL}
+      matchLabels:
+         app: ${LABEL}
     template:
       metadata:
         annotations:
-          sidecar.istio.io/inject: "true"
+          sidecar.maistra.io/proxyEnv: "{ \"WASM_INSECURE_REGISTRIES\": \"*\"}"
         labels:
           app: ${LABEL}
+          sidecar.istio.io/inject: "true"
       spec:
         containers:
           - image: quay.io/jsmadis/httpbin:latest
@@ -27,7 +29,7 @@ objects:
             ports:
               - containerPort: 8080
     strategy:
-      type: Rolling
+      type: RollingUpdate
 - apiVersion: v1
   kind: Service
   metadata:
