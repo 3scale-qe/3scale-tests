@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class BillingAddressForm(View):
     """Billing Address form"""
 
-    ROOT = "//form[@action='/admin/account/payment_details']"
+    ROOT = "//form[@action='/admin/account/stripe']"
     name = TextInput(id="account_billing_address_name")
     address1 = TextInput(id="account_billing_address_address1")
     address2 = TextInput(id="account_billing_address_address2")
