@@ -42,7 +42,7 @@ def api_doc_page(login, navigator, ui_active_doc, request, custom_admin_login):
     """Custom doc page for developer portal"""
     view = navigator.navigate(CMSNewPageView)
     page_name = blame(request, "CustomDocumentation")
-    page_path = blame(request, "apidocs")
+    page_path = blame(request, "/apidocs")
 
     view.create(
         page_name,

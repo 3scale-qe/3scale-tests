@@ -143,8 +143,8 @@ def test_tls_terminology_policy_content(navigator, policy_service):
     assert tls_policy_view.local_cert_key.is_displayed
 
     tls_policy_view.cert_type_select.select_by_value("1")
-    assert tls_policy_view.embedded_cert_path.is_displayed
-    assert tls_policy_view.embedded_cert_key_path.is_displayed
+    assert tls_policy_view.embedded_cert.is_displayed
+    assert tls_policy_view.embedded_cert_key.is_displayed
 
     tls_policy_view.cert_type_select.select_by_value("0")
     assert tls_policy_view.local_cert_key.is_displayed
