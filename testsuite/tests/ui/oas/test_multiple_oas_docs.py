@@ -65,7 +65,7 @@ def multiple_api_doc_page(login, navigator, oas3_one_spec, oas3_two_spec, reques
     """Custom doc page for developer portal"""
     view = navigator.navigate(CMSNewPageView)
     page_name = blame(request, "Multiple OAS docs")
-    page_path = blame(request, "multiple_oas")
+    page_path = blame(request, "/multiple_oas")
 
     view.create(
         page_name,

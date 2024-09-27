@@ -50,8 +50,8 @@ class TlsTerminationPolicyView(View):
     add_cert_btn = Button(locator=".//button[contains(@class, 'btn-add')]")
     local_cert_key = FileInput(id="root_certificate_key_path")
     local_cert = FileInput(id="root_certificate_path")
-    embedded_cert_path = TextInput(id="root_certificate")
-    embedded_cert_key_path = TextInput(id="root_certificate_key")
+    embedded_cert = FileInput(id="root_certificate")
+    embedded_cert_key = FileInput(id="root_certificate_key")
     update_policy_btn = Button(locator=".//button[text()='Update Policy']")
     cert_type_select = ThreescaleDropdown('//*[@id="root_certificates_0_anyof_select"]')
 
@@ -67,8 +67,8 @@ class TlsTerminationPolicyView(View):
         """Adds certs from filesystem"""
         self.add_cert_btn.click()
         self.cert_type_select.select_by_value("1")
-        self.embedded_cert_path.fill(certificate.files["certificate"])
-        self.embedded_cert_key_path.fill(certificate.files["key"])
+        self.embedded_cert.fill(certificate.files["certificate"])
+        self.embedded_cert_key.fill(certificate.files["key"])
         self.update_policy_btn.click()
 
     @property
