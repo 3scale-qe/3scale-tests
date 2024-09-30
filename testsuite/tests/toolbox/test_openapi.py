@@ -16,6 +16,10 @@ from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 # authentization in 3scale and mapping to OAS(http://spec.openapis.org/oas/v3.0.3#security-scheme-object):
 #
 # - 1 token -> see uber.json

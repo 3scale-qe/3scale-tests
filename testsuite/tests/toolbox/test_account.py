@@ -6,6 +6,10 @@ import pytest
 
 from testsuite.toolbox import toolbox
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def create_cmd(threescale_src1):

@@ -8,6 +8,10 @@ from testsuite.toolbox import constants
 from testsuite.toolbox import toolbox
 from testsuite.utils import randomize
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def empty_list(service, create_cmd):

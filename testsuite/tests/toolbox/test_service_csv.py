@@ -10,6 +10,10 @@ from testsuite.config import settings
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 DATA = [
     "service_name",
