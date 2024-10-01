@@ -11,6 +11,10 @@ from testsuite import rawobj
 
 SWAGGER_LINK = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v2.0/json/petstore.json"
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def my_app_plan(request, custom_app_plan, service):

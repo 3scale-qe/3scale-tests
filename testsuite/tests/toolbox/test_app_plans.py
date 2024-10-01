@@ -14,6 +14,10 @@ from testsuite.toolbox import toolbox
 from testsuite.utils import blame
 from testsuite import rawobj
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def service(request, custom_service):

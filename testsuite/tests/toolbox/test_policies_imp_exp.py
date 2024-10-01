@@ -8,6 +8,10 @@ import pytest
 from testsuite.config import settings
 from testsuite.toolbox import toolbox
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def policy_file(policy_configs):

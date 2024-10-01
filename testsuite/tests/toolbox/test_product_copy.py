@@ -9,7 +9,10 @@ from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.7')"),
+    pytest.mark.xdist_group(name="toolbox"),
+]
 
 
 @pytest.fixture(scope="module", params=["copy_service", "product_copy", "service_copy"])

@@ -104,7 +104,7 @@ ui: pipenv check-secrets.yaml
 	$(PYTEST) --ui $(flags) testsuite/tests/ui
 
 toolbox: pipenv check-secrets.yaml
-	$(PYTEST) --toolbox $(flags) testsuite/tests/toolbox
+	$(PYTEST) -n4 --dist loadgroup --toolbox $(flags) testsuite/tests/toolbox
 
 test-images:
 	$(PYTEST) --images $(flags) testsuite/tests/images

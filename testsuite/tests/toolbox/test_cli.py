@@ -9,7 +9,9 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite.toolbox import toolbox
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.7')")
+pytestmark = [
+    pytest.mark.skipif("TESTED_VERSION < Version('2.7')"),
+]
 
 # removed 'update' as unsupported command
 

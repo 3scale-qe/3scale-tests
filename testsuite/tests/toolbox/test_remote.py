@@ -8,6 +8,10 @@ from testsuite.config import settings
 
 from testsuite.toolbox import toolbox
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 EMPTY_LIST = "Empty remote list.\n"
 

@@ -11,6 +11,10 @@ from testsuite.utils import blame
 from testsuite.toolbox import constants
 from testsuite.toolbox import toolbox
 
+pytestmark = [
+    pytest.mark.xdist_group(name="toolbox"),
+]
+
 
 @pytest.fixture(scope="module")
 def metric_obj(request, service):
