@@ -129,6 +129,97 @@ class CheckBoxGroup(GenericLocatorWidget):
                 element.click()
 
 
+class PfCheckBoxGroup(Widget):
+    """
+    Patternfly CheckBox group
+    :param locator: Locator of widget which contains patternfly checkboxes
+    :param label_text: Label of the patternfly checkbox group. This param shadows param locator
+    """
+
+    def __init__(self, parent=None, locator=None, label_text=None, logger=None):
+        super().__init__(parent, logger=logger)
+        self.locator = locator
+        self.label_text = label_text
+
+        if label_text:
+            self.locator = (
+                f"//div[@class='pf-c-form__group' and "
+                f".//span[@class='pf-c-form__label-text' and text()='{label_text}']]"
+            )
+        elif locator:
+            self.locator = locator
+        else:
+            self.locator = ""
+        self.checkboxes = self.locator + "//input[@type='checkbox']"
+        self.checkbox_by_label = (
+            self.locator + "//div[@class='pf-c-check' and ./label[text()='{}']]//input[@type='checkbox']"
+        )
+        self.checkbox_by_id = self.locator + "//input[@type='checkbox' and @id='{}']"
+
+    def is_checked(self, cb_id: str = None, label: str = None):
+        """
+        Detect if checkbox in the checkbox group is already checked
+        @param cb_id: select checkbox by id (this param have higher priority than param label)
+        @param label: select checkbox by label
+        @return true if is checked
+        """
+        locator = self.checkbox_by_id.format(cb_id) if cb_id else self.checkbox_by_label.format(label)
+        return self.browser.element(locator).is_selected()
+
+    def check(self, ids=None, labels=None):
+        """
+        Check specified checkboxes of the checkbox group. Specification can be based on checkbox id, or it's label.
+        @param ids: specify checkboxes by id
+        @param labels: specify checkboxes by labels
+        @return: None
+        """
+        ids = ids if ids else []
+        labels = labels if labels else []
+        self.uncheck_all()
+        for cb_id in ids:
+            self.browser.element(self.checkbox_by_id.format(cb_id)).click()
+        for label in labels:
+            element = self.browser.element(self.checkbox_by_label.format(label))
+            if not element.is_selected():  # element can be already selected by id
+                element.click()
+
+    def uncheck(self, ids=None, labels=None):
+        """
+        Uncheck specified checkboxes of the checkbox group. Specification can be based on checkbox id, or it's label.
+        @param ids: specify checkboxes by id
+        @param labels: specify checkboxes by labels
+        @return: None
+        """
+        ids = ids if ids else []
+        labels = labels if labels else []
+        elms = []
+        for cb_id in ids:
+            elms.append(self.browser.element(self.checkbox_by_id.format(cb_id)))
+        for label in labels:
+            elms.append(self.browser.element(self.checkbox_by_label.format(label)))
+        for elem in elms:
+            if elem.is_selected():
+                elem.click()
+
+    def check_all(self):
+        """
+        Check all checkboxes of the group
+        @return: None
+        """
+        for element in self.browser.elements(self.checkboxes):
+            if not element.is_selected():
+                element.click()
+
+    def uncheck_all(self):
+        """
+        Uncheck all checkboxes of the group
+        @return:
+        """
+        for element in self.browser.elements(self.checkboxes):
+            if element.is_selected():
+                element.click()
+
+
 class ThreescaleDropdown(GenericLocatorWidget):
     """Specific dropdown of 3scale pages"""
 
