@@ -232,6 +232,10 @@ class OpenShiftClient:
             return (
                 apiobject.get_label("com.redhat.component-name") == "3scale-operator"
                 or apiobject.get_label("rht.subcomp") == "3scale_operator"
+                or (
+                    apiobject.get_label("control-plane") == "controller-manager"
+                    and apiobject.get_label("app") == "3scale-api-management"
+                )
             )
 
         return self.select_resource("pods", narrow_function=select_operator).object(cls=Operator)
@@ -248,6 +252,10 @@ class OpenShiftClient:
             return (
                 apiobject.get_label("com.redhat.component-name") == "apicast-operator"
                 or apiobject.get_label("rht.subcomp") == "apicast_operator"
+                or (
+                    apiobject.get_label("control-plane") == "controller-manager"
+                    and apiobject.get_label("app") == "apicast"
+                )
             )
 
         return self.select_resource("pods", narrow_function=select_operator).object(cls=Operator)
