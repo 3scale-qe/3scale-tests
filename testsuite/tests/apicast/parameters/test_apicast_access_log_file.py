@@ -5,6 +5,7 @@ All access logs must be appended to the file set to the parameter.
 """
 
 import re
+import tempfile
 from typing import Tuple
 from urllib.parse import urlparse
 
@@ -50,7 +51,7 @@ def make_requests(api_client):
 
 
 @pytest.fixture
-def read_log(staging_gateway, tmpdir):
+def read_log(staging_gateway):
     """Read log from gateway by copying it to a local directory.
 
     Returns a tuple containing the content of the file and also the
@@ -60,6 +61,11 @@ def read_log(staging_gateway, tmpdir):
     def read(filename) -> Tuple[str, int]:
         source = f"/tmp/{filename}"
 
+        # tmpdir is used as destination for files to rsync, file is only read
+        # into string, since file is only used in this function it does not
+        # need to be in $resultsdir, also dir needs to be created every time,
+        # e.g in case --load is used and tmpdir does no longer exists
+        tmpdir = tempfile.mkdtemp(prefix="apicast_logs_")
         dest = f"{tmpdir}/{filename}"
 
         # copy log file from apicast to local
