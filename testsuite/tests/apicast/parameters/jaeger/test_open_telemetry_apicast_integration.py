@@ -24,6 +24,7 @@ pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CU
             SystemApicast,
             id="system",
             marks=[
+                pytest.mark.disruptive,
                 pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
                 pytest.mark.skipif("TESTED_VERSION < Version('2.14')"),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735"),
