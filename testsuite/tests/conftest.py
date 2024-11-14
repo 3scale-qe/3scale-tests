@@ -273,7 +273,8 @@ def pytest_metadata(metadata):
         "mockserver+ssl",
     ]
     tool_options = weakget(settings)["fixtures"]["tools"] % {"namespace": "tools"}
-    oc_tools = Tools(["OpenshiftProject"], tool_options)
+    sources = tool_options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
+    oc_tools = Tools(sources, tool_options)
     for tool_name in tool_names:
         try:
             url = oc_tools[tool_name]
