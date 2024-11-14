@@ -24,6 +24,7 @@ pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CU
             SystemApicast,
             id="system",
             marks=[
+                pytest.mark.disruptive,
                 pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
                 pytest.mark.skipif("TESTED_VERSION < Version('2.14')"),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735"),
@@ -34,8 +35,7 @@ pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CU
             id="operator",
             marks=[
                 pytest.mark.required_capabilities(Capability.OCP4),
-                # removing skip so it runs againts alpha, as it's build as 0.7.0
-                # pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.7.6')"),
+                pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.8.0')"),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9539"),
             ],
         ),
