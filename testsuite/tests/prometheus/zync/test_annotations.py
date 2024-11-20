@@ -4,9 +4,9 @@ Check if annotations required by prometheus are set
 
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
+from openshift_client import OpenShiftPythonException
 
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.configuration import openshift
 
 pytestmark = [
     pytest.mark.sandbag,  # requires openshift
@@ -18,11 +18,15 @@ pytestmark = [
 ANNOTATIONS = ["prometheus.io/port", "prometheus.io/scrape"]
 
 
-@pytest.fixture(scope="module", params=["dc/zync", "dc/zync-que"])
-def pod(request):
+@pytest.fixture(scope="module", params=["zync", "zync-que"])
+def pod(request, openshift):
     """Return zync pod object."""
-    pods = openshift().deployment(request.param).get_pods().objects()
-    pod = next(filter(lambda x: x.model.status.phase == "Running", pods))
+    try:
+        pods = openshift().deployment(f"deployment/{request.param}").get_pods().objects()
+        pod = next(filter(lambda x: x.model.status.phase == "Running", pods))
+    except (StopIteration, OpenShiftPythonException):
+        pods = openshift().deployment(f"dc/{request.param}").get_pods().objects()
+        pod = next(filter(lambda x: x.model.status.phase == "Running", pods))
     return pod
 
 

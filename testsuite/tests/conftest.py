@@ -565,7 +565,7 @@ def production_gateway(request, testconfig, openshift):
 @pytest.fixture(scope="session")
 def rhsso_kind(request, testconfig):
     """SSO kind, rhsso or rhbk"""
-    return testconfig["rhsso"].get("kind", "rhbk")
+    return testconfig["rhsso"].get("kind", "rhsso")
 
 
 @pytest.fixture(scope="session")
