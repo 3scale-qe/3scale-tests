@@ -39,7 +39,7 @@ default:
       threescale:
         name: "{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
   rhsso:
-    kind: rhbk # rhbk is deault; other acceptable value is rhsso
+    kind: rhsso # rhsso is deault for 2.14; other acceptable value is rhbk
     test_user:
       username: testUser
       password: testUser

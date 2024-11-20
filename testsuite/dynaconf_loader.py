@@ -114,7 +114,7 @@ def _rhsso_password(tools_config, rhsso_config):
     server_url = tools_config.get("server")
     project = tools_config.get("namespace")
     token = tools_config.get("token")
-    kind = rhsso_config.get("kind", "rhbk")
+    kind = rhsso_config.get("kind", "rhsso")
     try:
         # is this RHOAM?
         tools = OpenShiftClient(project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
