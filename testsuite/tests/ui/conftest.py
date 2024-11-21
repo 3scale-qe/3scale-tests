@@ -465,46 +465,51 @@ def get_resultsdir_path(node):
     return path
 
 
+# pylint: disable=too-many-locals
 def fullpage_screenshot(driver, file_path):
     """
-    A full-page screenshot function. It scroll the website and screenshots it.
+    A full-page screenshot function. It scrolls the website and screenshots it.
     - Creates multiple files
     - Screenshots are made only vertically (on Y axis)
     """
-    # Removal of the height: 100% style, that disables scroll.
-    driver.execute_script("document.body.style.height = 'unset'")
-    driver.execute_script("document.body.parentNode.style.height = 'unset'")
+    try:
+        # Removal of the height: 100% style, that disables scroll.
+        driver.execute_script("document.body.style.height = 'unset'")
+        driver.execute_script("document.body.parentNode.style.height = 'unset'")
 
-    total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
-    viewport_height = driver.execute_script("return window.innerHeight")
+        total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+        viewport_height = driver.execute_script("return window.innerHeight")
 
-    screenshot_bytes = driver.get_screenshot_as_png()
-    screenshot = Image.open(io.BytesIO(screenshot_bytes))
-    width, height = screenshot.size
-    del screenshot
-
-    scaling_constant = float(height) / float(viewport_height)
-    stitched_image = Image.new("RGB", (width, int(total_height * scaling_constant)))
-    part = 0
-
-    for scroll in range(0, total_height, viewport_height):
-        driver.execute_script("window.scrollTo({0}, {1})".format(0, scroll))
         screenshot_bytes = driver.get_screenshot_as_png()
         screenshot = Image.open(io.BytesIO(screenshot_bytes))
-
-        if scroll + viewport_height > total_height:
-            offset = (0, int(math.ceil((total_height - viewport_height) * scaling_constant)))
-        else:
-            offset = (0, int(math.ceil(scroll * scaling_constant)))
-
-        stitched_image.paste(screenshot, offset)
+        width, height = screenshot.size
         del screenshot
-        part += 1
 
-    date = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
-    fullpath = f"{file_path}/{date}.png"
-    stitched_image.save(fullpath)
-    return fullpath
+        scaling_constant = float(height) / float(viewport_height)
+        stitched_image = Image.new("RGB", (width, int(total_height * scaling_constant)))
+        part = 0
+
+        for scroll in range(0, total_height, viewport_height):
+            driver.execute_script("window.scrollTo({0}, {1})".format(0, scroll))
+            screenshot_bytes = driver.get_screenshot_as_png()
+            screenshot = Image.open(io.BytesIO(screenshot_bytes))
+
+            if scroll + viewport_height > total_height:
+                offset = (0, int(math.ceil((total_height - viewport_height) * scaling_constant)))
+            else:
+                offset = (0, int(math.ceil(scroll * scaling_constant)))
+
+            stitched_image.paste(screenshot, offset)
+            del screenshot
+            part += 1
+
+        date = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
+        fullpath = f"{file_path}/{date}.png"
+        stitched_image.save(fullpath)
+        return fullpath
+    # pylint: disable=broad-exception-caught
+    except Exception as e:
+        return f"Error: Failed to take full-page screenshot. Details: {str(e)}"
 
 
 @pytest.fixture(scope="module")
