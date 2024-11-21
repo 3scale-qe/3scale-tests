@@ -9,7 +9,9 @@ from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc, randomize
 from testsuite import rawobj
 
-SWAGGER_LINK = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v2.0/json/petstore.json"
+SWAGGER_LINK = (
+    "https://raw.githubusercontent.com/OAI/learn.openapis.org/refs/heads/main/examples/v2.0/json/petstore.json"
+)
 
 
 @pytest.fixture(scope="module")
