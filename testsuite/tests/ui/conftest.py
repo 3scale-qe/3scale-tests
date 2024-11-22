@@ -11,7 +11,9 @@ import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
+from retry.api import retry
 from selenium.common import InvalidSessionIdException, WebDriverException
+from threescale_api.errors import ApiClientError
 from threescale_api.resources import Account, ApplicationPlan, Service
 from PIL import Image
 
@@ -252,7 +254,7 @@ def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, req
         backend.create(name, system_name, description, endpoint)
         backend = resilient.resource_read_by_name(threescale.backends, system_name)
         if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(backend.delete)
+            request.addfinalizer(retry(exceptions=ApiClientError, tries=3, delay=1, backoff=2)(backend.delete))
         return backend
 
     return _custom_ui_backend
@@ -265,8 +267,9 @@ def ui_backend(custom_ui_backend, request):
     return custom_ui_backend(name, name)
 
 
+# custom_ui_backend dependency forces delete product first (backend cannot be deleted when is used by some product)
 @pytest.fixture(scope="module")
-def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, request):
+def custom_ui_product(custom_admin_login, navigator, threescale, testconfig, request, custom_ui_backend):
     """Parametrized custom Product created via UI"""
 
     def _custom_ui_product(name: str, system_name: str, description: str = "", autoclean=True):
