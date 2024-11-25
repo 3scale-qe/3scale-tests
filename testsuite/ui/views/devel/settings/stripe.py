@@ -1,6 +1,7 @@
 """Settings Devel portal View containing credit card details for Stripe payment gateway"""
 
 import logging
+import time
 
 from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
 
@@ -85,6 +86,7 @@ class OTPForm(View):
 
     def complete_auth(self):
         """Completes the authentication"""
+        time.sleep(1)
         self.browser.element(self.challenge_frame.complete_auth).submit()
         self.browser.selenium.switch_to.default_content()
         self.browser.wait_for_element("//*[normalize-space(.)='Credit card number']", timeout=20)
