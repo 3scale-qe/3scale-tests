@@ -25,7 +25,6 @@ def send_message_from_devel(navigator, subject, body):
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.disruptive  # test should be mark as disruptive because it deletes the state of inbox messages
 @pytest.mark.usefixtures("login", "application", "service")
 def test_message_counter(custom_devel_login, custom_admin_login, account, navigator):
     """
@@ -51,16 +50,16 @@ def test_message_counter(custom_devel_login, custom_admin_login, account, naviga
     assert_dashboard_counters(navigator, start_msg_count + 2, start_unread_msg_count + 2)
 
     admin_messages_view = navigator.navigate(MessagesView)
-    link = admin_messages_view.get_unread_msg_link(subject="subject1")
+    link = admin_messages_view.get_unread_msg_link(Subject="subject1", From=account.entity_name)
     link.click()
     admin_messages_view = navigator.navigate(MessagesView)
-    link = admin_messages_view.get_unread_msg_link(subject="subject2")
+    link = admin_messages_view.get_unread_msg_link(Subject="subject2", From=account.entity_name)
     link.click()
 
     assert_dashboard_counters(navigator, start_msg_count + 2, start_unread_msg_count + 0)
 
     admin_messages_view = navigator.navigate(MessagesView)
-    admin_messages_view.delete_message("subject1")
-    admin_messages_view.delete_message("subject2")
+    admin_messages_view.delete_message(Subject="subject1", From=account.entity_name)
+    admin_messages_view.delete_message(Subject="subject2", From=account.entity_name)
 
     assert_dashboard_counters(navigator, start_msg_count + 0, start_unread_msg_count + 0)

@@ -1,6 +1,5 @@
 """View representations of Messages pages"""
 
-import time
 import re
 
 from widgetastic.widget import GenericLocatorWidget, View, Text
@@ -39,27 +38,25 @@ class MessagesView(BaseAudienceView):
         self.select_dropdown.item_select(select_all_item)  # item_select does not have better selector than exact text
         self.actions_dropdown.open()
         self.actions_dropdown.item_select("Delete")
-        time.sleep(1)
+        self.delete_dialog_button.wait_displayed(timeout="1s")
         self.delete_dialog_button.click()
 
-    def delete_message(self, subject):
+    def delete_message(self, **kwargs):
         """
-        Deletes first message with given subject
+        Deletes first message with which matches given text values in columns
+        e.g. delete_message(Subject='subject1, From='user1') will delete message with subject subject1 from
+        user user1 if such message exists and is not already deleted.
         """
-        delete_button = self.browser.elements(f"//table[@id='messages']//tr[descendant::a[text()='{subject}']]//button")
-        if delete_button:
-            delete_button[0].click()
+        row = self.table.row(**kwargs)
+        if row.From.text != "(deleted)":
+            row[4].click()
 
-    def get_unread_msg_link(self, subject=None):
+    def get_unread_msg_link(self, **kwargs):
         """Returns link to the first unread message, None if such message does not exist
-        :param str subject: Specify unread message, with given subject
+        **kwargs: Allows filter rows by values in the columns.
+        Keys are names of the columns, values are text values in the specified column.
         """
-        links = self.browser.elements("//tr[contains(@class, 'unread')]//td[@data-label='Subject']/a")
-        if not links:
-            return None
-        if subject:
-            links = [link for link in links if link.text == subject]
-        return links[0]
+        return self.table.row(_row__attr=("class", "unread"), **kwargs).Subject.browser.element("./a")
 
     def get_first_unread_msg_link_gen(self):
         """
