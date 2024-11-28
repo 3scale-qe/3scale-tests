@@ -9,7 +9,6 @@ types-braintree = "*"
 types-stripe = "*"
 types-Pillow = "*"
 black = "*"
-types-retry = "*"
 # Have commented out python-language-server to make it available quickly
 # for the development
 #python-language-server = "*"
@@ -59,7 +58,6 @@ pytest-persistence = "*"
 pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
-retry = "==0.9.2"
 
 [requires]
 python_version = "3"

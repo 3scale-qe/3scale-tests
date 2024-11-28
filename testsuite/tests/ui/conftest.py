@@ -11,7 +11,6 @@ import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
-from retry.api import retry
 from selenium.common import InvalidSessionIdException, WebDriverException
 from threescale_api.errors import ApiClientError
 from threescale_api.resources import Account, ApplicationPlan, Service
@@ -254,7 +253,11 @@ def custom_ui_backend(custom_admin_login, navigator, threescale, testconfig, req
         backend.create(name, system_name, description, endpoint)
         backend = resilient.resource_read_by_name(threescale.backends, system_name)
         if autoclean and not testconfig["skip_cleanup"]:
-            request.addfinalizer(retry(exceptions=ApiClientError, tries=3, delay=1, backoff=2)(backend.delete))
+
+            @backoff.on_exception(backoff.fibo, ApiClientError, max_tries=3, jitter=None)
+            def finalizer():
+                backend.delete()
+
         return backend
 
     return _custom_ui_backend
