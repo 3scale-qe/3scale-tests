@@ -20,7 +20,8 @@ The performance test consists of two files:
 ## How to run?
 To run the performance tests, you need to set up hyperfoil first.
 The testsuite needs to have a hyperfoil controller accessible with URL. Each set of tests have preconfigured number of agents and its properties but this configuration can be overridden in configuration file by `shared_templates` definition.
-Testsuites `setting.yaml` contains predefined settings for clustered hyperfoil.
+Minimum required settings for clustered hyperfoil can be found in `settings.yaml.tpl`, in section labeled "hyperfoil".
+
 
 ### Configuration
 
@@ -38,8 +39,8 @@ Content of`shared_template` will be merged into each benchmark YAML definition.
 * #### **Clustered hyperfoil**
      The easiest way how to run performance tests is to use clustered hyperfoil.
      
-     Deploy by the [operator](https://hyperfoil.io/userguide/installation/k8s.html) or
-     [manually](https://hyperfoil.io/userguide/installation/k8s_manual.html).
+     Deploy by the [operator](https://hyperfoil.io/docs/user-guide/installation/k8s/) or
+     [manually](https://hyperfoil.io/docs/user-guide/installation/k8s_manual/).
      
      Testsuite needs the following configuration:
      
@@ -58,8 +59,8 @@ Content of`shared_template` will be merged into each benchmark YAML definition.
       Right now, we focus on running the testsuite with clustered hyperfoil. 
       There might be some difficulties with manually deployed hyperfoil.
 
-    Hyperfoil can be deployed [manually](https://hyperfoil.io/userguide/installation/start_manual.html)
-    or via [Ansible](https://hyperfoil.io/userguide/installation/ansible.html).
+    Hyperfoil can be deployed [manually](https://hyperfoil.io/docs/user-guide/installation/start_manual/)
+    or via [Ansible](https://hyperfoil.io/docs/user-guide/installation/ansible/).
 
     Testsuite needs to have the following configuration:
      ```yaml

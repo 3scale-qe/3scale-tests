@@ -170,6 +170,12 @@ development:
     podman_image: "" # container image ID
   hyperfoil:
     url: "" # URL for hyperfoil controller
+    shared_template:  # optional setting - overrides default agent definition
+      agents:  # Dict of agents definition
+        agent-one:  # Agent name
+          host: 127.0.0.1
+          port: 22
+          stop: true
   cfssl:
     binary: "cfssl" # Path to the cfssl binary
   images:
