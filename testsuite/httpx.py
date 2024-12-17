@@ -89,7 +89,7 @@ class HttpxClient:
         http2,
         app,
         endpoint: str = "sandbox_endpoint",
-        verify: bool = None,
+        verify: bool = False,
         cert=None,
         disable_retry_status_list: Iterable = (),
     ) -> None:
@@ -115,7 +115,7 @@ class HttpxClient:
 
     def _ssl_context(self):
         """Create ssl context for httpx"""
-        return create_ssl_context(cert=self._cert, verify=self._verify, http2=self.http2, trust_env=True)
+        return create_ssl_context(cert=self._cert, verify=self._verify, trust_env=True)
 
     def extend_connection_pool(self, maxsize: int):
         """
@@ -222,7 +222,7 @@ class AsyncClient(httpx.AsyncClient):
         disable_retry_status_list: Iterable = (),
     ):
         base_url = app.service.proxy.fetch()[endpoint]
-        ssl_context = create_ssl_context(cert=cert, verify=verify, http2=http2, trust_env=True)
+        ssl_context = create_ssl_context(cert=cert, verify=verify, trust_env=True)
         super().__init__(base_url=base_url, verify=ssl_context, http2=http2)
 
         self._app = app
