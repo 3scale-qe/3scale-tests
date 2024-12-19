@@ -18,7 +18,6 @@ class WebhooksView(BaseSettingsView):
     path_pattern = "/p/admin/webhooks/edit"
     webhook_active = GenericLocatorWidget('//*[@id="web_hook_active"]')
     webhook_provider = GenericLocatorWidget('//*[@id="web_hook_provider_actions"]')
-    checkBox = Checkbox(id="web_hook_account_created_on")
     url = TextInput(id="web_hook_url")
     update = ThreescaleUpdateButton()
     accounts_cb_group = PfCheckBoxGroup(label_text="Accounts")
