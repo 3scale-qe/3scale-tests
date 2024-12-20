@@ -8,7 +8,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import CheckBoxGroup, ThreescaleDropdown
+from testsuite.ui.widgets import ThreescaleDropdown, PfCheckBoxGroup
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
@@ -48,7 +48,7 @@ class TokenNewView(BaseSettingsView):
 
     path_pattern = "/p/admin/user/access_tokens/new"
     name = TextInput(id="access_token_name")
-    scopes = CheckBoxGroup("//*[@id='access_token_scopes_input']")
+    scopes = PfCheckBoxGroup("//*[@for='access_token_scopes']/ancestor::div[@class='pf-c-form__group']")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
     create_button = ThreescaleSubmitButton()
     token_value = Text(".//div/dt/span[text()='Token']/ancestor::dt/following-sibling::dd")

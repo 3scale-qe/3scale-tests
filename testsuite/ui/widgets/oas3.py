@@ -37,7 +37,7 @@ class Endpoint(ParametrizedView):
 
     PARAMETERS = ("endpoint_method", "endpoint_path")
     ROOT = ParametrizedLocator(
-        "//span[@data-path={endpoint_path|quote}]/.."
+        "//span[@data-path={endpoint_path|quote}]/../.."
         "/span[text()={endpoint_method|quote}]"
         '/ancestor::div[contains(@id, "operations")]'
     )

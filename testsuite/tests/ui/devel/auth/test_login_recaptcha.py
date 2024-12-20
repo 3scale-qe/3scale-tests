@@ -5,7 +5,7 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import settings, rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.ui.views.admin.audience.developer_portal import BotProtection
-from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, SuccessfulAccountCreationView, ForgotPasswordView
+from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, ForgotPasswordView
 from testsuite.utils import blame, warn_and_skip
 
 # requires special setup, internet access
@@ -30,7 +30,8 @@ def ui_devel_account(request, testconfig, threescale):
 
     if not testconfig["skip_cleanup"]:
         usr = threescale.accounts.read_by_name(user_name)
-        request.addfinalizer(usr.delete)
+        if usr:
+            request.addfinalizer(usr.delete)
 
 
 @pytest.fixture(scope="module")
@@ -66,6 +67,8 @@ def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
         - Navigates and fills up the Sign Up page on developer portal
         - Assert that invisible recaptcha badge is present
         - Submits the form and checks that the success website appears
+
+        note: Since reCAPTCHA v3 does not support developer mode, this test does not attempt to submit the form.
     """
     signup_view = navigator.open(
         BasicSignUpView, url=settings["threescale"]["devel"]["url"], access_code=provider_account["site_access_code"]
@@ -77,11 +80,6 @@ def test_devel_recaptcha_sing_up(provider_account, ui_devel_account, navigator):
 
     assert signup_view.signup_button.is_enabled
     assert signup_view.recaptcha.is_displayed, "Recaptcha was not found on the developer sign up page"
-
-    signup_view.signup_button.click()
-
-    login_success = SuccessfulAccountCreationView(navigator.browser)
-    assert login_success.is_displayed
 
 
 def test_devel_forgot_password_recaptcha(custom_account, navigator, params):

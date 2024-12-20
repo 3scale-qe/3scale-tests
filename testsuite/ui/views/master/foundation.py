@@ -21,8 +21,8 @@ class BaseMasterView(View, Navigable):
     support_link = Text("//a[@href='//access.redhat.com/products/red-hat-3scale#support']")
     master_header = Text("//*[contains(@class,'Header--master')]")
     context_menu = Dropdown(component_id="context-selector")
-    documentation = Dropdown(component_id="OUIA-Generated-Dropdown-2")
-    user_session = Dropdown(component_id="OUIA-Generated-Dropdown-3")
+    documentation = Dropdown(component_id="OUIA-Generated-DropdownToggle-2")
+    user_session = Dropdown(component_id="OUIA-Generated-DropdownToggle-3")
     threescale_version = Text("//*[contains(@class,'powered-by-3scale')]/span")
 
     def __init__(self, parent, logger=None, **kwargs):
