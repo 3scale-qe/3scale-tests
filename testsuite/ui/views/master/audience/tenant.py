@@ -66,7 +66,7 @@ class TenantDetailView(BaseMasterAudienceView):
 
     path_pattern = "/buyers/accounts/{account_id}"
     edit_button = ThreescaleEditButton()
-    applications_button = Text("//*[@data-ouia-component-id='OUIA-Generated-NavExpandable-3']/button")
+    applications_button = Text("*//button[normalize-space(text())='Applications']")
     public_domain = Text(".//th[contains(text(),'Public domain')]/parent::*/td/a")
     admin_domain = Text(".//th[contains(text(),'Admin domain')]/parent::*/td/a")
     resume_b = Button("Resume", classes=["button-to", "resume"])

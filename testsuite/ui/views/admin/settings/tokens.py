@@ -48,9 +48,7 @@ class TokenNewView(BaseSettingsView):
 
     path_pattern = "/p/admin/user/access_tokens/new"
     name = TextInput(id="access_token_name")
-    scopes = PfCheckBoxGroup(
-        '//*[@id="new_access_token"]/div[@class="pf-c-form__group"][.//span[contains(normalize-space(.), "Scopes")]]'
-    )
+    scopes = PfCheckBoxGroup("//*[@for='access_token_scopes']/ancestor::div[@class='pf-c-form__group']")
     permissions = ThreescaleDropdown("//*[@id='access_token_permission']")
     create_button = ThreescaleSubmitButton()
     token_value = Text(".//div/dt/span[text()='Token']/ancestor::dt/following-sibling::dd")
