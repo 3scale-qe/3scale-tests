@@ -17,7 +17,6 @@ def fields_definitions(navigator, threescale):
     threescale.fields_definitions.delete(definition.entity_id)
 
 
-@pytest.mark.xfail
 @pytest.mark.usefixtures("login")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7955")
 def test_field_definitions(account, navigator, browser):
