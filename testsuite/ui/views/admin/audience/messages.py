@@ -1,8 +1,12 @@
 """View representations of Messages pages"""
 
+import re
+
 from widgetastic.widget import GenericLocatorWidget, View, Text
 from widgetastic_patternfly import TextInput
-from widgetastic_patternfly4 import Button, PatternflyTable
+
+from widgetastic_patternfly4 import Button, PatternflyTable, Dropdown
+from widgetastic_patternfly4.ouia import Dropdown as OUIADropdown
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
@@ -16,6 +20,54 @@ class MessagesView(BaseAudienceView):
     table = PatternflyTable("//table[@aria-label='Messages table']")
     compose_msg_link = GenericLocatorWidget("//*[contains(@href,'/p/admin/messages/outbox/new')]")
     empty_inbox = Text("//div[text()='Your inbox is empty, there are no new messages.']")
+    select_dropdown = OUIADropdown(component_id="OUIA-Generated-Dropdown-1")
+    # This dropdown does not have page unique component id
+    actions_dropdown = Dropdown(
+        None, locator="//div[@id='pf-random-id-0']//div[@data-ouia-component-id='OUIA-Generated-Dropdown-2']"
+    )
+    delete_dialog_button = Button(locator='//div[@id="colorbox"]//button[contains(text(), "Delete")]')
+
+    def delete_all(self):
+        """
+        Deletes all massages from the inbox
+        """
+        if self.empty_inbox.is_displayed:
+            return
+        items = self.select_dropdown.items
+        select_all_item = [s for s in items if re.match("Select all.*", s)][0]
+        self.select_dropdown.item_select(select_all_item)  # item_select does not have better selector than exact text
+        self.actions_dropdown.open()
+        self.actions_dropdown.item_select("Delete")
+        self.delete_dialog_button.wait_displayed(timeout="1s")
+        self.delete_dialog_button.click()
+
+    def delete_message(self, **kwargs):
+        """
+        Deletes first message with which matches given text values in columns
+        e.g. delete_message(Subject='subject1, From='user1') will delete message with subject subject1 from
+        user user1 if such message exists and is not already deleted.
+        """
+        row = self.table.row(**kwargs)
+        if row.From.text != "(deleted)":
+            row[4].click()
+
+    def get_unread_msg_link(self, **kwargs):
+        """Returns link to the first unread message, None if such message does not exist
+        **kwargs: Allows filter rows by values in the columns.
+        Keys are names of the columns, values are text values in the specified column.
+        """
+        return self.table.row(_row__attr=("class", "unread"), **kwargs).Subject.browser.element("./a")
+
+    def get_first_unread_msg_link_gen(self):
+        """
+        Returns generator, that returns link to the first unread message until, such message exists.
+        """
+        while True:
+            link = self.get_unread_msg_link()
+            if link:
+                yield link
+            else:
+                break
 
     def prerequisite(self):
         return BaseAudienceView
