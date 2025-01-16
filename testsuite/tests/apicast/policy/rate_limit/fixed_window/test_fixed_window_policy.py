@@ -34,7 +34,10 @@ pytestmark = pytest.mark.flaky
 @pytest_cases.fixture
 def service_plus2(service_proxy_settings, custom_service, request, backends_mapping):
     """Service configured with parametrized config"""
-    return custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping)
+    service = custom_service({"name": blame(request, "svc")}, service_proxy_settings, backends_mapping)
+    yield service
+    for usage in service.backend_usages.list():
+        usage.delete()
 
 
 @pytest_cases.fixture
