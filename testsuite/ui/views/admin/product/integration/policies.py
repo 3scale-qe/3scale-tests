@@ -48,7 +48,7 @@ class Policies(enum.Enum):
     TLS_CLIENT_CERTIFICATE_VALIDATION = "TLS Client Certificate Validation"
     TLS_TERMINATION = "TLS Termination"
     RESPONSE_REQUEST_CONTENT_LIMITS = "Response/Request content limits"
-    OAUTH_TWO_MUTUAL_TLS_CLIENT_AUTHENTICATION = "OAuth 2.0 Mutual TLS Client Authentication"
+    OAUTH_TWO_MUTUAL_TLS_CLIENT_AUTHENTICATION = "oauth_mtls"
     HEADER_MODIFICATION = "Header Modification"
     JWT_CLAIM_CHECK = "JWT Claim Check"
     IP_CHECK = "IP Check"
