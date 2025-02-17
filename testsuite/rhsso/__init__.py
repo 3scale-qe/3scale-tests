@@ -33,7 +33,7 @@ class RHSSOServiceConfiguration:
         """OIDCClient for the created client"""
         if not self._oidc_client:
             self._oidc_client = self.client.oidc_client
-        return self._oidc_client
+        return self._oidc_client  # type: ignore
 
     def issuer_url(self) -> str:
         """
