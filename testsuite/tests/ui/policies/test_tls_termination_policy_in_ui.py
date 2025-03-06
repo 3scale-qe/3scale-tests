@@ -1,6 +1,6 @@
 # flake8: noqa F811
 """Tests that TLS Termination can be correctly setup from UI,
- flake8 ignore needed because it treats the imported fixtures as F811 'redefiniton of unused..'"""
+flake8 ignore needed because it treats the imported fixtures as F811 'redefiniton of unused..'"""
 
 import pytest
 import requests

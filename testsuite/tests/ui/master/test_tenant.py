@@ -1,5 +1,5 @@
 """
-    Tests that test the tenant modification such as creation, deletion, edit or resume.
+Tests that test the tenant modification such as creation, deletion, edit or resume.
 """
 
 import pytest

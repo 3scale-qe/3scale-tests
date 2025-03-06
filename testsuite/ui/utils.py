@@ -1,5 +1,5 @@
 """
-    This file contains utilities that can be used across the tests to help wit the certain tasks. (ui helpers)
+This file contains utilities that can be used across the tests to help wit the certain tasks. (ui helpers)
 """
 
 
