@@ -37,11 +37,7 @@ DESCRIPTIONS = (
     + [pytest.param(f"{c}{n}", marks=[pytest.mark.fuzz]) for n, c in enumerate(r'!"#$%&\'()*+,-./\: ;<=>?@[]^`{|}~_')]
     + [pytest.param(f"{c}", marks=[pytest.mark.fuzz]) for n, c in enumerate(r'!"#$%&\'()*+,-./\: ;<=>?@[]^`{|}~_')]
     + [pytest.param(f"{n}{c}", marks=[pytest.mark.fuzz]) for n, c in enumerate(r'!"#$%&\'()*+,-./\: ;<=>?@[]^`{|}~')]
-    + [
-        pytest.param(
-            "99_", marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763")]
-        )
-    ]
+    + [pytest.param("99_", marks=[pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763")])]
 )
 
 

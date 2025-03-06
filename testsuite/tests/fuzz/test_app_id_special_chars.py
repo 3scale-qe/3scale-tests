@@ -111,7 +111,6 @@ def app_key(request):
             "9999_",
             "keykey8",
             marks=[
-                pytest.mark.xfail,
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763"),
                 pytest.mark.fuzz,
             ],
