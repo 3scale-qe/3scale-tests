@@ -1,7 +1,7 @@
 """
-    rewrite of admin dashboard test to master (testing the master dashboard)
+rewrite of admin dashboard test to master (testing the master dashboard)
 
-    Tests in this file are testing the functionality of the master dashboard.
+Tests in this file are testing the functionality of the master dashboard.
 """
 
 import pytest

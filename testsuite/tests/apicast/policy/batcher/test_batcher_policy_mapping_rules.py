@@ -1,5 +1,5 @@
 """
-    Test checks that mapping rules are working with batcher policy
+Test checks that mapping rules are working with batcher policy
 """
 
 from time import sleep

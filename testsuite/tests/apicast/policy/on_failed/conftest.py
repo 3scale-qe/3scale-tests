@@ -1,4 +1,4 @@
-"""Default conftest for on_failed """
+"""Default conftest for on_failed"""
 
 import pytest
 

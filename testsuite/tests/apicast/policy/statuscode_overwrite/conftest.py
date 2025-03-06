@@ -1,4 +1,4 @@
-"""Default conftest for statuscode overwrite """
+"""Default conftest for statuscode overwrite"""
 
 import pytest
 
