@@ -142,21 +142,19 @@ def hits(app):
 @pytest.mark.parametrize(
     "expect_ok",
     [
-        (
-            [
-                ("/backpath2/backpath21/backpath22/path1/1234", 3),
-                ("/backpath2/backpath21/backpath22/path1", 2),
-                ("/backpath2/backpath21/backpath22/", 1),
-                ("/backpath2/backpath21/path1/1234", 3),
-                ("/backpath2/backpath21/path1", 2),
-                ("/backpath2/backpath21/", 1),
-                ("/backpath2/path1/1234", 3),
-                ("/backpath2/path1", 2),
-                ("/backpath2/", 1),
-                ("/backpath1/path1/bar/1234", 1),
-                ("/backpath1/path1/bar", 1),
-            ]
-        )
+        [
+            ("/backpath2/backpath21/backpath22/path1/1234", 3),
+            ("/backpath2/backpath21/backpath22/path1", 2),
+            ("/backpath2/backpath21/backpath22/", 1),
+            ("/backpath2/backpath21/path1/1234", 3),
+            ("/backpath2/backpath21/path1", 2),
+            ("/backpath2/backpath21/", 1),
+            ("/backpath2/path1/1234", 3),
+            ("/backpath2/path1", 2),
+            ("/backpath2/", 1),
+            ("/backpath1/path1/bar/1234", 1),
+            ("/backpath1/path1/bar", 1),
+        ]
     ],
 )
 # pylint: disable=unused-argument

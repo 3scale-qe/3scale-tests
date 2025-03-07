@@ -1,5 +1,5 @@
 """
-    Test that checks if the first anything part is removed
+Test that checks if the first anything part is removed
 """
 
 import pytest

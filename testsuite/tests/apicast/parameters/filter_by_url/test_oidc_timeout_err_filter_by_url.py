@@ -1,13 +1,13 @@
 """
-    Regression test for THREESCALE-6139
-    Apicast takes long time to startup when using APICAST_SERVICES_FILTER_BY_URL to filter services.
-    Problem is that filtered service contains oidc_issuer_enpoint to server
-        which will return timeout_err after 1 minute.
+Regression test for THREESCALE-6139
+Apicast takes long time to startup when using APICAST_SERVICES_FILTER_BY_URL to filter services.
+Problem is that filtered service contains oidc_issuer_enpoint to server
+    which will return timeout_err after 1 minute.
 
-    This test recreate this problem using http://example.com:81 url which returns timeout error after 1 minute.
+This test recreate this problem using http://example.com:81 url which returns timeout error after 1 minute.
 
 
-    WARNING: If this service is left undeleted on older versions, it will break self managed apicasts.
+WARNING: If this service is left undeleted on older versions, it will break self managed apicasts.
 """
 
 from time import time

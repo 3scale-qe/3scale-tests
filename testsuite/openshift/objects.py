@@ -1,4 +1,4 @@
-"""This module contains basic objects for working with openshift resources """
+"""This module contains basic objects for working with openshift resources"""
 
 import base64
 import enum

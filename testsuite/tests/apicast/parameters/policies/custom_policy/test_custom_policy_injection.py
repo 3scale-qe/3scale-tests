@@ -1,5 +1,4 @@
-"""Test for custom policy injected through operator with secret
-"""
+"""Test for custom policy injected through operator with secret"""
 
 import pytest
 

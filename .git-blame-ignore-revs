@@ -8,3 +8,4 @@
 
 b0bf287f7f07c727c498deaa199f2629a3aac5a9 # black 24.1.1 changes
 9261b5ae4bf0d53058e6adf2e5d2544011360ba7 # Change regarding flake8 check for python 3.12
+d499948418f6e1dc432dabf11f158e58d9a0b0d8 # black 25.1.0 changes

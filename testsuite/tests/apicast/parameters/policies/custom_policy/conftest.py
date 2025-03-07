@@ -1,4 +1,4 @@
-"""Conftest for """
+"""Conftest for"""
 
 import base64
 from contextlib import ExitStack

@@ -1,4 +1,4 @@
-""" Representation of Login specific MASTER views"""
+"""Representation of Login specific MASTER views"""
 
 from widgetastic.widget import View, Text
 
