@@ -140,27 +140,24 @@ def hits(app):
 
 
 @pytest.mark.parametrize(
-    "expect_ok",
+    "path,expected_hits_diff",
     [
-        (
-            [
-                ("/backpath2/backpath21/backpath22/path1/1234", 3),
-                ("/backpath2/backpath21/backpath22/path1", 2),
-                ("/backpath2/backpath21/backpath22/", 1),
-                ("/backpath2/backpath21/path1/1234", 3),
-                ("/backpath2/backpath21/path1", 2),
-                ("/backpath2/backpath21/", 1),
-                ("/backpath2/path1/1234", 3),
-                ("/backpath2/path1", 2),
-                ("/backpath2/", 1),
-                ("/backpath1/path1/bar/1234", 1),
-                ("/backpath1/path1/bar", 1),
-            ]
-        )
+        ("/backpath1/path1/bar/1234", 1),
+        ("/backpath1/path1/bar", 1),
+        ("/backpath2/backpath21/backpath22/path1/1234", 3),
+        ("/backpath2/backpath21/backpath22/path1", 2),
+        ("/backpath2/backpath21/backpath22/", 1),
+        ("/backpath2/backpath21/path1/1234", 3),
+        ("/backpath2/backpath21/path1", 2),
+        ("/backpath2/backpath21/", 1),
+        ("/backpath2/path1/1234", 3),
+        ("/backpath2/path1", 2),
+        ("/backpath2/", 1),
     ],
 )
 # pylint: disable=unused-argument
-def test(application, client, backend_usages, backends, expect_ok):
+@pytest.mark.usefixtures("backend_usages", "backends")
+def test(application, client, path, expected_hits_diff):
     """
     Make requests against all backends and mappings
     Assert that these requests return 200
@@ -173,13 +170,12 @@ def test(application, client, backend_usages, backends, expect_ok):
     # it will be also possible to check the hits at the backend level
     # right now is by hits only tested if the 'last' flag in mapping at
     # the backend level works correctly
-    for path, expected_hits_diff in expect_ok:
-        hits_before = hits(application)
+    hits_before = hits(application)
 
-        response = client.get(path)
-        assert response.status_code == 200, f"For path {path} expected status_code 200"
+    response = client.get(path)
+    assert response.status_code == 200, f"For path {path} expected status_code 200"
 
-        hits_after = resilient.analytics_list_by_service(
-            application.threescale_client, application["service_id"], "hits", "total", hits_before + expected_hits_diff
-        )
-        assert hits_after == hits_before + expected_hits_diff, f"For {path} expected different number of hits"
+    hits_after = resilient.analytics_list_by_service(
+        application.threescale_client, application["service_id"], "hits", "total", hits_before + expected_hits_diff
+    )
+    assert hits_after == hits_before + expected_hits_diff, f"For {path} expected different number of hits"
