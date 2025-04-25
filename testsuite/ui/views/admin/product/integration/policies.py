@@ -48,10 +48,10 @@ class TlsTerminationPolicyView(View):
     NAME = "TLS Termination"
     remove_policy_btn = Button("Remove", classes=[Button.DANGER])
     add_cert_btn = Button(locator=".//button[contains(@class, 'btn-add')]")
-    local_cert_key = FileInput(id="root_certificate_key_path")
-    local_cert = FileInput(id="root_certificate_path")
-    embedded_cert = FileInput(id="root_certificate")
-    embedded_cert_key = FileInput(id="root_certificate_key")
+    local_cert_key = FileInput(id="root_certificates_0_certificate_key_path")
+    local_cert = FileInput(id="root_certificates_0_certificate_path")
+    embedded_cert = FileInput(id="root_certificates_0_certificate")
+    embedded_cert_key = FileInput(id="root_certificates_0_certificate_key")
     update_policy_btn = Button(locator=".//button[text()='Update Policy']")
     cert_type_select = ThreescaleDropdown('//*[@id="root_certificates_0_anyof_select"]')
 

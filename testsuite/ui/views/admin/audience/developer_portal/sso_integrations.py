@@ -78,7 +78,7 @@ class RHSSOIntegrationEditView(BaseAudienceView):
     path_pattern = "/p/admin/authentication_providers/{integration_id}/edit"
     client_id = TextInput(id="authentication_provider_client_id")
     client_secret = TextInput(id="authentication_provider_client_secret")
-    realm = TextInput(id="authentication_provider_realm")
+    realm = TextInput(id="authentication_provider_site")
     update_button = ThreescaleUpdateButton()
 
     def __init__(self, parent, integration):
