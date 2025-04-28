@@ -82,11 +82,10 @@ class MasterDashboardView(BaseMasterView):
         """Products page object"""
 
         products_title = Text(locator='//*[@id="products-widget"]/article/div[1]/div[1]/h1')
-        create_product_button = Button(locator="//a[@href='/apiconfig/services/new']")
 
         @property
         def is_displayed(self):
-            return self.products_title.is_displayed and self.create_product_button.is_displayed
+            return self.products_title.is_displayed
 
     def prerequisite(self):
         return BaseMasterView
