@@ -153,6 +153,7 @@ def test_check_services_values():
     attr_list = attr_list.union(["buyer_key_regenerate_enabled", "buyer_plan_change_permission"])
     attr_list = attr_list.union(["buyers_manage_apps", "buyers_manage_keys", "custom_keys_enabled"])
     attr_list = attr_list.union(["intentions_required", "mandatory_app_key", "referrer_filters_required"])
+    attr_list = attr_list.union(["annotations"])
     attr_list.remove("system_name")
     toolbox.check_object(
         out_variables["ser1_entity"],
