@@ -1,5 +1,5 @@
 """This module contains object wrappers on top of python-keycloak API, since that is not object based"""
-
+from enum import verify
 from urllib.parse import urlparse
 
 from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakPostError
@@ -42,13 +42,15 @@ class Realm:
         self.admin.update_user(user_id, {"emailVerified": True})
         return user_id
 
-    def oidc_client(self, client_id, client_secret):
+    def oidc_client(self, client_id, client_secret, cert=None):
         """Create OIDC client for this realm"""
         return KeycloakOpenID(
             server_url=self.admin.connection.server_url,
             client_id=client_id,
             realm_name=self.name,
             client_secret_key=client_secret,
+            cert=cert,
+            verify=False,  # todo ################## heeeej  tohle? resi mega bug?
         )
 
 
@@ -68,12 +70,19 @@ class Client:
         self.admin.assign_client_role(user["id"], realm_management, role)
 
     @property
-    def oidc_client(self):
+    def oidc_client(self, cert=None):  # todo je tohle spravne misto? nejspis ne
         """OIDC client"""
         # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
         client_id = self.admin.get_client(self.client_id)["clientId"]
         secret = self.admin.get_client_secrets(self.client_id)["value"]
-        return self.realm.oidc_client(client_id, secret)
+        return self.realm.oidc_client(client_id, secret, cert)
+
+    def mtls_client(self, cert=None):  # todo je tohle spravne misto? nejspis ne
+        """OIDC client"""
+        # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
+        client_id = self.admin.get_client(self.client_id)["clientId"]
+        secret = self.admin.get_client_secrets(self.client_id)["value"]
+        return self.realm.oidc_client(client_id, secret, cert)
 
 
 # pylint: disable=too-few-public-methods
@@ -104,6 +113,11 @@ class RHSSO:
 
     def create_realm(self, name: str, **kwargs) -> Realm:
         """Creates new realm"""
+        self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
+        return Realm(self.master, name)
+
+    def use_realm(self, name: str, **kwargs) -> Realm:
+        """Uses realm"""
         self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
         return Realm(self.master, name)
 
