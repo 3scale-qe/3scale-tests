@@ -304,6 +304,7 @@ ensure-smoke:
 
 fake-sync:
 	test -e Pipfile.lock \
+		&& (pipenv --venv || pipenv sync --dev $(PIPENV_ARGS)) \
 		&& touch Pipfile.lock \
 		&& touch .make-pipenv-sync .make-pipenv-sync-dev \
 		|| true
