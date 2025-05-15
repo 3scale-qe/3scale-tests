@@ -24,7 +24,10 @@ def service(custom_service, custom_backend, private_base_url, lifecycle_hooks, r
     """Preconfigured service with backend defined existing over one test run"""
     name = {"name": blame(request, "svc")}
     backend = custom_backend("backend_default", endpoint=private_base_url("echo_api"))
-    return custom_service(name, backends={"/": backend}, hooks=lifecycle_hooks)
+    svc = custom_service(name, backends={"/": backend}, hooks=lifecycle_hooks)
+    yield svc
+    for usage in svc.backend_usages.list():
+        usage.delete()
 
 
 @pytest.fixture(scope="function")
