@@ -30,18 +30,18 @@ class UsersView(BaseSettingsView):
 
     path_pattern = "/p/admin/account/users"
     table = PatternflyTable(
-        '//*[@id="users"]',
-        column_widgets={"Invite a New User": ThreescaleDeleteEditGroup()},
+        "//table[@aria-label='Users table']",
+        column_widgets={4: ThreescaleDeleteEditGroup()},
     )
 
     @step("UserDetailView")
     def detail(self, user):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id))).invite_a_new_user.widget.edit()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.edit()
 
     def delete(self, user):
         """Delete user by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id))).invite_a_new_user.widget.delete()
+        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.delete()
 
     def prerequisite(self):
         return BaseSettingsView

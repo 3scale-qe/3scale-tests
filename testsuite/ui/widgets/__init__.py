@@ -488,7 +488,7 @@ class ThreescaleDeleteEditGroup(GenericLocatorWidget):
     """Special Delete Edit group for 3scale"""
 
     DELETE_LOCATOR = ".//button[contains(@class, delete)]"
-    EDIT_LOCATOR = ".//a[@title='Edit']"
+    EDIT_LOCATOR = ".//a[text()='Edit']"
 
     def __init__(self, parent=None, locator=".//*[@class='pf-c-overflow-menu']", logger=None):
         super().__init__(parent=parent, locator=locator, logger=logger)
