@@ -92,7 +92,11 @@ class URLRewritePolicyView(View):
 
         self.regex_input.fill(regex)
         self.replace_input.fill(replace)
-        self.operation_select.select_by_value(operation)
+
+        operation_text = "Substitute the first match of the regex applied."
+        if operation == "gsub":
+            operation_text = "Substitute all the matches of the regex applied."
+        self.operation_select.select_by_text(operation_text)
 
         self.update_policy_btn.click()
 
