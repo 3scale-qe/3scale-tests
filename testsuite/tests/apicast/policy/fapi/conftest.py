@@ -1,0 +1,287 @@
+"""Module for setting up test that require TLS gateway and/or certificates"""
+
+from weakget import weakget
+import pytest
+
+from testsuite.certificates import Certificate, CertificateManager
+from testsuite.certificates.cfssl.cli import CFSSLProviderCLI
+from testsuite.certificates.stores import InMemoryCertificateStore
+from testsuite.gateways import gateway
+from testsuite.gateways.apicast.tls import TLSApicast
+from testsuite.openshift.objects import SecretKinds
+from testsuite.rhsso import OIDCClientAuthHook
+from testsuite.utils import blame, warn_and_skip
+from keycloak import KeycloakOpenID
+
+
+
+
+from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
+
+
+###################### setting staging apicast start
+
+@pytest.fixture(scope="session")
+def manager(testconfig):
+    """Certificate Manager"""
+    provider = CFSSLProviderCLI(binary=testconfig["cfssl"]["binary"])
+    store = InMemoryCertificateStore()
+    return CertificateManager(provider, provider, store)
+
+@pytest.fixture(scope="session")
+def superdomain(testconfig):
+    """3scale superdomain"""
+    return testconfig["threescale"]["superdomain"]
+
+# todo dat tam moji CA
+@pytest.fixture(scope="session")
+def server_authority(request, superdomain, manager, testconfig):
+    """CA Authority to be used in the gateway"""
+    wildcard_domain = "*." + superdomain
+    authority = manager.get_or_create_ca("server-ca", hosts=[wildcard_domain])
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(authority.delete_files)
+    return authority
+
+# pylint: disable=too-many-arguments
+@pytest.fixture(scope="module")
+def staging_gateway(request, server_authority, superdomain, manager, testconfig):
+    """Deploy tls apicast gateway. We need APIcast listening on https port"""
+    kwargs = {
+        "name": blame(request, "tls-gw"),
+        "manager": manager,
+        "server_authority": server_authority,
+        "superdomain": superdomain,
+    }
+    gw = gateway(kind=TLSApicast, staging=True, **kwargs)
+
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
+    gw.create()
+
+    return gw
+
+###################### setting staging apicast end
+
+
+@pytest.fixture(scope="module", autouse=True)
+def rhsso_setup(lifecycle_hooks, rhsso_service_info):
+    """Have application/service with RHSSO auth configured"""
+
+    lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))  # todo tady se nastavuje RHSSO pro product na apicastu
+
+
+#  todo fuj fuj predelat na fixture? neni to DRY (vykopirovano z tests/conftest.py)
+def _resolve_rhsso(testconfig, tools, rhsso_kind):
+    cnf = testconfig["rhsso"]
+    if "password" not in cnf:
+        return None
+    if "username" not in cnf:
+        return None
+    if "url" in cnf:
+        return RHSSO(server_url=cnf["url"], username=cnf["username"], password=cnf["password"])
+    key = "no-ssl-rhbk"
+    if rhsso_kind == "rhsso":
+        key = "no-ssl-sso"
+    return RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
+
+
+
+#  todo predelat konfiguraci clienta
+@pytest.fixture(scope="session")
+def rhsso_service_info(request, testconfig, tools, rhsso_kind):
+    """
+    Set up client for zync
+    :return: dict with all important details
+    """
+    rhsso = _resolve_rhsso(testconfig, tools, rhsso_kind)
+    if not rhsso:
+        warn_and_skip("SSO admin password neither discovered not set in config", "fail")
+    realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)
+    # todo misto noveho realmu jsem priradil manualne vytvoreny
+    # realm = KeycloakOpenID(
+    #     server_url="https://ssl-rhbk-mstastny-foo.apps.ocp-cluster.osp.api-qe.eng.rdu2.redhat.com",
+    #     client_id='mtls_client',
+    #     realm_name='basic',
+    #     cert=("/home/mstastny/Repos/rh/gitlab/3scale-qe/testsuite-tools/tools/base/rhbk/secrets/client.crt", "/home/mstastny/Repos/rh/gitlab/3scale-qe/testsuite-tools/tools/base/rhbk/secrets/client.key"),
+    #     verify="/home/mstastny/Repos/rh/gitlab/3scale-qe/testsuite-tools/tools/base/rhbk/secrets/rootCA.pem",
+    # )
+
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(realm.delete)
+
+    client = realm.create_client(
+        name=blame(request, "mtls_client"),
+        serviceAccountsEnabled=True,
+        directAccessGrantsEnabled=True,
+        publicClient=False,
+        protocol="openid-connect",
+        standardFlowEnabled=False,
+        #verify=False, #  todo zkontrolovat
+    )
+
+    #  todo priradit existijiho clienta
+
+
+    cnf = testconfig["rhsso"]
+    username = cnf["test_user"]["username"]
+    password = cnf["test_user"]["password"]
+    user = realm.create_user(username, password)
+
+    client.assign_role("manage-clients")
+
+    return RHSSOServiceConfiguration(rhsso, realm, client, user, username, password)
+
+
+# @pytest.fixture(scope="module", autouse=True)
+# def require_openshift(testconfig):
+#     """These tests require openshift available"""
+#     if not weakget(testconfig)["openshift"]["servers"]["default"] % False:
+#         warn_and_skip("All from tls skipped due to missing openshift")
+#
+#
+# @pytest.fixture(scope="session")
+# def manager(testconfig):
+#     """Certificate Manager"""
+#     provider = CFSSLProviderCLI(binary=testconfig["cfssl"]["binary"])
+#     store = InMemoryCertificateStore()
+#     return CertificateManager(provider, provider, store)
+#
+#
+# @pytest.fixture(scope="session")
+# def superdomain(testconfig):
+#     """3scale superdomain"""
+#     return testconfig["threescale"]["superdomain"]
+#
+#
+# @pytest.fixture(scope="session")
+# def server_authority(request, superdomain, manager, testconfig):
+#     """CA Authority to be used in the gateway"""
+#     wildcard_domain = "*." + superdomain
+#     authority = manager.get_or_create_ca("server-ca", hosts=[wildcard_domain])
+#     if not testconfig["skip_cleanup"]:
+#         request.addfinalizer(authority.delete_files)
+#     return authority
+#
+#
+# # pylint: disable=too-many-arguments
+# @pytest.fixture(scope="module")
+# def staging_gateway(request, server_authority, superdomain, manager, gateway_options, gateway_environment, testconfig):
+#     """Deploy tls apicast gateway. We need APIcast listening on https port"""
+#     kwargs = {
+#         "name": blame(request, "tls-gw"),
+#         "manager": manager,
+#         "server_authority": server_authority,
+#         "superdomain": superdomain,
+#     }
+#     kwargs.update(gateway_options)
+#     gw = gateway(kind=TLSApicast, staging=True, **kwargs)
+#
+#     if not testconfig["skip_cleanup"]:
+#         request.addfinalizer(gw.destroy)
+#     gw.create()
+#
+#     if len(gateway_environment) > 0:
+#         gw.environ.set_many(gateway_environment)
+#
+#     return gw
+#
+#
+# @pytest.fixture(scope="session")
+# def create_cert(request, superdomain, manager, testconfig):
+#     """Creates certificate that is valid for entire 3scale subdomain"""
+#     host = "*." + superdomain
+#
+#     def _create(name: str, certificate_authority: Certificate) -> Certificate:
+#         cert = manager.get_or_create(name, common_name=host, hosts=[host], certificate_authority=certificate_authority)
+#
+#         if not testconfig["skip_cleanup"]:
+#             request.addfinalizer(cert.delete_files)
+#         return cert
+#
+#     return _create
+#
+#
+# @pytest.fixture(scope="session")
+# def chainify(request, testconfig):
+#     """Creates chain from certificate and his certificate authorities"""
+#
+#     def _chain(certificate: Certificate, *authorities: Certificate) -> Certificate:
+#         entire_chain = [certificate]
+#         entire_chain.extend(authorities)
+#         chain = Certificate(certificate="".join(cert.certificate for cert in entire_chain), key=certificate.key)
+#         if not testconfig["skip_cleanup"]:
+#             request.addfinalizer(chain.delete_files)
+#         return chain
+#
+#     return _chain
+#
+#
+# @pytest.fixture(scope="session")
+# def valid_authority(request, manager, testconfig) -> Certificate:
+#     """To be used in tests validating server certificates"""
+#     certificate_authority = manager.get_or_create_ca("valid_ca", hosts=["*.com"])
+#     if not testconfig["skip_cleanup"]:
+#         request.addfinalizer(certificate_authority.delete_files)
+#     return certificate_authority
+#
+#
+# @pytest.fixture(scope="session")
+# def certificate(valid_authority, create_cert) -> Certificate:
+#     """Valid certificate for entire 3scale superdomain"""
+#     return create_cert("valid", valid_authority)
+#
+#
+# @pytest.fixture(scope="module")
+# def invalid_authority(staging_gateway):
+#     """Authority for testing negative case, same as the CA used in gateway"""
+#     return staging_gateway.server_authority
+#
+#
+# @pytest.fixture(scope="module")
+# def invalid_certificate(invalid_authority, create_cert) -> Certificate:
+#     """Valid certificate for entire 3scale superdomain"""
+#     return create_cert("invalid", invalid_authority)
+#
+#
+# @pytest.fixture(scope="module")
+# def mount_certificate_secret(request, staging_gateway, testconfig):
+#     """Mount volume from TLS secret on staging gateway."""
+#
+#     def _mount(mount_path, certificate):
+#         secret_name = blame(request, "tls")
+#
+#         def turn_down():
+#             staging_gateway.openshift.delete("secret", secret_name)
+#
+#         if not testconfig["skip_cleanup"]:
+#             request.addfinalizer(turn_down)
+#
+#         staging_gateway.openshift.secrets.create(secret_name, SecretKinds.TLS, certificate=certificate)
+#         staging_gateway.deployment.add_volume(secret_name, mount_path, secret_name)
+#
+#     return _mount
+#
+#
+# # pylint: disable=too-many-arguments
+# @pytest.fixture(scope="module")
+# def service(request, backends_mapping, custom_service, service_proxy_settings, lifecycle_hooks, policy_settings):
+#     """Preconfigured service, which is created for each policy settings, which are often parametrized in this module"""
+#     service = custom_service(
+#         {"name": blame(request, "svc")}, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks
+#     )
+#     if policy_settings:
+#         service.proxy.list().policies.append(policy_settings)
+#     return service
+#
+#
+# @pytest.fixture(scope="module")
+# def gateway_options():
+#     """Additional options to pass to staging gateway constructor"""
+#     return {}
+#
+#
+# @pytest.fixture(scope="module")
+# def gateway_environment():
+#     """Allows setting environment for tls tests"""
+#     return {}

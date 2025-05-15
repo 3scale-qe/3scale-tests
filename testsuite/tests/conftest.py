@@ -624,6 +624,10 @@ def _resolve_rhsso(testconfig, tools, rhsso_kind):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         return None
+    if "username" not in cnf:
+        return None
+    if "url" in cnf:
+        return RHSSO(server_url=cnf["url"], username=cnf["username"], password=cnf["password"])
     key = "no-ssl-rhbk"
     if rhsso_kind == "rhsso":
         key = "no-ssl-sso"
@@ -644,7 +648,7 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
 
-    client = realm.create_client(
+    client = realm.create_client(  # todo zda se ze tenhle client nefunguje
         name=blame(request, "client"),
         serviceAccountsEnabled=True,
         directAccessGrantsEnabled=False,
