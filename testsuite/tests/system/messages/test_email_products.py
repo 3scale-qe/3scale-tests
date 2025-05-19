@@ -24,7 +24,7 @@ def test_service_deleted_automatic_email(mailhog_client, only_service):
     Assert that a corresponding email has been sent
     """
     only_service.delete()
-    # Deletion task scheduled to send email after 5 minutes after deletion
-    time.sleep(5 * 60)
+    # Deletion task scheduled to send email after 10 minutes after deletion
+    time.sleep(10 * 60)
 
     mailhog_client.assert_message_received(subject=f"Service {only_service['name']} deleted", expected_count=1)
