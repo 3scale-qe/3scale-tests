@@ -3,6 +3,7 @@
 import enum
 from typing import List
 
+from selenium.common.exceptions import NoSuchElementException
 from widgetastic.widget import TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
@@ -31,17 +32,25 @@ class UsersView(BaseSettingsView):
     path_pattern = "/p/admin/account/users"
     table = PatternflyTable(
         "//table[@aria-label='Users table']",
-        column_widgets={4: ThreescaleDeleteEditGroup()},
+        column_widgets={4: ThreescaleDeleteEditGroup(), 5: ThreescaleDeleteEditGroup()},
     )
 
     @step("UserDetailView")
     def detail(self, user):
         """Opens detail Account by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.edit()
+        row = self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))
+        try:
+            row[5].widget.edit()
+        except NoSuchElementException:
+            row[4].widget.edit()
 
     def delete(self, user):
         """Delete user by ID"""
-        self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))[4].widget.delete()
+        row = self.table.row(_row__attr=("id", "user_" + str(user.entity_id)))
+        try:
+            row[5].widget.delete()
+        except NoSuchElementException:
+            row[4].widget.delete()
 
     def prerequisite(self):
         return BaseSettingsView
