@@ -36,7 +36,6 @@ def policy_settings():
     )
 
 
-@pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-11738")
 def test_on_failed(api_client):
     """if condition is met, non-existing policy is loaded and
