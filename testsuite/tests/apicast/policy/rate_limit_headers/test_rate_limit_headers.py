@@ -25,7 +25,7 @@ pytestmark = [
 
 
 @pytest_cases.fixture
-def service(custom_service, service_proxy_settings, request, lifecycle_hooks, backends_mapping):
+def service2(custom_service, service_proxy_settings, request, lifecycle_hooks, backends_mapping):
     """
     Function-scoped service with the rate limit headers policy
     The caching policy is added, so the reported numbers will be 100% accurate
@@ -39,26 +39,28 @@ def service(custom_service, service_proxy_settings, request, lifecycle_hooks, ba
     proxy.policies.insert(0, rawobj.PolicyConfig("rate_limit_headers", {}))
     proxy.policies.insert(0, rawobj.PolicyConfig("caching", {"caching_type": "none"}))
 
-    return svc
+    yield svc
+    for usage in svc.backend_usages.list():
+        usage.delete()
 
 
 @pytest_cases.fixture
-def app_plan_backend(service, custom_app_plan, threescale, request):
+def app_plan_backend(service2, backend_usages, custom_app_plan, threescale, request):
     """
     Creates a mapped metric on a backend and on a service, so the default 'hits', that are
     interconnected are not used.
     Creates an app plan with a limits on those metric, one 'minute' and the other 'hour' scoped.
     """
-    backend = threescale.backends.read(service.backend_usages.list()[0]["backend_id"])
+    backend = threescale.backends.read(backend_usages[0]["backend_id"])
     backend_metric = backend.metrics.list()[0]
     backend.mapping_rules.create(rawobj.Mapping(backend_metric, "/anything"))
 
-    service_metric = service.metrics.create(rawobj.Metric("metric_svc"))
-    proxy = service.proxy.list()
+    service_metric = service2.metrics.create(rawobj.Metric("metric_svc"))
+    proxy = service2.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(service_metric, pattern="/anything/foo"))
     proxy.deploy()
 
-    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service)
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service2)
     plan.limits(backend_metric).create({"metric_id": backend_metric["id"], "period": "minute", "value": 10})
     plan.limits(service_metric).create({"metric_id": service_metric["id"], "period": "minute", "value": 5})
 
@@ -66,7 +68,7 @@ def app_plan_backend(service, custom_app_plan, threescale, request):
 
 
 @pytest_cases.fixture
-def app_plan_service(service, custom_app_plan, request):
+def app_plan_service(service2, custom_app_plan, request):
     """
     Creates metrics and mapping rules for those metrics.
     The second mapping rule is a subset of the first one. When the second (foo) metric is increased,
@@ -74,15 +76,15 @@ def app_plan_service(service, custom_app_plan, request):
 
     Creates an app plan with two limits on the created metrics.
     """
-    metric_anything = service.metrics.create(rawobj.Metric("anything"))
-    metric_anything_foo = service.metrics.create(rawobj.Metric("foo"))
+    metric_anything = service2.metrics.create(rawobj.Metric("anything"))
+    metric_anything_foo = service2.metrics.create(rawobj.Metric("foo"))
 
-    proxy = service.proxy.list()
+    proxy = service2.proxy.list()
     proxy.mapping_rules.create(rawobj.Mapping(metric_anything, pattern="/anything"))
     proxy.mapping_rules.create(rawobj.Mapping(metric_anything_foo, pattern="/anything/foo"))
     proxy.deploy()
 
-    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service)
+    plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, "app")), service2)
     plan.limits(metric_anything).create({"metric_id": metric_anything["id"], "period": "minute", "value": 10})
     plan.limits(metric_anything_foo).create({"metric_id": metric_anything_foo["id"], "period": "minute", "value": 5})
 
