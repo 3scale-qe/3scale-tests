@@ -153,6 +153,43 @@ def _rhsso_credentials(tools_config, rhsso_config):
     return None, None
 
 
+def _shared_tool_certs(tools_config, shared_certs_config):
+    """Search for SSO clients certificates"""
+    if not shared_certs_config:
+        shared_certs_config = tools_config
+    server_url = shared_certs_config.get("server_url")
+    project = shared_certs_config.get("namespace")
+    token = shared_certs_config.get("token")
+    client = OpenShiftClient(project_name=project, server_url=server_url, token=token)
+    try:
+        iter(client.secrets)
+    except OpenShiftPythonException:
+        return {"valid": [], "invalid": []}
+
+    valid_certs = []
+    invalid_certs = []
+    for secret in client.secrets:
+        try:
+            name = secret["metadata"]["name"]
+            annotations = secret["metadata"]["annotations"]
+            shared_cert = annotations["shared_cert"]
+            valid = annotations["valid"]
+        except KeyError:
+            continue
+        if shared_cert != "True":
+            continue
+        cert = {
+            "name": name,
+            "crt": client.secrets[name]["tls.crt"].decode("utf-8"),
+            "key": client.secrets[name]["tls.key"].decode("utf-8"),
+        }
+        if valid == "True":
+            valid_certs.append(cert)
+        if valid == "False":
+            invalid_certs.append(cert)
+    return {"valid": valid_certs, "invalid": invalid_certs}
+
+
 def _threescale_operator_ocp(ocp):
     try:
         ocp.threescale_operator  # pylint: disable=pointless-statement
@@ -257,6 +294,8 @@ def load(obj, env=None, silent=None, key=None):
         rhsso_setup = obj.get("rhsso", {})
         rhsso_username, rhsso_password = _rhsso_credentials(ocp_tools_setup, rhsso_setup)
 
+        shared_certs_setup = obj.get("shared_certs", {})
+
         ocp = OpenShiftClient(
             project_name=project, server_url=ocp_setup.get("server_url"), token=ocp_setup.get("token")
         )
@@ -346,6 +385,7 @@ def load(obj, env=None, silent=None, key=None):
                 "apicast": {"openshift": apicast_operator_ocp},
             },
             "rhsso": {"password": rhsso_password, "username": rhsso_username},
+            "shared_certs": {"client_certs": _shared_tool_certs(ocp_tools_setup, shared_certs_setup)},
         }
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated

@@ -94,6 +94,25 @@ default:
       token: # token for openshift where the testenv tools are deployed (unnecessary for for default openshift)
     private_base_url:
       default: echo_api # tool name to be used by default for backend
+  shared_certs:
+    # config for obtaining certificates which are signed by same CA as tools.
+    # If this config is not set, testsuite will use same openshift and namespace as tools
+    namespace: tools # openshift namespace/project where the secrets with certificates are deployed
+    server_url: # openshift url where the secrets with certificates are deployed
+    token: # token for openshift where the secrets with certificates are deployed
+    # certs can be also added manually
+    client_certs:
+        valid:
+            - name: client1
+              crt: "cert1"
+              key: "key1"
+            - name: client2
+              crt: "cert2"
+              key: "key2"
+        invalid:
+            - name: client3
+              crt: "cert3"
+              key: "key3"
   warn_and_skip:
     # section to control how warn_and_skip should behave for particular tests
     # works just for tests and fixture that use warn_and_skip
