@@ -675,7 +675,12 @@ def _resolve_rhsso(testconfig, tools, route_name):
     if "password" not in cnf:
         return None
 
-    return RHSSO(server_url=tools[route_name], username=cnf["username"], password=cnf["password"])
+    return RHSSO(
+        server_url=tools[route_name],
+        username=cnf["username"],
+        password=cnf["password"],
+        verify=testconfig["ssl_verify"],
+    )
 
 
 @pytest.fixture(scope="session")
