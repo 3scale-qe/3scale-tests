@@ -91,6 +91,7 @@ class RHSSO:
                 realm_name="master",
                 verify=False,
             )
+            self.master.get_clients()  # test whether the server url is valid
             self.server_url = server_url
         except KeycloakPostError:
             self.server_url = urlparse(server_url)._replace(path="auth/").geturl()
@@ -101,6 +102,7 @@ class RHSSO:
                 realm_name="master",
                 verify=False,
             )
+            self.master.get_clients()  # test whether the server url is valid
 
     def create_realm(self, name: str, **kwargs) -> Realm:
         """Creates new realm"""
