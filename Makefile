@@ -61,41 +61,41 @@ testsuite/%: FORCE pipenv check-secrets.yaml
 
 test: ## Run test
 test pytest tests: pipenv check-secrets.yaml
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-fuzz $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-fuzz $(flags) testsuite/tests
 
 speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv check-secrets.yaml
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz $(flags) testsuite/tests
 
 sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
 sandbag: pipenv
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite/tests
 
 fuzz:  ## run tests from tests/fuzz
 fuzz: pipenv
-	$(PYTEST) -n8 -m 'not flaky' $(flags) testsuite/tests/fuzz
+	$(PYTEST) -n8 -m 'not flaky' --fuzz $(flags) testsuite/tests/fuzz
 
 
 persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv check-secrets.yaml
-	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) testsuite
+	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) testsuite/tests
 
 persistence-store persistence-load: export _3SCALE_TESTS_skip_cleanup=true
 persistence-store persistence-load: pipenv check-secrets.yaml
-	$(subst -p no:persistence,,$(PYTEST)) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite
+	$(subst -p no:persistence,,$(PYTEST)) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) --$(subst persistence-,,$@) $(persistence_file) testsuite/tests
 
 debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
 debug: test
 
 smoke: pipenv check-secrets.yaml
-	$(PYTEST) -n6 -msmoke $(flags) testsuite
+	$(PYTEST) -n6 -msmoke $(flags) testsuite/tests
 
 flaky: pipenv check-secrets.yaml
-	$(PYTEST) -mflaky $(flags) testsuite
+	$(PYTEST) -mflaky $(flags) testsuite/tests
 
 disruptive: pipenv check-secrets.yaml
-	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite
+	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite/tests
 
 performance-smoke: pipenv check-secrets.yaml
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke

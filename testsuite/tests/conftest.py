@@ -62,22 +62,32 @@ def pytest_addoption(parser):
         "--performance", action="store_true", default=False, help="Run also performance tests (default: False)"
     )
     parser.addoption("--ui", action="store_true", default=False, help="Run also UI tests (default: False)")
-    parser.addoption("--drop-fuzz", action="store_true", default=False, help="Skip fuzzing tests (default: False)")
-    parser.addoption(
+    fuzz_group = parser.getgroup("fuzz-group")
+    fuzz_group.addoption("--drop-fuzz", action="store_true", default=False, help="Skip fuzzing tests (default: False)")
+    fuzz_group.addoption(
         "--fuzz",
         action="store_true",
         default=False,
-        help="Run ONLY fuzzing tests skipped by --drop-fuzz (default: False)",
+        help="Run also all tests from tests/fuzz (default: False)",
     )
-    parser.addoption(
+
+    sandbag_group = parser.getgroup("sandbag-group")
+    sandbag_group.addoption(
         "--drop-sandbag", action="store_true", default=False, help="Skip demanding/slow tests (default: False)"
     )
-    parser.addoption(
+    sandbag_group.addoption(
         "--sandbag",
+        action="store_true",
+        default=False,
+        help="Alias for --sandbag-only",
+    )
+    sandbag_group.addoption(
+        "--sandbag-only",
         action="store_true",
         default=False,
         help="Run ONLY demanding/slow tests skipped by --drop-sandbag (default: False)",
     )
+
     parser.addoption(
         "--drop-nopersistence",
         action="store_true",
@@ -89,31 +99,32 @@ def pytest_addoption(parser):
     parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    """Ensure mutually exclusive options"""
+    fuzz = config.getoption("--fuzz")
+    drop_fuzz = config.getoption("--drop-fuzz")
+    if fuzz and drop_fuzz:
+        raise pytest.UsageError("--fuzz and --drop-fuzz are mutually exclusive")
+
+    sandbag = config.getoption("--sandbag")
+    sandbag_only = config.getoption("--sandbag-only")
+    drop_sandbag = config.getoption("--drop-sandbag")
+    if (sandbag or sandbag_only) and drop_sandbag:
+        raise pytest.UsageError("--sandbag/--sandbag-only and --drop-sandbag are mutually exclusive")
+
+
 # there are many branches as there are many options to influence test selection
 # pylint: disable=too-many-branches
 def pytest_runtest_setup(item):
     """Exclude disruptive tests by default, require explicit option"""
 
     marks = [i.name for i in item.iter_markers()]
+
     sandbag_caps = (Capability.CUSTOM_ENVIRONMENT, Capability.LOGS, Capability.JAEGER)
+
     if "skipif_devrelease" in marks and TESTED_VERSION.is_devrelease:
         pytest.skip("Excluding on development release")
-    if "disruptive" in marks and not item.config.getoption("--disruptive"):
-        pytest.skip("Excluding disruptive tests")
-    if "/toolbox/" in item.nodeid and not item.config.getoption("--toolbox"):
-        pytest.skip("Excluding toolbox tests")
-    if "performance" in marks and not item.config.getoption("--performance"):
-        pytest.skip("Excluding performance tests")
-    if "/ui/" in item.nodeid and not item.config.getoption("--ui"):
-        pytest.skip("Excluding UI tests")
-    if "/images/" in item.nodeid and not item.config.getoption("--images"):
-        pytest.skip("Excluding image check tests")
-    if item.config.getoption("--drop-fuzz"):
-        if "fuzz" in marks:
-            pytest.skip("Dropping fuzz")
-    if item.config.getoption("--fuzz"):
-        if "fuzz" not in marks:
-            pytest.skip("Running fuzz only")
+
     if item.config.getoption("--drop-sandbag"):
         if "sandbag" in marks or "xfail" in marks:
             pytest.skip("Dropping sandbag")
@@ -123,14 +134,13 @@ def pytest_runtest_setup(item):
                 for cap in mark.args:
                     if cap in sandbag_caps:
                         pytest.skip("Dropping sandbag")
-    if item.config.getoption("--sandbag"):
+
+    if item.config.getoption("--sandbag") or item.config.getoption("--sandbag-only"):
         required_capabilities = set(chain(*{m.args for m in item.iter_markers("required_capabilities")}))
         # sandbag is something marked, xfailing or having specific requirements
         if not ("sandbag" in marks or "xfail" in marks or set(sandbag_caps) & required_capabilities):
             pytest.skip("Running sandbag only")
-    if item.config.getoption("--drop-nopersistence"):
-        if "nopersistence" in marks:
-            pytest.skip("Dropping nopersistence")
+
     if "required_capabilities" in marks:
         capability_marks = item.iter_markers(name="required_capabilities")
         for mark in capability_marks:
@@ -140,8 +150,6 @@ def pytest_runtest_setup(item):
     else:
         if Capability.APICAST not in CapabilityRegistry():
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
-    if "/tools/" in item.nodeid and not item.config.getoption("--tool-check"):
-        pytest.skip("Excluding tools availability tests")
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -166,7 +174,8 @@ def pytest_html_results_table_html(report, data):
         del data[:]
 
 
-# pylint: disable=unused-argument
+# there are many branches as there are many options to influence test selection
+# pylint: disable=too-many-statements,too-many-nested-blocks,unused-argument
 def pytest_collection_modifyitems(session, config, items):
     """
     Add user properties to testcases for xml output
@@ -178,11 +187,10 @@ def pytest_collection_modifyitems(session, config, items):
     https://docs.pytest.org/en/stable/usage.html
     """
 
-    sso_only_opt = config.option.sso_only
-
-    selected_fixtures = ["rhsso_setup"]
     selected = []
     deselected = []
+
+    sso_fixture = "rhsso_setup"
 
     for item in items:
         for marker in item.iter_markers(name="issue"):
@@ -191,10 +199,36 @@ def pytest_collection_modifyitems(session, config, items):
             item.user_properties.append(("issue", issue))
             item.user_properties.append(("issue-id", issue_id))
 
-        if sso_only_opt and not any(fixture in selected_fixtures for fixture in item.fixturenames):
+        markers = [i.name for i in item.iter_markers()]
+
+        # pylint: disable=too-many-boolean-expressions
+        if (
+            (not config.option.disruptive and "disruptive" in markers)
+            or (not config.option.fuzz and "fuzz" in markers)
+            or (not config.option.images and "/images/" in item.nodeid)
+            or (not config.option.performance and "performance" in markers)
+            or (not config.option.tool_check and "/tools/" in item.nodeid)
+            or (not config.option.toolbox and "/toolbox/" in item.nodeid)
+            or (not config.option.ui and "/ui/" in item.nodeid)
+        ):
             deselected.append(item)
-        else:
-            selected.append(item)
+            continue
+
+        # pylint: disable=too-many-boolean-expressions
+        if (config.option.drop_fuzz and "fuzz" in markers) or (
+            config.option.drop_nopersistence and "nopersistence" in markers
+        ):
+            deselected.append(item)
+            continue
+
+        if config.option.sso_only:
+            if sso_fixture in list(item.fixturenames):
+                selected.append(item)
+            else:
+                deselected.append(item)
+            continue
+
+        selected.append(item)
 
     items[:] = selected
 
