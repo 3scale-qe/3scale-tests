@@ -1,30 +1,42 @@
 """Test Financial-Grade API policy with oauth2 certificate bound access token (advanced profile)"""
 
-import os
 import pytest
 import requests
 
 from testsuite import rawobj
-from testsuite.utils import blame
+from testsuite.utils import blame, warn_and_skip
 from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
-# pylint: disable=reimported,unused-import
-from testsuite.tests.apicast.policy.tls.conftest import (manager, superdomain, server_authority, staging_gateway,
-                                                         gateway_options, gateway_environment)
-# pylint: disable=reimported,unused-import
-from  testsuite.tests.apicast.policy.tls.conftest import (certificate, superdomain, valid_authority, create_cert,
-                                                          superdomain, manager)
+from testsuite.certificates import Certificate
+
+# pylint: disable=reimported, unused-import
+# flake8: noqa
+from testsuite.tests.apicast.policy.tls.conftest import (
+    certificate,
+    manager,
+    superdomain,
+    server_authority,
+    staging_gateway,
+    gateway_options,
+    gateway_environment,
+    valid_authority,
+    create_cert,
+)
 
 
-@pytest.fixture()
-def mtls_client_cert():
+@pytest.fixture(scope="module")
+def mtls_client_cert(request, testconfig):
     """Clients certificate. CA of this cert needs to be trusted by the sso"""
-    # todo create certs dynamically
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    crt_path = os.path.join(script_dir, "certificates", "client.crt" )
-    key_path = os.path.join(script_dir, "certificates", "client.key" )
-    return crt_path, key_path
+    try:
+        crt = testconfig["shared_certs"]["client_certs"]["valid"][0]
+    except IndexError:
+        warn_and_skip("Valid tools cert is not available, skipping fapi advanced tests")
+    cert = Certificate(crt["key"], crt["crt"])
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(cert.delete_files)
+    return cert.files["certificate"], cert.files["key"]
 
 
+# flake8: noqa
 @pytest.fixture()
 def unknown_cert(certificate):
     """Cert which won't be used for obtaining the token"""
@@ -40,10 +52,13 @@ def service(service):
         3scale APIcast
         Fapi
     """
-    fapi_policy = rawobj.PolicyConfig("fapi", configuration = {
-        "validate_x_fapi_customer_ip_address": True,
-        "validate_oauth2_certificate_bound_access_token": True
-      })
+    fapi_policy = rawobj.PolicyConfig(
+        "fapi",
+        configuration={
+            "validate_x_fapi_customer_ip_address": True,
+            "validate_oauth2_certificate_bound_access_token": True,
+        },
+    )
     service.proxy.list().policies.insert(1, fapi_policy)
     return service
 
@@ -56,16 +71,15 @@ def fapi_sso_client_id():
 
 # pylint: disable=too-many-arguments
 @pytest.fixture(scope="module")
-def application(service, custom_application, custom_app_plan, lifecycle_hooks, request, fapi_sso_client_id,
-                rhsso_service_info):
+def application(
+    service, custom_application, custom_app_plan, lifecycle_hooks, request, fapi_sso_client_id, rhsso_service_info
+):
     """application bound to the account and service existing over whole testing session"""
     plan = custom_app_plan(rawobj.ApplicationPlan(blame(request, blame(request, "fapi"))), service)
     app = custom_application(
-        rawobj.Application(
-            name=fapi_sso_client_id,
-            app_id=fapi_sso_client_id,
-            application_plan=plan),
-        hooks=lifecycle_hooks)
+        rawobj.Application(name=fapi_sso_client_id, app_id=fapi_sso_client_id, application_plan=plan),
+        hooks=lifecycle_hooks,
+    )
     service.proxy.deploy()
     app.register_auth("oidc", OIDCClientAuth.partial(rhsso_service_info))
     return app
@@ -88,7 +102,7 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id):
             "tls.client.certificate.bound.access.tokens": "true",
             "client.authentication.type": "tls",
             "x509.allow.regex.pattern.comparison": "true",
-        }
+        },
     }
     return rhsso_service_info.realm.create_client(fapi_sso_client_id, **client_config)
 
@@ -96,6 +110,7 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id):
 # pylint: disable=too-few-public-methods
 class FapiClient:
     """Temporary class for sending requests to apicast. This should be replaced by using fixture api_client"""
+
     def __init__(self, base_url, verify):
         self.base_url = base_url
         self.http_session = requests.Session()

@@ -1,6 +1,7 @@
 """Utility classes for working with RHSSO server"""
 
 import functools
+from typing import cast
 
 import backoff
 from keycloak import KeycloakOpenID
@@ -26,13 +27,13 @@ class RHSSOServiceConfiguration:
         self.client = client
         self.username = username
         self.password = password
-        self._oidc_client = None
+        self._oidc_client: KeycloakOpenID | None = None
 
     @property
     def oidc_client(self) -> KeycloakOpenID:
         """OIDCClient for the created client"""
         if not self._oidc_client:
-            self._oidc_client = self.client.oidc_client
+            self._oidc_client = cast(KeycloakOpenID, self.client.oidc_client)
         return self._oidc_client
 
     def issuer_url(self) -> str:
