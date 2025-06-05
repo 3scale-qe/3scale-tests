@@ -40,6 +40,8 @@ default:
         name: "{DEFAULT_OPENSHIFT_THREESCALE_PROJECT}"
   rhsso:
     kind: rhbk # rhbk is deault; other acceptable value is rhsso
+    username: admin # auto-discovered, might be overitten here
+    password: admin-pass # auto-discovered, might be overitten here
     test_user:
       username: testUser
       password: testUser
