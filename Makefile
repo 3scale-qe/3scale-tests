@@ -22,7 +22,7 @@ PIPENV_IGNORE_VIRTUALENVS ?= 1
 
 persistence_file ?= $(resultsdir)/pytest-persistence.pickle
 
-PYTEST = pipenv run python -m pytest --tb=$(TB) -o cache_dir=$(resultsdir)/.pytest_cache.$(@F)
+PYTEST = pipenv run python -m pytest --tb=$(TB) -ra -o cache_dir=$(resultsdir)/.pytest_cache.$(@F)
 RUNSCRIPT = pipenv run ./scripts/
 
 ifdef junit
