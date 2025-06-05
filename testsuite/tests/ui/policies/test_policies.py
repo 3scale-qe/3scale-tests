@@ -1,11 +1,21 @@
 """Rewrite of spec/ui_specs/policies_spec.rb"""
 
-import pytest
+from collections import Counter
 
+import pytest
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
 from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, Policies
 
 pytestmark = pytest.mark.usefixtures("login")
+
+
+@pytest.fixture()
+def policy_list():
+    """generate list of all policies"""
+    policies = [policy.value for policy in list(Policies)]
+    policies.remove("3scale APIcast")  # default policy is not in the policy registry
+    policies.remove("fapi")
+    return policies
 
 
 def test_add_policy(navigator, policy_service):
@@ -158,3 +168,13 @@ def test_edit_policy_widgets(navigator, policy_service, api_client, policy_appli
 
     response = api_client(app=policy_application).get("/hello")
     assert response.json()["path"] == "/get"
+
+
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-11620")
+def test_policy_list(navigator, policy_service, policy_list):
+    """Test:
+    - Create service via API
+    - Navigate to Policies page and check, that policy registry displays all policies from policy_list"""
+    policies_page = navigator.navigate(ProductPoliciesView, product=policy_service)
+    registry_policies = policies_page.policy_section.registry_items
+    assert Counter(policy_list) == Counter(registry_policies)

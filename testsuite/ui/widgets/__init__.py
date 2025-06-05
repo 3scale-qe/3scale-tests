@@ -5,10 +5,10 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
-from widgetastic.widget import GenericLocatorWidget, Widget
+from widgetastic.widget import GenericLocatorWidget, Widget, View
 from widgetastic.widget import TextInput
 from widgetastic.xpath import quote
-from widgetastic_patternfly4 import Select
+from widgetastic_patternfly4 import Select, Modal
 
 from testsuite.ui.exception import ItemNotPresentException
 
@@ -254,7 +254,7 @@ class ThreescaleCheckBox(GenericLocatorWidget):
         return self.__element__().get_attribute("checked") == "true"
 
 
-class PolicySection(Widget):
+class PolicySection(View):
     """Widget representing Policies table section"""
 
     ROOT = "//div[@class='PoliciesWidget']/section"
@@ -262,28 +262,36 @@ class PolicySection(Widget):
     REGISTRY_ITEMS_LOCATOR = "//ul/li/article/h3"
     REGISTRY_ITEM_LOCATOR = "//ul/li/article/h3[text()='{}']"
     CHAIN_ITEMS_LOCATOR = ".//ul/li//article/h3"
-    CHAIN_ITEM_LOCATOR = "//ul/li//article/h3[text()='{}']"
-    ADD_POLICY_LOC = ".//button[normalize-space(.)='Add policy']"
+    CHAIN_ITEM_LOCATOR = ".//ul/li//article/h3[text()='{}']"
+    ADD_POLICY_LOCATOR = ".//button[normalize-space(.)='Add policy']"
+    add_policy_modal = Modal(locator="//div[contains(@class, 'pf-c-modal-box')]")
 
+    # pylint: disable=super-init-not-called, non-parent-init-called
     def __init__(self, parent=None, logger=None):
         Widget.__init__(self, parent, logger=logger)
 
     @property
     def items(self):
-        """Returns a list of all policy registry items as strings."""
+        """Returns a list of all policy registry items from policy chain as strings."""
         return [self.browser.text(el) for el in self.browser.elements(self.CHAIN_ITEMS_LOCATOR, parent=self)]
 
     @property
     def registry_items(self):
         """Returns a list of all policy registry items as strings."""
-        return [self.browser.text(el) for el in self.browser.elements(self.REGISTRY_ITEMS_LOCATOR)]
+        displayed = self.add_policy_modal.is_displayed
+        if not displayed:
+            self.open_policy_registry()
+        result = [self.browser.text(el) for el in self.browser.elements(self.REGISTRY_ITEMS_LOCATOR)]
+        if not displayed:
+            self.close_policy_registry()
+        return result
 
     @property
     def is_policy_registry_displayed(self):
         """Check if policy registry list is displayed.
         :return: True if displayed, False otherwise.
         """
-        return self.browser.is_displayed(self.ADD_POLICY_LOC)
+        return self.add_policy_modal.is_displayed
 
     @property
     def first_policy(self):
@@ -297,7 +305,7 @@ class PolicySection(Widget):
         """Opens the Policy registry list and adds a policy by its name.
         :param policy_name: Name of the policy to be added
         """
-        self.browser.click(self.ADD_POLICY_LOC, parent=self)
+        self.browser.click(self.ADD_POLICY_LOCATOR, parent=self)
         self.add_item(policy_name)
 
     def edit_policy(self, policy_name):
@@ -305,7 +313,7 @@ class PolicySection(Widget):
         :param policy_name:
         """
         if self.has_item(policy_name):
-            self.item_select(policy_name)
+            self.browser.click(self.item_element(policy_name))
         else:
             raise ItemNotPresentException("Item {!r} not found.".format(policy_name))
 
@@ -323,7 +331,7 @@ class PolicySection(Widget):
         ac.perform()
 
     def has_item(self, item):
-        """Returns whether the items exists.
+        """Returns whether the items exist in policy chain.
         :param
             item: item name
         :return:
@@ -333,11 +341,23 @@ class PolicySection(Widget):
 
     # pylint: disable=raise-missing-from
     def item_element(self, item):
-        """Returns a WebElement for given item name.
+        """Returns a WebElement for given item name from policy chain.
         :return WebElement
         """
         try:
             return self.browser.element(self.CHAIN_ITEM_LOCATOR.format(item), parent=self)
+        except NoSuchElementException:
+            raise ItemNotPresentException("Item {!r} not found.".format(item))
+
+    # pylint: disable=raise-missing-from
+    def registry_item_element(self, item):
+        """Returns a WebElement for given item name from policy registry.
+        :return WebElement
+        """
+        if not self.add_policy_modal.is_displayed:
+            self.open_policy_registry()
+        try:
+            return self.browser.element(self.REGISTRY_ITEM_LOCATOR.format(item), parent=self)
         except NoSuchElementException:
             raise ItemNotPresentException("Item {!r} not found.".format(item))
 
@@ -347,17 +367,27 @@ class PolicySection(Widget):
         self.logger.info("Selecting %r", item)
         if item not in self.registry_items:
             raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
-        self.browser.click(self.item_element(item))
+        self.browser.click(self.registry_item_element(item))
 
     def item_select(self, item):
-        """Opens the Policy registry and selects the desired policy.
+        """Opens the policy registry and selects the desired policy.
         :param
             item: Item to be selected
         """
         self.logger.info("Selecting %r", item)
         if not self.has_item(item):
             raise ItemNotPresentException('Item "{item}" of policy is not present'.format(item=item))
-        self.browser.click(self.item_element(item))
+        self.browser.click(self.registry_item_element(item))
+
+    def open_policy_registry(self):
+        """Opens the policy registry if not already opened"""
+        if not self.is_policy_registry_displayed:
+            self.browser.click(self.ADD_POLICY_LOCATOR, parent=self)
+
+    def close_policy_registry(self):
+        """Closes the policy registry if not already closed"""
+        if self.is_policy_registry_displayed:
+            self.add_policy_modal.close()
 
 
 class APIDocsSelect(Select):
