@@ -51,7 +51,7 @@ def test_sso_availability(rhsso_kind, rhsso_service_info: RHSSOServiceConfigurat
     """
     endpoint = rhsso_service_info.rhsso.server_url
     if rhsso_kind == "rhbk":
-        endpoint = endpoint + "/health"
+        endpoint = endpoint.replace("no-ssl-rhbk", "no-ssl-rhbk-management") + "/health"
     response = requests.get(endpoint, verify=False)
     assert response.status_code == 200
     if rhsso_kind == "rhbk":
