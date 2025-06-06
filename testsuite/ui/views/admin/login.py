@@ -1,4 +1,4 @@
-""" Representation of Login specific views"""
+"""Representation of Login specific views"""
 
 from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
 from widgetastic_patternfly4.ouia import Button

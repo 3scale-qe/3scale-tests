@@ -1,9 +1,9 @@
 """
-    Smoke test that will create 3scale objects for performance testing.
-    Fill necessary data to benchmark template.
-    Run the test and assert results.
-    This test shows usage how to write test where 3scale product is secured with app id
-    and app key combination.
+Smoke test that will create 3scale objects for performance testing.
+Fill necessary data to benchmark template.
+Run the test and assert results.
+This test shows usage how to write test where 3scale product is secured with app id
+and app key combination.
 """
 
 import asyncio

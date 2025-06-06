@@ -87,7 +87,6 @@ def test_production_call_without_promote(application, prod_client):
     response = client.get("/get")
 
 
-@pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
 @pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)  # Test should have mark that states that it needs production_gateway
 def test_production_call_without_redeploy(application, prod_client):
     client = prod_client(application, redeploy=False)

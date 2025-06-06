@@ -1,4 +1,4 @@
-"""Selenium factory for creating  Threescale browser instances to run UI tests. """
+"""Selenium factory for creating  Threescale browser instances to run UI tests."""
 
 import logging
 

@@ -8,6 +8,7 @@ import typing
 import warnings
 from base64 import b64encode
 from os import urandom
+from pathlib import Path
 
 import pytest
 
@@ -229,3 +230,10 @@ def custom_policy() -> dict:
     return _M
     """
     return {"init.lua": initlua, "example.lua": examplelua, "apicast-policy.json": apicastpolicyjson}
+
+
+def get_results_dir_path():
+    """resolve resultsdir or defaults to root of 3scale-tests repo"""
+    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../..")
+    resultsdir = os.environ.get("resultsdir", no_argument_dir)
+    return Path(resultsdir)

@@ -1,4 +1,4 @@
-""""
+""" "
 testing proper function of the CORS policy
 
 Rewrite: ./spec/functional_specs/policies/cors/cors_policy_spec.rb

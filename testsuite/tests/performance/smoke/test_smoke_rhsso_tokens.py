@@ -1,8 +1,8 @@
 """
-    Smoke test that will create 3scale objects for performance testing.
-    Fill necessary data to benchmark template.
-    Run the test and assert results.
-    This test shows usage how to write test where access token is created by performance test.
+Smoke test that will create 3scale objects for performance testing.
+Fill necessary data to benchmark template.
+Run the test and assert results.
+This test shows usage how to write test where access token is created by performance test.
 """
 
 import os

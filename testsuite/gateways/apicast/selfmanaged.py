@@ -1,4 +1,4 @@
-"""Self-managed APIcast already deployed somewhere in OpenShift """
+"""Self-managed APIcast already deployed somewhere in OpenShift"""
 
 import inspect
 import logging

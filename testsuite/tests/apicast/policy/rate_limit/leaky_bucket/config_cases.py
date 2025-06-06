@@ -1,8 +1,8 @@
 """
-    Configuration cases for leaky bucket policy tests
-    Each case_ function is used as policy configuration for test
-                        returns tuple: 1st: configuration of the policies
-                                       2nd: True if the condition was applied, false otherwise
+Configuration cases for leaky bucket policy tests
+Each case_ function is used as policy configuration for test
+                    returns tuple: 1st: configuration of the policies
+                                   2nd: True if the condition was applied, false otherwise
 """
 
 from typing import Tuple

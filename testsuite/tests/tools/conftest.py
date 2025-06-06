@@ -1,20 +1,9 @@
 """Tools conftest"""
 
 import json
-import os
-from pathlib import Path
 import pytest
 
-
-def get_results_dir_path():
-    """Method that gives you the path to the directory where you should store test results."""
-    try:
-        results_dir = os.environ.get("resultsdir")
-        return Path(results_dir)
-    except KeyError:
-        current_file = Path(__file__).resolve()
-        project_dir = current_file.parents[3]
-        return project_dir / "attachments"
+from testsuite.utils import get_results_dir_path
 
 
 def save_as_json(data, path):
@@ -34,5 +23,6 @@ def save_as_json(data, path):
 @pytest.hookimpl(trylast=True)
 def pytest_metadata(metadata):
     """Saves metadata to the attachments directory in json format"""
+    # path to resultsdir folder defaults to root of testsuite repository
     results_dir_path = get_results_dir_path()
-    save_as_json(metadata, results_dir_path / "pytest_metadata.json")
+    save_as_json(metadata, results_dir_path / "attachments" / "pytest_metadata.json")

@@ -1,5 +1,5 @@
 """
-    Performance test for managed services with multiple 3scale entities (products, backends,...)
+Performance test for managed services with multiple 3scale entities (products, backends,...)
 """
 
 import asyncio
