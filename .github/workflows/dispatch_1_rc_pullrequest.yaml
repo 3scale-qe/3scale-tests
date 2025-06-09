@@ -26,6 +26,6 @@ jobs:
       - name: create PR
         run: |
           git push -u origin HEAD
-          gh pr create --fill --reviewer mkudlej,mdujava,dhlavac
+          gh pr create -B stable-2.15 --fill --reviewer mkudlej,mdujava,dhlavac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
