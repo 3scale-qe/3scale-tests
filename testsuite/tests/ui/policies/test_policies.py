@@ -14,7 +14,6 @@ def policy_list():
     """generate list of all policies"""
     policies = [policy.value for policy in list(Policies)]
     policies.remove("3scale APIcast")  # default policy is not in the policy registry
-    policies.remove("fapi")
     return policies
 
 

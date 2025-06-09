@@ -21,7 +21,7 @@ class Policies(enum.Enum):
     THREESCALE_AUTH_CACHING = "3scale Auth Caching"
     HTTP_STATUS_CODE_OVERWRITE = "HTTP Status Code Overwrite"
     CAMEL_SERVICE = "Camel Service"
-    # tbd
+    # This policy should be added in the future
     # CONDITIONAL_POLICY = "Conditional Policy [Tech preview]"
     CONTENT_CACHING = "Content caching"
     PROXY_SERVICE = "Proxy Service"
@@ -56,7 +56,6 @@ class Policies(enum.Enum):
     THREESCALE_BATCHER = "3scale Batcher"
     ON_FAIL = "On fail"
     REQUEST_UNBUFFERED = "Request Unbuffered"
-    FAPI = "fapi"
     URL_REWRITING_WITH_CAPTURES = "URL Rewriting with Captures"
     THE_FINANCIAL_GRADE_API = "The Financial-grade API (FAPI)"
     JWT_PARSER = "JWT Parser"
