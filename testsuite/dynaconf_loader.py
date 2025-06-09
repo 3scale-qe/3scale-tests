@@ -108,7 +108,7 @@ def _apicast_image(ocp):
         return lookup.model.spec.template.spec.containers[0].image
 
 
-def _rhsso_password(tools_config, rhsso_config):
+def _rhsso_credentials(tools_config, rhsso_config):
     """Search for SSO admin password"""
     server_url = tools_config.get("server")
     project = tools_config.get("namespace")
@@ -117,7 +117,9 @@ def _rhsso_password(tools_config, rhsso_config):
     try:
         # is this RHOAM?
         tools = OpenShiftClient(project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
-        return tools.secrets["credential-rhssouser"]["ADMIN_PASSWORD"].decode("utf-8")
+        username = tools.secrets["credential-rhssouser"]["ADMIN_USERNAME"].decode("utf-8")
+        password = tools.secrets["credential-rhssouser"]["ADMIN_PASSWORD"].decode("utf-8")
+        return username, password
     except (OpenShiftPythonException, KeyError):
         pass
 
@@ -125,24 +127,30 @@ def _rhsso_password(tools_config, rhsso_config):
     if kind == "rhbk":
         try:
             # was it deployed as part of tools?
-            return tools.secrets["rhbk-initial-admin"]["password"].decode("utf-8")
+            username = tools.secrets["rhbk-initial-admin"]["username"].decode("utf-8")
+            password = tools.secrets["rhbk-initial-admin"]["password"].decode("utf-8")
+            return username, password
         except (OpenShiftPythonException, KeyError):
             pass
 
     if kind == "rhsso":
         try:
             # first RHSSO 7.5 way
-            return tools.secrets["credential-sso"]["ADMIN_PASSWORD"].decode("utf-8")
+            username = tools.secrets["credential-sso"]["ADMIN_USERNAME"].decode("utf-8")
+            password = tools.secrets["credential-sso"]["ADMIN_PASSWORD"].decode("utf-8")
+            return username, password
         except (OpenShiftPythonException, KeyError):
             pass
 
         try:
             # try 7.4 known deployment if previous fails
-            return tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
+            username = tools.environ("dc/sso")["SSO_ADMIN_USERNAME"]
+            password = tools.environ("dc/sso")["SSO_ADMIN_PASSWORD"]
+            return username, password
         except (OpenShiftPythonException, KeyError):
             pass
 
-    return None
+    return None, None
 
 
 def _threescale_operator_ocp(ocp):
@@ -247,6 +255,7 @@ def load(obj, env=None, silent=None, key=None):
             ocp_tools_setup = ocp_setup
 
         rhsso_setup = obj.get("rhsso", {})
+        rhsso_username, rhsso_password = _rhsso_credentials(ocp_tools_setup, rhsso_setup)
 
         ocp = OpenShiftClient(
             project_name=project, server_url=ocp_setup.get("server_url"), token=ocp_setup.get("token")
@@ -336,7 +345,7 @@ def load(obj, env=None, silent=None, key=None):
                 "threescale": {"openshift": threescale_operator_ocp},
                 "apicast": {"openshift": apicast_operator_ocp},
             },
-            "rhsso": {"password": _rhsso_password(ocp_tools_setup, rhsso_setup)},
+            "rhsso": {"password": rhsso_password, "username": rhsso_username},
         }
 
         # this overwrites what's already in settings to ensure NAMESPACE is propagated

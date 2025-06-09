@@ -1,4 +1,4 @@
-""" Tests for MessageBus variables in system-redis secret """
+"""Tests for MessageBus variables in system-redis secret"""
 
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import

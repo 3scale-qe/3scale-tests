@@ -1,4 +1,4 @@
-""" 3scale specific widgets"""
+"""3scale specific widgets"""
 
 import backoff
 from selenium.webdriver import ActionChains

@@ -1,4 +1,5 @@
 "UI conftest"
+
 # pylint: disable=too-many-arguments, unused-argument
 
 import io
@@ -33,7 +34,7 @@ from testsuite.ui.views.devel.login import LoginView as DeveloperLoginView
 from testsuite.ui.views.master.audience.tenant import TenantNewView, TenantDetailView
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
-from testsuite.utils import blame
+from testsuite.utils import blame, get_results_dir_path
 
 
 LOGGER = logging.getLogger(__name__)
@@ -448,12 +449,11 @@ def get_resultsdir_path(node):
     """
 
     xml = node.config.getoption("--junitxml")
-    # path to "3scape-py-testsuite" folder
-    no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../..")
-    resultsdir = os.environ.get("resultsdir", no_argument_dir)
     failed_test_name = node.nodeid.replace("/", ".").replace(".py::", ".")
 
     if not xml:
+        # path to resultsdir folder defaults to root of testsuite repository
+        resultsdir = get_results_dir_path()
         path = f"{resultsdir}/attachments/ui/{failed_test_name}/"
 
     else:
