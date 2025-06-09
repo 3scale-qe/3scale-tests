@@ -72,9 +72,7 @@ class Client:
         """OIDC client"""
         # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
         client_id = self.admin.get_client(self.client_id)["clientId"]
-        # next type ignore is needed only until this fix will be released:
-        # https://github.com/marcospereirampj/python-keycloak/pull/655
-        secret = self.admin.get_client_secrets(self.client_id)["value"]  # type: ignore
+        secret = self.admin.get_client_secrets(self.client_id)["value"]
         return self.realm.oidc_client(client_id, secret)
 
 
