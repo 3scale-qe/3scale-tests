@@ -29,7 +29,7 @@ pytest-asyncio = "==0.21.2"
 requests = "*"
 3scale-api = ">=0.35.0"
 dynaconf = "*"
-python-keycloak = "==4.0.1"
+python-keycloak = ">=4.7.3"  # this fix needed: https://github.com/marcospereirampj/python-keycloak/pull/622/files
 backoff = "*"
 websocket_client = "==1.5.1"
 httpx = {version = "*", extras = ["http2"]}
