@@ -126,10 +126,10 @@ class FapiClient:
 
 
 @pytest.fixture()
-def fapi_api_client(api_client):
+def fapi_api_client(application):
     """Create client for api_calls on apicast"""
     # pylint: disable=protected-access
-    api_base_url = api_client()._base_url
+    api_base_url = application.api_client()._base_url
     return FapiClient(api_base_url, verify=False)
 
 
