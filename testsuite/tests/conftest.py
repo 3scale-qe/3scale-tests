@@ -624,10 +624,6 @@ def _resolve_rhsso(testconfig, tools, rhsso_kind):
     cnf = testconfig["rhsso"]
     if "password" not in cnf:
         return None
-    if "username" not in cnf:
-        return None
-    if "url" in cnf:
-        return RHSSO(server_url=cnf["url"], username=cnf["username"], password=cnf["password"])
     key = "no-ssl-rhbk"
     if rhsso_kind == "rhsso":
         key = "no-ssl-sso"
