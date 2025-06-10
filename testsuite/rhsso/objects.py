@@ -79,7 +79,7 @@ class Client:
         secret = self.admin.get_client_secrets(self.client_id)["value"]  # type: ignore
         return self.realm.oidc_client(client_id, secret)
 
-    def mtls_client(self, cert=None):  # todo je tohle spravne misto? nejspis ne
+    def mtls_client(self, cert=None):
         """OIDC client"""
         # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
         client_id = self.admin.get_client(self.client_id)["clientId"]

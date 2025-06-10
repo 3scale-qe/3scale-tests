@@ -648,7 +648,7 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind):
     if not testconfig["skip_cleanup"]:
         request.addfinalizer(realm.delete)
 
-    client = realm.create_client(  # todo zda se ze tenhle client nefunguje
+    client = realm.create_client(
         name=blame(request, "client"),
         serviceAccountsEnabled=True,
         directAccessGrantsEnabled=False,

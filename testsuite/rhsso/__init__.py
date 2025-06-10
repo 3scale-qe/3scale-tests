@@ -74,7 +74,7 @@ class RHSSOServiceConfiguration:
 
         @backoff.on_predicate(backoff.fibo, lambda x: x is None, max_tries=8, jitter=None)
         def _app_client():
-            return self.realm.admin.get_client_id(application["client_id"])  # todo, kde se bere application client id
+            return self.realm.admin.get_client_id(application["client_id"])
 
         client = _app_client()
         if not allow_null:
