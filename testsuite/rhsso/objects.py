@@ -23,11 +23,11 @@ class Realm:
         """Deletes realm"""
         self.admin.delete_realm(self.name)
 
-    def create_client(self, name, **kwargs):
+    def create_client(self, name, cert=None, **kwargs):
         """Creates new client"""
         self.admin.create_client(payload={**kwargs, "clientId": name})
         client_id = self.admin.get_client_id(name)
-        return Client(self, client_id)
+        return Client(self, client_id, cert)
 
     def create_user(self, username, password, **kwargs):
         """Creates new user"""
@@ -57,10 +57,11 @@ class Realm:
 class Client:
     """Helper class for RHSSO client manipulation"""
 
-    def __init__(self, realm: Realm, client_id) -> None:
+    def __init__(self, realm: Realm, client_id, cert=None) -> None:
         self.admin = realm.admin
         self.realm = realm
         self.client_id = client_id
+        self.cert = cert
 
     def assign_role(self, role_name):
         """Assign client role from realm management client"""
@@ -77,14 +78,7 @@ class Client:
         # next type ignore is needed only until this fix will be released:
         # https://github.com/marcospereirampj/python-keycloak/pull/655
         secret = self.admin.get_client_secrets(self.client_id)["value"]  # type: ignore
-        return self.realm.oidc_client(client_id, secret)
-
-    def mtls_client(self, cert=None):
-        """OIDC client"""
-        # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
-        client_id = self.admin.get_client(self.client_id)["clientId"]
-        secret = self.admin.get_client_secrets(self.client_id)["value"]
-        return self.realm.oidc_client(client_id, secret, cert)
+        return self.realm.oidc_client(client_id, secret, self.cert)
 
 
 # pylint: disable=too-few-public-methods

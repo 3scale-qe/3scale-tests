@@ -86,7 +86,7 @@ def application(
 
 
 @pytest.fixture(scope="module")
-def fapi_sso_client(rhsso_service_info, fapi_sso_client_id):
+def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert):
     """Create client in SSO with mtls enabled. SSO will authorize any client with cert signed by
     accepted CA with any subjectdn"""
     client_config = {
@@ -104,7 +104,7 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id):
             "x509.allow.regex.pattern.comparison": "true",
         },
     }
-    return rhsso_service_info.realm.create_client(fapi_sso_client_id, **client_config)
+    return rhsso_service_info.realm.create_client(fapi_sso_client_id, cert=mtls_client_cert, **client_config)
 
 
 # pylint: disable=too-few-public-methods
@@ -147,13 +147,13 @@ def test_valid_cert_returns_200(fapi_api_client, fapi_sso_client, mtls_client_ce
     Using the same certificate and obtained token send request to staging apicast.
     Assert, that response contains http return code 200
     """
-    mtls_client = fapi_sso_client.mtls_client(cert=mtls_client_cert)
+    mtls_client = fapi_sso_client.oidc_client
     api_access_token = mtls_client.token(grant_type="client_credentials")["access_token"]
     response = fapi_api_client.get(token=api_access_token, cert=mtls_client_cert)
     assert response.status_code == 200
 
 
-def test_invalid_cert_returns_401(fapi_api_client, fapi_sso_client, mtls_client_cert, unknown_cert):
+def test_invalid_cert_returns_401(fapi_api_client, fapi_sso_client, unknown_cert):
     """
     Test client authentication using certificate bound access token (https://datatracker.ietf.org/doc/html/rfc8705).
 
@@ -161,7 +161,7 @@ def test_invalid_cert_returns_401(fapi_api_client, fapi_sso_client, mtls_client_
     Using the different certificate and obtained token send request to staging apicast.
     Assert, that response contains http return code 401
     """
-    mtls_client = fapi_sso_client.mtls_client(cert=mtls_client_cert)
+    mtls_client = fapi_sso_client.oidc_client
     api_access_token = mtls_client.token(grant_type="client_credentials")["access_token"]
     response = fapi_api_client.get(token=api_access_token, cert=unknown_cert)
     assert response.status_code == 401
