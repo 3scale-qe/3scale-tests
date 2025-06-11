@@ -9,9 +9,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: select latest pre-release from a branch
+        shell: bash
+        run: gh release list | grep $(git describe --tags  --abbrev=0)
+        env:
+          # github-actions account doesn't seem to trigger events, therefore different account must be used
+          GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
       - name: dispatch_github_release
         shell: bash
-        run: gh release list --limit 1|awk '{print $1}'|xargs git show-ref|(read commit ref; ref=${ref##refs/tags/}; gh release create ${ref%%rc*} --generate-notes --target $commit)
+        run: git describe --tags  --abbrev=0|xargs git show-ref|(read commit ref; ref=${ref##refs/tags/}; gh release create ${ref%%rc*} --generate-notes --target $commit)
         env:
           # github-actions account doesn't seem to trigger events, therefore different account must be used
           GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
