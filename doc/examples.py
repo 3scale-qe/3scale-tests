@@ -42,6 +42,24 @@ def policy_settings():
     return rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5})
 
 
+# to add multiple policies you can return them in the list
+@pytest.fixture(scope="module")
+def policy_settings():
+    """Have service with upstream_connection policy added to the chain and
+    configured to read_timeout after 5 seconds"""
+    return [rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5}), rawobj.PolicyConfig("fapi", {})]
+
+
+# if you need to add policy before default 3scale APIcast policy you need to apply different approach
+@pytest.fixture(scope="module")
+def service(service):
+    """
+    Set upstream connection before #scale APIcast
+    """
+    service.proxy.list().policies.insert(0, rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5}))
+    return service
+
+
 ################################################################################
 # To switch authentication define two following fixtures
 @pytest.fixture(scope="module")
