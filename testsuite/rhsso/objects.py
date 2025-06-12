@@ -114,11 +114,6 @@ class RHSSO:
         self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
         return Realm(self.master, name)
 
-    def use_realm(self, name: str, **kwargs) -> Realm:
-        """Uses realm"""
-        self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
-        return Realm(self.master, name)
-
 
 # pylint: disable=too-few-public-methods
 class Token:
