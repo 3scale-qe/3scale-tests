@@ -717,7 +717,10 @@ def httpx():
 @pytest.fixture(scope="module")
 def service(backends_mapping, custom_service, service_settings, service_proxy_settings, lifecycle_hooks):
     "Preconfigured service with backend defined existing over whole testsing session"
-    return custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+    service = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+    yield service
+    for usage in service.backend_usages.list():
+        usage.delete()
 
 
 @pytest.fixture(scope="module")
@@ -930,7 +933,8 @@ def custom_service(threescale, request, testconfig, logger):
                             hook(svc)
                         except Exception:  # pylint: disable=broad-except
                             pass
-
+                    for usage in svc.backend_usages.list():
+                        usage.delete()
                     svc.delete()
 
                 with self._lock:
@@ -959,12 +963,9 @@ def custom_service(threescale, request, testconfig, logger):
     return _CustomService()
 
 
-@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=14, jitter=None)
+@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=1, jitter=None)
 def _backend_delete(backend):
     """reliable backend delete"""
-
-    for usage in backend.usages():
-        usage.delete()
     backend.delete()
 
 
