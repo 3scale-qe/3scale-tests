@@ -11,8 +11,10 @@ def policy_settings():
 
 @pytest.fixture(scope="module")
 def service(service, policy_settings):
-    "Service with prepared policy_settings added"
+    """Service with prepared policy_settings added"""
     if policy_settings is not None:
-        service.proxy.list().policies.append(policy_settings)
+        if not isinstance(policy_settings, list):
+            policy_settings = [policy_settings]
+        service.proxy.list().policies.append(*policy_settings)
 
     return service
