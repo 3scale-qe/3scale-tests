@@ -89,7 +89,7 @@ def service_config_version(service):
     ],
     ids=["Staging Apicast", "Production Apicast"],
 )
-def test_x_fapi_header_provided(request, client, gateway, custom_id, service_config_version):
+def test_x_fapi_header(request, client, gateway, custom_id, service_config_version):
     """
         Test that requests on product with fapi policy returns provided x-fapi-transaction-id header
     Test:
@@ -98,45 +98,12 @@ def test_x_fapi_header_provided(request, client, gateway, custom_id, service_con
         - Send http GET request to endpoint / with unique header "x-fapi-transaction-id"
         - Assert that response has status code 200 and has header "x-fapi-transaction-id" matches provided id
         - Assert that x-fapi-transaction-id was logged
-
-    """
-    client_kwargs = {}
-    if client == "prod_client":
-        client_kwargs = {"version": service_config_version}
-
-    client = request.getfixturevalue(client)
-    gateway = request.getfixturevalue(gateway)
-    client = client(**client_kwargs)
-
-    result = client.get("/", headers={"x-fapi-transaction-id": custom_id})
-    fapi_id = result.headers.get("x-fapi-transaction-id")
-    assert result.status_code == 200
-    assert fapi_id == custom_id
-
-    logs = gateway.get_logs()
-    match = re.search(f"{custom_id}#{custom_id}", logs, re.MULTILINE)
-    assert match is not None
-
-
-@pytest.mark.parametrize(
-    ("client", "gateway"),
-    [
-        ("api_client", "staging_gateway"),
-        pytest.param("prod_client", "production_gateway", marks=pytest.mark.disruptive),
-    ],
-    ids=["Staging Apicast", "Production Apicast"],
-)
-def test_x_fapi_header_created(request, client, gateway, service_config_version):
-    """
-        Test that requests on product with fapi policy returns provided x-fapi-transaction-id header
-    Test:
-        - Create product with fapi policy via API
-        - Add logging policy, which logs "x-fapi-transaction-id" header
         - Send GET request to endpoint / without header "x-fapi-transaction-id"
         - Assert that response has status code 200
         - Assert that response has header "x-fapi-transaction-id: uuid", where uuid is
         valid uuid version 4 specified in RFC 4122
         - Assert that newly generated x-fapi-transaction-id was logged
+
     """
     client_kwargs = {}
     if client == "prod_client":
@@ -146,12 +113,21 @@ def test_x_fapi_header_created(request, client, gateway, service_config_version)
     gateway = request.getfixturevalue(gateway)
     client = client(**client_kwargs)
 
+    # test whether apicast returns same x-fapi-transaction-id
+    result = client.get("/", headers={"x-fapi-transaction-id": custom_id})
+    fapi_id = result.headers.get("x-fapi-transaction-id")
+    assert result.status_code == 200
+    assert fapi_id == custom_id
+    logs = gateway.get_logs()
+    match = re.search(f"{custom_id}#{custom_id}", logs, re.MULTILINE)
+    assert match is not None
+
+    # test whether apicast generates new x-fapi-transaction-id
     result = client.get("/")
     fapi_id = result.headers.get("x-fapi-transaction-id")
     assert result.status_code == 200
     assert UUID(fapi_id).variant == "specified in RFC 4122"
     assert UUID(fapi_id).version == 4
-
     logs = gateway.get_logs()
     match = re.search(f"#{fapi_id}", logs, re.MULTILINE)
     assert match is not None
