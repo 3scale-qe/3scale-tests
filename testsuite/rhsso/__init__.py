@@ -26,7 +26,7 @@ class RHSSOServiceConfiguration:
         self.client = client
         self.username = username
         self.password = password
-        self._oidc_client = None
+        self._oidc_client: KeycloakOpenID | None = None
 
     @property
     def oidc_client(self) -> KeycloakOpenID:
