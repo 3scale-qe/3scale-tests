@@ -14,7 +14,6 @@ from testsuite.prometheus import get_metrics_keys
 pytestmark = [
     pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY),
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
-    pytest.mark.disruptive,
 ]
 
 METRICS = [
@@ -75,6 +74,7 @@ def apicast_status_metrics(prometheus, container):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5417")
+@pytest.mark.disruptive
 @pytest.mark.parametrize(
     ("client", "container"),
     [("api_client", "apicast-staging"), ("prod_client", "apicast-production")],
