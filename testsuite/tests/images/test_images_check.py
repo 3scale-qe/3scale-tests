@@ -16,16 +16,24 @@ pytestmark = pytest.mark.nopersistence
 
 
 PARAMETERS = [
-    ("threescale_system", "amp-system", ["system-app", "system-sidekiq"]),
-    ("threescale_backend", "amp-backend", ["backend-listener", "backend-worker"]),
-    ("threescale_zync", "amp-zync", ["zync", "zync-que"]),
-    ("threescale_memcached", "system-memcached", ["system-memcache"]),
-    ("threescale_searchd", "system-searchd", ["system-searchd"]),
-    ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"]),
+    ("threescale_system", "amp-system", ["system-app", "system-sidekiq"], []),
+    ("threescale_backend", "amp-backend", ["backend-listener", "backend-worker", "backend-cron"], []),
+    ("threescale_zync", "amp-zync", ["zync", "zync-que"], []),
+    (
+        "threescale_memcached",
+        "system-memcached",
+        ["system-memcache"],
+        [pytest.mark.skipif("TESTED_VERSION > Version('2.15.0')")],
+    ),
+    ("threescale_searchd", "system-searchd", ["system-searchd"], []),
+    ("apicast", "amp-apicast", ["apicast-staging", "apicast-production"], []),
 ]
 
-IS_PARAMETERS = [(image, image_stream) for image, image_stream, _ in PARAMETERS]
-COMPONENTS_PARAMETERS = [(image, deployment_configs) for image, _, deployment_configs in PARAMETERS]
+
+IS_PARAMETERS = [pytest.param(image, image_stream, marks=marks) for image, image_stream, _, marks in PARAMETERS]
+COMPONENTS_PARAMETERS = [
+    pytest.param(image, deployment_configs, marks=marks) for image, _, deployment_configs, marks in PARAMETERS
+]
 
 
 @pytest.mark.parametrize(("image", "image_stream"), IS_PARAMETERS)
