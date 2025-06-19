@@ -627,7 +627,9 @@ def _resolve_rhsso(testconfig, tools, rhsso_kind):
     key = "no-ssl-rhbk"
     if rhsso_kind == "rhsso":
         key = "no-ssl-sso"
-    return RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
+    return RHSSO(
+        server_url=tools[key], username=cnf["username"], password=cnf["password"], verify=testconfig["ssl_verify"]
+    )
 
 
 @pytest.fixture(scope="session")
