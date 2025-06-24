@@ -9,8 +9,11 @@ from uuid import UUID
 import pytest
 import threescale_api
 
-from testsuite import rawobj
+from packaging.version import Version
 from testsuite.utils import blame
+from testsuite import TESTED_VERSION, rawobj
+
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="Threescale version must be at least 2.16.0")
 
 
 @pytest.fixture(scope="module")
