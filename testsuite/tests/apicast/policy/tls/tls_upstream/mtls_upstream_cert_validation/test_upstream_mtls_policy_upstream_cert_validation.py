@@ -11,13 +11,12 @@ Third the no certificates are specified in ca_certificates, in which case APIcas
 from urllib.parse import urlparse
 
 import pytest
-
 from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.openshift.objects import Routes
 from testsuite.tests.apicast.policy.tls import embedded
-from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import blame
 
 pytestmark = [

@@ -2,12 +2,12 @@
 Test valid content caching on product with multiple backends
 """
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
-from testsuite.utils import randomize, blame
+from testsuite.utils import blame, randomize
 
 pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')")
 

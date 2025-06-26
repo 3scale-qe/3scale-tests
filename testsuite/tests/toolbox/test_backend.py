@@ -1,16 +1,16 @@
 """Tests for remote Toolbox feature"""
 
-import re
 import random
+import re
 import string
 
 import pytest
 from packaging.version import Version
 
-from testsuite.config import settings
-from testsuite.toolbox import toolbox
 import testsuite.utils
 from testsuite import TESTED_VERSION
+from testsuite.config import settings
+from testsuite.toolbox import toolbox
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.7"), reason="TESTED_VERSION < Version('2.7')"),

@@ -6,13 +6,13 @@ It is necessary to have the jaeger url config value set
 
 import backoff
 import pytest
-
 from packaging.version import Version
-from testsuite import TESTED_VERSION, APICAST_OPERATOR_VERSION
+
+from testsuite import APICAST_OPERATOR_VERSION, TESTED_VERSION
+from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.utils import randomize
-from testsuite.capabilities import Capability
 
 pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CUSTOM_ENVIRONMENT)]
 

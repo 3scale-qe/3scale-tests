@@ -6,8 +6,7 @@ from urllib.parse import urlparse
 
 import pytest
 
-from testsuite import rawobj
-from testsuite import resilient
+from testsuite import rawobj, resilient
 from testsuite.echoed_request import EchoedRequest
 
 

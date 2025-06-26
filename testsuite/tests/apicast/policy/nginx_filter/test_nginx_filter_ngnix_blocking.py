@@ -8,7 +8,7 @@ import pytest
 from packaging.version import Version
 from weakget import weakget
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import blame, warn_and_skip
 
 pytestmark = [

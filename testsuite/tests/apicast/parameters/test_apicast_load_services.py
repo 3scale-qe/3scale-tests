@@ -1,11 +1,10 @@
 """Tests that APICAST_LOAD_SERVICES_WHEN_NEEDED loads all mapping rules"""
 
 import pytest
-
 from packaging.version import Version
-from testsuite import rawobj, TESTED_VERSION
-from testsuite.capabilities import Capability
 
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
 pytestmark = [

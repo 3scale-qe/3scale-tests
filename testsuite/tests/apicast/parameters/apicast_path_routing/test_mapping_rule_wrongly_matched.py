@@ -4,10 +4,10 @@ APICAST_PATH_ROUTING is in use
 """
 
 import pytest
-
 from packaging.version import Version
-from testsuite.capabilities import Capability
+
 from testsuite import TESTED_VERSION
+from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),

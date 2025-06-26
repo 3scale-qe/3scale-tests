@@ -1,7 +1,7 @@
 # pylint: disable=invalid-name
 "These are constructors to create native 3scale API objects"
 
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List, Optional
 
 if TYPE_CHECKING:
     from threescale_api import resources

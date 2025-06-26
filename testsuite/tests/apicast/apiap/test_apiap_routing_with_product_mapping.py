@@ -4,6 +4,7 @@ Test if APIAP routing only match paths that start with the routing path of the b
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

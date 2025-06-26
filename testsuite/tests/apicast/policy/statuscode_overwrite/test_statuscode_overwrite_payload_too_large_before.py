@@ -7,6 +7,7 @@ on the response code produced by the second policy.
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

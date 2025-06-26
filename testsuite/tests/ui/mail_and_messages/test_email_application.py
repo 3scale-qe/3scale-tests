@@ -4,10 +4,9 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.utils import blame
-
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
 from testsuite.ui.views.devel.applications import DevelApplicationDetailView
+from testsuite.utils import blame
 
 pytestmark = pytest.mark.usefixtures("login")
 

@@ -2,11 +2,10 @@
 Rewrite spec/functional_specs/policies/ip_check/ip_check_forward_whitelist_spec.rb
 """
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [pytest.mark.nopersistence]
 

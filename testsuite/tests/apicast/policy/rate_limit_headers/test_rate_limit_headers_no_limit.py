@@ -2,12 +2,11 @@
 When no limit is specified, the RateLimit headers should not be contained in the response
 """
 
-from packaging.version import Version
 import pytest
-from testsuite.utils import blame
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.utils import blame
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [

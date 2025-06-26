@@ -9,10 +9,9 @@ import pytest_cases
 from packaging.version import Version
 from pytest_cases import parametrize_with_cases
 
+from testsuite import TESTED_VERSION, rawobj, resilient
 from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
-from testsuite import rawobj, resilient, TESTED_VERSION
-
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),

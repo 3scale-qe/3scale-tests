@@ -6,7 +6,7 @@ import pytest
 import requests
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION
+from testsuite import APICAST_OPERATOR_VERSION, TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded

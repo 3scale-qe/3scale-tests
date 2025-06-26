@@ -2,7 +2,7 @@
 
 from time import sleep
 
-from widgetastic.widget import View, TextInput, Text, GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 from widgetastic_patternfly4 import PatternflyTable
 from widgetastic_patternfly4.ouia import Select
 
@@ -12,11 +12,11 @@ from testsuite.ui.views.admin.audience.account import AccountApplicationsView
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets import ThreescaleCheckBox
 from testsuite.ui.widgets.buttons import (
-    ThreescaleUpdateButton,
-    ThreescaleDeleteButton,
     ThreescaleCreateButton,
+    ThreescaleDeleteButton,
     ThreescaleEditButton,
     ThreescaleSubmitButton,
+    ThreescaleUpdateButton,
 )
 
 

@@ -1,6 +1,6 @@
 """Representation of Login specific MASTER views"""
 
-from widgetastic.widget import View, Text
+from widgetastic.widget import Text, View
 
 from testsuite.ui.navigation import Navigable
 from testsuite.ui.views.admin.login import LoginForm

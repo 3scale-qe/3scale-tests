@@ -3,11 +3,11 @@ Module contains Base View used for all Master Views. BaseMasterView is further e
 All of them creates basic page structure for respective Master portal pages.
 """
 
-from widgetastic.widget import View, Text, GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import Button
 from widgetastic_patternfly4.ouia import Dropdown
 
-from testsuite.ui.navigation import step, Navigable
+from testsuite.ui.navigation import Navigable, step
 
 
 class BaseMasterView(View, Navigable):

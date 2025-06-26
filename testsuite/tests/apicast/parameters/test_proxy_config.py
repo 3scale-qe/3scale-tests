@@ -5,7 +5,7 @@ Test for issue https://issues.redhat.com/browse/THREESCALE-8485
 import pytest
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [

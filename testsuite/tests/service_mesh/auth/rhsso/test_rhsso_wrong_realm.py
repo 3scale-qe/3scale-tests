@@ -3,9 +3,9 @@ Modified copy of testsuite/tests/apicast/auth/rhsso/openid_rhsso/test_rhsso_wron
 
 import pytest
 
+from testsuite.capabilities import Capability
 from testsuite.rhsso import Token
 from testsuite.utils import blame
-from testsuite.capabilities import Capability
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH)
 

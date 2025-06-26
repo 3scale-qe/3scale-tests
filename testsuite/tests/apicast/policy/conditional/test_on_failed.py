@@ -1,10 +1,9 @@
 "testing proper function of on_failed policy with conditional policy"
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')")
 

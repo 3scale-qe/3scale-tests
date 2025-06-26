@@ -1,6 +1,6 @@
 """View representations of product's methods and metrics pages"""
 
-from widgetastic.widget import TextInput, Table, Text, GenericLocatorWidget, View
+from widgetastic.widget import GenericLocatorWidget, Table, Text, TextInput, View
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step

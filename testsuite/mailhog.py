@@ -2,15 +2,15 @@
 This module contains wrapper for the Mailhog API
 """
 
-from typing import Set, Optional
+from typing import Optional, Set
+
 import backoff
 import pytest
 import requests
-
 from openshift_client import OpenShiftPythonException
 
-from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient
+from testsuite.utils import warn_and_skip
 
 
 class MailhogClient:

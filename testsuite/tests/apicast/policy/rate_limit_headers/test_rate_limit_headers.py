@@ -6,15 +6,13 @@ Tests that:
  - the combination of backend and service metrics should make no problem
 """
 
-from packaging.version import Version
 import pytest
 import pytest_cases
+from packaging.version import Version
 from pytest_cases import fixture_ref
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import blame, wait_interval
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
-
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [

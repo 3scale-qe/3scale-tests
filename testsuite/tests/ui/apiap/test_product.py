@@ -2,12 +2,17 @@
 
 import pytest
 
-from testsuite.ui.views.admin.product.product import ProductEditView
-from testsuite.ui.views.admin.product.application import ApplicationPlanDetailView
-from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
-from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
-from testsuite.ui.views.admin.product.integration.backends import ProductBackendsView, ProductAddBackendView
 from testsuite import rawobj, resilient
+from testsuite.ui.views.admin.product.application import ApplicationPlanDetailView
+from testsuite.ui.views.admin.product.integration.backends import (
+    ProductAddBackendView,
+    ProductBackendsView,
+)
+from testsuite.ui.views.admin.product.integration.configuration import (
+    ProductConfigurationView,
+)
+from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
+from testsuite.ui.views.admin.product.product import ProductEditView
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.usefixtures("login")

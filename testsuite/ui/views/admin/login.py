@@ -1,6 +1,6 @@
 """Representation of Login specific views"""
 
-from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 from widgetastic_patternfly4.ouia import Button
 
 from testsuite.ui.exception import UIException

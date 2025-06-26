@@ -9,7 +9,6 @@ from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.tls import embedded
 
-
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7363"),

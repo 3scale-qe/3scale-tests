@@ -6,10 +6,9 @@ with multiple backends.
 from urllib.parse import urlparse
 
 import pytest
-
 from packaging.version import Version
-from testsuite import TESTED_VERSION
 
+from testsuite import TESTED_VERSION
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),

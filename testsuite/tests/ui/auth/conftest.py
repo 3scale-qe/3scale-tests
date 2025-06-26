@@ -8,8 +8,8 @@ import pytest
 from testsuite import resilient
 from testsuite.ui.views.admin.settings.sso_integrations import (
     NewSSOIntegrationView,
-    SSOIntegrationEditView,
     SSOIntegrationDetailView,
+    SSOIntegrationEditView,
 )
 from testsuite.ui.views.auth import Auth0View, RhssoView
 

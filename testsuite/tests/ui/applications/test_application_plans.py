@@ -3,8 +3,7 @@
 import pytest
 from packaging.version import Version
 
-from testsuite import TESTED_VERSION
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.ui.views.admin.product.application import ApplicationPlansView
 from testsuite.utils import blame
 

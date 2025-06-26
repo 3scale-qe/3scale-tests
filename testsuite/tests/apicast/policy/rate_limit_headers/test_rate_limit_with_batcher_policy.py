@@ -3,12 +3,12 @@ Tests that the combination with the batcher policy works as supposed
 """
 
 import time
-from packaging.version import Version
-import pytest
-from testsuite.utils import blame, wait_interval
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
 
+import pytest
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.utils import blame, wait_interval
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [

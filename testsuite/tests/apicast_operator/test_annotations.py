@@ -2,7 +2,7 @@
 Check if annotations of apicast-operator pod are present
 """
 
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union
 
 import pytest
 from packaging.version import Version

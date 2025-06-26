@@ -5,9 +5,9 @@ Test for product search
 import pytest
 from packaging.version import Version
 
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.product import ProductsView
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION
 
 pytestmark = [
     pytest.mark.usefixtures("login"),

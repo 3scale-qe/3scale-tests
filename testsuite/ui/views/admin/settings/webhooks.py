@@ -2,8 +2,7 @@
 View representations of Webhook pages
 """
 
-from widgetastic.widget import TextInput, GenericLocatorWidget
-
+from widgetastic.widget import GenericLocatorWidget, TextInput
 
 from testsuite.ui.views.admin.settings import BaseSettingsView
 from testsuite.ui.widgets import PfCheckBoxGroup

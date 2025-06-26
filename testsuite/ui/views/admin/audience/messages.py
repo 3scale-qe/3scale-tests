@@ -2,10 +2,9 @@
 
 import re
 
-from widgetastic.widget import GenericLocatorWidget, View, Text
+from widgetastic.widget import GenericLocatorWidget, Text, View
 from widgetastic_patternfly import TextInput
-
-from widgetastic_patternfly4 import Button, PatternflyTable, Dropdown
+from widgetastic_patternfly4 import Button, Dropdown, PatternflyTable
 from widgetastic_patternfly4.ouia import Dropdown as OUIADropdown
 
 from testsuite.ui.navigation import step

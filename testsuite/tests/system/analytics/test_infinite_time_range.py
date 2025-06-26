@@ -10,8 +10,8 @@ Warning: due to the nature of the problem, test might produce false negatives, b
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from threescale_api.errors import ApiClientError
 from packaging.version import Version
+from threescale_api.errors import ApiClientError
 
 from testsuite import TESTED_VERSION
 

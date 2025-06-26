@@ -9,8 +9,8 @@ the number of requests send by the application.
 """
 
 import pytest
-from testsuite import rawobj
-from testsuite import resilient
+
+from testsuite import rawobj, resilient
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.required_capabilities()

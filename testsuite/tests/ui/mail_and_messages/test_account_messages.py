@@ -7,10 +7,15 @@ import pytest
 from testsuite import rawobj
 from testsuite.config import settings
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.views.admin.login import RequestAdminPasswordView, LoginView, ResetPasswordView
+from testsuite.ui.views.admin.login import (
+    LoginView,
+    RequestAdminPasswordView,
+    ResetPasswordView,
+)
 from testsuite.ui.views.devel import Navbar
-from testsuite.ui.views.devel.login import ForgotPasswordView, LoginView as DevelLoginView
-from testsuite.utils import randomize, blame
+from testsuite.ui.views.devel.login import ForgotPasswordView
+from testsuite.ui.views.devel.login import LoginView as DevelLoginView
+from testsuite.utils import blame, randomize
 
 
 @pytest.fixture(scope="module")

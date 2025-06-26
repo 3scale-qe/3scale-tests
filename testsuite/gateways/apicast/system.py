@@ -3,7 +3,6 @@
 from typing import TYPE_CHECKING
 
 import backoff
-
 from openshift_client import OpenShiftPythonException
 
 from testsuite.capabilities import Capability

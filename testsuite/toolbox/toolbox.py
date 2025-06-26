@@ -7,8 +7,9 @@ from io import BytesIO, StringIO
 
 import jsondiff
 import paramiko
-from testsuite.toolbox import constants
+
 from testsuite.config import settings
+from testsuite.toolbox import constants
 
 
 def get_toolbox_cmd(cmd_in):

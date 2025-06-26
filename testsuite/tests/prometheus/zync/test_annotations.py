@@ -3,8 +3,8 @@ Check if annotations required by prometheus are set
 """
 
 import pytest
-from packaging.version import Version
 from openshift_client import OpenShiftPythonException
+from packaging.version import Version
 
 from testsuite import TESTED_VERSION
 

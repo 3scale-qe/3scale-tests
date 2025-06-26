@@ -5,6 +5,7 @@ https://issues.redhat.com/browse/THREESCALE-4464
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways import gateway

@@ -5,16 +5,15 @@ metric is expected
 """
 
 import base64
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Tuple
 
 import pytest
 import requests
 from packaging.version import Version
-
 from threescale_api.resources import Service
-from testsuite import TESTED_VERSION
 
+from testsuite import TESTED_VERSION
 
 NUM_OF_REQUESTS = 10
 

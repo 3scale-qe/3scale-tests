@@ -3,12 +3,16 @@ Tests that when an app plan has two limits with different time frame, the RateLi
 the currently more constrained limit are sent.
 """
 
-from packaging.version import Version
 import pytest
-from testsuite.utils import blame, wait_interval, wait_until_next_minute, wait_interval_hour
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.utils import (
+    blame,
+    wait_interval,
+    wait_interval_hour,
+    wait_until_next_minute,
+)
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [

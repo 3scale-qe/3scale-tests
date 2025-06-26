@@ -4,12 +4,12 @@ Test large data in post request when using http and https proxies
 
 from urllib.parse import urlparse
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 
 from testsuite import TESTED_VERSION
-from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import random_string
 
 pytestmark = [

@@ -4,8 +4,8 @@ Tests the analytics at the backend level
 
 import pytest
 from packaging.version import Version
-from testsuite import rawobj, TESTED_VERSION
-from testsuite import resilient
+
+from testsuite import TESTED_VERSION, rawobj, resilient
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),

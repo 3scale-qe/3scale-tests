@@ -9,7 +9,6 @@ from packaging.version import Version
 
 from testsuite import TESTED_VERSION
 
-
 NUM_OF_REQUESTS = 10
 
 pytestmark = [

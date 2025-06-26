@@ -17,7 +17,6 @@ from threescale_api.resources import Service
 from testsuite.rhsso import OIDCClientAuth
 from testsuite.utils import blame_desc
 
-
 pytestmark = [
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1948"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1949"),

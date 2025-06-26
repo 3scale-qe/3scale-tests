@@ -5,7 +5,6 @@ import braintree
 import stripe
 from braintree.exceptions.request_timeout_error import RequestTimeoutError
 from braintree.exceptions.service_unavailable_error import ServiceUnavailableError
-
 from threescale_api.resources import InvoiceState
 
 

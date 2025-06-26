@@ -3,9 +3,13 @@
 import pytest
 from packaging.version import Version
 
-from testsuite import settings, rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj, settings
 from testsuite.ui.views.admin.audience.developer_portal import BotProtection
-from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, ForgotPasswordView
+from testsuite.ui.views.devel.login import (
+    BasicSignUpView,
+    ForgotPasswordView,
+    LoginView,
+)
 from testsuite.utils import blame, warn_and_skip
 
 # requires special setup, internet access
