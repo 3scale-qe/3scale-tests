@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/policies/url_rewrite_query/query_rewrite_policy_in
 """
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 

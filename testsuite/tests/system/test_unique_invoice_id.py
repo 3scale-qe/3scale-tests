@@ -6,9 +6,11 @@ For testing this issue, we don't need to use UI, as all can be done trough API
 """
 
 from datetime import date, timedelta
+
 import backoff
 import pytest
-from threescale_api.resources import InvoiceState, Account, ApplicationPlan
+from threescale_api.resources import Account, ApplicationPlan, InvoiceState
+
 from testsuite import rawobj
 from testsuite.utils import blame, blame_desc
 

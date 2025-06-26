@@ -1,19 +1,18 @@
 "testsuite helpers"
 
 import os
-from datetime import datetime, timezone
 import secrets
 import time
 import typing
 import warnings
 from base64 import b64encode
+from datetime import datetime, timezone
 from os import urandom
 from pathlib import Path
 
 import pytest
 
 from testsuite.config import settings
-
 
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest

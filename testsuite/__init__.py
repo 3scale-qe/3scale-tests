@@ -20,13 +20,13 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-from pathlib import Path  # noqa
-from packaging.version import Version  # noqa
-from weakget import weakget
+from pathlib import Path
+
 import importlib_resources as resources
+from packaging.version import Version
+from weakget import weakget
 
 from testsuite.config import settings  # noqa
-
 
 # To avoid indefinite waiting on socket issues default timeout is used.
 # Furthermore to avoid reset of timeout, monkey patching is used to alter

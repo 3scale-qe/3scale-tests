@@ -7,12 +7,12 @@ from urllib.parse import urlparse
 import pytest
 
 from testsuite.ui.views.admin.wizard import (
-    WizardIntroView,
     WizardBackendApiView,
-    WizardRequestView,
     WizardEditApiView,
-    WizardResponseView,
+    WizardIntroView,
     WizardOutroView,
+    WizardRequestView,
+    WizardResponseView,
 )
 from testsuite.utils import blame
 

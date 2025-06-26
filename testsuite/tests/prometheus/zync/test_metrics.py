@@ -3,15 +3,15 @@ Check if all keys  are avaiable in Prometheus
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [
     pytest.mark.sandbag,  # requires openshift
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4642"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),
 ]
 
 METRICS_QUE = [

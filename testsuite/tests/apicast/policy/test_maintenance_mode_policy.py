@@ -5,6 +5,7 @@ Expected: to return specified code eg 328 and message of service unavailability.
 """
 
 import pytest
+
 from testsuite import rawobj
 
 

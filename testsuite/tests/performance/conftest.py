@@ -6,16 +6,14 @@ import asyncio
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
-from weakget import weakget
 
 import pytest
-
 from hyperfoil import HyperfoilClient
-
-from testsuite.perf_utils import HyperfoilUtils
+from weakget import weakget
 
 from testsuite import rawobj
-from testsuite.utils import randomize, blame
+from testsuite.perf_utils import HyperfoilUtils
+from testsuite.utils import blame, randomize
 
 
 @pytest.fixture(scope="session")

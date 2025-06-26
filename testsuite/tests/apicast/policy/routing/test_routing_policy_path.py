@@ -6,6 +6,7 @@ from socket import gethostbyname
 from urllib.parse import urlsplit, urlunsplit
 
 import pytest
+
 from testsuite.echoed_request import EchoedRequest
 
 

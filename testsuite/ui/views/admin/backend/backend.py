@@ -1,12 +1,15 @@
 """View representations of Backend pages"""
 
-from widgetastic.widget import TextInput
-from widgetastic.widget import Text
+from widgetastic.widget import Text, TextInput
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.backend import BackendsView, BaseBackendView
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleDeleteButton, ThreescaleSubmitButton
+from testsuite.ui.widgets.buttons import (
+    ThreescaleDeleteButton,
+    ThreescaleSubmitButton,
+    ThreescaleUpdateButton,
+)
 
 
 class BackendNewView(BaseAdminView):

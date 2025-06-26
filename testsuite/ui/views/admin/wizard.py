@@ -1,10 +1,10 @@
 """Introduction wizard pages module"""
 
-from widgetastic.widget import View, GenericLocatorWidget, TextInput
+from widgetastic.widget import GenericLocatorWidget, TextInput, View
 from widgetastic_patternfly import Text
 from widgetastic_patternfly4 import Button
 
-from testsuite.ui.navigation import step, Navigable
+from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 

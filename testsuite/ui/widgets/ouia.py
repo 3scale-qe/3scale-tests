@@ -5,9 +5,8 @@ from typing import Optional
 
 from selenium.webdriver.common.by import By
 from widgetastic.types import ViewParent
-from widgetastic_patternfly4.navigation import check_nav_loaded
 from widgetastic_patternfly4 import ouia
-
+from widgetastic_patternfly4.navigation import check_nav_loaded
 
 # pylint: disable=abstract-method
 

@@ -11,8 +11,7 @@ the request matching that mapping rule is not evaluated by other mapping rules.
 
 import pytest
 
-from testsuite import rawobj
-from testsuite import resilient
+from testsuite import rawobj, resilient
 
 pytestmark = [pytest.mark.nopersistence]
 

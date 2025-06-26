@@ -1,11 +1,13 @@
 """Tests wasm authorities filtering"""
 
 from urllib.parse import urlsplit
+
 import pytest
+
+from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways.wasm import ServiceMeshHttpClient
 from testsuite.utils import blame
-from testsuite import rawobj
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_WASM)
 

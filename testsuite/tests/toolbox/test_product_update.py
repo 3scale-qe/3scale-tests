@@ -3,14 +3,14 @@
 import re
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame, blame_desc
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.7')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.7"), reason="TESTED_VERSION < Version('2.7')"),
     pytest.mark.xdist_group(name="toolbox"),
 ]
 

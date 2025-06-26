@@ -3,8 +3,8 @@
 import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import (
-    RHSSOIntegrationEditView,
     RHSSOIntegrationDetailView,
+    RHSSOIntegrationEditView,
 )
 from testsuite.ui.views.devel import BaseDevelView
 

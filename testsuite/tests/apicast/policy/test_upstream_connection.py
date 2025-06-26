@@ -1,13 +1,12 @@
 "testing proper function of upstream test connection"
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import warn_and_skip
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.6')")
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.6"), reason="TESTED_VERSION < Version('2.6')")
 
 
 # https://github.com/3scale/apicast-cloud-hosted

@@ -6,13 +6,12 @@ with multiple backends.
 from urllib.parse import urlparse
 
 import pytest
+from packaging.version import Version
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
-
+from testsuite import TESTED_VERSION
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6312"),
 ]
 

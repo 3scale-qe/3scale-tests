@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/policies/ip_check/ip_check_real_ip_whitelist_spec.
 """
 
 import pytest
+
 from testsuite import rawobj
 
 pytestmark = [pytest.mark.nopersistence]

@@ -5,8 +5,9 @@ import os
 
 import importlib_resources as resources
 
-from testsuite.openshift.objects import SecretTypes
 from testsuite.openshift.client import OpenShiftClient
+from testsuite.openshift.objects import SecretTypes
+
 from . import OpenshiftApicast
 
 LOGGER = logging.getLogger(__name__)

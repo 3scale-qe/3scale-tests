@@ -3,8 +3,8 @@ Rewrite spec/functional_specs/policies/soap/soap_policy_spec.rb
 """
 
 import pytest
-from testsuite import rawobj
-from testsuite import resilient
+
+from testsuite import rawobj, resilient
 
 
 @pytest.fixture(scope="module")

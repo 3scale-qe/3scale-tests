@@ -2,15 +2,17 @@
 When no limit is specified, the RateLimit headers should not be contained in the response
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
-from testsuite.utils import blame
-from testsuite import rawobj
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.utils import blame
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')"), pytest.mark.flaky]
+pytestmark = [
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
+    pytest.mark.flaky,
+]
 
 
 @pytest.fixture(scope="module")

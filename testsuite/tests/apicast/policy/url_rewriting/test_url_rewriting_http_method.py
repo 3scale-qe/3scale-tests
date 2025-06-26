@@ -3,14 +3,13 @@ Tests that the rules in the url_rewriting_policy can match also against the
 http method of the request.
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
-from testsuite import rawobj
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
+pytestmark = [pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')")]
 
 
 @pytest.fixture(scope="module")

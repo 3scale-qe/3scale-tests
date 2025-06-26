@@ -5,7 +5,6 @@ import re
 import pytest
 
 from testsuite.config import settings
-
 from testsuite.toolbox import toolbox
 
 pytestmark = [

@@ -4,10 +4,10 @@ Rewrite ./spec/functional_specs/auth/basic_auth_app_id_spec.rb
 """
 
 import pytest
+from packaging.version import Version
 from threescale_api.resources import Service
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.gateways.apicast.system import SystemApicast
@@ -92,7 +92,7 @@ def test_basic_auth_failure(api_client, application, auth_method, expected_statu
     assert response.status_code == expected_status
 
 
-@pytest.mark.skipif("TESTED_VERSION < Version('2.14')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.14"), reason="TESTED_VERSION < Version('2.14')")
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-11435")
 # pylint: disable=unused-argument
 def test_basic_auth_malformed_secret(http_client, valid_auth_headers, malformed_request, gateway_kind):

@@ -24,18 +24,17 @@ Actually this is 'scratched'. Does 'plain-to-plain' comparison make sense?
     spec/functional_specs/policies/rate_limit/connection/plain_text/true_condition/rate_limit_connection_service_true_spec.rb
 """
 
-from datetime import datetime, timedelta, timezone
-from pprint import pformat
 import asyncio
 import random
+from datetime import datetime, timedelta, timezone
+from pprint import pformat
 
 import httpx
 import pytest
 
 from testsuite import rawobj
 from testsuite.httpx import AsyncClientHook
-from testsuite.utils import randomize, blame
-
+from testsuite.utils import blame, randomize
 
 # the results can be bit unstable due to higher load caused by parallel
 # http requests

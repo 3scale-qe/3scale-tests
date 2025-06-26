@@ -4,10 +4,9 @@ import re
 
 import pytest
 
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
-from testsuite.utils import blame
 from testsuite import rawobj
+from testsuite.toolbox import constants, toolbox
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.xdist_group(name="toolbox"),

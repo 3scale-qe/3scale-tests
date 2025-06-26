@@ -7,13 +7,14 @@ from typing import Optional
 from threescale_api.resources import Application, Service
 
 from testsuite.openshift.objects import Routes, SecretKinds
-from . import AbstractApicast, OpenshiftApicast
-from .selfmanaged import SelfManagedApicast
-from .. import new_gateway
+
 from ... import settings
 from ...capabilities import Capability
 from ...certificates import Certificate
 from ...openshift.env import Properties
+from .. import new_gateway
+from . import AbstractApicast, OpenshiftApicast
+from .selfmanaged import SelfManagedApicast
 
 LOGGER = logging.getLogger(__name__)
 

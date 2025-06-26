@@ -2,8 +2,8 @@
 Conftest for the jaeger tests
 """
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
 from testsuite.jaeger import Jaeger
 

@@ -3,11 +3,16 @@
 import json
 import os
 import subprocess
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 import importlib_resources as resources
 
-from testsuite.certificates import KeyProvider, SigningProvider, Certificate, UnsignedKey
+from testsuite.certificates import (
+    Certificate,
+    KeyProvider,
+    SigningProvider,
+    UnsignedKey,
+)
 from testsuite.certificates.cfssl import CFSSLException
 
 

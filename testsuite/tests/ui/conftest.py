@@ -12,30 +12,31 @@ import backoff
 import pytest
 import pytest_html
 from auth0.management import auth0
+from PIL import Image
 from selenium.common import InvalidSessionIdException, WebDriverException
 from threescale_api.errors import ApiClientError
 from threescale_api.resources import Account, ApplicationPlan, Service
-from PIL import Image
 
 from testsuite import rawobj, resilient
 from testsuite.auth0 import auth0_token
 from testsuite.config import settings
 from testsuite.ui.browser import ThreeScaleBrowser
 from testsuite.ui.navigation import Navigator
-from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.admin.audience.account import AccountNewView, AccountsView
-from testsuite.ui.views.admin.audience.application import ApplicationNewView, ApplicationsView
-from testsuite.ui.views.admin.product.product import ProductsView
+from testsuite.ui.views.admin.audience.application import (
+    ApplicationNewView,
+    ApplicationsView,
+)
 from testsuite.ui.views.admin.backend.backend import BackendNewView
+from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.admin.login import LoginView
 from testsuite.ui.views.admin.product.application import ApplicationPlanNewView
-from testsuite.ui.views.admin.product.product import ProductNewView
+from testsuite.ui.views.admin.product.product import ProductNewView, ProductsView
 from testsuite.ui.views.devel.login import LoginView as DeveloperLoginView
-from testsuite.ui.views.master.audience.tenant import TenantNewView, TenantDetailView
+from testsuite.ui.views.master.audience.tenant import TenantDetailView, TenantNewView
 from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame, get_results_dir_path
-
 
 LOGGER = logging.getLogger(__name__)
 

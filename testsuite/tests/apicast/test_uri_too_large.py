@@ -1,9 +1,9 @@
 """Test for apicast logs with 414 Request-URI Too Large response"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 
 WARN_MESSAGES = [
@@ -16,7 +16,7 @@ WARN_MESSAGES = [
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.LOGS),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.13')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.13"), reason="TESTED_VERSION < Version('2.13')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7906"),
     pytest.mark.issue("https://issues.redhat.com/browse/MGDAPI-5655"),
 ]

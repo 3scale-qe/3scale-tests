@@ -5,10 +5,8 @@ Test metrics provided by apicast to Prometheus.
 
 import backoff
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite.capabilities import Capability
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [

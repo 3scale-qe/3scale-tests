@@ -1,7 +1,7 @@
 """Verify we have prerequisites for Operator metrics tests."""
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
 from testsuite.utils import warn_and_skip
 
