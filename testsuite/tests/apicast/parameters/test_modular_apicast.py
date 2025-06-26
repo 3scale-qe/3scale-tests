@@ -11,7 +11,6 @@ When tested with APIcast deployed by template it successfully tests custom polic
 import backoff
 import importlib_resources as resources
 import pytest
-
 from openshift_client import OpenShiftPythonException
 
 from testsuite import rawobj

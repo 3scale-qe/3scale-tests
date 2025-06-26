@@ -4,9 +4,9 @@ In 2.10 version the HTTP methods were added
 """
 
 import pytest
-
 from packaging.version import Version
-from testsuite import rawobj, TESTED_VERSION
+
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [

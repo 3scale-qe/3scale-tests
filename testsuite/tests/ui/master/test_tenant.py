@@ -5,13 +5,17 @@ Tests that test the tenant modification such as creation, deletion, edit or resu
 import pytest
 
 from testsuite import resilient
-from testsuite.ui.views.admin.login import LoginView
-from testsuite.ui.views.admin.foundation import DashboardView
-from testsuite.ui.views.common.foundation import NotFoundView
-from testsuite.utils import blame
 from testsuite.ui.utils import assert_displayed_in_new_tab
-from testsuite.ui.views.master.audience.tenant import TenantDetailView, TenantEditView, TenantsView
+from testsuite.ui.views.admin.foundation import DashboardView
+from testsuite.ui.views.admin.login import LoginView
+from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.ui.views.devel import LandingView
+from testsuite.ui.views.master.audience.tenant import (
+    TenantDetailView,
+    TenantEditView,
+    TenantsView,
+)
+from testsuite.utils import blame
 
 pytestmark = pytest.mark.usefixtures("master_login")
 

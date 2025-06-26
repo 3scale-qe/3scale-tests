@@ -4,7 +4,7 @@
 
 import abc
 
-from threescale_api.resources import Application, Service, Backend
+from threescale_api.resources import Application, Backend, Service
 
 
 class LifecycleHook(abc.ABC):

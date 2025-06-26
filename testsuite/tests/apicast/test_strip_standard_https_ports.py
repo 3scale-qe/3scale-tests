@@ -3,7 +3,6 @@ When APIcast sends a request to a standard port, it should strip the port from t
 """
 
 import pytest
-
 from packaging.version import Version
 
 from testsuite import TESTED_VERSION

@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
-import pytest
 import openshift_client as oc
+import pytest
 
 from testsuite.billing import Braintree
 from testsuite.ui.objects import CreditCard

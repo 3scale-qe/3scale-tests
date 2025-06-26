@@ -6,6 +6,7 @@ import math
 import typing
 from io import StringIO
 from typing import List, Union
+
 import yaml
 
 from testsuite.certificates import Certificate

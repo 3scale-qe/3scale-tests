@@ -6,11 +6,11 @@ response body
 import pytest
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
-    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
     pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6736"),
 ]
 

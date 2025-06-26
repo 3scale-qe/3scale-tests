@@ -1,14 +1,13 @@
 "testing proper function of retry policy with conditional policy"
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
-from testsuite.utils import blame, generate_tail
-from testsuite import rawobj, TESTED_VERSION
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
+from testsuite.utils import blame, generate_tail
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')"),

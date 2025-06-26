@@ -7,6 +7,7 @@ affect the response code of the other policy.
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

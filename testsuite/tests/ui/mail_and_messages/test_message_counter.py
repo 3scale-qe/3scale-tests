@@ -1,9 +1,8 @@
 """Test of message counters in dashboard main-section tabs"""
 
 import pytest
-
-from testsuite.utils import blame
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.foundation import DashboardView

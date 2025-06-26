@@ -3,8 +3,10 @@ Test caching policy with strict mode.
 """
 
 from time import sleep
+
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 

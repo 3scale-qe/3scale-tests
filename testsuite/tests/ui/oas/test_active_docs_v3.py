@@ -7,7 +7,10 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView, ActiveDocsView
+from testsuite.ui.views.admin.product.active_docs import (
+    ActiveDocsDetailView,
+    ActiveDocsView,
+)
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.usefixtures("login")

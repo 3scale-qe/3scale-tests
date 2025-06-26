@@ -4,12 +4,10 @@ Based on spec/ui_specs/webhooks/webhooks_applications_spec.rb (ruby test is via 
 
 import xml.etree.ElementTree as Et
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
-from testsuite import TESTED_VERSION
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import blame
 
 # webhook tests seem disruptive to requestbin as they reset it with no mercy

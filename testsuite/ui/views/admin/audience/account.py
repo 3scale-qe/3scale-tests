@@ -1,22 +1,22 @@
 """View representations of Accounts pages"""
 
-from widgetastic.widget import TextInput, GenericLocatorWidget, Text, View
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
 from testsuite.ui.widgets import (
-    ThreescaleDropdown,
-    ThreescaleCheckBox,
     CheckBoxGroup,
     HorizontalNavigation,
+    ThreescaleCheckBox,
+    ThreescaleDropdown,
 )
 from testsuite.ui.widgets.buttons import (
-    ThreescaleUpdateButton,
     ThreescaleDeleteButton,
     ThreescaleEditButton,
     ThreescaleSubmitButton,
+    ThreescaleUpdateButton,
 )
 from testsuite.ui.widgets.searchinput import ThreescaleSearchInput
 

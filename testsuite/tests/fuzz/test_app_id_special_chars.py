@@ -4,8 +4,8 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]

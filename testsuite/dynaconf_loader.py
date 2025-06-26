@@ -18,16 +18,16 @@ overwritten by values from config and env. Therefore the update at the end of
 load() is doubled.
 """
 
-from pathlib import Path
 import logging
 import os
 import os.path
 import re
-
-from packaging.version import Version, InvalidVersion
-from weakget import weakget
+from pathlib import Path
 
 from openshift_client import OpenShiftPythonException
+from packaging.version import InvalidVersion, Version
+from weakget import weakget
+
 from testsuite.openshift.client import OpenShiftClient
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name

@@ -6,8 +6,7 @@ restrict the access to the resource.
 import pytest
 from packaging.version import Version
 
-from testsuite import TESTED_VERSION
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),

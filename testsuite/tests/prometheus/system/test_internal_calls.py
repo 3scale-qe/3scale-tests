@@ -6,8 +6,8 @@ import base64
 
 import pytest
 import requests
-
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.prometheus import get_metrics_keys
 

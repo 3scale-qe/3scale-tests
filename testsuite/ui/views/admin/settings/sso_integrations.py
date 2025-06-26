@@ -2,13 +2,17 @@
 
 from urllib.parse import urlparse
 
-from widgetastic.widget import TextInput, Text
-from widgetastic_patternfly4 import PatternflyTable, Button
+from widgetastic.widget import Text, TextInput
+from widgetastic_patternfly4 import Button, PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import ThreescaleDropdown, ThreescaleCheckBox
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleEditButton, ThreescaleDeleteButton
+from testsuite.ui.widgets import ThreescaleCheckBox, ThreescaleDropdown
+from testsuite.ui.widgets.buttons import (
+    ThreescaleCreateButton,
+    ThreescaleDeleteButton,
+    ThreescaleEditButton,
+)
 
 
 class SSOIntegrationsView(BaseSettingsView):
