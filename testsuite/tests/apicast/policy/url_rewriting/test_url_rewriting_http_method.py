@@ -3,12 +3,11 @@ Tests that the rules in the url_rewriting_policy can match also against the
 http method of the request.
 """
 
-from packaging.version import Version
 import pytest
-from testsuite.echoed_request import EchoedRequest
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
+from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')")]
 

@@ -4,10 +4,11 @@ Test valid content caching options
 
 import time
 import uuid
-from packaging.version import Version
-import pytest
 
-from testsuite import rawobj, TESTED_VERSION
+import pytest
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')")

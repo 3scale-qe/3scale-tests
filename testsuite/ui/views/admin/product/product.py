@@ -1,13 +1,22 @@
 """View representations of Product pages"""
 
-from widgetastic.widget import TextInput, ConditionalSwitchableView, GenericLocatorWidget, View
+from widgetastic.widget import (
+    ConditionalSwitchableView,
+    GenericLocatorWidget,
+    TextInput,
+    View,
+)
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView
 from testsuite.ui.views.admin.product import BaseProductView, ProductsView
 from testsuite.ui.widgets import RadioGroup, ThreescaleDropdown
-from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleUpdateButton, ThreescaleDeleteButton
+from testsuite.ui.widgets.buttons import (
+    ThreescaleCreateButton,
+    ThreescaleDeleteButton,
+    ThreescaleUpdateButton,
+)
 
 
 class ProductNewView(BaseAdminView):

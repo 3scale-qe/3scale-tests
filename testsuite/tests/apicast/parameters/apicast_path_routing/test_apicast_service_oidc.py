@@ -4,8 +4,8 @@ Test for using OIDC with apicast env_variable 'APICAST_SERVICES_FILTER_BY_URL' a
 
 import pytest
 
-from testsuite.gateways import gateway
 from testsuite.capabilities import Capability
+from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame

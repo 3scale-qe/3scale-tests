@@ -4,7 +4,7 @@ import pytest
 
 from testsuite import settings
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.views.devel import BaseDevelView, AccessView, LandingView
+from testsuite.ui.views.devel import AccessView, BaseDevelView, LandingView
 
 
 @pytest.fixture(scope="module")

@@ -1,10 +1,9 @@
 """Test for large policy chain"""
 
 import pytest
-
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 
 
 @pytest.fixture()

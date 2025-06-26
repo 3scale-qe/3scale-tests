@@ -13,6 +13,8 @@ import pytest
 
 from testsuite import rawobj, resilient
 
+pytestmark = [pytest.mark.nopersistence]
+
 
 @pytest.fixture(scope="module")
 def backends_mapping(custom_backend, private_base_url):

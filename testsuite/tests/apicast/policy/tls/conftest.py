@@ -1,7 +1,7 @@
 """Module for setting up test that require TLS gateway and/or certificates"""
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
 from testsuite.certificates import Certificate, CertificateManager
 from testsuite.certificates.cfssl.cli import CFSSLProviderCLI

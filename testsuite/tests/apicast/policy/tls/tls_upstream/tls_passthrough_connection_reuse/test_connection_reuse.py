@@ -6,8 +6,8 @@ the Openshift HAProxy router, and the requests are routed to the appropriate bac
 """
 
 import pytest
-
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.echoed_request import EchoedRequest
 

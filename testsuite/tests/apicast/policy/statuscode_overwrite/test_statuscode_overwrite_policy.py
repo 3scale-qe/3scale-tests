@@ -5,6 +5,7 @@ certain response codes from backend, the response codes are overwritten.
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

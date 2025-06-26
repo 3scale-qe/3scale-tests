@@ -4,8 +4,8 @@ https://issues.redhat.com/browse/THREESCALE-5965
 """
 
 import pytest
-
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 
 pytestmark = [

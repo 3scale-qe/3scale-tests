@@ -9,7 +9,6 @@ import pytest
 # pylint has problem with lxml for some reason
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-
 from openshift_client import OpenShiftPythonException
 
 from testsuite import rawobj

@@ -3,9 +3,10 @@ Rewrite spec/functional_specs/policies/batcher/batcher_policy_append_spec.rb
 """
 
 from time import sleep
-import pytest
-from testsuite import rawobj
 
+import pytest
+
+from testsuite import rawobj
 
 BATCH_REPORT_SECONDS = 50
 

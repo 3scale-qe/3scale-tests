@@ -1,12 +1,12 @@
 """View representations of Product Active docs pages"""
 
+from widgetastic.widget import Text, View
 from widgetastic_patternfly4 import PatternflyTable
-from widgetastic.widget import View, Text
 
-from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, ThreescaleEditButton
-from testsuite.ui.widgets import ActiveDocV2Section
 from testsuite.ui.navigation import step
+from testsuite.ui.views.admin.product import BaseProductView
+from testsuite.ui.widgets import ActiveDocV2Section
+from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, ThreescaleEditButton
 from testsuite.ui.widgets.oas3 import Endpoint
 
 

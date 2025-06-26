@@ -6,8 +6,7 @@ response body
 import pytest
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
-
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),

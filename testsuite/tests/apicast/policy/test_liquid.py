@@ -2,13 +2,10 @@
 Test behavior of liquid
 """
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
-from testsuite import rawobj
-from testsuite import TESTED_VERSION
-
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION <= Version("2.13"), reason="TESTED_VERSION <= Version('2.13')"),

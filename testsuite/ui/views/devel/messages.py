@@ -1,6 +1,6 @@
 """Devel messages pages and tabs"""
 
-from widgetastic.widget import TextInput, View, Text
+from widgetastic.widget import Text, TextInput, View
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import Navigable, step

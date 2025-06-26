@@ -6,8 +6,8 @@ request body
 import pytest
 from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import random_string
-from testsuite import rawobj, TESTED_VERSION
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),

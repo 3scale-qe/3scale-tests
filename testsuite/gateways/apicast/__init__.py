@@ -1,17 +1,16 @@
 """Module containing all APIcast gateways"""
 
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional, List, Dict, Tuple
-import logging
+from typing import Dict, List, Optional, Tuple
 
 from openshift_client import OpenShiftPythonException
-
 from threescale_api.resources import Service
 
+from testsuite import utils
 from testsuite.capabilities import Capability
 from testsuite.gateways import AbstractGateway
-from testsuite import utils
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.openshift.deployments import Deployment
 from testsuite.openshift.env import Properties

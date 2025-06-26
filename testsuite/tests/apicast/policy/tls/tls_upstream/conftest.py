@@ -4,9 +4,8 @@ Configuration for tests making use of an upstream supporting TLS
 
 from urllib.parse import urlparse
 
-import pytest
-
 import importlib_resources as resources
+import pytest
 
 from testsuite.certificates import Certificate
 from testsuite.utils import blame

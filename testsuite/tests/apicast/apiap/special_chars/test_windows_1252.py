@@ -5,10 +5,10 @@ Test that any char from the windows-1252 encoding won't be changed by the apicas
 from urllib.parse import urlparse
 
 import pytest
-
 from packaging.version import Version
-from testsuite.echoed_request import EchoedRequest
+
 from testsuite import TESTED_VERSION
+from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
     pytest.mark.xfail,

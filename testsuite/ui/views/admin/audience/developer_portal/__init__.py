@@ -2,20 +2,24 @@
 
 from selenium.common.exceptions import NoSuchElementException
 from wait_for import TimedOutError, wait_for
-from widgetastic.widget import GenericLocatorWidget, TextInput, Text, FileInput, Image
+from widgetastic.widget import FileInput, GenericLocatorWidget, Image, Text, TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.widgets import (
-    ThreescaleDropdown,
+    APIDocsSelect,
+    CheckBoxGroup,
     DivBasedEditor,
     ThreescaleButtonGroup,
     ThreescaleCheckBox,
-    CheckBoxGroup,
-    APIDocsSelect,
+    ThreescaleDropdown,
 )
-from testsuite.ui.widgets.buttons import ThreescaleSubmitButton, ThreescaleDeleteButton, ThreescaleCreateButton
+from testsuite.ui.widgets.buttons import (
+    ThreescaleCreateButton,
+    ThreescaleDeleteButton,
+    ThreescaleSubmitButton,
+)
 
 
 class CMSNewPageView(BaseAudienceView):

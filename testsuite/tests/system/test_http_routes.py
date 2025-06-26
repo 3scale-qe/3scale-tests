@@ -4,9 +4,8 @@ Test that http routes will be created and managed by zync
 
 from urllib.parse import urlparse
 
-from packaging.version import Version
-
 import pytest
+from packaging.version import Version
 
 from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability

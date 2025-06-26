@@ -1,6 +1,7 @@
 """Tests for working with proxy proxy of Toolbox feature"""
 
 import json
+
 import pytest
 
 from testsuite.toolbox import toolbox

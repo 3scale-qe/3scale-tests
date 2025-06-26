@@ -1,10 +1,9 @@
 "testing proper function of upstream test connection"
 
+import pytest
 from packaging.version import Version
 
-import pytest
-
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.utils import warn_and_skip
 
 pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.6"), reason="TESTED_VERSION < Version('2.6')")

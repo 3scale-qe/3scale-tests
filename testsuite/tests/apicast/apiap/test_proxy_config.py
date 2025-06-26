@@ -2,9 +2,8 @@
 Update api_backend on service without backend configured
 """
 
-from packaging.version import Version
-
 import pytest
+from packaging.version import Version
 
 from testsuite import TESTED_VERSION
 

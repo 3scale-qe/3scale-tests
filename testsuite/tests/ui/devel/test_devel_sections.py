@@ -6,10 +6,10 @@ from packaging.version import Version
 from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.account import AccountUserGroupView
 from testsuite.ui.views.admin.audience.developer_portal import (
-    DeveloperPortalGroupNewView,
     CMSEditPageView,
     CMSNewPageView,
     CMSNewSectionView,
+    DeveloperPortalGroupNewView,
     DeveloperPortalGroupView,
 )
 from testsuite.ui.views.common.foundation import NotFoundView

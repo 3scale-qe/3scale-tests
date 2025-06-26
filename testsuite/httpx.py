@@ -2,20 +2,26 @@
 
 import functools
 import logging
-from typing import Iterable, Generator
+from typing import Generator, Iterable
 
-from httpx import Client, Request, Response, URL, Auth, create_ssl_context, USE_CLIENT_DEFAULT
-from threescale_api.resources import Application, Service
-from threescale_api.utils import response2str, request2curl
 import backoff
 import httpx
+from httpx import (
+    URL,
+    USE_CLIENT_DEFAULT,
+    Auth,
+    Client,
+    Request,
+    Response,
+    create_ssl_context,
+)
+from threescale_api.resources import Application, Service
+from threescale_api.utils import request2curl, response2str
 
 from testsuite.lifecycle_hook import LifecycleHook
 
-
 # pylint: disable=too-few-public-methods
 from testsuite.utils import basic_auth_string
-
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

@@ -1,7 +1,6 @@
 "Toolbox conftest"
 
 import pytest
-
 from threescale_api import client
 
 from testsuite import rawobj

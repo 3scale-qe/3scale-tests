@@ -1,14 +1,14 @@
 """Representation of login specific Views"""
 
-from widgetastic.widget import TextInput, Text, View, GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 
 from testsuite.ui.exception import UIException
 from testsuite.ui.navigation import step
+from testsuite.ui.views.auth import Auth0View, RhssoView
 from testsuite.ui.views.common.foundation import FlashMessage
-from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
-from testsuite.ui.views.auth import RhssoView, Auth0View
-from testsuite.ui.views.devel import BaseDevelView, SignUpView
 from testsuite.ui.views.common.login import LoginForm
+from testsuite.ui.views.devel import BaseDevelView, SignUpView
+from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 
 class ReCaptcha(View):

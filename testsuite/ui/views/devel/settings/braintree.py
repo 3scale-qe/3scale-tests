@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from wait_for import TimedOutError
-from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
+from widgetastic.widget import GenericLocatorWidget, Select, Text, TextInput, View
 from widgetastic_patternfly import Button
 
 from testsuite.ui.objects import BillingAddress, CreditCard

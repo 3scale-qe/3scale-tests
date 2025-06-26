@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
 

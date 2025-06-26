@@ -9,6 +9,7 @@ and return 404 response code or 403 if using WASMGateway
 """
 
 import pytest
+
 from testsuite import rawobj
 
 pytestmark = pytest.mark.required_capabilities()

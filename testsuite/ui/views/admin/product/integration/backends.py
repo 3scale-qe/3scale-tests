@@ -1,7 +1,7 @@
 """View representations of products integration backends section pages"""
 
-from widgetastic.widget import TextInput, Text
-from widgetastic_patternfly4 import PatternflyTable, Button
+from widgetastic.widget import Text, TextInput
+from widgetastic_patternfly4 import Button, PatternflyTable
 from widgetastic_patternfly4.ouia import Select
 
 from testsuite.ui.navigation import step

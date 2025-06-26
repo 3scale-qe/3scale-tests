@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION
+from testsuite import APICAST_OPERATOR_VERSION, TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [

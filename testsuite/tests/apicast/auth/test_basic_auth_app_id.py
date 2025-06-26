@@ -4,8 +4,8 @@ Rewrite ./spec/functional_specs/auth/basic_auth_app_id_spec.rb
 """
 
 import pytest
-from threescale_api.resources import Service
 from packaging.version import Version
+from threescale_api.resources import Service
 
 from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability

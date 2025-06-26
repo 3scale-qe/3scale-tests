@@ -3,7 +3,7 @@
 import enum
 from typing import Literal
 
-from widgetastic.widget import TextInput, View, FileInput
+from widgetastic.widget import FileInput, TextInput, View
 from widgetastic_patternfly4 import Button
 
 from testsuite.certificates import Certificate

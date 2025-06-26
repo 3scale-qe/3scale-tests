@@ -3,11 +3,11 @@ Rewrite spec/functional_specs/policies/batcher/batcher_policy_oidc_spec.rb
 """
 
 from time import sleep
+
 import pytest
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
-
 
 BATCH_REPORT_SECONDS = 50
 

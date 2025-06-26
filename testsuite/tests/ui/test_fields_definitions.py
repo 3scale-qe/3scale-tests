@@ -3,8 +3,13 @@
 import pytest
 from widgetastic.widget import TextInput
 
-from testsuite.ui.views.admin.audience.account_user import AccountUserEditView, AccountUserDetailView
-from testsuite.ui.views.admin.audience.fields_definitions import FieldsDefinitionsCreateView
+from testsuite.ui.views.admin.audience.account_user import (
+    AccountUserDetailView,
+    AccountUserEditView,
+)
+from testsuite.ui.views.admin.audience.fields_definitions import (
+    FieldsDefinitionsCreateView,
+)
 
 
 @pytest.fixture(autouse=True)

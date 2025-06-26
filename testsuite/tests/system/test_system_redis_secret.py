@@ -2,6 +2,7 @@
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 
 pytestmark = [

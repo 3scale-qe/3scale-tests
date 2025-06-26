@@ -5,15 +5,15 @@ the increase of the metric, respective to the endpoint and returned
 status code, is expected in prometheus.
 """
 
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 import pytest
 import requests
 from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame, randomize
-from testsuite import rawobj, TESTED_VERSION
 
 NUM_OF_REQUESTS = 10
 

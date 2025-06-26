@@ -9,12 +9,10 @@ from urllib.parse import urlparse
 
 import pytest
 import pytest_cases
-
 from packaging.version import Version
 
 from testsuite import TESTED_VERSION, rawobj
 from testsuite.tests.apicast.policy.maintenance_mode import config_cases_host
-
 
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),

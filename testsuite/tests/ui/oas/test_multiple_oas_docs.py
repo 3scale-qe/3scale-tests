@@ -3,7 +3,11 @@
 import importlib_resources as resources
 import pytest
 
-from testsuite.ui.views.admin.audience.developer_portal import CMSEditPageView, CMSNewPageView, ActiveDocsNewView
+from testsuite.ui.views.admin.audience.developer_portal import (
+    ActiveDocsNewView,
+    CMSEditPageView,
+    CMSNewPageView,
+)
 from testsuite.ui.views.devel import DocsView
 from testsuite.utils import blame
 

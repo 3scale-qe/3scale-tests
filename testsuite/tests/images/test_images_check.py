@@ -1,16 +1,13 @@
 """Image checkt tests"""
 
 import pytest
-
+from openshift_client import OpenShiftPythonException
 from packaging.version import Version
 
-from openshift_client import OpenShiftPythonException
-
+from testsuite import TESTED_VERSION
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION
-
 
 pytestmark = pytest.mark.nopersistence
 

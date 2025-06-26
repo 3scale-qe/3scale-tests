@@ -5,13 +5,13 @@ Test that content caching policy is working correctly with env:
 """
 
 import time
-from packaging.version import Version
 
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
-from testsuite.echoed_request import EchoedRequest
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import blame, randomize
 
 pytestmark = [

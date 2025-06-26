@@ -5,13 +5,11 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from widgetastic.exceptions import NoSuchElementException
 from widgetastic.utils import ParametrizedLocator
-from widgetastic.widget import GenericLocatorWidget, Widget, View
-from widgetastic.widget import TextInput
+from widgetastic.widget import GenericLocatorWidget, TextInput, View, Widget
 from widgetastic.xpath import quote
-from widgetastic_patternfly4 import Select, Modal
+from widgetastic_patternfly4 import Modal, Select
 
 from testsuite.ui.exception import ItemNotPresentException
-
 
 # Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
 # an abstract method. Disabling abstract-method for all widgets.

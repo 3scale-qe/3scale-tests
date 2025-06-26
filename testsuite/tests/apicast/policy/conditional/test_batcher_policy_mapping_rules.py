@@ -3,11 +3,11 @@ Test checks that batcher policy works with conditional policy.
 """
 
 from time import sleep
+
 import pytest
-
 from packaging.version import Version
-from testsuite import TESTED_VERSION, rawobj
 
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
     pytest.mark.nopersistence,

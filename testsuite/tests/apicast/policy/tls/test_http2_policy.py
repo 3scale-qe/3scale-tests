@@ -6,10 +6,9 @@ import pytest
 
 import testsuite
 from testsuite import rawobj  # noqa # pylint: disable=unused-import
-from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.httpx import HttpxClient
-
 
 # CFSSL instance is necessary
 pytestmark = [

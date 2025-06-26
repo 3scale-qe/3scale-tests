@@ -4,7 +4,9 @@
 
 import pytest
 
-from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
+from testsuite.ui.views.admin.product.integration.configuration import (
+    ProductConfigurationView,
+)
 from testsuite.ui.views.admin.product.integration.settings import ProductSettingsView
 
 

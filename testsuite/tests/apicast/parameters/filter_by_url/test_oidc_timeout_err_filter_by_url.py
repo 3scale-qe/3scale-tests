@@ -12,15 +12,15 @@ WARNING: If this service is left undeleted on older versions, it will break self
 
 from time import time
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 from threescale_api.resources import Service
 
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),

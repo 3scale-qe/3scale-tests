@@ -4,8 +4,8 @@ Test Prometheus metric for content_caching.
 
 import backoff
 import pytest
-
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 from testsuite.prometheus import get_metrics_keys
 

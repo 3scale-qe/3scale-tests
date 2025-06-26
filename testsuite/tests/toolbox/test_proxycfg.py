@@ -1,7 +1,8 @@
 """Tests for working with proxy configurations of Toolbox feature"""
 
-import re
 import json
+import re
+
 import pytest
 
 from testsuite import rawobj

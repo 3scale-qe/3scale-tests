@@ -2,14 +2,15 @@
 
 import base64
 from contextlib import ExitStack
-import pytest
+
 import backoff
+import pytest
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.system import SystemApicast
-from testsuite.utils import generate_tail, custom_policy
+from testsuite.utils import custom_policy, generate_tail
 
 SCALE_OPERATOR = "3scale operator"
 APICAST_OPERATOR = "APIcast operator"
