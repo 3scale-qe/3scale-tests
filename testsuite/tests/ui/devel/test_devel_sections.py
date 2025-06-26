@@ -2,9 +2,9 @@
 
 import backoff
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.account import AccountUserGroupView
 from testsuite.ui.views.admin.audience.developer_portal import (
     DeveloperPortalGroupNewView,
@@ -75,6 +75,9 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
 
 
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=5, jitter=None)
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9020")
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-836")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')")
 @pytest.mark.usefixtures("dev_portal_group")
 @pytest.mark.usefixtures("login")
 def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):

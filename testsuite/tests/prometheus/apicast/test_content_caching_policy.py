@@ -5,12 +5,12 @@ Test Prometheus metric for content_caching.
 import backoff
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5439"),
 ]
 
