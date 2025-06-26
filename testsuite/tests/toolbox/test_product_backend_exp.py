@@ -1,14 +1,15 @@
 """Tests for importing/exporting product from/to CRD."""
 
+import json
 import random
 import string
-import json
+
 import pytest
 
+from testsuite import rawobj
 from testsuite.config import settings
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame
-from testsuite import rawobj
 
 pytestmark = [
     pytest.mark.xdist_group(name="toolbox"),

@@ -5,6 +5,7 @@ Rewrite spec/functional_specs/policies/combination/routing_url_rewrite_spec.rb
 from urllib.parse import urlparse
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 

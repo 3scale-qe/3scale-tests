@@ -7,11 +7,12 @@ from the JWT object
 """
 
 import time
+
 import pytest
 
 from testsuite import rawobj
-from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.echoed_request import EchoedRequest
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
 
 @pytest.fixture(scope="module", autouse=True)

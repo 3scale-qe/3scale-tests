@@ -3,9 +3,10 @@ Test 3scale Operator pod resource limits and requests
 """
 
 import re
-import pytest
 
+import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 

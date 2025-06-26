@@ -3,9 +3,10 @@ Test Prometheus metric for content_caching.
 """
 
 from datetime import datetime, timedelta, timezone
-import pytest
 
+import pytest
 from packaging.version import Version
+
 from testsuite import APICAST_OPERATOR_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.prometheus import get_metrics_keys

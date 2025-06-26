@@ -3,7 +3,7 @@
 import pytest
 from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded

@@ -2,12 +2,12 @@
 
 from urllib.parse import urlparse
 
-from packaging.version import Version
 import pytest
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
-from testsuite import TESTED_VERSION
 
 pytestmark = [pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT)]
 

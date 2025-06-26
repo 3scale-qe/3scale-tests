@@ -4,9 +4,10 @@ character in the name
 """
 
 from time import sleep
-import pytest
 
+import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

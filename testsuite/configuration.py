@@ -1,12 +1,12 @@
 """Module responsible for processing configuration"""
 
 import inspect
-from typing import Dict, Any, Mapping
+from typing import Any, Dict, Mapping
 
 from weakget import weakget
 
-from testsuite.config import settings
 from testsuite.capabilities import Singleton
+from testsuite.config import settings
 from testsuite.openshift.client import OpenShiftClient
 
 

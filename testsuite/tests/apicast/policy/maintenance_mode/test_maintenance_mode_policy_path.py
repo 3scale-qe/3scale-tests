@@ -8,7 +8,6 @@ from typing import Tuple
 
 import pytest
 import pytest_cases
-
 from packaging.version import Version
 
 from testsuite import TESTED_VERSION, rawobj

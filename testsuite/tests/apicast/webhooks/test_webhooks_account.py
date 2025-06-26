@@ -4,9 +4,8 @@ Based on spec/ui_specs/webhooks/webhooks_accounts_spec.rb (ruby test is via UI)
 
 import xml.etree.ElementTree as Et
 
-from packaging.version import Version
-
 import pytest
+from packaging.version import Version
 
 from testsuite import TESTED_VERSION
 from testsuite.utils import blame

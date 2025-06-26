@@ -6,8 +6,8 @@ with multiple backends.
 from urllib.parse import urlparse
 
 import pytest
-
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 
 pytestmark = [

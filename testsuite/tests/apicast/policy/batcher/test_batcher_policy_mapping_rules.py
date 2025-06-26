@@ -3,9 +3,10 @@ Test checks that mapping rules are working with batcher policy
 """
 
 from time import sleep
-import pytest
 
+import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [

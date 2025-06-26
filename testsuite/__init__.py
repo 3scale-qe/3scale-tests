@@ -21,9 +21,10 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
     logger.addHandler(handler)
 
 from pathlib import Path
+
+import importlib_resources as resources
 from packaging.version import Version
 from weakget import weakget
-import importlib_resources as resources
 
 from testsuite.config import settings  # noqa
 

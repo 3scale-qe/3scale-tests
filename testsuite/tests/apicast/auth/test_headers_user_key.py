@@ -5,7 +5,6 @@ Rewrite: spec/functional_specs/auth/headers_user_key_spec.rb
 """
 
 import pytest
-
 from threescale_api.resources import Service
 
 

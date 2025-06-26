@@ -6,10 +6,10 @@ import base64
 
 import pytest
 import requests
-
-from testsuite.config import settings
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
+from testsuite.config import settings
 from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [

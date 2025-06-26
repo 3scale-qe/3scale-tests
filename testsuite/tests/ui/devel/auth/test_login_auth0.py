@@ -3,10 +3,10 @@
 import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal.sso_integrations import (
-    Auth0IntegrationEditView,
     Auth0IntegrationDetailView,
+    Auth0IntegrationEditView,
 )
-from testsuite.ui.views.devel import SignUpView, BaseDevelView
+from testsuite.ui.views.devel import BaseDevelView, SignUpView
 
 
 @pytest.fixture(scope="module")

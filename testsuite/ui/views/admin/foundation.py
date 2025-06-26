@@ -4,11 +4,11 @@ Product, Backend, and AccountSettings Views. All of them creates basic page stru
 Admin portal pages.
 """
 
-from widgetastic.widget import GenericLocatorWidget, View, Text
+from widgetastic.widget import GenericLocatorWidget, Text, View
 from widgetastic_patternfly4 import Button
 from widgetastic_patternfly4.ouia import Dropdown
 
-from testsuite.ui.navigation import step, Navigable
+from testsuite.ui.navigation import Navigable, step
 
 
 class BaseAdminView(View, Navigable):

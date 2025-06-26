@@ -1,13 +1,13 @@
 """Test of message counters in dashboard main-section tabs"""
 
 import pytest
-
-from testsuite.utils import blame
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.devel.messages import ComposeView
+from testsuite.utils import blame
 
 
 def assert_dashboard_counters(navigator, message_count, unread_count):
