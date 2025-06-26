@@ -6,9 +6,8 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 
-# case[N] fixtures create tests that have to be executed in specific order
+# case[N] fixtures create tests that have to be executed in specific order, satisfied by loadfile
 pytestmark = [
-    pytest.mark.disruptive,
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3623"),
 ]

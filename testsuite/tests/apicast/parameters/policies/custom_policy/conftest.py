@@ -9,7 +9,7 @@ from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.system import SystemApicast
-from testsuite.utils import blame, custom_policy
+from testsuite.utils import generate_tail, custom_policy
 
 SCALE_OPERATOR = "3scale operator"
 APICAST_OPERATOR = "APIcast operator"
@@ -40,11 +40,11 @@ def policy_settings():
 
 
 @pytest.fixture(scope="module")
-def policy_secret(request, staging_gateway, gateway_kind):
+def policy_secret(staging_gateway, gateway_kind):
     """
     Create an openshift secrets to use as custom policy based on https://github.com/3scale-qe/apicast-example-policy
     """
-    name = blame(request, "secret")[-6:]  # 63 characters limit for referencing secret
+    name = generate_tail(6)  # 63 characters limit for referencing secret
     secrets = staging_gateway.openshift.secrets
     labels = {}
     if gateway_kind.id == SCALE_OPERATOR:

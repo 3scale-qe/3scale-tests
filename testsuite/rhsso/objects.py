@@ -42,7 +42,7 @@ class Realm:
         self.admin.update_user(user_id, {"emailVerified": True})
         return user_id
 
-    def oidc_client(self, client_id, client_secret):
+    def oidc_client(self, client_id, client_secret) -> KeycloakOpenID:
         """Create OIDC client for this realm"""
         return KeycloakOpenID(
             server_url=self.admin.connection.server_url,
@@ -68,7 +68,7 @@ class Client:
         self.admin.assign_client_role(user["id"], realm_management, role)
 
     @property
-    def oidc_client(self):
+    def oidc_client(self) -> KeycloakOpenID:
         """OIDC client"""
         # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
         client_id = self.admin.get_client(self.client_id)["clientId"]
@@ -91,6 +91,7 @@ class RHSSO:
                 realm_name="master",
                 verify=False,
             )
+            self.master.get_clients()  # test whether the server url is valid
             self.server_url = server_url
         except KeycloakPostError:
             self.server_url = urlparse(server_url)._replace(path="auth/").geturl()
@@ -101,6 +102,7 @@ class RHSSO:
                 realm_name="master",
                 verify=False,
             )
+            self.master.get_clients()  # test whether the server url is valid
 
     def create_realm(self, name: str, **kwargs) -> Realm:
         """Creates new realm"""
