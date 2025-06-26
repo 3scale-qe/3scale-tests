@@ -1,13 +1,13 @@
 """Tests for Grafana Dashboards definitions"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.required_capabilities(Capability.OCP4),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7961"),
 ]

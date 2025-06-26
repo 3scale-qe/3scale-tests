@@ -7,13 +7,13 @@ the Openshift HAProxy router, and the requests are routed to the appropriate bac
 
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import TESTED_VERSION
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
     pytest.mark.nopersistence,
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6849"),
 ]
 

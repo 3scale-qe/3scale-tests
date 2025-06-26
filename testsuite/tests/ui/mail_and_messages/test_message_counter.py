@@ -2,9 +2,9 @@
 
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.utils import blame
+from packaging.version import Version
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.devel.messages import ComposeView
@@ -40,7 +40,7 @@ def contents(request):
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.skipif("TESTED_VERSION < Version('2.15')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.15"), reason="TESTED_VERSION < Version('2.15')")
 @pytest.mark.usefixtures("login", "application", "service")
 def test_message_counter(
     custom_devel_login, custom_admin_login, account, navigator, mailhog_client, subjects, contents

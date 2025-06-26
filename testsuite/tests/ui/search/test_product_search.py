@@ -3,13 +3,16 @@ Test for product search
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 from testsuite.ui.views.admin.product import ProductsView
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
-pytestmark = [pytest.mark.usefixtures("login"), pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")]
+pytestmark = [
+    pytest.mark.usefixtures("login"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')"),
+]
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8562")

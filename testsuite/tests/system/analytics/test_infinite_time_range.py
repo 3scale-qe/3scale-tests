@@ -11,13 +11,13 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from threescale_api.errors import ApiClientError
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6649"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
 ]
 
 

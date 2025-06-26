@@ -2,8 +2,8 @@
 
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import rawobj, TESTED_VERSION
 from testsuite.capabilities import Capability
 
 from testsuite.utils import blame
@@ -30,7 +30,13 @@ def service(backends_mapping, custom_service, service_proxy_settings, lifecycle_
 
 
 @pytest.mark.parametrize(
-    "load_service", [pytest.param(True, marks=pytest.mark.skipif("TESTED_VERSION < Version('2.13')")), False]
+    "load_service",
+    [
+        pytest.param(
+            True, marks=pytest.mark.skipif(TESTED_VERSION < Version("2.13"), reason="TESTED_VERSION < Version('2.13')")
+        ),
+        False,
+    ],
 )
 def test_mapping_rule_hit(api_client, staging_gateway, load_service):
     """Tests that the mapping rule is loaded and works correctly"""
