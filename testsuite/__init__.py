@@ -20,8 +20,8 @@ if "_3SCALE_TESTS_DEBUG" in os.environ:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-from pathlib import Path  # noqa
-from packaging.version import Version  # noqa
+from pathlib import Path
+from packaging.version import Version
 from weakget import weakget
 import importlib_resources as resources
 

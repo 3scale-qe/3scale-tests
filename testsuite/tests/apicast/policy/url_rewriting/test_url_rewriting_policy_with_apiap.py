@@ -3,12 +3,12 @@ Test if url rewriting policy works with APIAP
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.8')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.8"), reason="TESTED_VERSION < Version('2.8')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4301"),
 ]
 

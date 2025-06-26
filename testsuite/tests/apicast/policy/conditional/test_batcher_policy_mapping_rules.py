@@ -5,13 +5,13 @@ Test checks that batcher policy works with conditional policy.
 from time import sleep
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import TESTED_VERSION, rawobj
 
 
 pytestmark = [
     pytest.mark.nopersistence,
-    pytest.mark.skipif("TESTED_VERSION < Version('2.16')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')"),
 ]
 
 BATCH_REPORT_SECONDS = 50

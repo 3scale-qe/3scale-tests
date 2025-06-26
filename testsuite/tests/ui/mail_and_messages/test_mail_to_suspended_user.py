@@ -1,9 +1,9 @@
 """Test that system is not sending mail notification to suspended users"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.settings.user import UserDetailView
 from testsuite.utils import blame
 
@@ -35,7 +35,7 @@ def provider_account_user(navigator, provider_account_user):
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8903")
 @pytest.mark.usefixtures("login")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')")
 def test_mail_to_suspended_user(provider_account_user, ui_account, mailhog_client):
     """
     Test:

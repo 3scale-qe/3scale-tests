@@ -9,15 +9,18 @@ case tests ends with 502 error.
 https://docs.openshift.com/container-platform/4.9/networking/ingress-operator.html#nw-http2-haproxy_configuring-ingress
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 import pytest
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.tests.apicast.policy.websocket.conftest import retry_sucessful, retry_failing
 
 # websockets may fail for reason described above
-pytestmark = [pytest.mark.sandbag, pytest.mark.skipif("TESTED_VERSION < Version('2.8')")]
+pytestmark = [
+    pytest.mark.sandbag,
+    pytest.mark.skipif(TESTED_VERSION < Version("2.8"), reason="TESTED_VERSION < Version('2.8')"),
+]
 
 
 @pytest.fixture

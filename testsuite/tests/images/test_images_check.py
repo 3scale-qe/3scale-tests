@@ -2,14 +2,14 @@
 
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 from openshift_client import OpenShiftPythonException
 
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 
 pytestmark = pytest.mark.nopersistence
@@ -38,7 +38,7 @@ COMPONENTS_PARAMETERS = [
 
 @pytest.mark.parametrize(("image", "image_stream"), IS_PARAMETERS)
 # INFO: image streams are no longer used (starting with 2.15-dev)
-@pytest.mark.skipif("TESTED_VERSION > Version('2.14')")
+@pytest.mark.skipif(TESTED_VERSION > Version("2.14"), reason="TESTED_VERSION > Version('2.14')")
 def test_imagesource_image(images, openshift, image, image_stream):
     """
     Test:

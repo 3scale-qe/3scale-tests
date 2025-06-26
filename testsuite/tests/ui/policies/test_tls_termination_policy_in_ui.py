@@ -4,9 +4,9 @@ flake8 ignore needed because it treats the imported fixtures as F811 'redefinito
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
@@ -31,7 +31,7 @@ from testsuite.tests.apicast.policy.tls.conftest import (
 
 pytestmark = [
     pytest.mark.sandbag,  # TLS requires pretty specific complex setup
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
     pytest.mark.usefixtures("login"),
 ]

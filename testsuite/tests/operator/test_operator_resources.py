@@ -11,7 +11,7 @@ from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.sandbag,  # requires operator in same namespace
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),
     pytest.mark.required_capabilities(Capability.OCP4),
     pytest.mark.nopersistence,
 ]

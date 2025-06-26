@@ -1,9 +1,9 @@
 """ "Test for TLS Apicast with backend routing"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded
@@ -11,7 +11,7 @@ from testsuite.tests.apicast.policy.tls import embedded
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8007"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.12"), reason="TESTED_VERSION < Version('2.12')"),
 ]
 
 

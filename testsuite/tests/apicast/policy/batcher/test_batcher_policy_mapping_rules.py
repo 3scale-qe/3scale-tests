@@ -5,13 +5,13 @@ Test checks that mapping rules are working with batcher policy
 from time import sleep
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import TESTED_VERSION, rawobj
 
 
 pytestmark = [
     pytest.mark.nopersistence,
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5513"),
 ]
 

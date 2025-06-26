@@ -2,16 +2,16 @@
 Test behavior of liquid
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 import pytest
 
 from testsuite import rawobj
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION <= Version('2.13')"),
+    pytest.mark.skipif(TESTED_VERSION <= Version("2.13"), reason="TESTED_VERSION <= Version('2.13')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8483"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8484"),
 ]

@@ -5,15 +5,15 @@ import random
 import string
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 from testsuite.config import settings
 from testsuite.toolbox import toolbox
 import testsuite.utils
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.7')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.7"), reason="TESTED_VERSION < Version('2.7')"),
     pytest.mark.xdist_group(name="toolbox"),
 ]
 

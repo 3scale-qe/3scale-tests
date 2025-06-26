@@ -3,17 +3,17 @@ Tests that when an app plan has two limits with different time frame, the RateLi
 the currently more constrained limit are sent.
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 import pytest
 from testsuite.utils import blame, wait_interval, wait_until_next_minute, wait_interval_hour
 from testsuite import rawobj
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.flaky,
 ]
 
