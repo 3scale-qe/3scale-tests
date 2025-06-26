@@ -6,20 +6,20 @@ Tests that:
  - the combination of backend and service metrics should make no problem
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 import pytest
 import pytest_cases
 from pytest_cases import fixture_ref
 
 from testsuite.utils import blame, wait_interval
 from testsuite import rawobj
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
 
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.flaky,
 ]
 

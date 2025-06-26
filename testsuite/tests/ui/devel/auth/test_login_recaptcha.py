@@ -1,9 +1,9 @@
 """Test for login into devel portal with spam protection enabled"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import settings, rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import settings, rawobj, TESTED_VERSION
 from testsuite.ui.views.admin.audience.developer_portal import BotProtection
 from testsuite.ui.views.devel.login import BasicSignUpView, LoginView, ForgotPasswordView
 from testsuite.utils import blame, warn_and_skip
@@ -97,7 +97,7 @@ def test_devel_forgot_password_recaptcha(custom_account, navigator, params):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10579")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.15')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.15"), reason="TESTED_VERSION < Version('2.15')")
 def test_devel_login_recaptcha(custom_account, navigator, params):
     """
     Test

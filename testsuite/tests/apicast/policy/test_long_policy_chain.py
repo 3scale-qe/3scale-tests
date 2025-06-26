@@ -2,9 +2,9 @@
 
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION
 
 
 @pytest.fixture()
@@ -14,7 +14,7 @@ def policy():
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8377")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')")
 def test_long_policy_chain(policy, service):
     """
     Test creates a policy chain with size greater than 65,535 bytes 7 * header policy with 10000 characters

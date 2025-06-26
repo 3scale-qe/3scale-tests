@@ -1,17 +1,17 @@
 "testing proper function of retry policy with conditional policy"
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 import pytest
 
 from testsuite.capabilities import Capability
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION
 from testsuite.utils import blame
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.16')")
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')")
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
 

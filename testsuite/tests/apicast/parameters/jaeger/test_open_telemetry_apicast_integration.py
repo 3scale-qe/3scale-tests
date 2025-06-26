@@ -7,8 +7,8 @@ It is necessary to have the jaeger url config value set
 import backoff
 import pytest
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+from testsuite import TESTED_VERSION, APICAST_OPERATOR_VERSION
 from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.utils import randomize
@@ -26,7 +26,7 @@ pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CU
             marks=[
                 pytest.mark.disruptive,
                 pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),
-                pytest.mark.skipif("TESTED_VERSION < Version('2.14')"),
+                pytest.mark.skipif(TESTED_VERSION < Version("2.14"), reason="TESTED_VERSION < Version('2.14')"),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7735"),
             ],
         ),
@@ -35,7 +35,9 @@ pytestmark = [pytest.mark.required_capabilities(Capability.JAEGER, Capability.CU
             id="operator",
             marks=[
                 pytest.mark.required_capabilities(Capability.OCP4),
-                pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.8.0')"),
+                pytest.mark.skipif(
+                    APICAST_OPERATOR_VERSION < Version("0.8.0"), reason="APICAST_OPERATOR_VERSION < Version('0.8.0')"
+                ),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9539"),
             ],
         ),

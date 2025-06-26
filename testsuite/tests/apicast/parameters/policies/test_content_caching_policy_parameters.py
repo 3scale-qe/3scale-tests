@@ -5,17 +5,17 @@ Test that content caching policy is working correctly with env:
 """
 
 import time
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
 import pytest
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import rawobj, TESTED_VERSION
 from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.utils import blame, randomize
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
 ]
 
