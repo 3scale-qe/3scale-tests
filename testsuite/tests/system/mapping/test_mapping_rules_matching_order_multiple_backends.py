@@ -11,10 +11,7 @@ the request matching that mapping rule is not evaluated by other mapping rules.
 
 import pytest
 
-from testsuite import rawobj
-from testsuite import resilient
-
-pytestmark = [pytest.mark.nopersistence]
+from testsuite import rawobj, resilient
 
 
 @pytest.fixture(scope="module")
@@ -46,6 +43,7 @@ def delete_mapping(proxy):
     proxy.deploy()
     proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
     proxy.deploy()
+    return True
 
 
 @pytest.fixture(scope="module")
@@ -130,6 +128,7 @@ def backends(backend1, backend2, backend3, backend4, proxy):
         backend.mapping_rules.create(rawobj.Mapping(metric, "/"))
 
     proxy.deploy()
+    return True
 
 
 def hits(app):
