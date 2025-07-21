@@ -8,8 +8,6 @@ Tests that:
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
-import pytest_cases
-from pytest_cases import fixture_ref
 
 from testsuite.utils import blame, wait_interval
 from testsuite import rawobj
@@ -24,7 +22,7 @@ pytestmark = [
 ]
 
 
-@pytest_cases.fixture
+@pytest.fixture
 def service2(custom_service, service_proxy_settings, request, lifecycle_hooks, backends_mapping):
     """
     Function-scoped service with the rate limit headers policy
@@ -44,7 +42,7 @@ def service2(custom_service, service_proxy_settings, request, lifecycle_hooks, b
         usage.delete()
 
 
-@pytest_cases.fixture
+@pytest.fixture
 def app_plan_backend(service2, backend_usages, custom_app_plan, threescale, request):
     """
     Creates a mapped metric on a backend and on a service, so the default 'hits', that are
@@ -67,7 +65,7 @@ def app_plan_backend(service2, backend_usages, custom_app_plan, threescale, requ
     return plan
 
 
-@pytest_cases.fixture
+@pytest.fixture
 def app_plan_service(service2, custom_app_plan, request):
     """
     Creates metrics and mapping rules for those metrics.
@@ -91,18 +89,18 @@ def app_plan_service(service2, custom_app_plan, request):
     return plan
 
 
-@pytest_cases.fixture
-@pytest_cases.parametrize("app_plan", [fixture_ref(app_plan_service), fixture_ref(app_plan_backend)])
-def application(app_plan, custom_application, request, lifecycle_hooks):
+@pytest.fixture(params=["app_plan_service", "app_plan_backend"])
+def application(custom_application, request, lifecycle_hooks):
     """
     Creates an application with a application plan defined in the specified fixture
     """
+    app_plan = request.getfixturevalue(request.param)
     application = custom_application(rawobj.Application(blame(request, "limited_app"), app_plan), hooks=lifecycle_hooks)
 
     return application
 
 
-@pytest_cases.fixture
+@pytest.fixture
 def client(application):
     """Fixture plus api client"""
     return application.api_client()
