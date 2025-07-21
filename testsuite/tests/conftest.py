@@ -1010,11 +1010,6 @@ def custom_service(threescale, request, testconfig, logger):
     return _CustomService()
 
 
-def _backend_delete(backend):
-    """reliable backend delete"""
-    backend.delete()
-
-
 @pytest.fixture(scope="module")
 # pylint: disable=too-many-arguments
 def custom_backend(threescale, request, testconfig, private_base_url):
@@ -1049,7 +1044,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
                         hook(backend)
                     except Exception:  # pylint: disable=broad-except
                         pass
-                _backend_delete(backend)
+                backend.delete()
 
             request.addfinalizer(finalizer)
 
