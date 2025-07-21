@@ -11,13 +11,12 @@ import warnings
 from itertools import chain
 from typing import List
 
-import backoff
 import importlib_resources as resources
 import openshift_client as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key
-from threescale_api import client, errors
+from threescale_api import client
 from weakget import weakget
 
 # to actually initialize all the providers
@@ -1011,7 +1010,6 @@ def custom_service(threescale, request, testconfig, logger):
     return _CustomService()
 
 
-@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=1, jitter=None)
 def _backend_delete(backend):
     """reliable backend delete"""
     backend.delete()
