@@ -530,3 +530,32 @@ class ThreescaleDeleteEditGroup(GenericLocatorWidget):
     def edit(self):
         """Click on edit button"""
         self.browser.element(self.EDIT_LOCATOR).click()
+
+
+class ThreescaleDeleteEditGroup2(GenericLocatorWidget):
+    """Special Delete Edit group for 3scale"""
+
+    DELETE_LOCATOR = ".//*[text()='Delete']"
+    EDIT_LOCATOR = ".//*[text()='Edit']"
+    add_policy_modal = Modal(locator="//div[contains(@class, 'pf-c-modal-box')]")
+    DELETE_SPEC_LOCATOR = "//*[text()='Delete spec']"
+
+    def __init__(self, parent=None, locator=".//*[contains(@class, 'pf-c-dropdown')]", logger=None):
+        super().__init__(parent=parent, locator=locator, logger=logger)
+
+    def delete(self):
+        """Click on delete button"""
+        try:
+            if self.browser.element(self.DELETE_LOCATOR).is_displayed:
+                self.click()
+        except NoSuchElementException:
+            self.click()
+
+        self.browser.element(self.DELETE_LOCATOR).click()
+        self.browser.element(self.DELETE_SPEC_LOCATOR).click()
+
+    def edit(self):
+        """Click on edit button"""
+        if not self.browser.element(self.EDIT_LOCATOR).is_displayed:
+            self.click()
+        self.browser.element(self.EDIT_LOCATOR).click()

@@ -7,7 +7,7 @@ import pytest
 from threescale_api.resources import Service
 
 from testsuite import rawobj
-from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView
+from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView, ActiveDocsView
 from testsuite.utils import blame
 
 pytestmark = pytest.mark.usefixtures("login")
@@ -28,7 +28,7 @@ def service2(backends_mapping, custom_service, service_settings2, service_proxy_
     return custom_service(service_settings2, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def active_doc2(request, service2, oas3_body, custom_active_doc):
     """Active doc. bound to second service."""
     return custom_active_doc(
@@ -107,10 +107,26 @@ def test_active_docs_delete(navigator, service2):
     Test:
         - Create service via API
         - Create Active doc via API
-        - Delete Active doc via UI
+        - Delete Active doc via UI from oas preview
         - Assert that Active doc is deleted
     """
     preview_page = navigator.navigate(ActiveDocsDetailView, product=service2, active_doc=service2.active_docs.list()[0])
+    preview_page.oas3.server.wait_displayed()
     assert len(service2.active_docs.list()) == 1
     preview_page.delete_btn.click()
+    assert len(service2.active_docs.list()) == 0
+
+
+@pytest.mark.usefixtures("active_doc2")
+def test_active_docs_delete_via_table(navigator, service2):
+    """
+    Test:
+        - Create service via API
+        - Create Active doc via API
+        - Delete Active doc via UI from oas list table
+        - Assert that Active doc is deleted
+    """
+    oas_page = navigator.navigate(ActiveDocsView, product=service2)
+    assert len(service2.active_docs.list()) == 1
+    oas_page.delete(service2.active_docs.list()[0])
     assert len(service2.active_docs.list()) == 0
