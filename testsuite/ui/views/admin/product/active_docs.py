@@ -14,12 +14,12 @@ class ActiveDocsView(BaseProductView):
     """View representation of Active Docs list page"""
 
     path_pattern = "/apiconfig/services/{product_id}/api_docs"
-    active_docs_table = PatternflyTable(locator=".//table")
+    active_docs_table = PatternflyTable(locator=".//table", column_widgets={"Name": Text("./a")})
 
     @step("ActiveDocsDetailView")
     def detail(self, active_doc):
         """Navigate to active doc detail/preview page"""
-        self.active_docs_table.row(name=active_doc["name"]).name.click()
+        self.active_docs_table.row(name=active_doc["name"]).name.widget.click()
 
     def prerequisite(self):
         return BaseProductView
