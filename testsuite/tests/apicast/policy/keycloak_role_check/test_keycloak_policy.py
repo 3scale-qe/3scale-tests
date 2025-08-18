@@ -16,6 +16,7 @@ from pytest_cases import fixture_ref
 
 from testsuite import rawobj
 from testsuite.capabilities import Capability
+
 from .conftest import token
 
 pytestmark = [pytest.mark.disruptive, pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]

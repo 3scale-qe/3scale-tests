@@ -7,9 +7,10 @@ subscription to an app plan have been sent.
 
 import os
 import re
+
+import backoff
 import pytest
 import yaml
-import backoff
 
 from testsuite import rawobj
 from testsuite.utils import blame

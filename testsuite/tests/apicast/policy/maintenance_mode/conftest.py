@@ -1,13 +1,11 @@
 "Provides custom service to add policy to policy chain"
 
 import pytest
-
 import pytest_cases
 
 from testsuite import rawobj
-from testsuite.utils import blame
 from testsuite.capabilities import Capability
-
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY),

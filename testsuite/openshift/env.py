@@ -1,9 +1,9 @@
 """Module containing classes that manipulate deployment configs environment"""
 
 import abc
-import re
 import logging
-from typing import TYPE_CHECKING, Match, Dict
+import re
+from typing import TYPE_CHECKING, Dict, Match
 
 if TYPE_CHECKING:
     # pylint: disable=cyclic-import

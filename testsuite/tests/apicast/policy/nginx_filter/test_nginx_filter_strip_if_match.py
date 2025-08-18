@@ -4,14 +4,14 @@ or strip the header just for the nginx evaluation, but still send it to the upst
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6704"),
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
 ]

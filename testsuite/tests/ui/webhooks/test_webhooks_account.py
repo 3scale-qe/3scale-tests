@@ -7,8 +7,15 @@ import xml.etree.ElementTree as Et
 import pytest
 
 from testsuite import rawobj, resilient
-from testsuite.ui.views.admin.audience.account import UsageRulesView, AccountEditView, AccountsDetailView
-from testsuite.ui.views.admin.audience.account_plan import NewAccountPlanView, AccountPlansView
+from testsuite.ui.views.admin.audience.account import (
+    AccountEditView,
+    AccountsDetailView,
+    UsageRulesView,
+)
+from testsuite.ui.views.admin.audience.account_plan import (
+    AccountPlansView,
+    NewAccountPlanView,
+)
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 

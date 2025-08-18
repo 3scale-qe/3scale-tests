@@ -4,7 +4,7 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 from math import ceil
-from typing import Optional, Callable, Dict
+from typing import Callable, Dict, Optional
 from urllib.parse import urljoin
 
 import backoff

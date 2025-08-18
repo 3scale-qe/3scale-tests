@@ -3,7 +3,6 @@
 from dynaconf.base import LazySettings
 from dynaconf.constants import DEFAULT_SETTINGS_FILES
 
-
 # this was copied from dynaconf/__init__.py before it became deprecated
 # pylint: disable=invalid-name
 settings = LazySettings(

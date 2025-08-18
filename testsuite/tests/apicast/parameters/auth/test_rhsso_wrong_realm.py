@@ -5,7 +5,7 @@ import pytest
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast
 from testsuite.gateways.apicast.system import SystemApicast
-from testsuite.rhsso import Token, OIDCClientAuthHook
+from testsuite.rhsso import OIDCClientAuthHook, Token
 from testsuite.utils import blame
 
 

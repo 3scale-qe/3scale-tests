@@ -5,7 +5,10 @@ from threescale_api.resources import InvoiceState
 
 from testsuite import rawobj
 from testsuite.ui.objects import BillingAddress
-from testsuite.ui.views.admin.audience.account import InvoiceDetailView, AccountInvoicesView
+from testsuite.ui.views.admin.audience.account import (
+    AccountInvoicesView,
+    InvoiceDetailView,
+)
 from testsuite.utils import randomize
 
 

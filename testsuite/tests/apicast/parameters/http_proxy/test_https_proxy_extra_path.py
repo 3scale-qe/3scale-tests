@@ -2,12 +2,12 @@
 
 from urllib.parse import urlparse
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [pytest.mark.required_capabilities(Capability.CUSTOM_ENVIRONMENT)]
 
@@ -48,7 +48,7 @@ def gateway_environment(gateway_environment, testconfig, tools, rhsso_kind):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8426")
-@pytest.mark.skipif("TESTED_VERSION <= Version('2.12')")
+@pytest.mark.skipif(TESTED_VERSION <= Version("2.12"), reason="TESTED_VERSION <= Version('2.12')")
 def test_https_proxy_extra_path(api_client, extra_path):
     """
     Given private base url including extra path fragment /anything/else

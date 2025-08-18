@@ -2,8 +2,8 @@
 
 import json
 
-import requests
 import pytest
+import requests
 
 from testsuite.rhsso import RHSSOServiceConfiguration
 

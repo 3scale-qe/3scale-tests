@@ -1,10 +1,9 @@
 """Tests of applications plans"""
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.ui.views.admin.product.application import ApplicationPlansView
 from testsuite.utils import blame
 
@@ -25,7 +24,7 @@ def test_app_plan_create(custom_ui_app_plan, request, service):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-825")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.13"), reason="TESTED_VERSION < Version('2.13')")
 def test_default_app_plan_change(request, service, custom_app_plan, navigator):
     """
     Test of default application plan change:
@@ -54,7 +53,7 @@ def test_default_app_plan_change(request, service, custom_app_plan, navigator):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8979")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.13')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.13"), reason="TESTED_VERSION < Version('2.13')")
 def test_unset_default_app_plan(request, service, custom_app_plan, navigator):
     """
     Test unset default application plan:

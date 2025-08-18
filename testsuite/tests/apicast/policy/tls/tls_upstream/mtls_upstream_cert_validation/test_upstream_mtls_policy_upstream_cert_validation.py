@@ -11,18 +11,17 @@ Third the no certificates are specified in ca_certificates, in which case APIcas
 from urllib.parse import urlparse
 
 import pytest
+from packaging.version import Version
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.openshift.objects import Routes
 from testsuite.tests.apicast.policy.tls import embedded
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
 from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7099"),
 ]
 

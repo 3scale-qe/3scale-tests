@@ -3,16 +3,16 @@ Test for issue https://issues.redhat.com/browse/THREESCALE-8485
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.sandbag,
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8485"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.13')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.13"), reason="TESTED_VERSION < Version('2.13')"),
 ]
 
 

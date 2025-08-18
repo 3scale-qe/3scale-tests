@@ -10,7 +10,7 @@ from threescale_api.resources import Service
 from threescale_api.utils import HttpClient
 
 from testsuite.httpx import HttpxOidcClientAuth
-from testsuite.rhsso.objects import Realm, Client, RHSSO, Token
+from testsuite.rhsso.objects import RHSSO, Client, Realm, Token
 
 
 class RHSSOServiceConfiguration:

@@ -5,7 +5,6 @@ this two specs ware merged in to one parametrized test
 """
 
 import pytest
-
 from threescale_api.resources import Service
 
 

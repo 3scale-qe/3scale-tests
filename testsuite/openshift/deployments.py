@@ -7,6 +7,7 @@ from contextlib import ExitStack
 from datetime import timezone
 
 import openshift_client as oc
+
 from testsuite.openshift.env import Environ
 
 if typing.TYPE_CHECKING:

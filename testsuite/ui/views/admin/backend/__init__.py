@@ -1,7 +1,7 @@
 """Essential Views for Backends Views"""
 
-from widgetastic_patternfly4 import PatternflyTable
 from widgetastic.widget import Text
+from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.foundation import BaseAdminView

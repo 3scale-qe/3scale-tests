@@ -4,10 +4,10 @@ Tests wasm mapping rules special handling.
 
 import backoff
 import pytest
-from testsuite.capabilities import Capability
-from testsuite import rawobj
-from testsuite.utils import blame
 
+from testsuite import rawobj
+from testsuite.capabilities import Capability
+from testsuite.utils import blame
 
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_WASM)
 

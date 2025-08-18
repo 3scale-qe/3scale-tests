@@ -1,7 +1,6 @@
 "Rewrite spec/functional_specs/policies/default_credentials_spec.rb"
 
 import pytest
-
 from threescale_api.resources import Service
 
 from testsuite import rawobj

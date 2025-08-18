@@ -18,15 +18,16 @@ spec/functional_specs/policies/rate_limit/fixed_window/
 """
 
 import time
+
 import backoff
 import pytest
 import pytest_cases
 from pytest_cases import parametrize_with_cases
+
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import blame
-
 
 pytestmark = pytest.mark.flaky
 

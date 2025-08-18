@@ -6,8 +6,8 @@ only globally.
 
 import pytest
 
-from testsuite.certificates import Certificate
 from testsuite.capabilities import Capability
+from testsuite.certificates import Certificate
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame

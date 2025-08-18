@@ -5,16 +5,15 @@ metric is expected
 """
 
 import base64
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Tuple
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
+from packaging.version import Version
 from threescale_api.resources import Service
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
+from testsuite import TESTED_VERSION
 
 NUM_OF_REQUESTS = 10
 
@@ -22,7 +21,7 @@ pytestmark = [
     # can not be run in parallel
     pytest.mark.disruptive,
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6453"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),
 ]
 
 

@@ -1,7 +1,7 @@
 """Pytest plugin for collecting gateway logs"""
 
-from datetime import datetime, timezone
 import logging
+from datetime import datetime, timezone
 
 import pytest
 from _pytest.outcomes import Skipped

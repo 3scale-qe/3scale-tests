@@ -4,34 +4,38 @@ flake8 ignore needed because it treats the imported fixtures as F811 'redefinito
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
-from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
-from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, TlsTerminationPolicyView
-from testsuite.utils import blame
 
 # Imports for TLS fixtures
 # noqa # pylint: disable=unused-import
 from testsuite.tests.apicast.policy.tls.conftest import (
-    require_openshift,
-    staging_gateway,
-    mount_certificate_secret,
-    valid_authority,
     certificate,
     create_cert,
-    server_authority,
-    manager,
-    superdomain,
-    gateway_options,
     gateway_environment,
+    gateway_options,
+    manager,
+    mount_certificate_secret,
+    require_openshift,
+    server_authority,
+    staging_gateway,
+    superdomain,
+    valid_authority,
 )
+from testsuite.ui.views.admin.product.integration.configuration import (
+    ProductConfigurationView,
+)
+from testsuite.ui.views.admin.product.integration.policies import (
+    ProductPoliciesView,
+    TlsTerminationPolicyView,
+)
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.sandbag,  # TLS requires pretty specific complex setup
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6390"),
     pytest.mark.usefixtures("login"),
 ]

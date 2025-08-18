@@ -7,7 +7,7 @@ Capabilities are provider by a functions annotated with @capability_provider and
 """
 
 import enum
-from typing import Set, Callable, Any, Tuple, List
+from typing import Any, Callable, List, Set, Tuple
 
 # Users should have access only to these public methods/decorators
 __all__ = ["CapabilityRegistry", "Capability"]

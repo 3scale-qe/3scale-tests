@@ -3,9 +3,14 @@
 import pytest
 
 from testsuite.ui.views.admin.audience.application import ApplicationDetailView
-from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, Policies
-from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
 from testsuite.ui.views.admin.product.application import UsageRulesView
+from testsuite.ui.views.admin.product.integration.configuration import (
+    ProductConfigurationView,
+)
+from testsuite.ui.views.admin.product.integration.policies import (
+    Policies,
+    ProductPoliciesView,
+)
 
 
 @pytest.fixture(scope="module", autouse=True)

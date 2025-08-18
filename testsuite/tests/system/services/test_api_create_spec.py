@@ -3,9 +3,10 @@ Rewrite spec/functional_specs/api_create_spec.rb
 """
 
 import pytest
+
 from testsuite import rawobj
-from testsuite.utils import blame
 from testsuite.capabilities import Capability
+from testsuite.utils import blame
 
 
 @pytest.fixture(scope="module")

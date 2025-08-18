@@ -4,7 +4,9 @@ Rewrite spec/functional_specs/policies/url_rewrite_query/query_rewrite_policy_li
 
 from typing import Dict, List
 from urllib.parse import urlparse
+
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 

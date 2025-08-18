@@ -2,10 +2,10 @@
 
 import pytest
 
-from testsuite.ui.views.admin.audience.messages import MessagesView, ComposeMessageView
-from testsuite.utils import blame
-from testsuite.ui.views.devel.messages import InboxView, ComposeView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
+from testsuite.ui.views.admin.audience.messages import ComposeMessageView, MessagesView
+from testsuite.ui.views.devel.messages import ComposeView, InboxView
+from testsuite.utils import blame
 
 
 @pytest.fixture()

@@ -3,9 +3,9 @@ Provide a small client for interacting with Requestbin.
 """
 
 import xml.etree.ElementTree as Et
-import requests
 
 import backoff
+import requests
 
 
 # pylint: disable=too-few-public-methods

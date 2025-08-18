@@ -4,8 +4,7 @@ import re
 
 import pytest
 
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
+from testsuite.toolbox import constants, toolbox
 from testsuite.utils import randomize
 
 pytestmark = [

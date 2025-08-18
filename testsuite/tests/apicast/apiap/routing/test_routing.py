@@ -4,17 +4,16 @@ Test that request to product with specific paths to backends will be routed to c
 
 import pytest
 import pytest_cases
+from packaging.version import Version
 from pytest_cases import parametrize_with_cases
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.apiap.routing import routing_cases
 from testsuite.utils import blame
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.8.2')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.8.2"), reason="TESTED_VERSION < Version('2.8.2')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4937"),
 ]
 
@@ -68,13 +67,17 @@ def client(staging_gateway, application):
 @pytest_cases.parametrize(
     "append_slash",
     [
-        pytest.param(True, id="2.10_legacy", marks=[pytest.mark.skipif("TESTED_VERSION >= Version('2.11')")]),
+        pytest.param(
+            True,
+            id="2.10_legacy",
+            marks=[pytest.mark.skipif(TESTED_VERSION >= Version("2.11"), reason="TESTED_VERSION >= Version('2.11')")],
+        ),
         pytest.param(
             False,
             id="",
             marks=[
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7146"),
-                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+                pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
             ],
         ),
     ],

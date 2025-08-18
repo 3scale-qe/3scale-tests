@@ -5,8 +5,7 @@ from weakget import weakget
 
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
-from testsuite.utils import blame
-from testsuite.utils import warn_and_skip
+from testsuite.utils import blame, warn_and_skip
 
 
 @pytest.fixture(scope="module", autouse=True)

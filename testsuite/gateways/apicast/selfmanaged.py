@@ -2,13 +2,13 @@
 
 import inspect
 import logging
-from typing import Union, Type
+from typing import Type, Union
 
 from weakget import weakget
 
 from testsuite.capabilities import Capability
-from testsuite.gateways.gateways import Gateway, new_gateway
 from testsuite.gateways.apicast import AbstractApicast, OpenshiftApicast
+from testsuite.gateways.gateways import Gateway, new_gateway
 from testsuite.openshift.client import OpenShiftClient
 
 LOGGER = logging.getLogger(__name__)

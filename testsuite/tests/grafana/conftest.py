@@ -1,8 +1,8 @@
 """Check for openshift configuration"""
 
+import pytest
 from openshift_client import Missing
 from weakget import weakget
-import pytest
 
 from testsuite.utils import warn_and_skip
 

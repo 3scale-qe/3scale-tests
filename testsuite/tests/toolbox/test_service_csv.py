@@ -2,8 +2,9 @@
 
 import os
 import random
-import string
 import re
+import string
+
 import pytest
 
 from testsuite.config import settings
