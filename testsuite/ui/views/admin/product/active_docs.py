@@ -5,7 +5,7 @@ from widgetastic.widget import View, Text
 
 from testsuite.ui.views.admin.product import BaseProductView
 from testsuite.ui.widgets.buttons import ThreescaleDeleteButton, ThreescaleEditButton
-from testsuite.ui.widgets import ActiveDocV2Section
+from testsuite.ui.widgets import ActiveDocV2Section, ThreescaleDeleteEditGroup2
 from testsuite.ui.navigation import step
 from testsuite.ui.widgets.oas3 import Endpoint
 
@@ -14,12 +14,22 @@ class ActiveDocsView(BaseProductView):
     """View representation of Active Docs list page"""
 
     path_pattern = "/apiconfig/services/{product_id}/api_docs"
-    active_docs_table = PatternflyTable(locator=".//table")
+    active_docs_table = PatternflyTable(
+        locator=".//table",
+        column_widgets={
+            "Name": Text("./a"),
+            4: ThreescaleDeleteEditGroup2(),
+        },
+    )
+
+    def delete(self, active_doc):
+        """Navigate to active doc detail/preview page"""
+        self.active_docs_table.row(name=active_doc["name"])[4].widget.delete()
 
     @step("ActiveDocsDetailView")
     def detail(self, active_doc):
         """Navigate to active doc detail/preview page"""
-        self.active_docs_table.row(name=active_doc["name"]).name.click()
+        self.active_docs_table.row(name=active_doc["name"]).name.widget.click()
 
     def prerequisite(self):
         return BaseProductView
