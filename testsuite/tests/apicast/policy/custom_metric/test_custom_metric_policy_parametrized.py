@@ -52,7 +52,9 @@ def config(custom_service, case_data, request, backends_mapping, lifecycle_hooks
     proxy.policies.insert(0, policy_config)
     proxy.deploy()
 
-    return service, calls, metrics
+    yield service, calls, metrics
+    for usage in service.backend_usages.list():
+        usage.delete()
 
 
 @pytest_cases.fixture
