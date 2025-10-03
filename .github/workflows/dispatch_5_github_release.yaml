@@ -12,6 +12,8 @@ jobs:
       - name: select latest pre-release from a branch
         shell: bash
         run: gh release list | grep $(git describe --tags --abbrev=0)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: dispatch_github_release
         shell: bash
         run: git describe --tags --abbrev=0|xargs git show-ref|(read commit ref; ref=${ref##refs/tags/}; gh release create ${ref%%rc*} --generate-notes --target $commit)
