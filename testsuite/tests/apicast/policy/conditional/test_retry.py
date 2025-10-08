@@ -6,7 +6,7 @@ import pytest
 
 from testsuite.capabilities import Capability
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.utils import blame
+from testsuite.utils import blame, generate_tail
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 
@@ -37,7 +37,13 @@ def staging_gateway(request, testconfig):
 
 
 @pytest.fixture(scope="module")
-def policy_settings():
+def fail_request_suffix():
+    """Generate unique suffix for fail requests to avoid interference with other tests"""
+    return f"-{generate_tail()}"
+
+
+@pytest.fixture(scope="module")
+def policy_settings(fail_request_suffix):
     "config of upstream connection policy with read_timeout set"
     return rawobj.PolicyConfig(
         "conditional",
@@ -48,7 +54,7 @@ def policy_settings():
                         "left": "{{ uri }}",
                         "left_type": "liquid",
                         "op": "==",
-                        "right": "/fail-request/5/500",
+                        "right": f"/fail-request{fail_request_suffix}/5/500",
                         "right_type": "plain",
                     }
                 ]
@@ -58,11 +64,11 @@ def policy_settings():
     )
 
 
-def test_retry(api_client, mockserver):
+def test_retry(api_client, mockserver, fail_request_suffix):
     "test read timeout behavior"
     client = api_client(disable_retry_status_list=[503, 500, 404])
 
-    mockserver.temporary_fail_request(5)
-    assert client.get("/fail-request/5/500").status_code == 200
-    mockserver.temporary_fail_request(1)
-    assert client.get("/fail-request/1/500").status_code == 500
+    mockserver.temporary_fail_request(5, suffix=fail_request_suffix)
+    assert client.get(f"/fail-request{fail_request_suffix}/5/500").status_code == 200
+    mockserver.temporary_fail_request(1, suffix=fail_request_suffix)
+    assert client.get(f"/fail-request{fail_request_suffix}/1/500").status_code == 500

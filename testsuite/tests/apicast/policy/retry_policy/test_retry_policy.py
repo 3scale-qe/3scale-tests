@@ -13,6 +13,7 @@ import pytest
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.mockserver import Mockserver
+from testsuite.utils import generate_tail
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 
@@ -66,6 +67,12 @@ def mockserver(base_url, testconfig):
     return Mockserver(base_url, testconfig["ssl_verify"])
 
 
+@pytest.fixture(scope="module")
+def fail_request_suffix():
+    """Generate unique suffix for fail requests to avoid interference with other tests"""
+    return f"-{generate_tail()}"
+
+
 @pytest.mark.parametrize(
     "num_of_requests, awaited_response",
     [
@@ -74,7 +81,7 @@ def mockserver(base_url, testconfig):
         pytest.param(6, 500, id="6 request, should fail"),
     ],
 )
-def test_retry_policy(client, mockserver, num_of_requests, awaited_response):
+def test_retry_policy(client, mockserver, fail_request_suffix, num_of_requests, awaited_response):
     """
     To test retry policy:
     - append the retry policy, conifgured to retry max n times
@@ -88,6 +95,6 @@ def test_retry_policy(client, mockserver, num_of_requests, awaited_response):
     - make request n+1 times (/fail-request/n+1/500)
     - test if response is 500
     """
-    mockserver.temporary_fail_request(num_of_requests)
-    response = client.get("/fail-request/" + str(num_of_requests) + "/500")
+    mockserver.temporary_fail_request(num_of_requests, suffix=fail_request_suffix)
+    response = client.get(f"/fail-request{fail_request_suffix}/{num_of_requests}/500")
     assert response.status_code == awaited_response

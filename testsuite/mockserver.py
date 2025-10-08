@@ -26,14 +26,22 @@ class Mockserver:
         self._webhook = f"/webhook/{generate_tail()}"
         self.url = urljoin(self._url, self._webhook)
 
-    def temporary_fail_request(self, num, status=500):
-        """Create failing call for num occurences"""
+    def temporary_fail_request(self, num, status=500, suffix=""):
+        """Create failing call for num occurences
+
+        Args:
+            num: Number of times the request should fail
+            status: HTTP status code to return
+            suffix: Optional suffix to add after "fail-request" (e.g., "-abc123")
+        """
+        path = f"/fail-request{suffix}/{num}/{status}"
+
         response = requests.put(
             urljoin(self._url, "/mockserver/expectation"),
             verify=self.verify,
             data=json.dumps(
                 {
-                    "httpRequest": {"path": f"/fail-request/{num}/{status}"},
+                    "httpRequest": {"path": path},
                     "times": {"remainingTimes": num, "unlimited": False},
                     "httpResponse": {"statusCode": status},
                 }
