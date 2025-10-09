@@ -15,6 +15,12 @@ from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 pytestmark = pytest.mark.nopersistence
 
 
+@pytest.fixture(scope="session", autouse=True)
+def threescale():
+    """override fixture as threescale client is not needed, saves time"""
+    return
+
+
 PARAMETERS = [
     ("threescale_system", "amp-system", ["system-app", "system-sidekiq"], []),
     ("threescale_backend", "amp-backend", ["backend-listener", "backend-worker", "backend-cron"], []),
