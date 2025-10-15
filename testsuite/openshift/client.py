@@ -376,3 +376,12 @@ class OpenShiftClient:
         # only first yaml object is needed, rest of the output might contain logs where yaml parser might give up
         cluster_info = yaml.safe_load(lookup.out().split("---", 1)[0])
         return cluster_info["items"][0]["metadata"]["labels"]["kubernetes.io/arch"]
+
+    @cached_property
+    def fips(self):
+        """Openshift FIPS status"""
+        cluster_config = self.do_action(
+            "get", ["cm", "cluster-config-v1", "-n", "kube-system", "-o", "yaml"], parse_output=True
+        )
+        # only first yaml object is needed, rest of the output might contain logs where yaml parser might give up
+        return "fips: true" in cluster_config.model.data["install-config"]
