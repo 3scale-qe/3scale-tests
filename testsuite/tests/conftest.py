@@ -269,7 +269,7 @@ def pytest_metadata(metadata):
         admin_url = "(private tenant created on the fly is in use)"
 
     prometheus_client = _resolve_prometheus_client(settings, configuration.openshift)
-    rhsso = _resolve_rhsso(settings, _resolve_tools(settings), _rhsso_kind(settings))
+    rhsso = _resolve_rhsso(settings, _resolve_tools(settings), _rhsso_route(_rhsso_kind(settings)))
 
     metadata.update(
         {
@@ -654,23 +654,37 @@ def rhsso_kind(testconfig):
     return _rhsso_kind(testconfig)
 
 
-def _resolve_rhsso(testconfig, tools, rhsso_kind):
-    cnf = testconfig["rhsso"]
-    if "password" not in cnf:
-        return None
-    key = "no-ssl-rhbk"
+def _rhsso_route(rhsso_kind):
+    key = "ssl-rhbk+ssl"  # if rhsso_kind == "rhbk+ssl"
+    if rhsso_kind == "rhbk":
+        key = "no-ssl-rhbk"
     if rhsso_kind == "rhsso":
         key = "no-ssl-sso"
-    return RHSSO(server_url=tools[key], username=cnf["username"], password=cnf["password"])
+
+    return key
 
 
 @pytest.fixture(scope="session")
-def rhsso_service_info(request, testconfig, tools, rhsso_kind):
+def rhsso_route(testconfig, rhsso_kind):
+    """return route name with options like: rhbk+ssl"""
+    return _rhsso_route(rhsso_kind)
+
+
+def _resolve_rhsso(testconfig, tools, route_name):
+    cnf = testconfig["rhsso"]
+    if "password" not in cnf:
+        return None
+
+    return RHSSO(server_url=tools[route_name], username=cnf["username"], password=cnf["password"])
+
+
+@pytest.fixture(scope="session")
+def rhsso_service_info(request, testconfig, tools, rhsso_kind, rhsso_route):
     """
     Set up client for zync
     :return: dict with all important details
     """
-    rhsso = _resolve_rhsso(testconfig, tools, rhsso_kind)
+    rhsso = _resolve_rhsso(testconfig, tools, rhsso_route)
     if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
     realm = rhsso.create_realm(blame(request, "realm"), accessTokenLifespan=24 * 60 * 60)

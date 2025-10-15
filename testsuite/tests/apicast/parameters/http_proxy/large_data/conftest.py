@@ -23,8 +23,10 @@ def gateway_environment(gateway_environment, testconfig, tools, rhsso_kind):
       Tinyproxy has a problem with http openshift routes
     - To not load configuration every time, we set APIcast to load configuration on boot instead
     """
-    key = "no-ssl-rhbk"
-    if rhsso_kind == "rhsso":
+    key = "ssl-rhbk+ssl"
+    if rhsso_kind == "rhbk":
+        key = "no-ssl-rhbk"
+    elif rhsso_kind == "rhsso":
         key = "no-ssl-sso"
     rhsso_url = urlparse(tools[key]).hostname
     proxy_endpoint = testconfig["proxy"]

@@ -19,7 +19,7 @@ default:
       default:
         kind: "SystemApicast"
   rhsso:
-    kind: rhbk
+    kind: rhbk+ssl
     test_user:
       username: testUser
       password: testUser

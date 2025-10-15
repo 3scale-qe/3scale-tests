@@ -113,7 +113,7 @@ def _rhsso_credentials(tools_config, rhsso_config):
     server_url = tools_config.get("server")
     project = tools_config.get("namespace")
     token = tools_config.get("token")
-    kind = rhsso_config.get("kind", "rhbk")
+    kind = rhsso_config.get("kind", "rhbk+ssl")
     try:
         # is this RHOAM?
         tools = OpenShiftClient(project_name="redhat-rhoam-user-sso", server_url=server_url, token=token)
@@ -124,16 +124,23 @@ def _rhsso_credentials(tools_config, rhsso_config):
         pass
 
     tools = OpenShiftClient(project_name=project, server_url=server_url, token=token)
-    if kind == "rhbk":
+    if kind.startswith("rhbk"):
         try:
-            # was it deployed as part of tools?
+            # was it deployed as part of tools
+            username = tools.secrets["rhbk-admin"]["username"].decode("utf-8")
+            password = tools.secrets["rhbk-admin"]["password"].decode("utf-8")
+            return username, password
+        except (OpenShiftPythonException, KeyError):
+            pass
+        try:
+            # was it deployed as part of tools
             username = tools.secrets["rhbk-initial-admin"]["username"].decode("utf-8")
             password = tools.secrets["rhbk-initial-admin"]["password"].decode("utf-8")
             return username, password
         except (OpenShiftPythonException, KeyError):
             pass
 
-    if kind == "rhsso":
+    elif kind == "rhsso":
         try:
             # first RHSSO 7.5 way
             username = tools.secrets["credential-sso"]["ADMIN_USERNAME"].decode("utf-8")
