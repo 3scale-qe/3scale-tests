@@ -67,6 +67,9 @@ speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz $(flags) testsuite/tests
 
+capabilities-speedrun: pipenv check-secrets.yaml
+	$(PYTEST) -n1 -m 'not flaky' --drop-sandbag --capabilities $(flags) testsuite
+
 sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
 sandbag: pipenv
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite/tests
@@ -90,6 +93,9 @@ debug: test
 
 smoke: pipenv check-secrets.yaml
 	$(PYTEST) -n6 -msmoke $(flags) testsuite/tests
+
+capabilities-smoke: pipenv check-secrets.yaml
+	$(PYTEST) -n3 -msmoke --capabilities $(flags) testsuite
 
 flaky: pipenv check-secrets.yaml
 	$(PYTEST) -mflaky $(flags) testsuite/tests
