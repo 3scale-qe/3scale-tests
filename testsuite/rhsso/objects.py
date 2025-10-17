@@ -80,16 +80,17 @@ class Client:
 class RHSSO:
     """Helper class for RHSSO server"""
 
-    def __init__(self, server_url, username, password) -> None:
+    def __init__(self, server_url, username, password, verify=False) -> None:
         # python-keycloak API requires url to be pointed at auth/ endpoint
         # pylint: disable=protected-access
+        self.verify = verify
         try:
             self.master = KeycloakAdmin(
                 server_url=server_url,
                 username=username,
                 password=password,
                 realm_name="master",
-                verify=False,
+                verify=verify,
             )
             self.master.get_clients()  # test whether the server url is valid
             self.server_url = server_url
@@ -100,7 +101,7 @@ class RHSSO:
                 username=username,
                 password=password,
                 realm_name="master",
-                verify=False,
+                verify=verify,
             )
             self.master.get_clients()  # test whether the server url is valid
 

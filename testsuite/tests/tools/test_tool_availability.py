@@ -50,10 +50,10 @@ def test_sso_availability(rhsso_kind, rhsso_service_info: RHSSOServiceConfigurat
         - for rhbk also asserts that the status is UP
     """
     endpoint = rhsso_service_info.rhsso.server_url
-    if rhsso_kind == "rhbk":
-        endpoint = endpoint.replace("no-ssl-rhbk", "no-ssl-rhbk-management") + "/health"
+    if rhsso_kind.startswith("rhbk"):
+        endpoint = endpoint.replace("ssl-rhbk", "ssl-rhbk-management") + "/health"
     response = requests.get(endpoint, verify=False)
     assert response.status_code == 200
-    if rhsso_kind == "rhbk":
+    if rhsso_kind.startswith("rhbk"):
         status = json.loads(response.text)["status"]
         assert status == "UP"

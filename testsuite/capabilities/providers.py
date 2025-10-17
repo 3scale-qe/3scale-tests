@@ -49,3 +49,16 @@ def scaling():
 
 
 CapabilityRegistry().register_provider(scaling, {Capability.SCALING})
+
+
+def fips():
+    """
+    FIPS cluster limits crypto avaiable to be used
+    """
+
+    if openshift().fips:
+        return {Capability.FIPS}
+    return {Capability.NOFIPS}
+
+
+CapabilityRegistry().register_provider(fips, {Capability.NOFIPS, Capability.FIPS})
