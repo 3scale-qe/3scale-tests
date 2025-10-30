@@ -13,7 +13,7 @@ from packaging.version import Version
 from testsuite.utils import blame
 from testsuite import TESTED_VERSION, rawobj
 
-pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="Threescale version must be at least 2.16.0")
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16.1"), reason="Threescale version must be at least 2.16.1")
 
 
 @pytest.fixture(scope="module")
@@ -66,7 +66,7 @@ def policy_settings():
         {
             "enable_access_logs": False,
             "custom_logging":
-                f'{{{{req.headers.{"x-fapi-transaction-id"}}}}}#{{{{resp.headers.{"x-fapi-transaction-id"}}}}}',
+                f'{{{{req.headers.{"x-fapi-interaction-id"}}}}}#{{{{resp.headers.{"x-fapi-interaction-id"}}}}}',
         },
     )
     return [fapi_policy, logging_policy]
@@ -96,18 +96,18 @@ def service_config_version(service):
 # pylint: disable=too-many-arguments
 def test_x_fapi_header(request, client, gateway, provide_fapi_id, custom_id, service_config_version):
     """
-        Test that requests on product with fapi policy returns provided x-fapi-transaction-id header
+        Test that requests on product with fapi policy returns provided x-fapi-interaction-id header
     Test:
         - Create product with fapi policy via API
-        - Add logging policy, which logs "x-fapi-transaction-id" header
-        - Send http GET request to endpoint / with unique header "x-fapi-transaction-id"
-        - Assert that response has status code 200 and has header "x-fapi-transaction-id" matches provided id
-        - Assert that x-fapi-transaction-id was logged
-        - Send GET request to endpoint / without header "x-fapi-transaction-id"
+        - Add logging policy, which logs "x-fapi-interaction-id" header
+        - Send http GET request to endpoint / with unique header "x-fapi-interaction-id"
+        - Assert that response has status code 200 and has header "x-fapi-interaction-id" matches provided id
+        - Assert that x-fapi-interaction-id was logged
+        - Send GET request to endpoint / without header "x-fapi-interaction-id"
         - Assert that response has status code 200
-        - Assert that response has header "x-fapi-transaction-id: uuid", where uuid is
+        - Assert that response has header "x-fapi-interaction-id: uuid", where uuid is
         valid uuid version 4 specified in RFC 4122
-        - Assert that newly generated x-fapi-transaction-id was logged
+        - Assert that newly generated x-fapi-interaction-id was logged
 
     """
     client_kwargs = {}
@@ -120,16 +120,17 @@ def test_x_fapi_header(request, client, gateway, provide_fapi_id, custom_id, ser
 
     headers = None
     if provide_fapi_id:
-        headers = {"x-fapi-transaction-id": custom_id}
+        headers = {"x-fapi-interaction-id": custom_id}
 
     result = client.get("/", headers=headers)
-    fapi_id = result.headers.get("x-fapi-transaction-id")
+    fapi_id = result.headers.get("x-fapi-interaction-id")
     assert result.status_code == 200
+    assert fapi_id
     if provide_fapi_id:
-        # test whether apicast returns same x-fapi-transaction-id
+        # test whether apicast returns same x-fapi-interaction-id
         assert fapi_id == custom_id
     else:
-        # test whether apicast generates new x-fapi-transaction-id
+        # test whether apicast generates new x-fapi-interaction-id
         assert UUID(fapi_id).variant == "specified in RFC 4122"
         assert UUID(fapi_id).version == 4
     logs = gateway.get_logs()
@@ -146,22 +147,23 @@ def test_x_fapi_header(request, client, gateway, provide_fapi_id, custom_id, ser
 # pylint: disable=unused-argument
 def test_x_fapi_customer_ip(ip, ok, api_client, provide_fapi_id, custom_id):
     """
-        Test that requests on product with fapi policy returns provided x-fapi-transaction-id header
+        Test that requests on product with fapi policy returns provided x-fapi-interaction-id header
     Test:
         - Create product with fapi policy via API
-        - Send GET request to endpoint / with header "x-fapi-customer-ip-address" and "x-fapi-transaction-id"
+        - Send GET request to endpoint / with header "x-fapi-customer-ip-address" and "x-fapi-interaction-id"
         - Assert that response has status code 200 for valid IPv4 and IPv6 addresses
         - Assert that response status code is not 200 for invalid IP address
-        - Assert that "x-fapi-transaction-id" stayed the same when was provided and was generated when wasn't provided
+        - Assert that "x-fapi-interaction-id" stayed the same when was provided and was generated when wasn't provided
 
     """
     headers = {"x-fapi-customer-ip-address": ip}
     if provide_fapi_id:
-        headers.update({"x-fapi-transaction-id": custom_id})
+        headers.update({"x-fapi-interaction-id": custom_id})
     client = api_client()
     resp = client.get("/", headers=headers)
     assert resp.ok == ok
-    fapi_id = resp.headers.get("x-fapi-transaction-id")
+    fapi_id = resp.headers.get("x-fapi-interaction-id")
+    assert fapi_id
     if provide_fapi_id:
         assert fapi_id == custom_id
     else:
