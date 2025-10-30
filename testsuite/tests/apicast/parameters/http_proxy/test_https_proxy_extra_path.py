@@ -35,8 +35,10 @@ def gateway_environment(gateway_environment, testconfig, tools, rhsso_kind):
         - HTTPS_PROXY parameter
         - NO_PROXY - needed to skip proxy for internal services: system, backend, sso
     """
-    key = "no-ssl-rhbk"
-    if rhsso_kind == "rhsso":
+    key = "ssl-rhbk+ssl"
+    if rhsso_kind == "rhbk":
+        key = "no-ssl-rhbk"
+    elif rhsso_kind == "rhsso":
         key = "no-ssl-sso"
     rhsso_url = urlparse(tools[key]).hostname
     https_proxy = testconfig["proxy"]["https"]

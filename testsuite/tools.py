@@ -56,7 +56,9 @@ def _url(openshift, key, namespace):
             _, port = option.split(":", 1)
         openshift.do_action("get", ["svc", key])  # just check if the service exists
         return f"http://{key}.{namespace}.svc:{port}"
+
     hostname = openshift.routes[key]["spec"]["host"]
+
     if option == "ssl":
         return f"https://{hostname}:443"
     return f"http://{hostname}:80"
@@ -92,7 +94,7 @@ class Settings:
     """Get testenv tools from testsuite settings"""
 
     def __getitem__(self, name):
-        if name in ["no-ssl-sso", "no-ssl-rhbk"]:
+        if name in ["no-ssl-sso", "no-ssl-rhbk", "ssl-rhbk+ssl"]:
             return settings["rhsso"]["url"]
         try:
             return settings["threescale"]["service"]["backends"][name]
