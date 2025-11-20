@@ -13,7 +13,7 @@ from packaging.version import Version
 from testsuite.utils import blame
 from testsuite import TESTED_VERSION, rawobj
 
-pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16.1"), reason="Threescale version must be at least 2.16.1")
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16.2"), reason="Threescale version must be at least 2.16.2")
 
 
 @pytest.fixture(scope="module")
