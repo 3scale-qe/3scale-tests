@@ -22,10 +22,10 @@ RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1
 
 ARG PYTHON_VERSION=3.11
 
-RUN yum install -y python${PYTHON_VERSION} pip make gettext && \
+RUN yum install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-pip make gettext && \
 	yum clean all
 
-RUN pip3 --no-cache-dir install pipenv
+RUN pip${PYTHON_VERSION} --no-cache-dir install pipenv
 
 WORKDIR /opt/workdir/3scale-py-testsuite
 

@@ -34,6 +34,7 @@ PYTEST += --html=$(resultsdir)/report-$(@F).html --self-contained-html
 endif
 
 ifdef PYTHON_VERSION
+DOCKER_BUILD_ARGS += --build-arg PYTHON_VERSION=$(PYTHON_VERSION)
 PIPENV_ARGS += --python $(PYTHON_VERSION)
 endif
 
@@ -186,9 +187,9 @@ container-image: ## Build container image
 container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
 ifdef CACERT
-	docker build -t $(IMAGENAME) --build-arg=$(CACERT) .
+	docker build -t $(IMAGENAME) --build-arg=$(CACERT) $(DOCKER_BUILD_ARGS) .
 else
-	docker build -t $(IMAGENAME) .
+	docker build -t $(IMAGENAME) $(DOCKER_BUILD_ARGS) .
 endif
 
 clean: ## clean pip deps
