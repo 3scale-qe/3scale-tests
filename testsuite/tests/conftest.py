@@ -17,7 +17,9 @@ import openshift_client as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key
-from threescale_api import client, errors
+from threescale_api_crd import client as crd_client
+from threescale_api import client as rest_client
+from threescale_api import errors
 from weakget import weakget
 
 # to actually initialize all the providers
@@ -49,6 +51,13 @@ def term_handler():
     orig = signal.signal(signal.SIGTERM, signal.getsignal(signal.SIGINT))
     yield
     signal.signal(signal.SIGTERM, orig)
+
+
+@pytest.fixture(scope="session")
+def api_client_type(pytestconfig):
+    """Do tests use REST API client(False) or CR Capabilities client(True)?"""
+
+    return pytestconfig.getoption("capabilities")
 
 
 def pytest_addoption(parser):
@@ -97,6 +106,9 @@ def pytest_addoption(parser):
     parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
     parser.addoption("--tool-check", action="store_true", default=False, help="Run also tool availability check tests")
     parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
+    parser.addoption(
+        "--capabilities", action="store_true", default=False, help="Run tests with CR api client (default: False)"
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -150,6 +162,10 @@ def pytest_runtest_setup(item):
     else:
         if Capability.APICAST not in CapabilityRegistry():
             pytest.skip(f"Skipping test because current gateway doesn't have implicit capability {Capability.APICAST}")
+    if "/cr_capabilities/" in item.nodeid and not item.config.getoption("--capabilities"):
+        pytest.skip("Excluding CR Capabilities tests")
+    if "nocrcap" in marks and item.config.getoption("--capabilities"):
+        pytest.skip("Excluding tests incompatible with CR capabilities")
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -439,9 +455,8 @@ def testconfig():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def threescale(testconfig, request):
+def threescale(testconfig, request, api_client_type):
     "Threescale client"
-
     if weakget(testconfig)["fixtures"]["threescale"]["private_tenant"] % False:
         custom_tenant = request.getfixturevalue("custom_tenant")
         password = secrets.token_urlsafe(16)
@@ -464,7 +479,16 @@ def threescale(testconfig, request):
 
         return admin
 
-    return client.ThreeScaleClient(
+    if api_client_type:
+        return crd_client.ThreeScaleClientCRD(
+            testconfig["threescale"]["admin"]["url"],
+            testconfig["threescale"]["admin"]["token"],
+            ssl_verify=testconfig["ssl_verify"],
+            ocp_namespace=testconfig["openshift"]["projects"]["threescale"]["name"],
+            wait=0,
+        )
+
+    return rest_client.ThreeScaleClient(
         testconfig["threescale"]["admin"]["url"],
         testconfig["threescale"]["admin"]["token"],
         ssl_verify=testconfig["ssl_verify"],
@@ -473,10 +497,18 @@ def threescale(testconfig, request):
 
 
 @pytest.fixture(scope="session")
-def master_threescale(testconfig):
+def master_threescale(testconfig, api_client_type):
     """Threescale client using master url and token"""
 
-    return client.ThreeScaleClient(
+    if api_client_type:
+        return crd_client.ThreeScaleClientCRD(
+            testconfig["threescale"]["master"]["url"],
+            testconfig["threescale"]["master"]["token"],
+            ssl_verify=testconfig["ssl_verify"],
+            ocp_namespace=testconfig["openshift"]["projects"]["threescale"]["name"],
+        )
+
+    return rest_client.ThreeScaleClient(
         testconfig["threescale"]["master"]["url"],
         testconfig["threescale"]["master"]["token"],
         ssl_verify=testconfig["ssl_verify"],
@@ -968,6 +1000,8 @@ def custom_service(threescale, request, testconfig, logger):
                 params["description"] = blame_desc(request, params.get("description"))
 
             svc = threescale_client.services.create(params=params)
+            if len(svc.mapping_rules.list()) == 0:
+                svc.mapping_rules.create(rawobj.Mapping(svc.metrics.list()[0], pattern="/"))
 
             self._autoclean = autoclean
             if not testconfig["skip_cleanup"]:
@@ -978,7 +1012,6 @@ def custom_service(threescale, request, testconfig, logger):
                             hook(svc)
                         except Exception:  # pylint: disable=broad-except
                             pass
-
                     svc.delete()
 
                 with self._lock:
