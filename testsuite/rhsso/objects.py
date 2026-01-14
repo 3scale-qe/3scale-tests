@@ -44,8 +44,14 @@ class Realm:
 
     def oidc_client(self, client_id, client_secret) -> KeycloakOpenID:
         """Create OIDC client for this realm"""
+        server_url = self.admin.connection.server_url
+
+        # Inline check for server_url
+        if server_url is None or not server_url.strip():
+            raise RuntimeError("server_url must be set and non-empty")
+
         return KeycloakOpenID(
-            server_url=self.admin.connection.server_url,
+            server_url=server_url,
             client_id=client_id,
             realm_name=self.name,
             client_secret_key=client_secret,
