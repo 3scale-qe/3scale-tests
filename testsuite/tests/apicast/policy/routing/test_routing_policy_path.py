@@ -35,7 +35,7 @@ def service(service, private_base_url, httpbin_host):
     proxy = service.proxy.list()
 
     # let's convert URL to use IP address to have it different from Host header
-    (scheme, netloc, path, query, fragment) = urlsplit(private_base_url("httpbin"))
+    scheme, netloc, path, query, fragment = urlsplit(private_base_url("httpbin"))
 
     hostname = netloc
     user = None
