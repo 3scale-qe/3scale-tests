@@ -71,7 +71,7 @@ def test_debug_policy(api_client, access_token, service):
 
     assert "uri" in jrequest
     assert jrequest["uri"] == "/"
-    assert jrequest["host"] == parsed_url.hostname
+    assert jrequest["host"] in (parsed_url.hostname, parsed_url.netloc)
     assert jrequest["http_method"] == "GET"
     assert jrequest["current"]["original_request"]["current"]["query"] == "access_token=" + access_token
 

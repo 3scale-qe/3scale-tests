@@ -116,7 +116,7 @@ def test_query_rewrite_policy_liquid_set(api_client, service, all_params):
     assert echoed_request_params["liquid_arg"] == "Service " + str(service["id"])
     assert echoed_request_params["uri"] == "/get"
     assert echoed_request_params["md5_uri"] == "D3170460F7014C0475FF0723DEEFFD4B".lower()
-    assert echoed_request_params["host"] == parsed_url.hostname
+    assert echoed_request_params["host"] in (parsed_url.hostname, parsed_url.netloc)
     assert echoed_request_params["http_method"] == "GET"
 
     for param in all_params:

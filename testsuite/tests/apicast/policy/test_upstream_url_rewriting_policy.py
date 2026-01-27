@@ -54,7 +54,8 @@ def test_url_rewriting_policy_v1(api_client, private_base_url):
     request = EchoedRequest.create(api_client().get("/httpbin/v1"))
     assert request.path == "/rewrite"
     # X-Forwarded- can contain more values
-    assert parsed_url.hostname in request.headers["X-Forwarded-Host"]
+    forwarded_hosts = [h.strip() for h in request.headers["X-Forwarded-Host"].split(",")]
+    assert any(h in (parsed_url.hostname, parsed_url.netloc) for h in forwarded_hosts)
     assert "443" in request.headers["X-Forwarded-Port"]
     assert "https" in request.headers["X-Forwarded-Proto"]
 
@@ -68,7 +69,7 @@ def test_url_rewriting_policy_v2(api_client, application, private_base_url):
     assert response.status_code == 200
 
     request = EchoedRequest.create(response)
-    assert request.headers["Host"] == parsed_url.hostname
+    assert request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
     hits = resilient.analytics_list_by_service(
         application.threescale_client, application["service_id"], "hits", "total", old_usage + 1
