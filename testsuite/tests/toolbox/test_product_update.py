@@ -314,7 +314,7 @@ def test_update(toolbox_update, modify_product, dst_product, product_service, se
     # pylint: disable=too-many-statements
     # pylint: disable=too-many-arguments
     # pylint: disable=unused-argument
-    (stdout, stderr) = toolbox_update
+    stdout, stderr = toolbox_update
 
     assert not stderr
     assert re.findall(r"copy proxy policies", stdout)
@@ -401,12 +401,12 @@ def test_metrics_methods_maps_in_product(
     assert int(re.findall(r"updated proxy of (\d+) to match the original", stdout)[0]) == int(dst_product["id"])
 
     src_hits = service.metrics.read_by(**{"friendly_name": "Hits"})
-    (hits_id, number_meth) = re.findall(r"original service hits metric (\d+) has (\d+) methods", stdout)[0]
+    hits_id, number_meth = re.findall(r"original service hits metric (\d+) has (\d+) methods", stdout)[0]
     assert int(hits_id) == src_hits["id"]
     assert int(number_meth) == len(src_hits.methods.list())
 
     dst_hits = dst_product.metrics.read_by(**{"friendly_name": "Hits"})
-    (dst_hits_id, dst_number_meth) = re.findall(r"target service hits metric (\d+) has (\d+) methods", stdout)[0]
+    dst_hits_id, dst_number_meth = re.findall(r"target service hits metric (\d+) has (\d+) methods", stdout)[0]
     assert int(dst_hits_id) == dst_hits["id"]
 
     missing = int(re.findall(r"created (\d+) missing methods on target service", stdout)[0])

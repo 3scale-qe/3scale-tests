@@ -9,7 +9,6 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite import rawobj
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.9')")]
 
 

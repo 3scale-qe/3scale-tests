@@ -7,7 +7,6 @@ import pytest
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 from testsuite.utils import warn_and_skip
 
-
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.16')")
 
 

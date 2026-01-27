@@ -14,7 +14,6 @@ import pytest
 
 from testsuite.config import settings
 
-
 if typing.TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 

@@ -12,10 +12,8 @@ import httpx
 
 from testsuite.lifecycle_hook import LifecycleHook
 
-
 # pylint: disable=too-few-public-methods
 from testsuite.utils import basic_auth_string
-
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

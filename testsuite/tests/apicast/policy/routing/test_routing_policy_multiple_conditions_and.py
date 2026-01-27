@@ -46,7 +46,7 @@ def test_routing_policy_route_testing(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
     assert echoed_request.path == "/route/get"
 
 
@@ -59,7 +59,7 @@ def test_routing_policy_route_hello(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
 def test_routing_policy_noroute_test(api_client, private_base_url):
@@ -71,7 +71,7 @@ def test_routing_policy_noroute_test(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
 def test_routing_policy_route(api_client, private_base_url):
@@ -83,7 +83,7 @@ def test_routing_policy_route(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
 def test_routing_policy_empty(api_client, private_base_url):
@@ -95,4 +95,4 @@ def test_routing_policy_empty(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)

@@ -11,7 +11,6 @@ from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import warn_and_skip
 
-
 pytestmark = pytest.mark.required_capabilities(Capability.NOFIPS)
 
 

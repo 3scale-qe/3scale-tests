@@ -10,7 +10,6 @@ from testsuite.utils import blame, generate_tail
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.template import TemplateApicast
 
-
 pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.16')")
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 

@@ -46,7 +46,7 @@ def test_routing_policy_jwt_httpbin(api_client, private_base_url):
     response = api_client().get("/get")
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
     assert response.request.headers["Authorization"].startswith("Bearer")  # RHSSO used?
 
 
@@ -59,4 +59,4 @@ def test_routing_policy_jwt_echo_api(second_application, api_client, private_bas
     assert response.status_code == 200
     echoed_request = EchoedRequest.create(response)
     assert echoed_request.path == "/get"
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)

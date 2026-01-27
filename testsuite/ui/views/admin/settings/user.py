@@ -72,11 +72,11 @@ class UserDetailView(BaseSettingsView):
     role = RadioGroup('//*[@id="user_role_input"]')
 
     permissions = CheckBoxGroup(
-        '//*[@id="user_member_permissions_input"]',  # type:ignore
+        '//*[@id="user_member_permissions_input"]',  # type: ignore
         ol_identifier="FeatureAccessList",
     )
     access_list = CheckBoxGroup(
-        '//*[@id="user_member_permissions_input"]',  # type:ignore
+        '//*[@id="user_member_permissions_input"]',  # type: ignore
         ol_identifier="ServiceAccessList",
     )
 
