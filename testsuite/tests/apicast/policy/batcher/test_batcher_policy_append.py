@@ -6,7 +6,6 @@ from time import sleep
 import pytest
 from testsuite import rawobj
 
-
 BATCH_REPORT_SECONDS = 50
 
 

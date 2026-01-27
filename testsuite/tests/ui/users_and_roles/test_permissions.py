@@ -11,7 +11,6 @@ from testsuite.ui.views.admin.audience.developer_portal import (
 )
 from testsuite.ui.views.admin.foundation import AccessDeniedView
 
-
 PERMISSION_DICT = [
     pytest.param("portal", DeveloperPortalContentView),
     pytest.param("portal", DeveloperPortalContentView),

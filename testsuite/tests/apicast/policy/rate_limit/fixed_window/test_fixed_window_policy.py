@@ -27,7 +27,6 @@ from testsuite.capabilities import Capability
 from testsuite.tests.apicast.policy.rate_limit.fixed_window import config_cases
 from testsuite.utils import blame
 
-
 pytestmark = pytest.mark.flaky
 
 

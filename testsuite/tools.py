@@ -31,7 +31,6 @@ from testsuite.config import settings
 from testsuite.configuration import openshift
 from testsuite.openshift.client import OpenShiftClient
 
-
 _tr = {
     "echo_api": "mockserver+ssl",
     "httpbin": "go-httpbin+ssl",

@@ -206,7 +206,7 @@ def credentials_location(request):
             "keykey8",
             "query",
             marks=[
-                pytest.mark.xfail(TESTED_VERSION < Version('2.16'), reason="Bug fixed in 2.16"),
+                pytest.mark.xfail(TESTED_VERSION < Version("2.16"), reason="Bug fixed in 2.16"),
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763"),
                 pytest.mark.fuzz,
             ],

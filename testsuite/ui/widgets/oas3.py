@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from widgetastic.utils import ParametrizedLocator
 from widgetastic.widget import ParametrizedView, Text, Table, Widget, TextInput, GenericLocatorWidget
 
-
 # pylint: disable=abstract-method
 
 

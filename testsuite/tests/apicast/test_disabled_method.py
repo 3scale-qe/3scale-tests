@@ -5,7 +5,6 @@ Test that disabled method is not accessible
 import pytest
 from testsuite import rawobj
 
-
 pytestmark = pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-3330")
 
 

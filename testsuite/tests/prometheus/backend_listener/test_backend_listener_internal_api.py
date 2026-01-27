@@ -15,7 +15,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 from threescale_api.resources import Service
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 NUM_OF_REQUESTS = 10
 
 pytestmark = [

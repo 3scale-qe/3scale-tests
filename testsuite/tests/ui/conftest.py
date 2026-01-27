@@ -36,7 +36,6 @@ from testsuite.ui.views.master.login import MasterLoginView
 from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame, get_results_dir_path
 
-
 LOGGER = logging.getLogger(__name__)
 
 
