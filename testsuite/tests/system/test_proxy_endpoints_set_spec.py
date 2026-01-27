@@ -7,7 +7,6 @@ import pytest
 from testsuite.capabilities import Capability
 from testsuite.utils import warn_and_skip
 
-
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY)
 
 

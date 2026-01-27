@@ -9,7 +9,6 @@ from testsuite.utils import blame, wait_interval
 from testsuite import rawobj
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 # rate-limit have been always unstable, likely because of overhead in staging apicast?
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3795"),

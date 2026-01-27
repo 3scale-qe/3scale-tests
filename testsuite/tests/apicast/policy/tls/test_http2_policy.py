@@ -10,7 +10,6 @@ from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
 from testsuite.httpx import HttpxClient
 
-
 # CFSSL instance is necessary
 pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),

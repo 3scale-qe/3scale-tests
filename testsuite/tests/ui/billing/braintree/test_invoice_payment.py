@@ -2,7 +2,6 @@
 
 import pytest
 
-
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7762"),
 ]
