@@ -163,7 +163,7 @@ def test_copy(
     # pylint: disable=too-many-statements
     # pylint: disable=too-many-arguments
     # pylint: disable=unused-argument
-    (stdout, stderr) = toolbox_copy
+    stdout, stderr = toolbox_copy
 
     assert not stderr
     assert re.findall(r"copy proxy policies", stdout)
@@ -252,12 +252,12 @@ def test_metrics_methods_maps_in_product(
     assert int(re.findall(r"updated proxy of (\d+) to match the original", stdout)[0]) == int(dst_product["id"])
 
     src_hits = service.metrics.read_by(**{"friendly_name": "Hits"})
-    (hits_id, number_meth) = re.findall(r"original service hits metric (\d+) has (\d+) methods", stdout)[0]
+    hits_id, number_meth = re.findall(r"original service hits metric (\d+) has (\d+) methods", stdout)[0]
     assert int(hits_id) == src_hits["id"]
     assert int(number_meth) == len(src_hits.methods.list())
 
     dst_hits = dst_product.metrics.read_by(**{"friendly_name": "Hits"})
-    (dst_hits_id, dst_number_meth) = re.findall(r"target service hits metric (\d+) has (\d+) methods", stdout)[0]
+    dst_hits_id, dst_number_meth = re.findall(r"target service hits metric (\d+) has (\d+) methods", stdout)[0]
     assert int(dst_hits_id) == dst_hits["id"]
     # there is no method on target metric Hits
     assert int(dst_number_meth) == 0
