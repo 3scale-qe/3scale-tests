@@ -6,7 +6,6 @@ from time import sleep
 
 import pytest
 
-
 BATCH_REPORT_SECONDS = 50
 
 

@@ -11,7 +11,6 @@ from testsuite.gateways.apicast.operator import OperatorApicast
 from testsuite.utils import blame
 from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 pytestmark = pytest.mark.nopersistence
 
 

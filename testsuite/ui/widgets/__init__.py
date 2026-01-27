@@ -12,7 +12,6 @@ from widgetastic_patternfly4 import Select, Modal
 
 from testsuite.ui.exception import ItemNotPresentException
 
-
 # Widget contains fill method which raise not implemented exception if widget is not fillable but pylint detect it as
 # an abstract method. Disabling abstract-method for all widgets.
 # pylint: disable=abstract-method
