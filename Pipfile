@@ -58,6 +58,7 @@ pytest-persistence = "*"
 pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
+pip-system-certs = "*"
 
 [requires]
 python_version = "3"
