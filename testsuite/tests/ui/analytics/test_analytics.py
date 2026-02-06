@@ -69,11 +69,11 @@ def test_analytics(navigator, service, api_client, backend_anything, backend_val
     assert traffic.read_metric() == 1
 
     traffic.select_metric("hits")
-    # Wait for the metric to update to expected value
+    # Wait for the metric to update from initial value, then verify it's correct
     try:
-        wait_for(lambda: traffic.read_metric() == 5, timeout="3s", delay=0.2)
+        wait_for(lambda: traffic.read_metric() != 1, timeout="3s", delay=0.2)
     except TimedOutError:
-        pass
+        pass  # Metric didn't update after timeout, pytest assertion will fail
     assert traffic.read_metric() == 5
 
     traffic = navigator.navigate(BackendTrafficView, backend=backend_anything)
