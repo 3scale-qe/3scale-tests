@@ -2,6 +2,7 @@
 
 import pytest
 
+from wait_for import wait_for, TimedOutError
 from testsuite import rawobj
 from testsuite.ui.views.admin.backend.analytics import BackendTrafficView
 from testsuite.ui.views.admin.product.analytics import ProductTrafficView
@@ -67,7 +68,13 @@ def test_analytics(navigator, service, api_client, backend_anything, backend_val
     traffic.select_metric(f'hits.{service.backend_usages.list()[1]["backend_id"]}')
     assert traffic.read_metric() == 1
 
+    
     traffic.select_metric("hits")
+    # Wait for the metric to update to expected value
+    try:
+        wait_for(lambda: traffic.read_metric() == 5, timeout="3s", delay=0.2)
+    except TimedOutError:
+        pass
     assert traffic.read_metric() == 5
 
     traffic = navigator.navigate(BackendTrafficView, backend=backend_anything)
