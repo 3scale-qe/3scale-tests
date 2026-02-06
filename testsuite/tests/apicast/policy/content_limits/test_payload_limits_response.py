@@ -8,7 +8,6 @@ from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5244"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),

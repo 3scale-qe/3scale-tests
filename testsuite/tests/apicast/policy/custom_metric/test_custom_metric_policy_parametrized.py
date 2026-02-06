@@ -13,7 +13,6 @@ from testsuite.tests.apicast.policy.custom_metric import config_cases
 from testsuite.utils import blame
 from testsuite import rawobj, resilient, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5098"),
     pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),

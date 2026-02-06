@@ -27,7 +27,6 @@ import importlib_resources as resources
 
 from testsuite.config import settings  # noqa
 
-
 # To avoid indefinite waiting on socket issues default timeout is used.
 # Furthermore to avoid reset of timeout, monkey patching is used to alter
 # socket.settimeout behavior

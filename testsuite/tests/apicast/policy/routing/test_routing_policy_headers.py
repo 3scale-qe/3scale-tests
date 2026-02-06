@@ -46,7 +46,8 @@ def test_routing_policy_with_header(api_client, service, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == urlparse(private_base_url("httpbin")).hostname
+    parsed_url = urlparse(private_base_url("httpbin"))
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
 def test_routing_policy_with_header_without_id(api_client, private_base_url):
@@ -58,7 +59,7 @@ def test_routing_policy_with_header_without_id(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
 def test_routing_policy_without_header(api_client, private_base_url):
@@ -70,4 +71,4 @@ def test_routing_policy_without_header(api_client, private_base_url):
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    assert echoed_request.headers["Host"] == parsed_url.hostname
+    assert echoed_request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)

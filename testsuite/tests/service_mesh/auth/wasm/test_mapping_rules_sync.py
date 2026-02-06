@@ -8,7 +8,6 @@ from testsuite.capabilities import Capability
 from testsuite import rawobj
 from testsuite.utils import blame
 
-
 pytestmark = pytest.mark.required_capabilities(Capability.SERVICE_MESH_WASM)
 
 

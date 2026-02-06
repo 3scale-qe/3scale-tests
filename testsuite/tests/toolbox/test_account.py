@@ -31,7 +31,7 @@ def test_find_account_by_name(account, create_cmd):
     """Run command 'account find'"""
     ret = toolbox.run_cmd(create_cmd("find", account["org_name"]))
     assert not ret["stderr"]
-    (acc_id, org_name) = parse_find_command_out(ret["stdout"])
+    acc_id, org_name = parse_find_command_out(ret["stdout"])
     assert int(acc_id) == account["id"]
     assert org_name == account["org_name"]
 
@@ -43,6 +43,6 @@ def test_find_account_by_user(account, user, create_cmd):
         for attr in ["email", "username"]:
             ret = toolbox.run_cmd(create_cmd("find", acc_user[attr]))
             assert not ret["stderr"]
-            (acc_id, org_name) = parse_find_command_out(ret["stdout"])
+            acc_id, org_name = parse_find_command_out(ret["stdout"])
             assert int(acc_id) == account["id"]
             assert org_name == account["org_name"]

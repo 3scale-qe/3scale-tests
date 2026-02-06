@@ -8,7 +8,6 @@ import pytest
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 
-
 BATCH_REPORT_SECONDS = 50
 
 

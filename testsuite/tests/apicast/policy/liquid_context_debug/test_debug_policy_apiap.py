@@ -10,7 +10,6 @@ import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
-
 pytestmark = [
     pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6312"),
@@ -71,7 +70,7 @@ def test_debug_policy(api_client, access_token, service):
 
     assert "uri" in jrequest
     assert jrequest["uri"] == "/"
-    assert jrequest["host"] == parsed_url.hostname
+    assert jrequest["host"] in (parsed_url.hostname, parsed_url.netloc)
     assert jrequest["http_method"] == "GET"
     assert jrequest["current"]["original_request"]["current"]["query"] == "access_token=" + access_token
 

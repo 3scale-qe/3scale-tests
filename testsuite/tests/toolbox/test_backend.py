@@ -103,14 +103,14 @@ def test_copy(toolbox_copy, my_backend, my_backend_metrics, my_backend_methods, 
     """Test for checking copied backend"""
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
-    (stdout, stderr) = (toolbox_copy["stdout"], toolbox_copy["stderr"])
+    stdout, stderr = (toolbox_copy["stdout"], toolbox_copy["stderr"])
 
     assert not stderr
-    (s_back_id, s_system_name) = re.findall(r"source backend ID: (\d+) system_name: (\w+)", stdout)[0]
+    s_back_id, s_system_name = re.findall(r"source backend ID: (\d+) system_name: (\w+)", stdout)[0]
     assert my_backend["id"] == int(s_back_id)
     assert my_backend["system_name"] == s_system_name
 
-    (t_back_id, t_system_name) = re.findall(r"target backend ID: (\d+) system_name: (\w+)", stdout)[0]
+    t_back_id, t_system_name = re.findall(r"target backend ID: (\d+) system_name: (\w+)", stdout)[0]
     dst_backend = dest_client.backends[int(t_back_id)]
     assert dst_backend["system_name"] == t_system_name
 

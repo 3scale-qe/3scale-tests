@@ -8,7 +8,6 @@ from widgetastic.types import ViewParent
 from widgetastic_patternfly4.navigation import check_nav_loaded
 from widgetastic_patternfly4 import ouia
 
-
 # pylint: disable=abstract-method
 
 

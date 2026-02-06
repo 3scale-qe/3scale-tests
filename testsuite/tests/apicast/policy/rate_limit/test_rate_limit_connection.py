@@ -36,7 +36,6 @@ from testsuite import rawobj
 from testsuite.httpx import AsyncClientHook
 from testsuite.utils import randomize, blame
 
-
 # the results can be bit unstable due to higher load caused by parallel
 # http requests
 pytestmark = pytest.mark.flaky
