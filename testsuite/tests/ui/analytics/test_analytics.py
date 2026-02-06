@@ -68,7 +68,6 @@ def test_analytics(navigator, service, api_client, backend_anything, backend_val
     traffic.select_metric(f'hits.{service.backend_usages.list()[1]["backend_id"]}')
     assert traffic.read_metric() == 1
 
-    
     traffic.select_metric("hits")
     # Wait for the metric to update to expected value
     try:
