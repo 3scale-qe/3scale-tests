@@ -55,14 +55,14 @@ def auth0_setup(ui_sso_integration, testconfig, navigator, set_callback_urls, au
     urls = sso.callback_urls()
     set_callback_urls(testconfig["auth0"]["client"], urls)
 
-    sso.test_flow(Auth0View, auth0_user["email"], "RedHat123")
+    sso.test_flow(Auth0View, auth0_user.email, "RedHat123")
     assert sso.test_flow_checkbox.is_checked
     sso.publish()
 
     yield urls
 
     if not testconfig["skip_cleanup"]:
-        name = auth0_user["email"].split("@")[0]
+        name = auth0_user.email.split("@")[0]
         user = resilient.resource_read_by_name(threescale.provider_account_users, name)
         user.delete()
 
@@ -70,7 +70,7 @@ def auth0_setup(ui_sso_integration, testconfig, navigator, set_callback_urls, au
 @pytest.fixture
 def auth0_login(auth0_setup, auth0_user, custom_auth0_login):
     """Login into 3scale via RHSSO"""
-    custom_auth0_login(auth0_user["email"], "RedHat123", False)
+    custom_auth0_login(auth0_user.email, "RedHat123", False)
 
 
 @pytest.fixture
@@ -78,7 +78,7 @@ def auth0_bounce_login(auth0_setup, browser, auth0_user):
     """Login into 3scale via RHSSO using /bounce URL"""
     browser.url = auth0_setup[0].replace("/callback", "/bounce")
     provider = Auth0View(browser.root_browser)
-    provider.login(auth0_user["email"], "RedHat123")
+    provider.login(auth0_user.email, "RedHat123")
 
 
 # pylint: disable=too-many-locals
