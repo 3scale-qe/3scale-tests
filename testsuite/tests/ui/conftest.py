@@ -11,7 +11,7 @@ from datetime import datetime
 import backoff
 import pytest
 import pytest_html
-from auth0.management import auth0
+from auth0.management import Auth0
 from selenium.common import InvalidSessionIdException, WebDriverException
 from threescale_api.errors import ApiClientError
 from threescale_api.resources import Account, ApplicationPlan, Service
@@ -582,7 +582,7 @@ def auth0_client(testconfig):
     """
     API client for Auth0
     """
-    return auth0.Auth0(testconfig["auth0"]["domain"], auth0_token())
+    return Auth0(tenant_domain=testconfig["auth0"]["domain"], token=auth0_token())
 
 
 @pytest.fixture(scope="module")
@@ -592,18 +592,18 @@ def set_callback_urls(auth0_client):
     """
     cleanup = []
 
-    @backoff.on_predicate(backoff.fibo, lambda x: not x["callbacks"], max_tries=8, jitter=None)
+    @backoff.on_predicate(backoff.fibo, lambda x: not x.callbacks, max_tries=8, jitter=None)
     def _get_auth_client(client_id):
         return auth0_client.clients.get(client_id)
 
     def _set_callback_urls(client_id, urls: list):
-        auth0_client.clients.update(client_id, body={"callbacks": urls})
+        auth0_client.clients.update(client_id, callbacks=urls)
         cleanup.append(client_id)
         return _get_auth_client(client_id)
 
     yield _set_callback_urls
     for client in cleanup:
-        auth0_client.clients.update(client, body={"callbacks": []})
+        auth0_client.clients.update(client, callbacks=[])
 
 
 @pytest.fixture(scope="module")
@@ -619,17 +619,15 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
     """
     name = blame(request, "auth_user")
     user = auth0_client.users.create(
-        {
-            "email": f"{name}@anything.invalid",
-            "password": auth0_user_password,
-            "connection": "Username-Password-Authentication",
-            "email_verified": True,
-        }
+        email=f"{name}@anything.invalid",
+        password=auth0_user_password,
+        connection="Username-Password-Authentication",
+        email_verified=True,
     )
     if not testconfig["skip_cleanup"]:
 
         def _delete():
-            auth0_client.users.delete(user["user_id"])
+            auth0_client.users.delete(user.user_id)
 
         request.addfinalizer(_delete)
     return user
