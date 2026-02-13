@@ -57,7 +57,7 @@ class Policies(enum.Enum):
     ON_FAIL = "On fail"
     REQUEST_UNBUFFERED = "Request Unbuffered"
     URL_REWRITING_WITH_CAPTURES = "URL Rewriting with Captures"
-    THE_FINANCIAL_GRADE_API = "The Financial-grade API (FAPI)"
+    THE_FINANCIAL_GRADE_API = "Financial-grade API (FAPI)"
     JWT_PARSER = "JWT Parser"
 
 
