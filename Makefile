@@ -66,7 +66,7 @@ all-is-package:
 .PRECIOUS: testsuite/%
 testsuite/%: ## pattern to run individual testfile or directories (arg is passed to pytest with flags to allow most of tests to run)
 testsuite/%: FORCE pipenv check-secrets.yaml
-	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
+	$(PYTEST) -v --performance --ui --disruptive --toolbox --fuzz --images --tool-check $(flags) $@
 
 test: ## Run test
 test pytest tests: pipenv check-secrets.yaml
