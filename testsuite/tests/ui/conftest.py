@@ -49,6 +49,7 @@ def webdriver():
         headless=settings["fixtures"]["ui"]["browser"]["headless"],
         remote_url=settings["fixtures"]["ui"]["browser"]["remote_url"],
         binary_path=settings["fixtures"]["ui"]["browser"]["binary_path"],
+        disable_http2=settings["fixtures"]["ui"]["browser"]["disable_http2"],
     )
 
 
