@@ -33,8 +33,15 @@ ifdef html
 PYTEST += --html=$(resultsdir)/report-$(@F).html --self-contained-html
 endif
 
+DOCKER_BUILD_ARGS += --provenance=false --sbom=false
+
 ifdef PYTHON_VERSION
+DOCKER_BUILD_ARGS += --build-arg PYTHON_VERSION=$(PYTHON_VERSION)
 PIPENV_ARGS += --python $(PYTHON_VERSION)
+endif
+
+ifdef CACERT
+DOCKER_BUILD_ARGS += --build-arg=$(CACERT)
 endif
 
 ifeq ($(filter-out --store --load,$(flags)),$(flags))
@@ -185,11 +192,7 @@ pipenv-dev: .make-pipenv-sync-dev
 container-image: ## Build container image
 container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
-ifdef CACERT
-	docker build -t $(IMAGENAME) --build-arg=$(CACERT) .
-else
-	docker build -t $(IMAGENAME) .
-endif
+	docker build -t $(IMAGENAME) $(DOCKER_BUILD_ARGS) .
 
 clean: ## clean pip deps
 clean: mostlyclean
@@ -254,9 +257,9 @@ dist: pipenv fetch-tools
 	git checkout $(_version)
 	test -e VERSION
 ifdef CACERT
-	docker build `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` --build-arg "cacert=$(CACERT)" .
+	docker build --provenance=false --sbom=false `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` --build-arg "cacert=$(CACERT)" .
 else
-	docker build `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` .
+	docker build --provenance=false --sbom=false `$(RUNSCRIPT)semver-docker-tags "-t $(IMAGENAME)" $(_version) 4` .
 endif
 ifdef PUSHIMAGE
 	$(RUNSCRIPT)semver-docker-tags $(IMAGENAME) $(_version) 4|tr ' ' '\n'|xargs -l docker push
