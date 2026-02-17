@@ -64,7 +64,7 @@ all-is-package:
 .PRECIOUS: testsuite/%
 # pattern to run individual testfile or all testfiles in directory
 testsuite/%: FORCE pipenv check-secrets.yaml
-	$(PYTEST) -v --performance --ui --disruptive --toolbox $(flags) $@
+	$(PYTEST) -v --performance --ui --disruptive --toolbox --fuzz --images --tool-check $(flags) $@
 
 test: ## Run test
 test pytest tests: pipenv check-secrets.yaml
