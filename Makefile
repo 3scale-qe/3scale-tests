@@ -48,6 +48,7 @@ ifeq ($(filter-out --store --load,$(flags)),$(flags))
 	PYTEST += -p no:persistence
 endif
 
+commit-acceptance: ## Run all linters, checks, formatters
 commit-acceptance: pylint flake8 mypy all-is-package black-check
 
 pylint flake8 mypy: pipenv-dev
@@ -62,7 +63,7 @@ all-is-package:
 	@! find testsuite/ -type d \! -name __pycache__ \! -path 'testsuite/resources/*' \! -exec test -e {}/__init__.py \; -print | grep '^..*$$'
 
 .PRECIOUS: testsuite/%
-# pattern to run individual testfile or all testfiles in directory
+testsuite/%: ## Pattern to run individual testfile or directories (arg is passed to pytest with flags to allow most of tests to run)
 testsuite/%: FORCE pipenv check-secrets.yaml
 	$(PYTEST) -v --performance --ui --disruptive --toolbox --fuzz --images --tool-check $(flags) $@
 
@@ -78,12 +79,12 @@ sandbag:  ## Complemetary set to speedrun that makes the rest of test target (sp
 sandbag: pipenv
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite/tests
 
-fuzz:  ## run tests from tests/fuzz
+fuzz:  ## Run tests from tests/fuzz
 fuzz: pipenv
 	$(PYTEST) -n8 -m 'not flaky' --fuzz $(flags) testsuite/tests/fuzz
 
 
-persistence: ## Run speedrun tests compatible with persistence plugin. Use persitence-store|persistence-load instead
+persistence: ## Run tests compatible with persistence plugin. Use persitence-store|persistence-load instead
 persistence: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-nopersistence $(flags) testsuite/tests
 
@@ -95,27 +96,34 @@ debug: ## Run test  with debug flags
 debug: flags := $(flags) -s
 debug: test
 
+smoke: ## Run basic smoke tests
 smoke: pipenv check-secrets.yaml
 	$(PYTEST) -n6 -msmoke $(flags) testsuite/tests
 
+flaky: ## Run flaky tests
 flaky: pipenv check-secrets.yaml
 	$(PYTEST) -mflaky $(flags) testsuite/tests
 
+disruptive: ## Run disruptive tests
 disruptive: pipenv check-secrets.yaml
 	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite/tests
 
 performance-smoke: pipenv check-secrets.yaml
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
 
+ui: ## Run ui tests (will use selenium as configured in config/settings.local.yaml)
 ui: pipenv check-secrets.yaml
 	$(PYTEST) --ui $(flags) testsuite/tests/ui
 
+toolbox: ## Run toolbox tests
 toolbox: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadgroup --toolbox $(flags) testsuite/tests/toolbox
 
+test-images: ## Verify deployed images matches extracted digest from configs/settings.local.yaml
 test-images:
 	$(PYTEST) --images $(flags) testsuite/tests/images
 
+check: ## Run small tests to verify tools are confured and repond to requests
 check: pipenv check-secrets.yaml
 	$(PYTEST) --tool-check $(flags) testsuite/tests/tools
 
@@ -194,7 +202,7 @@ container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
 	docker build -t $(IMAGENAME) $(DOCKER_BUILD_ARGS) .
 
-clean: ## clean pip deps
+clean: ## Clean pip deps
 clean: mostlyclean
 	rm -f Pipfile.lock
 
