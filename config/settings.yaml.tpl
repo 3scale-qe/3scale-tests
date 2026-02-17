@@ -71,6 +71,7 @@ default:
         source: "" #local ,remote or binary
         webdriver: "" #chrome , firefox or edge(edge with remote drivers)
         remote_url: "" #URL and port to remote selenium instance e.g. http://127.0.0.1:4444
+        disable_http2: false
     tools:
       # tools is a fixture to provide testenv services like echo_api, jaeger
       # and services that are needed for testing each service is identified by
