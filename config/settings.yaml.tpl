@@ -71,6 +71,7 @@ default:
         source: "" #local ,remote or binary
         webdriver: "" #chrome , firefox or edge(edge with remote drivers)
         remote_url: "" #URL and port to remote selenium instance e.g. http://127.0.0.1:4444
+        disable_http2: false
     tools:
       # tools is a fixture to provide testenv services like echo_api, jaeger
       # and services that are needed for testing each service is identified by
@@ -88,7 +89,7 @@ default:
       # if `httpbin+svc:8888` is not found also `httpbin_plus_svc_port_8888` is
       # searched, this latter key can be used also in the config, however it
       # should not be, this is just for env.
-      sources: [ Rhoam, OpenshiftProject, Settings ] # Testenv information sources ordered by priority, query ends at first return of some value
+      sources: [ Settings, Rhoam, OpenshiftProject ] # Testenv information sources ordered by priority, query ends at first return of some value
       namespace: tools # openshift namespace/project where the testenv tools are deployed
       server_url: # openshift url where the testenv tools are deployed (default is same openshift as 3scale is deployed)
       token: # token for openshift where the testenv tools are deployed (unnecessary for for default openshift)

@@ -392,7 +392,7 @@ def operator_apicast_openshift():
 
 def _resolve_tools(testconfig):
     options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
-    sources = options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
+    sources = options.get("sources", ["Settings", "Rhoam", "OpenshiftProject"])
     return Tools(sources, options)
 
 
