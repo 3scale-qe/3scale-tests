@@ -18,13 +18,16 @@ METRICS_QUE = [
     "que_job_enqueued_total",
     "que_job_failures_total",
     "que_job_performed_total",
-    # "que_job_retries_total", # Removing as the existance of this metric is conditional on retries.
-    # If no retry, fail is triggered.
+    "que_job_retries_total",
     "que_jobs_scheduled_total",
     "que_workers_total",
     "rails_connection_pool_connections",
     "rails_connection_pool_size",
     "rails_connection_pool_waiting",
+    "que_job_enqueued_total",
+    "que_job_failures_total",
+    "que_job_performed_total",
+    "que_job_retries_total",
     "que_job_runtime_seconds_sum",
     "que_job_runtime_seconds_count",
 ]

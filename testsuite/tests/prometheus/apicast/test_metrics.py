@@ -27,11 +27,7 @@ METRICS = [
     "upstream_status",
     "apicast_status",
     "worker_process",
-    # TODO: Policy-dependent metrics below only appear when specific policies are configured
-    # Tested in test_content_caching_policy.py, removed here
-    # "content_caching",
-    # "batching_policy_auths_cache_hits",
-    # "batching_policy_auths_cache_misses",
+    "content_caching",
 ]
 
 METRICS_HISTOGRAM = ["total_response_time_seconds", "upstream_response_time_seconds"]
