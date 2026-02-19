@@ -26,11 +26,11 @@ LABELS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
     ("app", "apicast"),
     ("com.company", "Red_Hat"),
     ("control-plane", "controller-manager"),
-    ("rht.comp", "3scale_apicast"),
+    ("rht.comp", "3scale"),
     ("rht.comp_ver", None),
     ("rht.prod_name", "Red_Hat_Integration"),
     ("rht.prod_ver", None),
-    ("rht.subcomp", "apicast_operator"),
+    ("rht.subcomp", "Apicast_operator"),
     ("rht.subcomp_t", "infrastructure"),
 ]
 
