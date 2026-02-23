@@ -140,7 +140,7 @@ def credentials_location(request):
             ],
         ),
         # credentials located in the query
-        pytest.param("MYID", "keykey1", "headers"),
+        pytest.param("MYID", "keykey1", "query"),
         pytest.param(
             "!#$&'(",
             "keykey2",
