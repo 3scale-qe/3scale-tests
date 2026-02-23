@@ -1,6 +1,5 @@
 """Test special characters in app_id and app_key"""
 
-import random
 import pytest
 from threescale_api.resources import Service
 
@@ -63,7 +62,7 @@ def client2(application):
 @pytest.fixture(scope="module")
 def app_id(request):
     """indirect fixture for app_id used for creating and used as reference value in assert"""
-    return "".join(random.sample(request.param, len(request.param)))
+    return request.param
 
 
 @pytest.fixture(scope="module")
@@ -82,9 +81,9 @@ def credentials_location(request):
     ("app_id", "app_key", "credentials_location"),
     [
         # credentials located in the headers
-        pytest.param("MYID", "keykey1", "headers"),
+        pytest.param("MYIDh", "keykey1", "headers"),
         pytest.param(
-            "!#$&'(",
+            "!#$&'(h",
             "keykey2",
             "headers",
             marks=[
@@ -92,7 +91,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            ")*+,-./:",
+            ")*+,-./:h",
             "keykey3",
             "headers",
             marks=[
@@ -100,7 +99,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            ";=?@",
+            ";=?@h",
             "keykey4",
             "headers",
             marks=[
@@ -108,7 +107,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "_~ID",
+            "_~IDh",
             "keykey5",
             "headers",
             marks=[
@@ -116,7 +115,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            '"%<>[\\]^`{|}',
+            '"%<>[\\]^`{|}h',
             "keykey6",
             "headers",
             marks=[
@@ -124,7 +123,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "{}*~KEY",
+            "{}*~KEYh",
             "keykey7",
             "headers",
             marks=[
@@ -132,7 +131,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "9999_",
+            "1111_",
             "keykey8",
             "headers",
             marks=[
@@ -140,9 +139,9 @@ def credentials_location(request):
             ],
         ),
         # credentials located in the query
-        pytest.param("MYID", "keykey1", "headers"),
+        pytest.param("MYIDq", "keykey1", "query"),
         pytest.param(
-            "!#$&'(",
+            "!#$&'(q",
             "keykey2",
             "query",
             marks=[
@@ -152,7 +151,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            ")*+,-./:",
+            ")*+,-./:q",
             "keykey3",
             "query",
             marks=[
@@ -162,7 +161,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            ";=?@",
+            ";=?@q",
             "keykey4",
             "query",
             marks=[
@@ -172,7 +171,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "_~ID",
+            "_~IDq",
             "keykey5",
             "query",
             marks=[
@@ -180,7 +179,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            '"%<>[\\]^`{|}',
+            '"%<>[\\]^`{|}q',
             "keykey6",
             "query",
             marks=[
@@ -190,7 +189,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "{}*~KEY",
+            "{}*~KEYq",
             "keykey7",
             "query",
             marks=[
@@ -201,7 +200,7 @@ def credentials_location(request):
             ],
         ),
         pytest.param(
-            "9999_",
+            "2222_",
             "keykey8",
             "query",
             marks=[
