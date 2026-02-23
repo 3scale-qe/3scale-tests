@@ -14,6 +14,7 @@ black = "*"
 #python-language-server = "*"
 #pyls-mypy = "*"
 #pyls-isort = "*"
+#jedi = "*"
 # Optional debugger dependencies
 #ipdb = "*"
 #web-pdb = "*"
@@ -27,7 +28,6 @@ pytest = "<9.0.0"
 pytest-cases = "*"
 pytest-asyncio = "==0.21.2"
 requests = "*"
-3scale-api = ">=0.35.0"
 dynaconf = "*"
 python-keycloak = ">=4.7.3"  # this fix needed: https://github.com/marcospereirampj/python-keycloak/pull/622/files
 backoff = "*"
@@ -38,10 +38,6 @@ webdriver-manager = "*"
 widgetastic-core = "<2.0.0"  # as long as we use widgetastic-patternfly4
 widgetastic-patternfly4 = "*"
 widgetastic-patternfly = "*"
-# For developing purposes should be added 3scale-api library from source or
-# from github repository
-# 3scale-api = {editable = true,path = "./../3scale-api-python"}
-# 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 cfssl = "==0.0.3b243"
 openshift-client = ">=2.0.1"
 hyperfoil-client="*"
@@ -58,6 +54,13 @@ pytest-persistence = "*"
 pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
+
+# 3scale API clients
+# For developing purposes should be added 3scale-api library from source or from github repository
+
+3scale-api = ">=0.35.0"
+# 3scale-api = {editable = true,path = "./../3scale-api-python"}
+# 3scale-api = {git = "https://github.com/pestanko/3scale-api-python.git", editable = true}
 
 [requires]
 python_version = "3"
