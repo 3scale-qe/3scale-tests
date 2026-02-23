@@ -123,7 +123,7 @@ test-images: ## Verify deployed images matches extracted digest from configs/set
 test-images:
 	$(PYTEST) --images $(flags) testsuite/tests/images
 
-check: ## Run small tests to verify tools are confured and repond to requests
+check: ## Run small tests to verify tools are configured and respond to requests
 check: pipenv check-secrets.yaml
 	$(PYTEST) --tool-check $(flags) testsuite/tests/tools
 
