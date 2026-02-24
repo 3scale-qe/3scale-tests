@@ -159,7 +159,7 @@ class ThreescaleWebdriver:
         """
         Perform all required post-init actions.
         """
-        self.session.maximize_window()
+        self.session.set_window_size(1920, 1080)
 
     def finalize(self):
         """
