@@ -7,6 +7,7 @@ import requests
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
 from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite.config import settings
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded
@@ -177,11 +178,11 @@ def test_tls_path_routing_with_logging(client, client2, staging_gateway):
     url2 = f'{client2._base_url}/bar/foo?user_key={client2.auth.credentials["user_key"]}'
     session = requests.Session()
     for _ in range(5):
-        response = session.get(url1, verify=False)
+        response = session.get(url1, verify=settings["ssl_verify"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service1/foo/bar"
-        response = session.get(url2, verify=False)
+        response = session.get(url2, verify=settings["ssl_verify"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service2/bar/foo"
