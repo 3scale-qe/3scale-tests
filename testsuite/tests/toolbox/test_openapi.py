@@ -62,24 +62,25 @@ POLICIES = {
 
 
 @pytest.fixture(scope="module", params=["oas2", "oas3"])
-def oas(request):
+def oas(request, private_base_url):
     """Loads oas file"""
+    httpbin_url = private_base_url("httpbin")
     fil_oas = None
     fil_txt = None
     if request.param == "oas2":
         src = resources.files(OAS_FILES[request.param][0]).joinpath(OAS_FILES[request.param][1])
         with src.open("r") as opened_file:
             fil_oas = json.load(opened_file)
-            parsed_url = urlparse(settings["threescale"]["service"]["backends"]["httpbin"])
+            parsed_url = urlparse(httpbin_url)
             fil_oas["host"] = parsed_url.netloc
     else:
         src = resources.files(OAS_FILES[request.param][0]).joinpath(OAS_FILES[request.param][1])
         with src.open("r") as oas3_fil:
             fil_oas = yaml.load(oas3_fil, Loader=yaml.SafeLoader)
-            fil_oas["servers"][0]["url"] = settings["threescale"]["service"]["backends"]["httpbin"] + "/anything"
+            fil_oas["servers"][0]["url"] = httpbin_url + "/anything"
         with src.open("r") as oas3_fil:
             fil_txt = oas3_fil.read()
-            new_url = settings["threescale"]["service"]["backends"]["httpbin"] + "/anything"
+            new_url = httpbin_url + "/anything"
             fil_txt = fil_txt.replace("http://petstore.swagger.io/api", new_url)
 
     fil_name = settings["toolbox"]["podman_cert_dir"] + "/"
