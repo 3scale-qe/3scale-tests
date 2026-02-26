@@ -160,6 +160,12 @@ Alternatively it can be set in the configuration.
 `make disruptive NAMESPACE=3scale`
  - tests with side-effect
 
+`make capabilities-smoke NAMESPACE=3scale`
+ - smoke tests using 3scale Capabilities client instead of 3scale API client
+
+`make capabilities-speedrun NAMESPACE=3scale`
+ - speedrun tests using 3scale Capabilities client instead of 3scale API client
+
 Targets can be combined
 
 `make test flaky NAMESPACE=3scale`
@@ -170,6 +176,13 @@ Targets can be combined
 
 `make ./testsuite/tests/apicast/auth/test_basic_auth_user_key.py NAMESPACE=3scale`
  - to run particular test standalone
+
+### 3scale Capabilities
+
+By default 3scale REST API client is used. 3scale Capabilities client can be used
+instead of 3scale REST API client by using `--capabilities` argument. This argument
+unlock running of specific Capabilities tests. For more information about 3scale Capabilities
+see https://github.com/3scale/3scale-operator/blob/master/doc/operator-application-capabilities.md
 
 ### Test Selection, Marks and Custom Arguments
 

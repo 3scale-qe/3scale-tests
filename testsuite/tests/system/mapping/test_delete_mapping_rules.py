@@ -9,7 +9,7 @@ from testsuite import rawobj
 @pytest.fixture(scope="module")
 def service(service):
     """Removes default mapping rule from service"""
-    service.mapping_rules.delete(service.mapping_rules.list()[0].entity_id)
+    service.mapping_rules.list()[0].delete()
     service.proxy.deploy()
     return service
 

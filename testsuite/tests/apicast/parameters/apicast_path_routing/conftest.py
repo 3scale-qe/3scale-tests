@@ -10,7 +10,7 @@ def delete_all_mapping_rules(proxy):
     """Deletes all mapping rules in a given proxy."""
     mapping_rules = proxy.mapping_rules.list()
     for mapping_rule in mapping_rules:
-        proxy.mapping_rules.delete(mapping_rule["id"])
+        mapping_rule.delete()
 
 
 @pytest.fixture(scope="module")

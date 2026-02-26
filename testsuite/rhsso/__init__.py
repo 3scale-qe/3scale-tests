@@ -181,7 +181,12 @@ class OIDCClientAuthHook:
         self.credentials_location = credentials_location
         self.oidc_configuration = oidc_configuration
         if self.oidc_configuration is None:
-            self.oidc_configuration = {"standard_flow_enabled": False, "direct_access_grants_enabled": True}
+            self.oidc_configuration = {
+                "standard_flow_enabled": False,
+                "direct_access_grants_enabled": True,
+                "implicit_flow_enabled": False,
+                "service_accounts_enabled": False,
+            }
 
     # pylint: disable=no-self-use
     def before_service(self, service_params: dict) -> dict:
