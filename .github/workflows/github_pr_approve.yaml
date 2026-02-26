@@ -6,7 +6,7 @@ jobs:
   github_pr_approve:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: support stale approve
         # This provides extra approve for any PR that has:
         #   at least 2 reviews requested,
