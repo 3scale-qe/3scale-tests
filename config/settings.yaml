@@ -3,11 +3,6 @@ default:
   ssl_verify: true
   http2: false
   threescale:
-    service:
-      backends:
-        httpbin: https://httpbin.org:443
-        echo_api: https://echo-api.3scale.net:443
-        httpbin_nossl: http://httpbin.org:80
     gateway:
       SelfManagedApicast:
         force: OperatorApicast
@@ -55,6 +50,7 @@ default:
         webdriver: chrome
         remote_url: http://127.0.0.1:4444
         binary_path: ""
+        disable_http2: false
 
   cfssl:
     binary: "cfssl"
