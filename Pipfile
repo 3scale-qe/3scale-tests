@@ -54,6 +54,7 @@ pytest-persistence = "*"
 pytest-metadata = ">=3.0.0"
 pytest-html = "*"
 ansi2html = "*"
+pip-system-certs = "*"
 
 # 3scale API clients
 # For developing purposes should be added 3scale-api library from source or from github repository
