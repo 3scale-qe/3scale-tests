@@ -11,13 +11,12 @@ import warnings
 from itertools import chain
 from typing import List
 
-import backoff
 import importlib_resources as resources
 import openshift_client as oc
 import pytest
 from dynaconf.vendor.box.exceptions import BoxKeyError
 from pytest_metadata.plugin import metadata_key
-from threescale_api import client, errors
+from threescale_api import client
 from weakget import weakget
 
 # to actually initialize all the providers
@@ -765,7 +764,10 @@ def httpx():
 @pytest.fixture(scope="module")
 def service(backends_mapping, custom_service, service_settings, service_proxy_settings, lifecycle_hooks):
     "Preconfigured service with backend defined existing over whole testsing session"
-    return custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+    service = custom_service(service_settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
+    yield service
+    for usage in service.backend_usages.list():
+        usage.delete()
 
 
 @pytest.fixture(scope="module")
@@ -978,7 +980,8 @@ def custom_service(threescale, request, testconfig, logger):
                             hook(svc)
                         except Exception:  # pylint: disable=broad-except
                             pass
-
+                    for usage in svc.backend_usages.list():
+                        usage.delete()
                     svc.delete()
 
                 with self._lock:
@@ -1005,15 +1008,6 @@ def custom_service(threescale, request, testconfig, logger):
             return self._custom_service(*args, **kwargs)
 
     return _CustomService()
-
-
-@backoff.on_exception(backoff.fibo, errors.ApiClientError, max_tries=14, jitter=None)
-def _backend_delete(backend):
-    """reliable backend delete"""
-
-    for usage in backend.usages():
-        usage.delete()
-    backend.delete()
 
 
 @pytest.fixture(scope="module")
@@ -1050,7 +1044,7 @@ def custom_backend(threescale, request, testconfig, private_base_url):
                         hook(backend)
                     except Exception:  # pylint: disable=broad-except
                         pass
-                _backend_delete(backend)
+                backend.delete()
 
             request.addfinalizer(finalizer)
 

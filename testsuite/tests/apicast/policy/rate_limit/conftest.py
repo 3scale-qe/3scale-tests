@@ -31,7 +31,9 @@ def service_plus(custom_service, service_proxy_settings, request, policy_setting
         svc.proxy.list().policies.append(policy_settings)
     elif policy_settings is not None:
         svc.proxy.list().policies.append(*policy_settings)
-    return svc
+    yield svc
+    for usage in svc.backend_usages.list():
+        usage.delete()
 
 
 @pytest_cases.fixture
