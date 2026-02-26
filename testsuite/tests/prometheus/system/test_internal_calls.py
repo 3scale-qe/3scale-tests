@@ -9,6 +9,7 @@ import requests
 
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite.config import settings
 from testsuite.prometheus import get_metrics_keys
 
 pytestmark = [
@@ -80,7 +81,11 @@ def test_utilization(url, prometheus, application, backend_listener_url, auth_he
     service_id = application.service.entity_id
     app_plan_id = application.entity["plan_id"]
     for _ in range(REQUEST_NUM):
-        requests.get(url.format(backend_listener_url, service_id, app_plan_id), verify=False, headers=auth_headers)
+        requests.get(
+            url.format(backend_listener_url, service_id, app_plan_id),
+            verify=settings["ssl_verify"],
+            headers=auth_headers,
+        )
 
     # prometheus is downloading metrics periodicity, we need to wait for next fetch
     prometheus.wait_on_next_scrape("backend-worker")

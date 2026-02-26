@@ -4,6 +4,8 @@ from urllib.parse import urlparse
 
 from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakPostError
 
+from testsuite.config import settings
+
 
 class Realm:
     """Helper class for RHSSO realm manipulation"""
@@ -15,7 +17,7 @@ class Realm:
             password=master.connection.password,
             realm_name=name,
             user_realm_name="master",
-            verify=False,
+            verify=settings["ssl_verify"],
         )
         self.name = name
 
@@ -86,9 +88,11 @@ class Client:
 class RHSSO:
     """Helper class for RHSSO server"""
 
-    def __init__(self, server_url, username, password, verify=False) -> None:
+    def __init__(self, server_url, username, password, verify=None) -> None:
         # python-keycloak API requires url to be pointed at auth/ endpoint
         # pylint: disable=protected-access
+        if verify is None:
+            verify = settings["ssl_verify"]
         self.verify = verify
         try:
             self.master = KeycloakAdmin(

@@ -5,6 +5,7 @@ import json
 import requests
 import pytest
 
+from testsuite.config import settings
 from testsuite.rhsso import RHSSOServiceConfiguration
 
 
@@ -38,7 +39,7 @@ def test_tool_availability(private_base_url, tool_name, endpoint):
         - given tool is running and returns 200
     """
     endpoint = private_base_url(tool_name) + endpoint
-    response = requests.head(endpoint, verify=False)
+    response = requests.head(endpoint, verify=settings["ssl_verify"])
     assert response.status_code == 200
 
 
@@ -52,7 +53,7 @@ def test_sso_availability(rhsso_kind, rhsso_service_info: RHSSOServiceConfigurat
     endpoint = rhsso_service_info.rhsso.server_url
     if rhsso_kind.startswith("rhbk"):
         endpoint = endpoint.replace("ssl-rhbk", "ssl-rhbk-management") + "/health"
-    response = requests.get(endpoint, verify=False)
+    response = requests.get(endpoint, verify=settings["ssl_verify"])
     assert response.status_code == 200
     if rhsso_kind.startswith("rhbk"):
         status = json.loads(response.text)["status"]

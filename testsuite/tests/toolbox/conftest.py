@@ -35,7 +35,7 @@ def dest_client(custom_tenant, request) -> client.ThreeScaleClient:
 
         destination_endpoint = tenant.admin_base_url
 
-        unprivileged_client = tenant.admin_api(ssl_verify=False, wait=True)
+        unprivileged_client = tenant.admin_api(ssl_verify=settings["ssl_verify"], wait=True)
 
         token_name = blame(request, "at")
 
