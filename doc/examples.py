@@ -2,18 +2,17 @@
 This is complication of examples how to use testsuite and write tests. As such
 this is not supposed to be executed and it isn't goal to have this executable
 """
-from testsuite.gateways import SelfManagedApicastOptions, SelfManagedApicast, TemplateApicastOptions, TemplateApicast, \
-    gateway
+from testsuite.gateways import SelfManagedApicast, TemplateApicast, gateway
 from testsuite.capabilities import Capability
-from testsuite.rhsso.rhsso import OIDCClientAuth
+from testsuite.rhsso import OIDCClientAuth
 from threescale_api.resources import Service
 import pytest
-import rawobj
-import requests
+from testsuite import rawobj
 
 
 ################################################################################
 # run simple test
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/policy/retry_policy/test_retry_policy.py#L59
 from testsuite.utils import blame
 
 
@@ -24,6 +23,7 @@ def test_basic_request(application):
 
 
 # or use api_client
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/apiap/test_routing_policy_order.py#L40
 def test_another_basic_request(api_client):
     """test requests have to pass and return HTTP 200"""
     client = api_client()
@@ -35,6 +35,7 @@ def test_another_basic_request(api_client):
 ################################################################################
 # to add policy use policy_settings fixture.
 # BEWARE! This is defined in testsuite/tests/apicast/policy/conftest.py
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/parameters/policies/conftest.py#L7
 @pytest.fixture(scope="module")
 def policy_settings():
     """Have service with upstream_connection policy added to the chain and
@@ -43,6 +44,7 @@ def policy_settings():
 
 
 # to add multiple policies you can return them in the list
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/parameters/test_policy_dependency.py#L92
 @pytest.fixture(scope="module")
 def policy_settings():
     """Have service with upstream_connection policy added to the chain and
@@ -51,10 +53,11 @@ def policy_settings():
 
 
 # if you need to add policy before default 3scale APIcast policy you need to apply different approach
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/apiap/test_routing_policy_order.py#L28
 @pytest.fixture(scope="module")
 def service(service):
     """
-    Set upstream connection before #scale APIcast
+    Set upstream connection before 3scale APIcast
     """
     service.proxy.list().policies.insert(0, rawobj.PolicyConfig("upstream_connection", {"read_timeout": 5}))
     return service
@@ -62,6 +65,7 @@ def service(service):
 
 ################################################################################
 # To switch authentication define two following fixtures
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/auth/test_app_id.py#L21
 @pytest.fixture(scope="module")
 def service_settings(service_settings):
     """Have service with app_id/app_key pair authentication"""
@@ -69,6 +73,7 @@ def service_settings(service_settings):
     return service_settings
 
 
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/auth/test_headers_user_key.py#L22
 @pytest.fixture(scope="module")
 def service_proxy_settings(service_proxy_settings):
     """Expect credentials to be passed in headers"""
@@ -80,6 +85,7 @@ def service_proxy_settings(service_proxy_settings):
 # To test call against production gateway you can use the prod_client fixture which promotes the configuration to
 # production and then creates the actual client
 # (default value of the version is 1)
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/parameters/apicast_path_routing/test_apicast_service_oidc.py#L86
 
 # If you don't need to promote a specific version you can use it like this (the default version promoted is 1)
 @pytest.mark.disruptive  # test should be mark as disruptive because of production gateway redeploy
@@ -111,14 +117,17 @@ def test_production_call_without_redeploy(application, prod_client):
     response = client.get("/get")
 
 ###############################################################################
-# When requiring compatible backend to be used define following fixture
+# When requiring specific backend to be used, override the backend_default fixture
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/parameters/http_proxy/test_http_proxy.py#L15
 @pytest.fixture(scope="module")
-def service_proxy_settings(private_base_url):
-    return rawobj.Proxy(private_base_url("echo_api"))
+def backend_default(private_base_url, custom_backend):
+    """Use echo_api as the backend for this test module"""
+    return custom_backend("backend_default", endpoint=private_base_url("echo_api"))
 
 
 ###############################################################################
 # To configure metrics mapping rules, insert following into the service fixture
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/test_limit_exceeded_metric.py#L21
 @pytest.fixture(scope="module")
 def service(service):
     proxy = service.proxy.list()
@@ -133,17 +142,20 @@ def service(service):
 
 ###############################################################################
 # To explicitly specify gateway for tests override staging_gateway or production_gateway
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/policy/retry_policy/conftest.py#L20
 @pytest.fixture(scope="module")
-def staging_gateway(request, testconfig, openshift):
+def staging_gateway(request, testconfig):
     """Deploy self-managed template based apicast gateway."""
     gw = gateway(kind=TemplateApicast, staging=True, name=blame(request, "gw"))
-    request.addfinalizer(gw.destroy)
+    if not testconfig["skip_cleanup"]:
+        request.addfinalizer(gw.destroy)
     gw.create()
 
     return gw
 
 ###############################################################################
 # To skip apicast retrying on 404 status code
+# See: https://github.com/3scale-qe/3scale-tests/blob/v2.16.0.8/testsuite/tests/apicast/apiap/test_apiap_routing_to_backend.py#L71
 def test_skip_apicast_retrying_on_404(application, api_client):
 
     # 3scale is slow, have one request with retry is often (but not everytime)
