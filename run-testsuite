@@ -1,8 +1,0 @@
-#!/bin/sh
-
-FLAGS=
-if [ -n "$*" ]; then
-	FLAGS="flags=$*"
-fi
-
-make test $FLAGS

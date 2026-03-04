@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# --keep-going to reveal problems from all tools at once
-make -k commit-acceptance
