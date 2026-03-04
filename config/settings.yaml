@@ -50,7 +50,7 @@ default:
         webdriver: chrome
         remote_url: http://127.0.0.1:4444
         binary_path: ""
-        disable_http2: false
+        disable_http2: true
 
   cfssl:
     binary: "cfssl"
