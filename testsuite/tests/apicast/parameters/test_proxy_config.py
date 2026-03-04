@@ -44,7 +44,7 @@ def test_proxy_config(service, api_client):
     metric = service.metrics.list()[0]
     mapping_rules = service.proxy.mapping_rules
 
-    mapping_rules.delete(mapping_rules.list()[0]["id"])
+    mapping_rules.list()[0].delete()
     mapping_rules.create(rawobj.Mapping(metric, pattern="/foo"))
     service.proxy.deploy()
 
