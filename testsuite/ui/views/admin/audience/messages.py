@@ -13,6 +13,20 @@ from testsuite.ui.views.admin.audience import BaseAudienceView
 from testsuite.ui.views.common.foundation import FlashMessage
 
 
+class InboxMessageView(BaseAudienceView):
+    """View representation of a single message detail page in the admin inbox"""
+
+    path_pattern = "/p/admin/messages/inbox"
+    subject = Text("//dt[text()='Subject']/following-sibling::dd[1]")
+
+    def prerequisite(self):
+        return MessagesView
+
+    @property
+    def is_displayed(self):
+        return BaseAudienceView.is_displayed.fget(self) and self.path in self.browser.url and self.subject.is_displayed
+
+
 class MessagesView(BaseAudienceView):
     """View representation of accounts messages inbox page"""
 
