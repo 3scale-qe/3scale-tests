@@ -53,7 +53,7 @@ def test_admin_forgotten_password(
 
     mailhog_client.assert_message_received(subject="Password Recovery", receiver=mail, expected_count=1)
 
-    message = mailhog_client.find_message(subject="Password Recovery", receiver=mail)
+    message = mailhog_client.find_messages(subject="Password Recovery", receiver=mail)
 
     reset_link = re.search(r"(?P<url>https?://\S+)", message["items"][0]["Content"]["Body"]).group("url")
     page = navigator.open(ResetPasswordView, url=reset_link, exact=True)
@@ -93,7 +93,7 @@ def test_developer_forgotten_password(
         expected_count=1,
     )
 
-    message = mailhog_client.find_message(
+    message = mailhog_client.find_messages(
         subject=f"{provider_account.entity_name} Lost password recovery. (Valid for 24 hours)", receiver=mail
     )
 
