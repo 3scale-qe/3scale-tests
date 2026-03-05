@@ -7,17 +7,22 @@ from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakPostError
 from testsuite.config import settings
 
 
+def _fallback(value, default):
+    return default if value is None else value
+
+
 class Realm:
     """Helper class for RHSSO realm manipulation"""
 
-    def __init__(self, master: KeycloakAdmin, name) -> None:
+    def __init__(self, master: KeycloakAdmin, name, verify=None) -> None:
+        self.verify = verify if verify else settings["ssl_verify"]
         self.admin = KeycloakAdmin(
             server_url=master.connection.server_url,
             username=master.connection.username,
             password=master.connection.password,
             realm_name=name,
             user_realm_name="master",
-            verify=settings["ssl_verify"],
+            verify=self.verify,
         )
         self.name = name
 
@@ -25,11 +30,11 @@ class Realm:
         """Deletes realm"""
         self.admin.delete_realm(self.name)
 
-    def create_client(self, name, **kwargs):
+    def create_client(self, name, cert=None, verify=None, **kwargs):
         """Creates new client"""
         self.admin.create_client(payload={**kwargs, "clientId": name})
         client_id = self.admin.get_client_id(name)
-        return Client(self, client_id)
+        return Client(self, client_id, cert, _fallback(verify, self.verify))
 
     def create_user(self, username, password, **kwargs):
         """Creates new user"""
@@ -44,7 +49,7 @@ class Realm:
         self.admin.update_user(user_id, {"emailVerified": True})
         return user_id
 
-    def oidc_client(self, client_id, client_secret) -> KeycloakOpenID:
+    def oidc_client(self, client_id, client_secret, cert=None, verify=None) -> KeycloakOpenID:
         """Create OIDC client for this realm"""
         server_url = self.admin.connection.server_url
 
@@ -57,16 +62,20 @@ class Realm:
             client_id=client_id,
             realm_name=self.name,
             client_secret_key=client_secret,
+            cert=cert,
+            verify=_fallback(verify, self.verify),
         )
 
 
 class Client:
     """Helper class for RHSSO client manipulation"""
 
-    def __init__(self, realm: Realm, client_id) -> None:
+    def __init__(self, realm: Realm, client_id, cert=None, verify=None) -> None:
         self.admin = realm.admin
         self.realm = realm
         self.client_id = client_id
+        self.cert = cert
+        self.verify = verify
 
     def assign_role(self, role_name):
         """Assign client role from realm management client"""
@@ -81,18 +90,16 @@ class Client:
         # Note This is different clientId (clientId) than self.client_id (Id), because RHSSO
         client_id = self.admin.get_client(self.client_id)["clientId"]
         secret = self.admin.get_client_secrets(self.client_id)["value"]
-        return self.realm.oidc_client(client_id, secret)
+        return self.realm.oidc_client(client_id, secret, self.cert, verify=self.verify)
 
 
 # pylint: disable=too-few-public-methods
 class RHSSO:
     """Helper class for RHSSO server"""
 
-    def __init__(self, server_url, username, password, verify=None) -> None:
+    def __init__(self, server_url, username, password, verify=True) -> None:
         # python-keycloak API requires url to be pointed at auth/ endpoint
         # pylint: disable=protected-access
-        if verify is None:
-            verify = settings["ssl_verify"]
         self.verify = verify
         try:
             self.master = KeycloakAdmin(
@@ -115,10 +122,10 @@ class RHSSO:
             )
             self.master.get_clients()  # test whether the server url is valid
 
-    def create_realm(self, name: str, **kwargs) -> Realm:
+    def create_realm(self, name: str, verify=None, **kwargs) -> Realm:
         """Creates new realm"""
         self.master.create_realm(payload={"realm": name, "enabled": True, "sslRequired": "None", **kwargs})
-        return Realm(self.master, name)
+        return Realm(self.master, name, verify=_fallback(verify, self.verify))
 
 
 # pylint: disable=too-few-public-methods
