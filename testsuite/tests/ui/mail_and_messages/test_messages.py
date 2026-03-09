@@ -50,11 +50,15 @@ def test_message_from_dev_to_admin_portal(
         - Assert that email notification was sent
         - Assert message was received in admin portal
     """
+    msg_count = mailhog_client.find_messages(subject=f"New message from {account.entity_name}")["count"]
+
     custom_devel_login(account)
     compose_msg = navigator.navigate(ComposeView)
     compose_msg.send_message(subject, content)
 
-    mailhog_client.assert_message_received(subject=f"New message from {account.entity_name}", expected_count=1)
+    mailhog_client.assert_message_received(
+        subject=f"New message from {account.entity_name}", expected_count=msg_count + 1
+    )
 
     custom_admin_login()
     messages = navigator.navigate(MessagesView)
