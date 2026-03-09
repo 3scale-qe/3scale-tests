@@ -100,6 +100,14 @@ smoke: ## Run basic smoke tests
 smoke: pipenv check-secrets.yaml
 	$(PYTEST) -n6 -msmoke $(flags) testsuite/tests
 
+capabilities-smoke: ## run smoke tests with 3scale-api-python-crd client
+capabilities-smoke: pipenv check-secrets.yaml
+	$(PYTEST) -n3 --dist loadfile -msmoke --capabilities $(flags) testsuite
+
+capabilities-speedrun: ## run speedrun tests with 3scale-api-python-crd client
+capabilities-speedrun: pipenv check-secrets.yaml
+	$(PYTEST) -n1 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz --capabilities $(flags) testsuite
+
 flaky: ## Run flaky tests
 flaky: pipenv check-secrets.yaml
 	$(PYTEST) -mflaky $(flags) testsuite/tests
