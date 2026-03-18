@@ -36,7 +36,7 @@ def test_metric_worker(prometheus, production_gateway):
         "for k in /proc/[0-9]*;"
         'do grep -i "^nginx: worker process" $k/cmdline 2>&1 >/dev/null;'
         "if [[ $? == 0 ]]; then echo ${k##*/}; fi;"
-        "done | xargs kill -9"
+        "done | head -1 | xargs kill -9"
     )
     ocp.do_action("exec", ["-ti", pod_name, "--", "/bin/sh", "-c", kill_worker])
 
