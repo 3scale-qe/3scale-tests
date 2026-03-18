@@ -40,9 +40,36 @@ STATUSES = [300, 418, 507]
 
 
 # pylint: disable=unused-argument
-@pytest.fixture(scope="module", params=["apicast-staging", "apicast-production"])
-def metrics(request, prometheus):
+@pytest.fixture(
+    scope="module", params=["apicast-staging", pytest.param("apicast-production", marks=pytest.mark.disruptive)]
+)
+def metrics(request, prometheus, application, api_client):
     """Return all metrics from target defined of staging and also production apicast."""
+    # Check if any required metrics don't exist
+    existing_metrics = get_metrics_keys(prometheus.get_metrics(labels={"container": request.param}))
+
+    required_standard_metrics = ["threescale_backend_calls", "upstream_status", "apicast_status"]
+    required_histogram_metrics = ["total_response_time_seconds", "upstream_response_time_seconds"]
+
+    standard_missing = any(metric not in existing_metrics for metric in required_standard_metrics)
+
+    histogram_missing = any(
+        f"{metric}_{suffix}" not in existing_metrics
+        for metric in required_histogram_metrics
+        for suffix in ["_bucket", "_sum", "_count"]
+    )
+
+    # If some metrics do not exist, trigger with explicit HTTP request
+    if standard_missing or histogram_missing:
+        if request.param == "apicast-production":
+            prod_client = request.getfixturevalue("prod_client")
+            client = prod_client()
+        else:
+            client = api_client()
+
+        client.get("/get")
+        prometheus.wait_on_next_scrape(request.param)
+
     metrics = get_metrics_keys(prometheus.get_metrics(labels={"container": request.param}))
     return metrics
 
@@ -88,9 +115,10 @@ def test_apicast_status_metrics(request, client, container, prometheus):
 
     Apicast logs http status codes on prometheus as a counter.
     """
-
-    client = request.getfixturevalue(client)
-    client = client()
+    if client == "prod_client":
+        client = request.getfixturevalue(client)(promote=False)
+    else:
+        client = request.getfixturevalue(client)()
 
     for status in STATUSES:
         assert client.get(f"/status/{status}").status_code == status
