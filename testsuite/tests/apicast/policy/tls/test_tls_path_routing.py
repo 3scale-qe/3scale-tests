@@ -177,11 +177,11 @@ def test_tls_path_routing_with_logging(client, client2, staging_gateway):
     url2 = f'{client2._base_url}/bar/foo?user_key={client2.auth.credentials["user_key"]}'
     session = requests.Session()
     for _ in range(5):
-        response = session.get(url1, verify=False)
+        response = session.get(url1, verify=staging_gateway.server_authority.files["certificate"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service1/foo/bar"
-        response = session.get(url2, verify=False)
+        response = session.get(url2, verify=staging_gateway.server_authority.files["certificate"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service2/bar/foo"
