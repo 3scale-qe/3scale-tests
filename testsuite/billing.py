@@ -12,10 +12,11 @@ from threescale_api.resources import InvoiceState
 class Stripe:
     """API for Stripe"""
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, provider_account_id):
         # Due to fact that we can set up only one Stripe per 3scale and we use same api_key everytime this
         # is not disruptive even if it looks like it is.
         stripe.api_key = api_key
+        self.provider_account_id = provider_account_id
 
     @staticmethod
     @backoff.on_predicate(backoff.fibo, lambda x: x == [], max_tries=10, jitter=None)
@@ -23,16 +24,15 @@ class Stripe:
         """Retrieves the details of the charge"""
         return stripe.Charge.search(query=f"customer:'{customer['id']}'").get("data")
 
-    @staticmethod
     @backoff.on_exception(backoff.expo, IndexError, max_tries=4, jitter=None)
-    def read_customer_by_account(account):
+    def read_customer_by_account(self, account):
         """
         Read Stripe customer.
         Different 3scale deployments can have customers with the same id, which is reflected to the
         `3scale_account_reference` Stripe Customer variable. This method reads just the last one.
         """
         return stripe.Customer.search(
-            query=f"metadata['3scale_account_reference']:'3scale-2-{str(account.entity_id)}'"
+            query=f"metadata['3scale_account_reference']:'3scale-{self.provider_account_id}-{account.entity_id}'"
         ).get("data")[0]
 
     def assert_payment(self, invoice, account):
@@ -51,7 +51,7 @@ class Stripe:
 class Braintree:
     """API for braintree"""
 
-    def __init__(self, merchant_id, public_key, private_key):
+    def __init__(self, merchant_id, public_key, private_key, provider_account_id):
         self.gateway = braintree.BraintreeGateway(
             braintree.Configuration(
                 environment=braintree.Environment.Sandbox,
@@ -60,6 +60,7 @@ class Braintree:
                 private_key=private_key,
             )
         )
+        self.provider_account_id = provider_account_id
 
     @backoff.on_exception(backoff.fibo, (ServiceUnavailableError, RequestTimeoutError), max_tries=8, jitter=None)
     def get_customer_transactions(self, account):
@@ -76,10 +77,9 @@ class Braintree:
         merchant_accounts = list(self.gateway.merchant_account.all().merchant_accounts.items)
         return [x for x in merchant_accounts if x.default is True][0].currency_iso_code
 
-    @staticmethod
-    def customer_id(account):
-        """Returns Braintree customer id. It is in a form `3scale-2-{account_id}-1`"""
-        return f"3scale-2-{account.entity_id}-1"
+    def customer_id(self, account):
+        """Returns Braintree customer id. It is in a form `3scale-{provider_id}-{account_id}-1`"""
+        return f"3scale-{self.provider_account_id}-{account.entity_id}-1"
 
     @staticmethod
     def _assert_transaction(invoice, transaction):
