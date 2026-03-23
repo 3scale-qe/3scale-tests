@@ -64,9 +64,9 @@ def service(service):
 
 
 @pytest.fixture(scope="module")
-def fapi_sso_client_id():
+def fapi_sso_client_id(request):
     """Client_id in the SSO and app_id of the application in 3scale must be the same"""
-    return "fapi_sso_client"
+    return blame(request, "fapi")
 
 
 # pylint: disable=too-many-arguments
@@ -86,7 +86,7 @@ def application(
 
 
 @pytest.fixture(scope="module")
-def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert):
+def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert, application):
     """Create client in SSO with mtls enabled. SSO will authorize any client with cert signed by
     accepted CA with any subjectdn"""
     client_config = {
@@ -104,7 +104,8 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert):
             "x509.allow.regex.pattern.comparison": "true",
         },
     }
-    return rhsso_service_info.realm.create_client(fapi_sso_client_id, cert=mtls_client_cert, **client_config)
+    rhsso_service_info.get_application_client(application)
+    return rhsso_service_info.realm.update_client(fapi_sso_client_id, cert=mtls_client_cert, **client_config)
 
 
 # pylint: disable=too-few-public-methods
@@ -122,7 +123,7 @@ class FapiClient:
             headers = {}
         if token:
             headers.update({"authorization": "Bearer " + token})
-        return self.http_session.get(self.base_url + path, headers=headers, cert=cert)
+        return self.http_session.get(self.base_url + path, headers=headers, cert=cert, verify=False)
 
 
 @pytest.fixture()

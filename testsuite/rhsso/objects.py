@@ -36,6 +36,13 @@ class Realm:
         client_id = self.admin.get_client_id(name)
         return Client(self, client_id, cert, _fallback(verify, self.verify))
 
+    def update_client(self, name, cert=None, verify=None, **kwargs):
+        """Updates existing client by merging provided kwargs into its current configuration"""
+        client_id = self.admin.get_client_id(name)
+        current = self.admin.get_client(client_id)
+        self.admin.update_client(client_id, payload={**current, **kwargs, "clientId": name})
+        return Client(self, client_id, cert, _fallback(verify, self.verify))
+
     def create_user(self, username, password, **kwargs):
         """Creates new user"""
         kwargs["username"] = username
