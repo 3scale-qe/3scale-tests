@@ -24,13 +24,14 @@ def require_braintree_patch(openshift):
 
 
 @pytest.fixture(scope="session")
-def braintree(testconfig):
+def braintree(testconfig, threescale):
     """Braintree API"""
     braintree_credentials = testconfig["braintree"]
     merchant_id = braintree_credentials["merchant_id"]
     public_key = braintree_credentials["public_key"]
     private_key = braintree_credentials["private_key"]
-    return Braintree(merchant_id, public_key, private_key)
+    provider_account_id = threescale.provider_accounts.fetch().entity_id
+    return Braintree(merchant_id, public_key, private_key, provider_account_id)
 
 
 @pytest.fixture(scope="module", autouse=True)
