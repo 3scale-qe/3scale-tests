@@ -15,7 +15,7 @@ def card_setup(custom_card):
 
 def normalize_url(url):
     """Invoice url need to be changed from internal to external form"""
-    for rep in (("3scale-admin", "3scale"), ("/api/", "/admin/account/")):
+    for rep in (("-admin.", "."), ("/api/", "/admin/account/")):
         url = url.replace(*rep)
     return url
 
@@ -28,11 +28,11 @@ def test_no_sca_ui_invoice(braintree, ui_invoice, account):
     assert invoice_view.state_field.text == "State Paid"
 
 
-def test_mail_completed_payment(invoice, mailhog_client):
+def test_mail_completed_payment(provider_account, invoice, mailhog_client):
     """Tests mail notification about successful payment"""
     invoice.charge()
     mailhog_client.assert_message_received(
-        subject="Provider Name API - Payment completed",
+        subject=f"{provider_account['org_name']} API - Payment completed",
         content=f"successfully completed your monthly payment for our service of USD {invoice.entity['cost']}0.\r\n\r\n"
         f"Your invoice is available online at:\r\n\r\n{normalize_url(invoice.url)}",
     )
