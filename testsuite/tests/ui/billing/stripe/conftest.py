@@ -20,9 +20,10 @@ def gateway_setup(custom_admin_login, navigator, testconfig):
 
 
 @pytest.fixture(scope="session")
-def stripe(testconfig):
+def stripe(testconfig, threescale):
     """Stripe API"""
-    return Stripe(testconfig["stripe"]["api_key"])
+    provider_account_id = threescale.provider_accounts.fetch().entity_id
+    return Stripe(testconfig["stripe"]["api_key"], provider_account_id)
 
 
 @pytest.fixture(scope="module")
