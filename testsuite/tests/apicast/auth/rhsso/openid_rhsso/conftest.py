@@ -2,6 +2,7 @@
 Conftest for the openid rhsso credentials locations tests
 """
 
+import backoff
 import pytest
 
 
@@ -14,6 +15,21 @@ def staging_client(api_client):
     """
     client = api_client()
     client.auth = None
+
+    original_get = client.get
+    original_post = client.post
+
+    @backoff.on_predicate(backoff.expo, lambda x: x.status_code == 404, max_tries=10, max_time=60)
+    def get_with_retry(*args, **kwargs):
+        return original_get(*args, **kwargs)
+
+    @backoff.on_predicate(backoff.expo, lambda x: x.status_code == 404, max_tries=10, max_time=60)
+    def post_with_retry(*args, **kwargs):
+        return original_post(*args, **kwargs)
+
+    client.get = get_with_retry
+    client.post = post_with_retry
+
     return client
 
 
