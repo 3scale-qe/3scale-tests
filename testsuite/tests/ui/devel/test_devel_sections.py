@@ -90,13 +90,11 @@ def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, d
         - Assert that this account hasn't access to this page
     """
     custom_devel_login(account=account)
-
     browser.url = testconfig["threescale"]["devel"]["url"] + dev_portal_page
 
     assert browser.element(".//h1").accessible_name == "Test"
 
     custom_devel_login(name="john", password="123456", fresh=True)
-
     browser.url = testconfig["threescale"]["devel"]["url"] + dev_portal_page
 
     assert NotFoundView(browser).is_displayed
