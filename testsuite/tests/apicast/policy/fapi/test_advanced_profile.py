@@ -1,14 +1,13 @@
 """Test Financial-Grade API policy with oauth2 certificate bound access token (advanced profile)"""
 
 import pytest
-import requests
 
 from testsuite import rawobj
 from testsuite.utils import blame, warn_and_skip
 from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 from testsuite.certificates import Certificate
 
-# pylint: disable=reimported, unused-import
+# pylint: disable=reimported,unused-import
 # flake8: noqa
 from testsuite.tests.apicast.policy.tls.conftest import (
     certificate,
@@ -109,29 +108,32 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert, ap
 
 
 # pylint: disable=too-few-public-methods
-class FapiClient:
-    """Temporary class for sending requests to apicast. This should be replaced by using fixture api_client"""
+class FapiMtlsAuth:
+    """Auth class for FAPI mTLS client credentials token retrieval"""
 
-    def __init__(self, base_url, verify):
-        self.base_url = base_url
-        self.http_session = requests.Session()
-        self.http_session.verify = verify
+    def __init__(self, fapi_sso_client):
+        self._fapi_sso_client = fapi_sso_client
 
-    def get(self, path="/", headers=None, token=None, cert=None):
-        """Sends http get request to url which was set up during initialization"""
-        if headers is None:
-            headers = {}
-        if token:
-            headers.update({"authorization": "Bearer " + token})
-        return self.http_session.get(self.base_url + path, headers=headers, cert=cert, verify=False)
+    def __call__(self, request):
+        token = self._fapi_sso_client.oidc_client.token(grant_type="client_credentials")["access_token"]
+        request.headers.update({"Authorization": "Bearer " + token})
+        return request
 
 
 @pytest.fixture()
-def fapi_client(application):
-    """Create client for api_calls on apicast"""
-    # pylint: disable=protected-access
-    api_base_url = application.api_client()._base_url
-    return FapiClient(api_base_url, verify=False)
+def fapi_client(application, fapi_sso_client, mtls_client_cert):
+    """Create client for api_calls on apicast using valid mTLS certificate"""
+    client = application.api_client(cert=mtls_client_cert)
+    client.auth = FapiMtlsAuth(fapi_sso_client)
+    return client
+
+
+@pytest.fixture()
+def fapi_client_invalid(application, fapi_sso_client, unknown_cert):
+    """Create client for api_calls on apicast using unknown certificate"""
+    client = application.api_client(cert=unknown_cert)
+    client.auth = FapiMtlsAuth(fapi_sso_client)
+    return client
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -140,7 +142,7 @@ def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
 
 
-def test_valid_cert_returns_200(fapi_client, fapi_sso_client, mtls_client_cert):
+def test_valid_cert_returns_200(fapi_client):
     """
     Test client authentication using certificate bound access token (https://datatracker.ietf.org/doc/html/rfc8705).
 
@@ -148,13 +150,10 @@ def test_valid_cert_returns_200(fapi_client, fapi_sso_client, mtls_client_cert):
     Using the same certificate and obtained token send request to staging apicast.
     Assert, that response contains http return code 200
     """
-    mtls_client = fapi_sso_client.oidc_client
-    api_access_token = mtls_client.token(grant_type="client_credentials")["access_token"]
-    response = fapi_client.get(token=api_access_token, cert=mtls_client_cert)
-    assert response.status_code == 200
+    assert fapi_client.get("/").status_code == 200
 
 
-def test_invalid_cert_returns_401(fapi_client, fapi_sso_client, unknown_cert):
+def test_invalid_cert_returns_401(fapi_client_invalid):
     """
     Test client authentication using certificate bound access token (https://datatracker.ietf.org/doc/html/rfc8705).
 
@@ -162,7 +161,4 @@ def test_invalid_cert_returns_401(fapi_client, fapi_sso_client, unknown_cert):
     Using the different certificate and obtained token send request to staging apicast.
     Assert, that response contains http return code 401
     """
-    mtls_client = fapi_sso_client.oidc_client
-    api_access_token = mtls_client.token(grant_type="client_credentials")["access_token"]
-    response = fapi_client.get(token=api_access_token, cert=unknown_cert)
-    assert response.status_code == 401
+    assert fapi_client_invalid.get("/").status_code == 401
