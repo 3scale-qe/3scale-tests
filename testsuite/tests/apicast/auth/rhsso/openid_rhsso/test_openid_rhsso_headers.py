@@ -42,6 +42,7 @@ def test_access_token(token):
 def test_token_headers(request, client_function, token):
     """Test checks if the request with access token using headers will succeed on both apicasts"""
     client = request.getfixturevalue(client_function)
+    client.auth = None
     response = client.get("/get", headers={"access_token": token})
     assert response.status_code == 200
 
@@ -64,6 +65,7 @@ def test_token_headers(request, client_function, token):
 def test_token_in_query(request, client_function, token):
     """Test checks if the request with access token in query params will fail on both apicasts."""
     client = request.getfixturevalue(client_function)
+    client.auth = None
     response = client.get("/get", params={"access_token": token})
     assert response.status_code == 403
 
@@ -83,6 +85,7 @@ def test_token_in_query(request, client_function, token):
 def test_token_basic_auth(request, client_function, token):
     """Test checks if the request with access token using basic auth will fail on both apicasts"""
     client = request.getfixturevalue(client_function)
+    client.auth = None
     response = client.get("/get", headers={"authorization": "Bearer " + token})
     assert response.status_code == 403
 
@@ -100,6 +103,7 @@ def test_token_basic_auth(request, client_function, token):
 def test_invalid_token_in_headers(request, client_function):
     """Test checks if the request with invalid access token in headers will fail on both apicasts."""
     client = request.getfixturevalue(client_function)
+    client.auth = None
     response = client.get("/get", headers={"access_token": "NotValidAccessToken"})
     assert response.status_code == 403
 
@@ -117,6 +121,7 @@ def test_invalid_token_in_headers(request, client_function):
 def test_client_id_and_secret_in_query(request, client_function, application):
     """Test checks if the request with client id and client secret in the query params will fail on both apicasts"""
     client = request.getfixturevalue(client_function)
+    client.auth = None
     response = client.get(
         "/get", params={"client_id": application["client_id"], "client_secret": application["client_secret"]}
     )
