@@ -1,5 +1,7 @@
 """Test Financial-Grade API policy with oauth2 certificate bound access token (advanced profile)"""
 
+from ssl import SSLError
+
 import pytest
 
 from testsuite import rawobj
@@ -23,8 +25,10 @@ from testsuite.tests.apicast.policy.tls.conftest import (
 
 
 @pytest.fixture(scope="module")
-def mtls_client_cert(request, testconfig):
+def mtls_client_cert(request, testconfig, rhsso_kind):
     """Clients certificate. CA of this cert needs to be trusted by the sso"""
+    if rhsso_kind != "rhbk+ssl":
+        warn_and_skip("FAPI advanced profile requires RHBK with SSL enabled (rhbk+ssl), skipping")
     try:
         crt = testconfig["shared_certs"]["client_certs"]["valid"][0]
     except IndexError:
@@ -104,7 +108,12 @@ def fapi_sso_client(rhsso_service_info, fapi_sso_client_id, mtls_client_cert, ap
         },
     }
     rhsso_service_info.get_application_client(application)
-    return rhsso_service_info.realm.update_client(fapi_sso_client_id, cert=mtls_client_cert, **client_config)
+    client = rhsso_service_info.realm.update_client(fapi_sso_client_id, cert=mtls_client_cert, **client_config)
+    try:
+        client.oidc_client.token(grant_type="client_credentials")
+    except SSLError as e:
+        warn_and_skip(f"RHBK mTLS token acquisition failed, check RHBK CA truststore configuration: {e}, skipping")
+    return client
 
 
 # pylint: disable=too-few-public-methods
