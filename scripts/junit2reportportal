@@ -59,6 +59,8 @@ token = os.environ[args.token_variable]
 reportportal = args.reportportal.rstrip("/")
 
 auth = {"Authorization": f"Bearer {token}"}
-launch_import = f"{reportportal}/api/v1/{args.project}/launch/import"
+launch_import = f"{reportportal}/api/v1/plugin/{args.project}/junit/import"
 
-print(requests.post(launch_import, files={"file": (f"{args.launch_name}.zip", stream.getbuffer(), "application/zip")}, headers=auth).text)
+print(requests.post(launch_import, files={"file": (f"{args.launch_name}.zip", stream.getbuffer(), "application/zip"),
+                                          "launchImportRq": (None, f'{{"name": "{args.launch_name}"}}', "application/json")},
+                    headers=auth).text)
