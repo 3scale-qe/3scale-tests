@@ -18,7 +18,7 @@ class _Chrome:
     """Factory class for Chrome browser"""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, source, accept_insecure_certs, headless, remote_url=None, binary_path=None):
+    def __init__(self, source, accept_insecure_certs, headless, remote_url=None, binary_path=None, disable_http2=None):
         self.source = source
         self.remote_url = remote_url
         self.binary_path = binary_path
@@ -35,6 +35,8 @@ class _Chrome:
             self.options.set_capability("acceptInsecureCerts", accept_insecure_certs)
         if headless:
             self.options.add_argument("--headless=new")
+        if disable_http2:
+            self.options.add_argument("--disable-http2")
 
     def install(self):
         """Installs the web driver"""
@@ -61,7 +63,7 @@ class _Firefox:
     """Factory class for Firefox browser"""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, source, accept_insecure_certs, headless, remote_url=None, binary_path=None):
+    def __init__(self, source, accept_insecure_certs, headless, remote_url=None, binary_path=None, disable_http2=None):
         self.source = source
         self.remote_url = remote_url
         self.binary_path = binary_path
@@ -73,6 +75,8 @@ class _Firefox:
             self.options.set_preference("webdriver_accept_untrusted_certs", accept_insecure_certs)
         if headless:
             self.options.headless = True
+        if disable_http2:
+            LOGGER.info("http2 can be disabled in about:config network.http.spdy.enabled.http2")
 
     def install(self):
         """Installs the web driver"""
@@ -114,7 +118,9 @@ class ThreescaleWebdriver:
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, driver, source, ssl_verify, headless=True, remote_url=None, binary_path=None):
+    def __init__(
+        self, driver, source, ssl_verify, headless=True, remote_url=None, binary_path=None, disable_http2=None
+    ):
         """
         Initializes factory with either specified or fetched from settings values.
         :param str driver: Browser name. One of ('chrome', 'firefox')
@@ -131,9 +137,9 @@ class ThreescaleWebdriver:
         accept_insecure_certs = not ssl_verify
 
         if self.driver == "chrome":
-            self.webdriver = _Chrome(source, accept_insecure_certs, headless, remote_url, binary_path)
+            self.webdriver = _Chrome(source, accept_insecure_certs, headless, remote_url, binary_path, disable_http2)
         elif self.driver == "firefox":
-            self.webdriver = _Firefox(source, accept_insecure_certs, headless, remote_url, binary_path)
+            self.webdriver = _Firefox(source, accept_insecure_certs, headless, remote_url, binary_path, disable_http2)
         else:
             raise ValueError(
                 '"{}" webdriver is not supported. Please use one of {}'.format(self.driver, ("chrome", "firefox"))
@@ -153,7 +159,7 @@ class ThreescaleWebdriver:
         """
         Perform all required post-init actions.
         """
-        self.session.maximize_window()
+        self.session.set_window_size(1920, 1080)
 
     def finalize(self):
         """

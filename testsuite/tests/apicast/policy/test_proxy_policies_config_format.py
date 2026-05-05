@@ -9,7 +9,6 @@ from threescale_api.errors import ApiClientError
 
 from testsuite import rawobj
 
-
 pytestmark = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-1059")
 
 

@@ -307,7 +307,7 @@ def pytest_metadata(metadata):
         "mockserver+ssl",
     ]
     tool_options = weakget(settings)["fixtures"]["tools"] % {"namespace": "tools"}
-    sources = tool_options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
+    sources = tool_options.get("sources", ["Settings", "Rhoam", "OpenshiftProject"])
     oc_tools = Tools(sources, tool_options)
     for tool_name in tool_names:
         try:
@@ -392,7 +392,7 @@ def operator_apicast_openshift():
 
 def _resolve_tools(testconfig):
     options = weakget(testconfig)["fixtures"]["tools"] % {"namespace": "tools"}
-    sources = options.get("sources", ["Rhoam", "OpenshiftProject", "Settings"])
+    sources = options.get("sources", ["Settings", "Rhoam", "OpenshiftProject"])
     return Tools(sources, options)
 
 
