@@ -22,7 +22,7 @@ class Stripe:
     @backoff.on_predicate(backoff.fibo, lambda x: x == [], max_tries=10, jitter=None)
     def read_charge(customer):
         """Retrieves the details of the charge"""
-        return stripe.Charge.search(query=f"customer:'{customer['id']}'").get("data")
+        return stripe.Charge.search(query=f"customer:'{customer['id']}'").data
 
     @backoff.on_exception(backoff.expo, IndexError, max_tries=4, jitter=None)
     def read_customer_by_account(self, account):
