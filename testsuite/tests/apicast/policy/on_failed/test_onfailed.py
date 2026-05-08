@@ -52,15 +52,16 @@ def status_code(chain_name, on_failed_configuration) -> int:
     return on_failed_configuration.get("error_status_code", 503)
 
 
-@backoff.on_predicate(
-    backoff.fibo,
-    lambda response: response.status_code not in (200, 503, 500),
-    max_tries=8,
-    jitter=None,
-)
-def make_request(api_client):
+def make_request(api_client, expected_code):
     """Make request to the product and retry if the response isn't from APIcast"""
-    return api_client.get("/")
+
+    @backoff.on_predicate(
+        backoff.fibo, lambda response: response.status_code != expected_code, max_tries=8, jitter=None
+    )
+    def _request():
+        return api_client.get("/")
+
+    return _request()
 
 
 def test_on_failed_policy(application, status_code):
@@ -70,5 +71,5 @@ def test_on_failed_policy(application, status_code):
     """
     api_client = application.api_client(disable_retry_status_list=(503,))
 
-    response = make_request(api_client)
+    response = make_request(api_client, status_code)
     assert response.status_code == status_code
