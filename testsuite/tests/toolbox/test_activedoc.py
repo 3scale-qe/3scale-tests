@@ -58,7 +58,7 @@ def parse_create_command_out(output):
 
 
 # Global variable for metrics' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, service, my_app_plan, my_activedoc, create_cmd):
