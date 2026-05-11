@@ -65,7 +65,7 @@ def empty_list(service, hits, create_cmd):
 
 
 # Global variable for methods' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, service, create_cmd):

@@ -64,7 +64,7 @@ def empty_list(metric_obj, create_cmd):
 
 
 # Global variable for metrics' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, metric_obj, create_cmd):
