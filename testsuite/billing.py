@@ -21,7 +21,7 @@ class Stripe:
     @backoff.on_predicate(backoff.fibo, lambda x: x == [], max_tries=10, jitter=None)
     def read_charge(customer):
         """Retrieves the details of the charge"""
-        return stripe.Charge.search(query=f"customer:'{customer['id']}'").get("data")
+        return stripe.Charge.search(query=f"customer:'{customer['id']}'").data
 
     @staticmethod
     @backoff.on_exception(backoff.expo, IndexError, max_tries=4, jitter=None)
@@ -33,7 +33,7 @@ class Stripe:
         """
         return stripe.Customer.search(
             query=f"metadata['3scale_account_reference']:'3scale-2-{str(account.entity_id)}'"
-        ).get("data")[0]
+        ).data[0]
 
     def assert_payment(self, invoice, account):
         """Compare 3scale and Stripe invoices"""
