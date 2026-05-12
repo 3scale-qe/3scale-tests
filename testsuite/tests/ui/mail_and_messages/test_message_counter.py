@@ -65,7 +65,7 @@ def test_message_counter(
         send_message_from_devel(navigator, subjects[0], contents[0])
         send_message_from_devel(navigator, subjects[1], contents[1])
     finally:
-        mailhog_client.find_message(
+        mailhog_client.find_messages(
             subject=f"New message from {account.entity_name}"
         )  # assure that messages will be deleted if skip_cleanup is false
 
