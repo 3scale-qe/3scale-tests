@@ -1,5 +1,6 @@
 """Test for developer portal sections"""
 
+import backoff
 import pytest
 from packaging.version import Version  # noqa # pylint: disable=unused-import
 
@@ -14,6 +15,12 @@ from testsuite.ui.views.admin.audience.developer_portal import (
 )
 from testsuite.ui.views.common.foundation import NotFoundView
 from testsuite.utils import blame
+
+pytestmark = [
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9020"),
+    pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-836"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="Requires 3scale >= 2.14"),
+]
 
 
 @pytest.fixture(scope="module")
@@ -67,9 +74,7 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
     view.update([group_name])
 
 
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-9020")
-@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-836")
-@pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")
+@backoff.on_exception(backoff.fibo, AssertionError, max_tries=5, jitter=None)
 @pytest.mark.usefixtures("dev_portal_group")
 @pytest.mark.usefixtures("login")
 def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):
