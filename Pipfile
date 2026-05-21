@@ -9,6 +9,7 @@ types-braintree = "*"
 types-stripe = "*"
 types-Pillow = "*"
 black = "*"
+isort = "*"
 # this will use system ca-bundle
 pip-system-certs = "*"
 # Have commented out python-language-server to make it available quickly
