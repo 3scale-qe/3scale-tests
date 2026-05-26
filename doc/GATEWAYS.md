@@ -7,6 +7,8 @@
 * `STANDARD_GATEWAY`: Default gateway deployed by 3scale, which means tests that deploy their own APIcast can run.
 * `LOGS`: Allows getting APIcast logs through `get_logs()` method
 * `JAEGER`: Allows configuring the APIcast to send data to Jaeger through `connect_jaeger()` method
+* `ZYNC_ROUTES`: Zync creates OCP routes for APIcast endpoints. Absent when `ZyncLessApicast` is used or `threescale.zync_routes_disabled: true` is set.
+* `ZYNC_OIDC_SYNC`: Zync is running and syncs OIDC clients with RHSSO/RHBK. Absent only when `ZyncLessApicast` is used (zync completely disabled).
 
 
 # Gateway type configuration
@@ -15,6 +17,35 @@
 
 *Capabilities*: "APICAST, CUSTOM_ENVIRONMENT, PRODUCTION_GATEWAY, SAME_CLUSTER, LOGS, JAEGER, STANDARD_GATEWAY" 
 ```
+gateway:
+  default:
+    kind: "SystemApicast"
+```
+## ZyncLess APIcast
+*Description*: Variant of System APIcast for 3scale deployments where zync is completely disabled. Since zync is not
+available to create OCP routes for APIcast endpoints, this gateway creates and manages them via lifecycle hooks.
+Requires `spec.zync.enabled: false` in the APIManager CR — capability provider raises an error if zync is enabled.
+Note: when using this gateway, OCP routes for the 3scale admin portal, master, and developer portal must be
+created manually as zync is also responsible for those.
+
+*Capabilities*: "APICAST, CUSTOM_ENVIRONMENT, PRODUCTION_GATEWAY, SAME_CLUSTER, LOGS, JAEGER, STANDARD_GATEWAY"
+(no `ZYNC_ROUTES` or `ZYNC_OIDC_SYNC` — all zync-dependent tests are automatically skipped)
+```
+gateway:
+  default:
+    kind: "ZyncLessApicast"
+```
+
+## System APIcast with zync routes disabled
+*Description*: Standard System APIcast for 3scale deployments where zync is running but not creating OCP routes
+(e.g. when routes are managed externally). Set `threescale.zync_routes_disabled: true` in config.
+Capability provider raises an error at startup if this config does not match the actual gateway type.
+
+*Capabilities*: "APICAST, CUSTOM_ENVIRONMENT, PRODUCTION_GATEWAY, SAME_CLUSTER, LOGS, JAEGER, STANDARD_GATEWAY, ZYNC_OIDC_SYNC"
+(no `ZYNC_ROUTES` — route creation tests are automatically skipped)
+```
+threescale:
+  zync_routes_disabled: true
 gateway:
   default:
     kind: "SystemApicast"
