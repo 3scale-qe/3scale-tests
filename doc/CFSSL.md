@@ -25,7 +25,7 @@ openssl req -batch -new -x509 -nodes -key rootCA.key -sha256 -days 1024 -out roo
 
 #### Running cfssl server
 
-To have cfssl server up and running somewehere, you can execute the following command:
+To have cfssl server up and running somewhere, you can execute the following command:
 
 ```bash
 cfssl serve -address 0.0.0.0 -port 8888 -ca /var/certs/rootCA.pem -ca-key /var/certs/rootCA.key
