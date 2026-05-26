@@ -403,7 +403,7 @@ def tools(testconfig):
 
 
 @pytest.fixture(scope="module")
-def prod_client(production_gateway, application, request):
+def prod_client(production_gateway, application, request, lifecycle_hooks):
     """Prepares application and service for production use and creates new production client
 
     Parameters:
@@ -422,6 +422,8 @@ def prod_client(production_gateway, application, request):
             if version == -1:
                 version = app.service.proxy.list().configs.latest()["version"]
             app.service.proxy.list().promote(version=version)
+            for hook in _select_hooks("on_proxy_promote", lifecycle_hooks):
+                hook(app.service)
         if redeploy:
             production_gateway.reload()
 
