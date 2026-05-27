@@ -186,7 +186,7 @@ export DOCKERCONFIGJSON
 endif
 
 Pipfile.lock: Pipfile
-	pipenv lock $(PIPENV_ARGS)
+	PIPENV_RESOLVER_PARENT_PYTHON=1 pipenv lock $(PIPENV_ARGS)
 
 .make-pipenv-sync: Pipfile.lock
 	pipenv sync $(PIPENV_ARGS)
