@@ -13,11 +13,12 @@ After waiting for the time in the 'retry-after' header, the request should
 be accepted.
 """
 
-from datetime import datetime, timezone
 import time
+from datetime import datetime, timezone
 
 import backoff
 import pytest
+
 from testsuite import rawobj
 from testsuite.utils import blame, wait_interval, wait_until_next_minute
 

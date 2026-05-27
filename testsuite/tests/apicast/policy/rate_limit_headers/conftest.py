@@ -3,6 +3,7 @@ Conftest for rate limit headers tests
 """
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.utils import blame
 

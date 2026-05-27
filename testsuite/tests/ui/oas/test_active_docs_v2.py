@@ -3,13 +3,13 @@
 from string import Template
 from urllib.parse import urlsplit
 
-import pytest
 import importlib_resources as resources
+import pytest
 
 from testsuite import rawobj
-from testsuite.utils import blame
 from testsuite.ui.views.admin.audience.developer_portal import ActiveDocsNewView
 from testsuite.ui.views.admin.product.active_docs import ActiveDocsDetailView
+from testsuite.utils import blame
 
 
 @pytest.fixture()

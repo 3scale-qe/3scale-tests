@@ -4,9 +4,10 @@ testing proper function of the CORS policy
 Rewrite: ./spec/functional_specs/policies/cors/cors_policy_spec.rb
 """
 
-from packaging.version import Version
 import pytest
-from testsuite import rawobj, TESTED_VERSION
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
 
 
 @pytest.fixture(scope="module")

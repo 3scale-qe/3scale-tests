@@ -5,16 +5,16 @@ This test will cover APIAP feature
 
 from urllib.parse import urlparse
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.echoed_request import EchoedRequest
+from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.toolbox.test_backend import random_string
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3863"),
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
 ]

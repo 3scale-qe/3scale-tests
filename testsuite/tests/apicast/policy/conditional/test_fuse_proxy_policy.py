@@ -6,15 +6,15 @@ Proxy service is simple camel route, that adds "Fuse-Camel-Proxy" header to the 
 """
 
 import pytest
+from packaging.version import Version
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import warn_and_skip
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.16')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')"),
     pytest.mark.required_capabilities(Capability.NOFIPS),
 ]
 

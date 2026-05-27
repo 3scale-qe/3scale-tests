@@ -10,6 +10,7 @@ The request will fail when:
 """
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.capabilities import Capability
 from testsuite.mockserver import Mockserver

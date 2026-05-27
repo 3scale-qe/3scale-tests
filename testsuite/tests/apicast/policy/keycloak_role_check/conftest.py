@@ -6,7 +6,7 @@ import pytest_cases
 
 from testsuite import rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
-from testsuite.utils import randomize, blame
+from testsuite.utils import blame, randomize
 
 
 # pylint: disable=unused-argument, too-many-arguments

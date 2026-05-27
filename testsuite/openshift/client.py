@@ -1,19 +1,23 @@
 """This module implements an openshift interface with openshift oc client wrapper."""
 
 import enum
-from functools import cached_property
 import json
 import os
 from contextlib import ExitStack
-from typing import List, Dict, Union, Any, Optional, Callable, Sequence
+from functools import cached_property
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import openshift_client as oc
 import yaml
 
 from testsuite.openshift.crd.apimanager import APIManager
 from testsuite.openshift.crd.operator import Operator
-from testsuite.openshift.deployments import KubernetesDeployment, DeploymentConfig, Deployment
-from testsuite.openshift.objects import Secrets, ConfigMaps, Routes
+from testsuite.openshift.deployments import (
+    Deployment,
+    DeploymentConfig,
+    KubernetesDeployment,
+)
+from testsuite.openshift.objects import ConfigMaps, Routes, Secrets
 from testsuite.openshift.scaler import Scaler
 
 

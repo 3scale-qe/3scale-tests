@@ -3,6 +3,7 @@ Test that checks if the first anything part is removed
 """
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 
