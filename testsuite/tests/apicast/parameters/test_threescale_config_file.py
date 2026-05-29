@@ -7,8 +7,8 @@ import json
 
 import pytest
 
-from testsuite.capabilities import Capability
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 from testsuite.gateways.apicast.template import TemplateApicast
 from testsuite.utils import blame
 

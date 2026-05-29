@@ -5,7 +5,7 @@ This test is testing only subset of utf-8 chars that have different encoding tha
 https://www.w3schools.com/tags/ref_urlencode.ASP
 """
 
-from urllib.parse import urlparse, quote
+from urllib.parse import quote, urlparse
 
 import pytest
 

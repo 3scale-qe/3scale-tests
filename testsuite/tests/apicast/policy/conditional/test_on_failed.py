@@ -1,12 +1,11 @@
 "testing proper function of on_failed policy with conditional policy"
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 
-pytestmark = pytest.mark.skipif("TESTED_VERSION < Version('2.16')")
+pytestmark = pytest.mark.skipif(TESTED_VERSION < Version("2.16"), reason="TESTED_VERSION < Version('2.16')")
 
 
 @pytest.fixture(scope="module")

@@ -4,10 +4,9 @@ import re
 
 import pytest
 
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
-from testsuite.utils import blame
 from testsuite import rawobj
+from testsuite.toolbox import constants, toolbox
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.xdist_group(name="toolbox"),
@@ -91,7 +90,7 @@ def parse_create_command_out(output):
 
 
 # Global variable for metrics' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, my_services, my_applications, create_cmd):

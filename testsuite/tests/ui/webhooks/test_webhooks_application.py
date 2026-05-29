@@ -7,7 +7,10 @@ import xml.etree.ElementTree as Et
 import pytest
 
 from testsuite import rawobj, resilient
-from testsuite.ui.views.admin.audience.application import ApplicationEditView, ApplicationDetailView
+from testsuite.ui.views.admin.audience.application import (
+    ApplicationDetailView,
+    ApplicationEditView,
+)
 from testsuite.ui.views.admin.settings.webhooks import WebhooksView
 from testsuite.utils import blame
 

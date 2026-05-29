@@ -1,6 +1,6 @@
 """Devel applications pages and tabs"""
 
-from widgetastic.widget import Text, Table
+from widgetastic.widget import Table, Text
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.devel import BaseDevelView, Navbar

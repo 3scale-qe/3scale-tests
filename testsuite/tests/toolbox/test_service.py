@@ -4,8 +4,7 @@ import re
 
 import pytest
 
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
+from testsuite.toolbox import constants, toolbox
 from testsuite.utils import randomize
 
 pytestmark = [
@@ -37,7 +36,7 @@ def parse_create_command_out(output):
 
 
 # Global variable for metrics' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, service, create_cmd):

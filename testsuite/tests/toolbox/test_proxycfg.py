@@ -1,7 +1,8 @@
 """Tests for working with proxy configurations of Toolbox feature"""
 
-import re
 import json
+import re
+
 import pytest
 
 from testsuite import rawobj
@@ -42,7 +43,7 @@ def hits(service):
 
 
 # Global variable for proxy configurations' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list_staging1(service, empty_list_staging, create_cmd):

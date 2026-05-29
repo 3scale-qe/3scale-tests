@@ -3,8 +3,8 @@
 from contextlib import contextmanager
 from time import sleep
 from urllib import parse
-import backoff
 
+import backoff
 from selenium.common.exceptions import NoSuchElementException
 from widgetastic.browser import Browser, DefaultPlugin
 

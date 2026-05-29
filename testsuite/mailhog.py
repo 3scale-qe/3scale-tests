@@ -2,15 +2,15 @@
 This module contains wrapper for the Mailhog API
 """
 
-from typing import Set, Optional
+from typing import Optional, Set
+
 import backoff
 import pytest
 import requests
-
 from openshift_client import OpenShiftPythonException
 
-from testsuite.utils import warn_and_skip
 from testsuite.openshift.client import OpenShiftClient
+from testsuite.utils import warn_and_skip
 
 
 class MailhogClient:
@@ -86,7 +86,7 @@ class MailhogClient:
             yield messages
 
     # pylint: disable=too-many-arguments, too-many-boolean-expressions
-    def find_message(self, subject=None, content=None, sender=None, receiver=None):
+    def find_messages(self, subject=None, content=None, sender=None, receiver=None):
         """Searches for messages by content, subject, sender, receiver
         CHeck presence of all provided values"""
         matching_messages = []
@@ -130,6 +130,6 @@ class MailhogClient:
         @param content: content of message to search for
         @param expected_count: number of expected messages
         """
-        messages = self.find_message(subject, content, sender, receiver)
+        messages = self.find_messages(subject, content, sender, receiver)
         assert messages["count"] == expected_count, f"Expected {expected_count} mail, found {messages['count']}"
         return messages

@@ -3,9 +3,9 @@
 import logging
 import time
 
-from widgetastic.widget import View, TextInput, Select, GenericLocatorWidget, Text
+from widgetastic.widget import GenericLocatorWidget, Select, Text, TextInput, View
 
-from testsuite.ui.objects import CreditCard, BillingAddress
+from testsuite.ui.objects import BillingAddress, CreditCard
 from testsuite.ui.views.devel import BaseDevelView
 from testsuite.ui.views.devel.settings import SettingsTabs
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton

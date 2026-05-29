@@ -1,15 +1,14 @@
 """Tests for working with metrics of Toolbox feature"""
 
 import re
-import pytest
 
-from testsuite.config import settings
+import pytest
 
 import testsuite
 from testsuite import rawobj
+from testsuite.config import settings
+from testsuite.toolbox import constants, toolbox
 from testsuite.utils import blame
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
 
 pytestmark = [
     pytest.mark.xdist_group(name="toolbox"),
@@ -64,7 +63,7 @@ def empty_list(metric_obj, create_cmd):
 
 
 # Global variable for metrics' values to check
-out_variables = {}
+out_variables: dict = {}
 
 
 def test_list1(empty_list, metric_obj, create_cmd):

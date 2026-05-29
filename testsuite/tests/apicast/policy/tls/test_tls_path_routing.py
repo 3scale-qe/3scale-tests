@@ -4,9 +4,9 @@ from urllib.parse import urlsplit
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import APICAST_OPERATOR_VERSION, TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.tests.apicast.policy.tls import embedded
@@ -16,8 +16,10 @@ pytestmark = [
     pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8000"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8252"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.12"), reason="TESTED_VERSION < Version('2.12')"),
+    pytest.mark.skipif(
+        APICAST_OPERATOR_VERSION < Version("0.6.0"), reason="APICAST_OPERATOR_VERSION < Version('0.6.0')"
+    ),
 ]
 
 
@@ -177,11 +179,11 @@ def test_tls_path_routing_with_logging(client, client2, staging_gateway):
     url2 = f'{client2._base_url}/bar/foo?user_key={client2.auth.credentials["user_key"]}'
     session = requests.Session()
     for _ in range(5):
-        response = session.get(url1, verify=False)
+        response = session.get(url1, verify=staging_gateway.server_authority.files["certificate"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service1/foo/bar"
-        response = session.get(url2, verify=False)
+        response = session.get(url2, verify=staging_gateway.server_authority.files["certificate"])
         assert response.status_code == 200
         echoed_request = EchoedRequest.create(response)
         assert echoed_request.json["path"] == "/service2/bar/foo"

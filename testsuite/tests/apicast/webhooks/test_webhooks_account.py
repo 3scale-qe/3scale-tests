@@ -4,16 +4,15 @@ Based on spec/ui_specs/webhooks/webhooks_accounts_spec.rb (ruby test is via UI)
 
 import xml.etree.ElementTree as Et
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
 import pytest
+from packaging.version import Version
 
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.utils import blame
 
 # webhook tests seem disruptive to requestbin as they reset it with no mercy
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.8.3')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.8.3"), reason="TESTED_VERSION < Version('2.8.3')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5207"),
     pytest.mark.disruptive,
 ]

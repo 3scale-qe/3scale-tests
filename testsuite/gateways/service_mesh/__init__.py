@@ -2,7 +2,7 @@
 
 from typing import Dict
 
-from threescale_api.resources import Service, Application
+from threescale_api.resources import Application, Service
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.gateways import AbstractGateway
