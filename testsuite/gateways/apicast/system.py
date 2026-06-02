@@ -1,20 +1,17 @@
 """System Apicast that comes deployed with 3scale"""
 
 from typing import TYPE_CHECKING
-from urllib.parse import urlparse
 
 import backoff
-from openshift_client import Missing, OpenShiftPythonException
-from threescale_api.resources import Service
+from openshift_client import OpenShiftPythonException
 
 from testsuite.capabilities import Capability
 from testsuite.gateways.apicast import AbstractApicast
 from testsuite.openshift.env import Properties
-from testsuite.openshift.objects import Routes
 from testsuite.utils import randomize
 
 if TYPE_CHECKING:
-    from typing import List, Optional
+    from typing import Optional
 
     # pylint: disable=cyclic-import
     from testsuite.openshift.client import OpenShiftClient
@@ -37,54 +34,6 @@ class SystemApicast(AbstractApicast):
     def __init__(self, staging: bool, openshift: "Optional[OpenShiftClient]" = None):
         self.staging = staging
         self.openshift: "Optional[OpenShiftClient]" = openshift
-        self._routes: "List[str]" = []
-
-    @property
-    def _zync_disabled(self) -> bool:
-        """Returns True if zync is disabled in the APIManager spec"""
-        if self.openshift is None:
-            return False
-        enabled = self.openshift.api_manager.get_path("spec/zync/enabled")
-        return enabled is not Missing and not enabled
-
-    @staticmethod
-    def _route_name(service: Service, production: bool = False) -> str:
-        env = "prod" if production else "stage"
-        return f"testsuite-{env}-{service.entity_id}"
-
-    def _create_route(self, name: str, endpoint_url: str, ocp_service: str):
-        """Creates an OCP route for the given endpoint URL pointing to the given OCP service"""
-        assert self.openshift is not None
-        hostname = urlparse(endpoint_url).hostname
-        if name in self.openshift.routes:
-            del self.openshift.routes[name]
-        self.openshift.routes.create(
-            name, Routes.Types.EDGE, service=ocp_service, hostname=hostname, **{"insecure-policy": "Allow"}
-        )
-        self._routes.append(name)
-
-    def on_service_create(self, service: Service):
-        """Creates staging OCP route when zync is disabled"""
-        if not self._zync_disabled:
-            return
-        proxy = service.proxy.fetch()
-        self._create_route(self._route_name(service), proxy["sandbox_endpoint"], "apicast-staging")
-
-    def on_proxy_promote(self, service: Service):
-        """Creates production OCP route when zync is disabled"""
-        if not self._zync_disabled:
-            return
-        proxy = service.proxy.fetch()
-        self._create_route(self._route_name(service, production=True), proxy["endpoint"], "apicast-production")
-
-    def on_service_delete(self, service: Service):
-        """Cleans up OCP routes created for this service"""
-        if self.openshift is None:
-            return
-        for name in [self._route_name(service), self._route_name(service, production=True)]:
-            if name in self._routes and name in self.openshift.routes:
-                del self.openshift.routes[name]
-                self._routes.remove(name)
 
     @property
     def deployment(self):
