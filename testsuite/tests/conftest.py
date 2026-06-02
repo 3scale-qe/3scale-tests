@@ -686,6 +686,8 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind, rhsso_route):
     Set up client for zync
     :return: dict with all important details
     """
+    if Capability.SSO not in CapabilityRegistry():
+        warn_and_skip("SSO capability not available: zync is disabled or RHSSO is not configured")
     rhsso = _resolve_rhsso(testconfig, tools, rhsso_route)
     if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
