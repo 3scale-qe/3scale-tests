@@ -1,5 +1,8 @@
 """This module is where most of the capability providers should be to not have them scattered around"""
 
+from openshift_client import Missing
+from weakget import weakget
+
 from testsuite import gateways
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
@@ -62,3 +65,16 @@ def fips():
 
 
 CapabilityRegistry().register_provider(fips, {Capability.NOFIPS, Capability.FIPS})
+
+
+def sso():
+    """SSO is available when zync is enabled and RHSSO is configured in dynaconf"""
+    enabled = openshift().api_manager.get_path("spec/zync/enabled")
+    if enabled is not Missing and not enabled:
+        return {}
+    if not weakget(settings)["rhsso"]["password"] % None:
+        return {}
+    return {Capability.SSO}
+
+
+CapabilityRegistry().register_provider(sso, {Capability.SSO})

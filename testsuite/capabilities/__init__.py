@@ -32,6 +32,7 @@ class Capability(enum.Enum):
     SCALING = "scaling"                         # If the current environment supports scaling of components
     FIPS = "fips"
     NOFIPS = "no-fips"
+    SSO = "sso"                                  # RHSSO/RHBK is configured and zync is enabled
     # fmt: on
 
 
