@@ -2,11 +2,17 @@
 
 from selenium.webdriver.common.by import By
 from widgetastic.utils import ParametrizedLocator
-from widgetastic.widget import ParametrizedView, Text, Table, Widget, TextInput, GenericLocatorWidget
+from widgetastic.widget import (
+    GenericLocatorWidget,
+    ParametrizedView,
+    Table,
+    Text,
+    TextInput,
+    Widget,
+)
+
 
 # pylint: disable=abstract-method
-
-
 class OAS3DropDown(Widget):
     """DropDown element used by OAS3. Usually used for key selection or autocomplete function"""
 

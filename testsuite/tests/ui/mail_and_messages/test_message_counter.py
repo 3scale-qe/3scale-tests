@@ -1,13 +1,13 @@
 """Test of message counters in dashboard main-section tabs"""
 
 import pytest
+from packaging.version import Version
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
-from testsuite.utils import blame
+from testsuite import TESTED_VERSION
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.foundation import DashboardView
 from testsuite.ui.views.devel.messages import ComposeView
+from testsuite.utils import blame
 
 
 def assert_dashboard_counters(navigator, message_count, unread_count):
@@ -40,7 +40,7 @@ def contents(request):
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.skipif("TESTED_VERSION < Version('2.15')")
+@pytest.mark.skipif(TESTED_VERSION < Version("2.15"), reason="TESTED_VERSION < Version('2.15')")
 @pytest.mark.usefixtures("login", "application", "service")
 def test_message_counter(
     custom_devel_login, custom_admin_login, account, navigator, mailhog_client, subjects, contents

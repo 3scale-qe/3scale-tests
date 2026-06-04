@@ -1,13 +1,24 @@
 """Representation of Login specific views"""
 
-from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
-from widgetastic_patternfly4.ouia import Button
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
+from widgetastic_patternfly4.ouia import Alert, Button
 
 from testsuite.ui.exception import UIException
 from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.views.admin.wizard import WizardIntroView
 from testsuite.ui.views.auth import Auth0View, RhssoView
 from testsuite.ui.views.common.login import LoginForm
+
+
+class AdminReCaptcha(View):
+    """ReCaptcha badge for admin portal — searches from browser root to escape view ROOT scoping."""
+
+    @property
+    def is_displayed(self):
+        element = self.browser.wait_for_element(
+            "//div[contains(@class,'grecaptcha-logo')]", timeout=10, exception=False
+        )
+        return element is not None
 
 
 class LoginView(View, Navigable):
@@ -18,9 +29,10 @@ class LoginView(View, Navigable):
     path = "/p/login"
     ROOT = "/html//div[@id='pf-login-page-container']"
     header = Text("//main/header/h2")
-    error_message = Text("//h4[@class='pf-c-alert__title']")
+    error_message = Alert(component_id="OUIA-Generated-Alert-danger-1")
     login_widget = View.nested(LoginForm)
     password_reset_link = Text("//a[@href='/p/password/reset']")
+    recaptcha = View.nested(AdminReCaptcha)
     auth0_link = Text("//*[@class='login-provider-link' and contains(@href,'auth0')]")
     rhsso_link = Text("//*[@class='login-provider-link' and contains(@href,'keycloak')]")
 
@@ -91,6 +103,8 @@ class RequestAdminPasswordView(View, Navigable):
     path = "/p/password/reset"
     password_reset_field = TextInput(id="email")
     passwd_reset_btn = Button(component_id="OUIA-Generated-Button-primary-1")
+    recaptcha = View.nested(AdminReCaptcha)
+    error_message = Alert(component_id="OUIA-Generated-Alert-danger-1")
 
     def reset_password(self, email):
         """Reset password of email address user"""

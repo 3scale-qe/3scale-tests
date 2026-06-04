@@ -5,9 +5,10 @@ Note: jaeger http rest api is not officially supported and may be a subject of a
 
 from string import Template
 from urllib.parse import urlparse
+
 import backoff
-import requests
 import importlib_resources as resources
+import requests
 
 
 class Jaeger:

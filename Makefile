@@ -49,13 +49,16 @@ ifeq ($(filter-out --store --load,$(flags)),$(flags))
 endif
 
 commit-acceptance: ## Run all linters, checks, formatters
-commit-acceptance: pylint flake8 mypy all-is-package black-check
+commit-acceptance: pylint flake8 mypy all-is-package black-check isort-check
 
 pylint flake8 mypy: pipenv-dev
 	pipenv run $@ $(flags) testsuite
 
 black-check: pipenv-dev
 	pipenv run black --check testsuite
+
+isort-check: pipenv-dev
+	pipenv run isort -c --profile black testsuite
 
 all-is-package:
 	@echo

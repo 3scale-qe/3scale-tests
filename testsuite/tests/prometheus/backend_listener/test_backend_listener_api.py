@@ -5,15 +5,15 @@ the increase of the metric, respective to the endpoint and returned
 status code, is expected in prometheus.
 """
 
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 import pytest
 import requests
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame, randomize
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 NUM_OF_REQUESTS = 10
 
@@ -21,7 +21,7 @@ pytestmark = [
     # can not be run in parallel
     pytest.mark.disruptive,
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4641"),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),
 ]
 
 

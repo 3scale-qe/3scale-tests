@@ -5,14 +5,14 @@ Test that any char from the windows-1252 encoding won't be changed by the apicas
 from urllib.parse import urlparse
 
 import pytest
+from packaging.version import Version
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 from testsuite.echoed_request import EchoedRequest
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 pytestmark = [
     pytest.mark.xfail,
-    pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6834"),
 ]
 

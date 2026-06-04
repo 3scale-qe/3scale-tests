@@ -1,8 +1,8 @@
 """Add test for product and backend analytics"""
 
 import pytest
+from wait_for import TimedOutError, wait_for
 
-from wait_for import wait_for, TimedOutError
 from testsuite import rawobj
 from testsuite.ui.views.admin.backend.analytics import BackendTrafficView
 from testsuite.ui.views.admin.product.analytics import ProductTrafficView

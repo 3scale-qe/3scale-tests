@@ -4,8 +4,6 @@ Test metrics provided by apicast to Prometheus.
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION  # noqa # pylint: disable=unused-import
 
 
 @pytest.mark.xfail  # xfail because Apicast does not have default ServiceMonitor created

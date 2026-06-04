@@ -3,7 +3,9 @@ Rewrite spec/functional_specs/policies/routing/routing_with_multiple_conditions_
 """
 
 from urllib.parse import urlparse
+
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 

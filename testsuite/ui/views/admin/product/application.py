@@ -5,9 +5,13 @@ from widgetastic_patternfly4 import PatternflyTable, Select
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.widgets import GenericLocatorWidget
-from testsuite.ui.widgets.buttons import ThreescaleUpdateButton, ThreescaleCreateButton, ThreescaleSubmitButton
 from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.widgets import GenericLocatorWidget
+from testsuite.ui.widgets.buttons import (
+    ThreescaleCreateButton,
+    ThreescaleSubmitButton,
+    ThreescaleUpdateButton,
+)
 
 
 class ApplicationPlansView(BaseProductView):

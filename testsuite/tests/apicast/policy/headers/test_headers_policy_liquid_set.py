@@ -5,6 +5,7 @@ Rewrite: ./spec/functional_specs/policies/headers/header_policy_liquid_set_spec.
 """
 
 import pytest
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
 
