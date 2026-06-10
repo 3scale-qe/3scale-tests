@@ -2,7 +2,7 @@
 
 ## Configuration
 First, you need to specify:
- * secrets in `secreets.yaml` or local version of secrets file
+ * secrets in `secrets.yaml` or local version of secrets file
  * settings in in `settings.yaml` or local version of settings file
 
 ### Settings
