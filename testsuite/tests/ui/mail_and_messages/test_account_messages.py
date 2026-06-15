@@ -67,7 +67,9 @@ def test_admin_forgotten_password(
 
     login_view = navigator.new_page(LoginView)
     custom_admin_login(name=account_name, password=account_password, fresh=True)
-    assert "Incorrect email or password. Please try again" in login_view.error_message.text
+    assert "Incorrect email or password. Please try again" in login_view.error_message.browser.text(
+        login_view.error_message
+    )
 
     custom_admin_login(name=account_name, password=password, fresh=True)
     assert BaseAdminView(navigator.browser).is_displayed
