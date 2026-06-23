@@ -32,7 +32,7 @@ def service(service):
     metric = service.metrics.list()[0]
 
     # delete implicit '/' rule
-    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+    proxy.mapping_rules.list()[0].delete()
 
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/get"))
 
