@@ -49,11 +49,15 @@ class ZyncLessApicast(SystemApicast):
 
     def on_service_create(self, service: Service):
         """Creates staging OCP route"""
+        if not self.staging:
+            return
         proxy = service.proxy.fetch()
         self._create_route(self._route_name(service), proxy["sandbox_endpoint"], "apicast-staging")
 
     def on_proxy_promote(self, service: Service):
         """Creates production OCP route"""
+        if self.staging:
+            return
         proxy = service.proxy.fetch()
         self._create_route(self._route_name(service, production=True), proxy["endpoint"], "apicast-production")
 

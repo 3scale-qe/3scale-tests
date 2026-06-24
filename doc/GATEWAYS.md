@@ -7,6 +7,8 @@
 * `STANDARD_GATEWAY`: Default gateway deployed by 3scale, which means tests that deploy their own APIcast can run.
 * `LOGS`: Allows getting APIcast logs through `get_logs()` method
 * `JAEGER`: Allows configuring the APIcast to send data to Jaeger through `connect_jaeger()` method
+* `ZYNC`: Zync is enabled in the 3scale deployment. Determined by the gateway type — absent when `ZyncLessApicast` is used. Tests that rely on zync functionality (route creation, OAuth client sync) require this capability.
+* `SSO`: RHSSO/RHBK is configured and zync is enabled (`ZYNC` capability is present and RHSSO password is set in config). Tests using OIDC/OAuth authentication require this capability.
 
 
 # Gateway type configuration
@@ -18,6 +20,20 @@
 gateway:
   default:
     kind: "SystemApicast"
+```
+## ZyncLess APIcast
+*Description*: Variant of System APIcast for 3scale deployments where zync is disabled. Since zync is not available
+to create OCP routes for APIcast endpoints, this gateway creates and manages them via lifecycle hooks.
+Requires `spec/zync/enabled: false` in the APIManager CR — will raise an error at startup if zync is enabled.
+Note: when using this gateway, OCP routes for the 3scale admin portal, master, and developer portal must be
+created manually as zync is also responsible for those.
+
+*Capabilities*: "APICAST, CUSTOM_ENVIRONMENT, PRODUCTION_GATEWAY, SAME_CLUSTER, LOGS, JAEGER, STANDARD_GATEWAY"
+(no `ZYNC` or `SSO` capability — RHSSO/OIDC tests are automatically skipped)
+```
+gateway:
+  default:
+    kind: "ZyncLessApicast"
 ```
 ## Container APIcast
 *Description*: Similar to Self-managed APIcast (at least for now), used for interop testing.
