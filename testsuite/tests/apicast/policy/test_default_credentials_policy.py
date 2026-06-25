@@ -18,10 +18,10 @@ def application(application, service):
 
 
 @pytest.fixture(scope="module")
-def service_app_id_key(custom_service, service_proxy_settings, request, backends_mapping):
+def service_app_id_key(custom_service, service_proxy_settings, request, backends_mapping, lifecycle_hooks):
     "Another service using app_id/key auth configuration"
     settings = {"name": blame(request, "CustSvc"), "backend_version": Service.AUTH_APP_ID_KEY}
-    return custom_service(settings, service_proxy_settings, backends_mapping)
+    return custom_service(settings, service_proxy_settings, backends_mapping, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
