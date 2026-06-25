@@ -403,7 +403,7 @@ def tools(testconfig):
 
 
 @pytest.fixture(scope="module")
-def prod_client(production_gateway, application, request):
+def prod_client(production_gateway, application, request, lifecycle_hooks):
     """Prepares application and service for production use and creates new production client
 
     Parameters:
@@ -422,6 +422,8 @@ def prod_client(production_gateway, application, request):
             if version == -1:
                 version = app.service.proxy.list().configs.latest()["version"]
             app.service.proxy.list().promote(version=version)
+            for hook in _select_hooks("on_proxy_promote", lifecycle_hooks):
+                hook(app.service)
         if redeploy:
             production_gateway.reload()
 
@@ -684,6 +686,8 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind, rhsso_route):
     Set up client for zync
     :return: dict with all important details
     """
+    if Capability.SSO not in CapabilityRegistry():
+        warn_and_skip("SSO capability not available: zync is disabled or RHSSO is not configured")
     rhsso = _resolve_rhsso(testconfig, tools, rhsso_route)
     if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")
