@@ -72,7 +72,7 @@ def test_edit_tenant(navigator, tenant, master_threescale, request):
     edit = navigator.navigate(TenantEditView, account=account)
 
     updated_name = blame(request, "updated_name")
-    edit.update(org_name=updated_name)
+    edit.replace(org_name=updated_name)
     account = master_threescale.accounts.read(account_id)
 
     assert account.entity_name != old_name

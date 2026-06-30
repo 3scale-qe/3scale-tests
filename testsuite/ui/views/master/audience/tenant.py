@@ -162,6 +162,12 @@ class TenantEditView(BaseMasterAudienceView):
     def __init__(self, parent, account):
         super().__init__(parent, account_id=account.entity_id)
 
+    def replace(self, org_name: str):
+        """Update account"""
+        self.browser.element(self.org_name).clear()
+        self.org_name.fill(org_name)
+        self.update_button.click()
+
     def update(self, org_name: str):
         """Update account"""
         self.org_name.fill(org_name)
