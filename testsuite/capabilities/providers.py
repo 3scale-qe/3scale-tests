@@ -68,9 +68,11 @@ CapabilityRegistry().register_provider(fips, {Capability.NOFIPS, Capability.FIPS
 
 
 def zync():
-    """Zync is available when the gateway is not ZyncLessApicast"""
+    """Zync is available when the gateway is not ZyncLessApicast,
+    unless zync_routes_disabled is set (zync runs but doesn't create routes)"""
     if issubclass(gateways.default, ZyncLessApicast):
-        return {}
+        if not weakget(settings)["threescale"]["gateway"]["default"]["zync_routes_disabled"] % False:
+            return {}
     return {Capability.ZYNC}
 
 

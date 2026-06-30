@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from openshift_client import Missing
 from threescale_api.resources import Service
 
+from testsuite.config import settings
 from testsuite.gateways.apicast.system import SystemApicast
 from testsuite.openshift.objects import Routes
 
@@ -27,9 +28,11 @@ class ZyncLessApicast(SystemApicast):
         self._routes: "List[str]" = []
 
     def create(self):
-        enabled = self.openshift.api_manager.get_path("spec/zync/enabled")
-        if enabled is Missing or enabled:
-            raise RuntimeError("ZyncLessApicast requires zync to be disabled in the APIManager spec")
+        zync_routes_disabled = settings["threescale"]["gateway"]["default"].get("zync_routes_disabled", False)
+        if not zync_routes_disabled:
+            enabled = self.openshift.api_manager.get_path("spec/zync/enabled")
+            if enabled is Missing or enabled:
+                raise RuntimeError("ZyncLessApicast requires zync to be disabled in the APIManager spec")
 
     @staticmethod
     def _route_name(service: Service, production: bool = False) -> str:
