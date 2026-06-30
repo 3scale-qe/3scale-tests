@@ -163,7 +163,8 @@ class TenantEditView(BaseMasterAudienceView):
         super().__init__(parent, account_id=account.entity_id)
 
     def update(self, org_name: str):
-        """Update account"""
+        """Update account with explicit replace through selenium"""
+        self.browser.element(self.org_name).clear()
         self.org_name.fill(org_name)
         self.update_button.click()
 
