@@ -12,7 +12,7 @@ from testsuite.utils import blame
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-2665"),
     pytest.mark.nopersistence,  # Tests relies on new application creation.
-    pytest.mark.required_capabilities(Capability.ZYNC),
+    pytest.mark.required_capabilities(Capability.ZYNC_OIDC_SYNC),
 ]
 
 

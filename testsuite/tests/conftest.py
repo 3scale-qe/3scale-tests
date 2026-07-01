@@ -99,6 +99,17 @@ def pytest_addoption(parser):
     parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
 
 
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Fail fast if zync configuration doesn't match the actual 3scale deployment.
+    Only runs on the controller process, not on xdist workers."""
+    if hasattr(session.config, "workerinput"):
+        return
+    try:
+        _ = Capability.ZYNC_ROUTES in CapabilityRegistry()
+    except RuntimeError as e:
+        pytest.exit(f"Zync configuration mismatch: {e}", returncode=3)
+
+
 def pytest_configure(config: pytest.Config) -> None:
     """Ensure mutually exclusive options"""
     fuzz = config.getoption("--fuzz")
@@ -691,8 +702,8 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind, rhsso_route):
     Set up client for zync
     :return: dict with all important details
     """
-    if Capability.SSO not in CapabilityRegistry():
-        warn_and_skip("SSO capability not available: zync is disabled or RHSSO is not configured")
+    if Capability.ZYNC_OIDC_SYNC not in CapabilityRegistry():
+        warn_and_skip("ZYNC_OIDC_SYNC capability not available: zync is disabled or not running")
     rhsso = _resolve_rhsso(testconfig, tools, rhsso_route)
     if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")

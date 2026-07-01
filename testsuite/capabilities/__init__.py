@@ -32,8 +32,8 @@ class Capability(enum.Enum):
     SCALING = "scaling"                         # If the current environment supports scaling of components
     FIPS = "fips"
     NOFIPS = "no-fips"
-    ZYNC = "zync"                                # Zync is enabled (gateway is not ZyncLessApicast)
-    SSO = "sso"                                  # RHSSO/RHBK is configured and zync is enabled
+    ZYNC_ROUTES = "zync-routes"                  # Zync creates OCP routes for APIcast endpoints
+    ZYNC_OIDC_SYNC = "zync-oidc-sync"            # Zync syncs OIDC clients with RHSSO/RHBK
     # fmt: on
 
 
