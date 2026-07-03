@@ -5,23 +5,23 @@ from ssl import SSLError
 import pytest
 
 from testsuite import rawobj
-from testsuite.utils import blame, warn_and_skip
-from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 from testsuite.certificates import Certificate
+from testsuite.rhsso import OIDCClientAuth, OIDCClientAuthHook
 
 # pylint: disable=reimported,unused-import
 # flake8: noqa
 from testsuite.tests.apicast.policy.tls.conftest import (
     certificate,
+    create_cert,
+    gateway_environment,
+    gateway_options,
     manager,
-    superdomain,
     server_authority,
     staging_gateway,
-    gateway_options,
-    gateway_environment,
+    superdomain,
     valid_authority,
-    create_cert,
 )
+from testsuite.utils import blame, warn_and_skip
 
 
 @pytest.fixture(scope="module")
