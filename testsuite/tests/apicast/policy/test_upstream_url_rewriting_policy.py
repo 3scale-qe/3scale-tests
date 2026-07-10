@@ -11,8 +11,22 @@ from testsuite.echoed_request import EchoedRequest
 
 
 @pytest.fixture(scope="module")
-def service(service, private_base_url):
+def upstream_url_one(private_base_url):
+    """URL of the echo_api backend used as upstream for v1 rule"""
+    return private_base_url("echo_api")
+
+
+@pytest.fixture(scope="module")
+def upstream_url_two(private_base_url):
+    """URL of the httpbin backend used as upstream for v2 rule"""
+    return private_base_url("httpbin")
+
+
+@pytest.fixture(scope="module")
+def service(service, upstream_url_one, upstream_url_two):
     """Add url_rewriting policy, configure metrics/mapping"""
+    assert upstream_url_one != upstream_url_two, "Upstream rules must use different backends to verify routing"
+
     proxy = service.proxy.list()
     proxy.policies.insert(
         0,
@@ -20,8 +34,8 @@ def service(service, private_base_url):
             "upstream",
             {
                 "rules": [
-                    {"url": private_base_url("echo_api"), "regex": "v1"},
-                    {"url": private_base_url(), "regex": "v2"},
+                    {"url": upstream_url_one, "regex": "v1"},
+                    {"url": upstream_url_two, "regex": "v2"},
                 ]
             },
         ),
@@ -47,27 +61,24 @@ def service(service, private_base_url):
     return service
 
 
-def test_url_rewriting_policy_v1(api_client, private_base_url):
+def test_url_rewriting_policy_v1(api_client, upstream_url_one):
     """must rewrite /httpbin/v1 to /rewrite and get response from new domain echo-api.3scale.net"""
-    parsed_url = urlparse(private_base_url("echo_api"))
+    parsed_url = urlparse(upstream_url_one)
     request = EchoedRequest.create(api_client().get("/httpbin/v1"))
     assert request.path == "/rewrite"
-    # X-Forwarded- can contain more values
-    forwarded_hosts = [h.strip() for h in request.headers["X-Forwarded-Host"].split(",")]
-    assert any(h in (parsed_url.hostname, parsed_url.netloc) for h in forwarded_hosts)
-    assert "443" in request.headers["X-Forwarded-Port"]
-    assert "https" in request.headers["X-Forwarded-Proto"]
+    assert request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
 
-def test_url_rewriting_policy_v2(api_client, application, private_base_url):
+def test_url_rewriting_policy_v2(api_client, application, upstream_url_two):
     """must rewrite /httpbin/v2 to /get and provide response from new domain httpbin"""
-    parsed_url = urlparse(private_base_url())
+    parsed_url = urlparse(upstream_url_two)
     analytics = application.threescale_client.analytics
     old_usage = analytics.list_by_service(application["service_id"], metric_name="hits")["total"]
-    response = api_client().get("/anything/anything")
+    response = api_client().get("/httpbin/v2")
     assert response.status_code == 200
 
     request = EchoedRequest.create(response)
+    assert request.path == "/get"
     assert request.headers["Host"] in (parsed_url.hostname, parsed_url.netloc)
 
     hits = resilient.analytics_list_by_service(
