@@ -1,5 +1,6 @@
 """Rewrite of spec/ui_specs/api_as_a_product/create_backend_spec.rb.rb"""
 
+import json
 from string import Template
 from urllib.parse import urlsplit
 
@@ -32,9 +33,13 @@ def test_active_docs_v2_generate_endpoints(navigator, service, private_base_url,
     """
     name = blame(request, "active_doc_v2")
     system_name = blame(request, "system_name")
+    parsed_url = urlsplit(private_base_url())
     oas_spec = Template(
         resources.files("testsuite.resources.oas2").joinpath("swagger.json").read_text()
-    ).safe_substitute(host=urlsplit(private_base_url()).netloc)
+    ).safe_substitute(host=parsed_url.netloc)
+    json_spec = json.loads(oas_spec)
+    json_spec["schemes"] = [parsed_url.scheme]
+    oas_spec = json.dumps(json_spec)
     edit = navigator.navigate(ActiveDocsNewView)
     edit.create_spec(
         name=name,
