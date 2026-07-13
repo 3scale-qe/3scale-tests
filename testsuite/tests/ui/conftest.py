@@ -6,11 +6,13 @@ import io
 import logging
 import math
 import os
+import re
 from datetime import datetime
 
 import backoff
 import pytest
 import pytest_html
+import wait_for
 from auth0.management import Auth0
 from PIL import Image
 from selenium.common import InvalidSessionIdException, WebDriverException
@@ -39,6 +41,22 @@ from testsuite.ui.webdriver import ThreescaleWebdriver
 from testsuite.utils import blame, get_results_dir_path
 
 LOGGER = logging.getLogger(__name__)
+
+# Patch wait_for 2.0 to accept string timeouts (e.g. "15s") for backwards compatibility with widgetastic
+_original_get_timeout_secs = wait_for._get_timeout_secs  # pylint: disable=protected-access
+
+
+def _patched_get_timeout_secs(kwargs):
+    """Parse string timeouts like '15s' into integers"""
+    timeout = kwargs.get("timeout", None)
+    if isinstance(timeout, str):
+        match = re.match(r"^(\d+)\s*s$", timeout)
+        if match:
+            kwargs["timeout"] = int(match.group(1))
+    return _original_get_timeout_secs(kwargs)
+
+
+wait_for._get_timeout_secs = _patched_get_timeout_secs  # pylint: disable=protected-access
 
 
 @pytest.fixture(scope="session")
