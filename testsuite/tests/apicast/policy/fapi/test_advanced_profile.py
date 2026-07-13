@@ -148,7 +148,16 @@ def fapi_client_invalid(application, fapi_sso_client, unknown_cert):
 @pytest.fixture(scope="module", autouse=True)
 def rhsso_setup(lifecycle_hooks, rhsso_service_info):
     """Have application/service with RHSSO auth configured"""
-    lifecycle_hooks.append(OIDCClientAuthHook(rhsso_service_info))
+    lifecycle_hooks.append(
+        OIDCClientAuthHook(
+            rhsso_service_info,
+            oidc_configuration={
+                "standard_flow_enabled": False,
+                "direct_access_grants_enabled": True,
+                "service_accounts_enabled": True,
+            },
+        )
+    )
 
 
 def test_valid_cert_returns_200(fapi_client):
