@@ -486,7 +486,7 @@ def master_threescale(testconfig):
 @pytest.fixture(scope="session")
 def account_password():
     """Default password for Accounts"""
-    return "123456"
+    return "1234567890121416"
 
 
 @pytest.fixture(scope="session")
