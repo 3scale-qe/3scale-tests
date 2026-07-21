@@ -17,7 +17,7 @@ default:
     kind: rhbk+ssl
     test_user:
       username: testUser
-      password: vhkvnvkxfsht
+      password: vhkvnvkxfsht1416
   redis:
     url: redis://apicast-testing-redis:6379/1
   proxy:
