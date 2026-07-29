@@ -4,7 +4,6 @@ Performance test for managed services with multiple 3scale entities (products, b
 
 import asyncio
 import os
-from concurrent.futures.thread import ThreadPoolExecutor
 from urllib.parse import urlparse
 
 import backoff
@@ -77,26 +76,23 @@ def create_mapping_rules():
 
 
 @pytest.fixture(scope="module")
-def services(services, create_mapping_rules):
+async def services(services, create_mapping_rules):
     """
     Removes default mapping rule of each product.
     For each backend creates 10 mapping rules
     """
-    loop = asyncio.get_event_loop()
     for svc in services:
         proxy = svc.proxy.list()
         proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
-    with ThreadPoolExecutor() as pool:
-        for svc in services:
-            proxy = svc.proxy.list()
-            futures = []
-            for be_usage in svc.backend_usages.list():
-                futures += [
-                    loop.run_in_executor(pool, create_mapping_rules, i, be_usage)
-                    for i in range(NUMBER_OF_MAPPING_RULES_PER_BACKEND)
-                ]
-            loop.run_until_complete(asyncio.gather(*futures))
-            proxy.update()
+    for svc in services:
+        proxy = svc.proxy.list()
+        futures = []
+        for be_usage in svc.backend_usages.list():
+            futures += [
+                asyncio.to_thread(create_mapping_rules, i, be_usage) for i in range(NUMBER_OF_MAPPING_RULES_PER_BACKEND)
+            ]
+        await asyncio.gather(*futures)
+        proxy.update()
     return services
 
 
