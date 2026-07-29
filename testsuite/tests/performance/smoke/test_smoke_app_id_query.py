@@ -63,7 +63,7 @@ def service_settings(service_settings):
 
 
 @pytest.fixture(scope="module")
-async def services(services, create_mapping_rules, event_loop):
+async def services(services, create_mapping_rules):
     """
     Removes default mapping rule of each product.
     For each backend creates 20 mapping rules
@@ -75,7 +75,7 @@ async def services(services, create_mapping_rules, event_loop):
         proxy = svc.proxy.list()
         futures = []
         for be_usage in svc.backend_usages.list():
-            futures += [event_loop.run_in_executor(None, create_mapping_rules, i, be_usage) for i in range(10)]
+            futures += [asyncio.to_thread(create_mapping_rules, i, be_usage) for i in range(10)]
         await asyncio.gather(*futures)
         proxy.deploy()
     return services
