@@ -1,9 +1,10 @@
 """Test special characters in app_id and app_key"""
 
 import pytest
+from packaging.version import Version
 from threescale_api.resources import Service
 
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import blame
@@ -90,8 +91,10 @@ def _generate_params():
     """Generate test params for both headers and params credentials locations."""
     issue_10761 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10761")
     issue_10762 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762")
+    issue_10763 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763")
     fuzz = pytest.mark.fuzz
     xfail = pytest.mark.xfail
+    xfail_10763 = pytest.mark.xfail(TESTED_VERSION < Version("2.16"), reason="THREESCALE-10763")
 
     # (app_id, app_key, headers_marks, params_marks)
     _params = [
@@ -102,7 +105,7 @@ def _generate_params():
         ("_~ID", "keykey5", [fuzz], [fuzz]),
         ('"%<>[\\]^`{|}', "keykey6", [fuzz], [fuzz, xfail, issue_10762]),
         ("{}*~KEY", "keykey7", [fuzz], [fuzz, xfail, issue_10761, issue_10762]),
-        ("1111_", "keykey8", [fuzz], [fuzz]),
+        ("1111_", "keykey8", [fuzz, xfail_10763, issue_10763], [fuzz, xfail_10763, issue_10763]),
     ]
 
     params = []
