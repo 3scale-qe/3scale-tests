@@ -1,8 +1,9 @@
 """test special characters in Application description"""
 
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 from testsuite.utils import blame
 
@@ -39,7 +40,11 @@ DESCRIPTIONS = (
     + [pytest.param(f"{n}{c}", marks=[pytest.mark.fuzz]) for n, c in enumerate(r'!"#$%&\'()*+,-./\: ;<=>?@[]^`{|}~')]
     + [
         pytest.param(
-            "99_", marks=[pytest.mark.xfail, pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763")]
+            "99_",
+            marks=[
+                pytest.mark.xfail(TESTED_VERSION < Version("2.16"), reason="THREESCALE-10763"),
+                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763"),
+            ],
         )
     ]
 )
