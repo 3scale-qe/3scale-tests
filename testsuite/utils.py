@@ -236,3 +236,8 @@ def get_results_dir_path():
     no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../..")
     resultsdir = os.environ.get("resultsdir", no_argument_dir)
     return Path(resultsdir)
+
+
+def fallback(value, default):
+    """Return default if value is None, otherwise return value"""
+    return default if value is None else value
