@@ -1,13 +1,12 @@
 """Test special characters in app_id and app_key"""
 
 import pytest
-from threescale_api.resources import Service
 from packaging.version import Version
+from threescale_api.resources import Service
 
-from testsuite import TESTED_VERSION
-from testsuite import rawobj
-from testsuite.echoed_request import EchoedRequest
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 from testsuite.utils import blame
 
 pytestmark = [pytest.mark.required_capabilities(Capability.PRODUCTION_GATEWAY)]
@@ -25,7 +24,7 @@ def private_base_url(tools):
 
 @pytest.fixture(scope="module")
 def service_proxy_settings(service_proxy_settings):
-    "auth via url params doesn't work because of url encoding of special characters"
+    """auth via url params doesn't work because of url encoding of special characters"""
     service_proxy_settings.update(credentials_location="headers")
     return service_proxy_settings
 
@@ -38,192 +37,98 @@ def service_settings(service_settings):
 
 
 @pytest.fixture(scope="module")
-def app_plan(service, custom_app_plan, request):
-    """Reuse application plan for all applications"""
+def app_plan_headers(service, custom_app_plan, request):
+    """Reuse application plan for all headers applications"""
     return custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service)
 
 
-@pytest.fixture(scope="module")
 # pylint: disable=too-many-arguments
-def application(app_id, app_key, credentials_location, service, custom_application, app_plan, lifecycle_hooks, request):
-    "application bound to the account and service existing over whole testing session"
-    plan = app_plan
-    app_obj = rawobj.Application(blame(request, "app"), plan, app_id=app_id, app_key=app_key)
-    app = custom_application(app_obj, hooks=lifecycle_hooks)
-    service.proxy.list().update({"credentials_location": credentials_location})
-    service.proxy.deploy()
-    return app
+@pytest.fixture()
+def application_headers(app_id, app_key, custom_application, app_plan_headers, lifecycle_hooks, request):
+    """Application with credentials sent via headers"""
+    app_obj = rawobj.Application(blame(request, "app"), app_plan_headers, app_id=app_id, app_key=app_key)
+    return custom_application(app_obj, hooks=lifecycle_hooks)
 
 
 @pytest.fixture(scope="module")
-def client2(application):
-    """Client for a created application"""
-    return application.api_client()
+def service_params(backends_mapping, custom_service, lifecycle_hooks, request):
+    """Second service with credentials_location=query"""
+    return custom_service(
+        {"name": blame(request, "svc"), "backend_version": Service.AUTH_APP_ID_KEY},
+        rawobj.Proxy(credentials_location="query"),
+        backends_mapping,
+        hooks=lifecycle_hooks,
+    )
 
 
 @pytest.fixture(scope="module")
+def app_plan_params(service_params, custom_app_plan, request):
+    """Reuse application plan for all params applications"""
+    return custom_app_plan(rawobj.ApplicationPlan(blame(request, "aplan")), service_params)
+
+
+# pylint: disable=too-many-arguments
+@pytest.fixture()
+def application_params(app_id, app_key, custom_application, app_plan_params, lifecycle_hooks, request):
+    """Application with credentials sent via query params"""
+    app_obj = rawobj.Application(blame(request, "app"), app_plan_params, app_id=app_id, app_key=app_key)
+    return custom_application(app_obj, hooks=lifecycle_hooks)
+
+
+@pytest.fixture()
 def app_id(request):
-    """indirect fixture for app_id used for creating and used as reference value in assert"""
+    """Indirect fixture for app_id used for creating application and as reference value in assert"""
     return request.param
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def app_key(request):
-    """indirect fixture for app_key used for creating and used as reference value in assert"""
+    """Indirect fixture for app_key used for creating application and as reference value in assert"""
     return request.param
 
 
-@pytest.fixture(scope="module")
-def credentials_location(request):
-    """indirect fixture for credentials_location used for creating and used as reference value in assert"""
-    return request.param
+def _generate_params():
+    """Generate test params for both headers and params credentials locations."""
+    issue_10761 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10761")
+    issue_10762 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762")
+    issue_10763 = pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763")
+    fuzz = pytest.mark.fuzz
+    xfail = pytest.mark.xfail
+    xfail_10763 = pytest.mark.xfail(TESTED_VERSION < Version("2.16"), reason="THREESCALE-10763")
+
+    # (app_id, app_key, headers_marks, params_marks)
+    _params = [
+        ("MYID", "keykey1", [], []),
+        ("!#$&'(", "keykey2", [fuzz], [fuzz, xfail, issue_10762]),
+        (")*+,-./:", "keykey3", [fuzz], [fuzz, xfail, issue_10762]),
+        (";=?@", "keykey4", [fuzz], [fuzz, xfail, issue_10762]),
+        ("_~ID", "keykey5", [fuzz], [fuzz]),
+        ('"%<>[\\]^`{|}', "keykey6", [fuzz], [fuzz, xfail, issue_10762]),
+        ("{}*~KEY", "keykey7", [fuzz], [fuzz, xfail, issue_10761, issue_10762]),
+        ("1111_", "keykey8", [fuzz, xfail_10763, issue_10763], [fuzz, xfail_10763, issue_10763]),
+    ]
+
+    params = []
+    for app_id, app_key, marks, params_marks in _params:
+        params.append(pytest.param(app_id, app_key, "headers", marks=marks))
+        params.append(pytest.param(app_id, app_key, "params", marks=params_marks))
+    return params
 
 
 @pytest.mark.parametrize(
     ("app_id", "app_key", "credentials_location"),
-    [
-        # credentials located in the headers
-        pytest.param("MYIDh", "keykey1", "headers"),
-        pytest.param(
-            "!#$&'(h",
-            "keykey2",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            ")*+,-./:h",
-            "keykey3",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            ";=?@h",
-            "keykey4",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "_~IDh",
-            "keykey5",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            '"%<>[\\]^`{|}h',
-            "keykey6",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "{}*~KEYh",
-            "keykey7",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "1111_",
-            "keykey8",
-            "headers",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        # credentials located in the query
-        pytest.param("MYIDq", "keykey1", "query"),
-        pytest.param(
-            "!#$&'(q",
-            "keykey2",
-            "query",
-            marks=[
-                pytest.mark.xfail,
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762"),
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            ")*+,-./:q",
-            "keykey3",
-            "query",
-            marks=[
-                pytest.mark.xfail,
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762"),
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            ";=?@q",
-            "keykey4",
-            "query",
-            marks=[
-                pytest.mark.xfail,
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762"),
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "_~IDq",
-            "keykey5",
-            "query",
-            marks=[
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            '"%<>[\\]^`{|}q',
-            "keykey6",
-            "query",
-            marks=[
-                pytest.mark.xfail,
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762"),
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "{}*~KEYq",
-            "keykey7",
-            "query",
-            marks=[
-                pytest.mark.xfail,
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10761"),
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10762"),
-                pytest.mark.fuzz,
-            ],
-        ),
-        pytest.param(
-            "2222_",
-            "keykey8",
-            "query",
-            marks=[
-                pytest.mark.xfail(TESTED_VERSION < Version("2.16"), reason="Bug fixed in 2.16"),
-                pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-10763"),
-                pytest.mark.fuzz,
-            ],
-        ),
-    ],
-    indirect=True,
+    _generate_params(),
+    indirect=["app_id", "app_key"],
 )
-def test_successful_requests(client2, app_id, app_key, credentials_location):
-    """Test checks if applications was created and is functional"""
-    response = client2.get("/get")
+def test_successful_requests(app_id, app_key, credentials_location, request):
+    """Test checks if application was created and is functional"""
+    application = request.getfixturevalue(f"application_{credentials_location}")
+    client = application.api_client()
+
+    response = client.get("/get")
     assert response.status_code == 200
 
     echoed_request = EchoedRequest.create(response)
-    # import pdb; pdb.set_trace()
-    if credentials_location == "headers":
-        assert echoed_request.headers["app_key"] == app_key
-        assert echoed_request.headers["app_id"] == app_id
-    else:
-        assert echoed_request.params["app_key"] == app_key
-        assert echoed_request.params["app_id"] == app_id
+    creds = getattr(echoed_request, credentials_location)
+    assert creds["app_key"] == app_key
+    assert creds["app_id"] == app_id
