@@ -6,7 +6,10 @@ Creates a new tenant and tests if the tenant works
 import pytest
 
 from testsuite import rawobj, resilient
+from testsuite.capabilities import Capability
 from testsuite.utils import blame
+
+pytestmark = pytest.mark.required_capabilities(Capability.ZYNC_ROUTES)
 
 
 @pytest.fixture(scope="session")

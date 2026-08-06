@@ -6,7 +6,10 @@ import backoff
 import pytest
 from keycloak.exceptions import KeycloakGetError
 
+from testsuite.capabilities import Capability
 from testsuite.rhsso import OIDCClientAuthHook
+
+pytestmark = [pytest.mark.required_capabilities(Capability.ZYNC_OIDC_SYNC)]
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -112,3 +112,9 @@ class LifecycleHook(abc.ABC):
 
         Args:
             :param application: The application to be deleted"""
+
+    def on_proxy_promote(self, service: Service):
+        """Called after proxy configuration is promoted to production.
+
+        Args:
+            :param service: Service whose proxy was promoted to production"""

@@ -14,7 +14,7 @@ from testsuite.capabilities import Capability
 pytestmark = [
     pytest.mark.skipif(TESTED_VERSION < Version("2.9"), reason="TESTED_VERSION < Version('2.9')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-3545"),
-    pytest.mark.required_capabilities(Capability.SAME_CLUSTER, Capability.PRODUCTION_GATEWAY),
+    pytest.mark.required_capabilities(Capability.SAME_CLUSTER, Capability.PRODUCTION_GATEWAY, Capability.ZYNC_ROUTES),
     pytest.mark.disruptive,
 ]
 
