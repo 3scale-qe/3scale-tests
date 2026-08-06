@@ -1,6 +1,6 @@
 """View representations of products integration configuration section pages"""
 
-from widgetastic.widget import View, ParametrizedLocator
+from widgetastic.widget import ParametrizedLocator, View
 from widgetastic_patternfly4 import Button
 
 from testsuite.ui.views.admin.product import BaseProductView

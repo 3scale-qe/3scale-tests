@@ -27,6 +27,7 @@ abstract, however that would cause huge disruption in usage of the testsuite.
 
 import inspect
 import sys
+
 from testsuite.config import settings
 from testsuite.configuration import openshift
 from testsuite.openshift.client import OpenShiftClient

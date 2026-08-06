@@ -1,6 +1,6 @@
 """View representations of Tenants pages"""
 
-from widgetastic.widget import TextInput, Text
+from widgetastic.widget import Text, TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
@@ -9,8 +9,8 @@ from testsuite.ui.widgets.buttons import (
     Button,
     ThreescaleDeleteButton,
     ThreescaleEditButton,
-    ThreescaleSubmitButton,
     ThreescaleSearchButton,
+    ThreescaleSubmitButton,
     ThreescaleUpdateButton,
 )
 

@@ -5,7 +5,7 @@ import tempfile
 from abc import ABC
 from typing import Dict
 
-from testsuite.certificates import CertificateStore, Certificate
+from testsuite.certificates import Certificate, CertificateStore
 
 
 def _persist(path, name: str, ext: str, content: str):

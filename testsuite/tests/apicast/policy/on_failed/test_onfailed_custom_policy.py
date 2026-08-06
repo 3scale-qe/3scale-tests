@@ -6,7 +6,6 @@ and tests that on failed policy returns the correct error code.
 import backoff
 import importlib_resources as resources
 import pytest
-
 from openshift_client import OpenShiftPythonException
 
 from testsuite.capabilities import Capability

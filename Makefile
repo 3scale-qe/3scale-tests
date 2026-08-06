@@ -49,13 +49,16 @@ ifeq ($(filter-out --store --load,$(flags)),$(flags))
 endif
 
 commit-acceptance: ## Run all linters, checks, formatters
-commit-acceptance: pylint flake8 mypy all-is-package black-check
+commit-acceptance: pylint flake8 mypy all-is-package black-check isort-check
 
 pylint flake8 mypy: pipenv-dev
 	pipenv run $@ $(flags) testsuite
 
 black-check: pipenv-dev
 	pipenv run black --check testsuite
+
+isort-check: pipenv-dev
+	pipenv run isort -c --profile black testsuite
 
 all-is-package:
 	@echo
@@ -183,7 +186,7 @@ export DOCKERCONFIGJSON
 endif
 
 Pipfile.lock: Pipfile
-	pipenv lock $(PIPENV_ARGS)
+	PIPENV_RESOLVER_PARENT_PYTHON=1 pipenv lock $(PIPENV_ARGS)
 
 .make-pipenv-sync: Pipfile.lock
 	pipenv sync $(PIPENV_ARGS)
@@ -201,6 +204,10 @@ container-image: ## Build container image
 container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
 	docker build -t $(IMAGENAME) $(DOCKER_BUILD_ARGS) .
+
+container-image-temp: ## Build container image that expires on quay.io in 7 days
+container-image-temp: DOCKER_BUILD_ARGS += --label quay.expires-after=7d
+container-image-temp: container-image
 
 clean: ## Clean pip deps
 clean: mostlyclean

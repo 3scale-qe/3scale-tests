@@ -16,7 +16,7 @@ Design of this navigation is based on: https://github.com/RedHatQE/navmazing
 
 import inspect
 from collections import deque
-from typing import TypeVar, Type, Optional
+from typing import Optional, Type, TypeVar
 
 from widgetastic.widget import View
 

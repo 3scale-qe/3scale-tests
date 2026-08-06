@@ -10,8 +10,8 @@ from urllib.parse import urlparse
 
 import pytest
 
-from testsuite.echoed_request import EchoedRequest
 from testsuite.capabilities import Capability
+from testsuite.echoed_request import EchoedRequest
 
 pytestmark = pytest.mark.required_capabilities(Capability.STANDARD_GATEWAY, Capability.CUSTOM_ENVIRONMENT)
 

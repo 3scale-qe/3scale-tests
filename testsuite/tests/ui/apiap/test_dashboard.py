@@ -7,7 +7,9 @@ from testsuite.config import settings
 from testsuite.ui.views.admin.audience.account import AccountsView
 from testsuite.ui.views.admin.audience.application import ApplicationsView
 from testsuite.ui.views.admin.audience.billing import BillingView
-from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalContentView
+from testsuite.ui.views.admin.audience.developer_portal import (
+    DeveloperPortalContentView,
+)
 from testsuite.ui.views.admin.audience.messages import MessagesView
 from testsuite.ui.views.admin.backend import BackendsView
 from testsuite.ui.views.admin.backend.backend import BackendNewView

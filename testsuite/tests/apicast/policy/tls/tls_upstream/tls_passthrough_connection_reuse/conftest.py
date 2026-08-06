@@ -4,7 +4,7 @@ Conftest for connection reuse test
 
 import pytest
 
-from testsuite import rawobj, gateways
+from testsuite import gateways, rawobj
 from testsuite.openshift.objects import Routes
 from testsuite.tests.apicast.policy.tls import embedded
 

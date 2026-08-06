@@ -1,12 +1,12 @@
 "testsuite helpers"
 
 import os
-from datetime import datetime, timezone
 import secrets
 import time
 import typing
 import warnings
 from base64 import b64encode
+from datetime import datetime, timezone
 from os import urandom
 from pathlib import Path
 
@@ -236,3 +236,8 @@ def get_results_dir_path():
     no_argument_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../..")
     resultsdir = os.environ.get("resultsdir", no_argument_dir)
     return Path(resultsdir)
+
+
+def fallback(value, default):
+    """Return default if value is None, otherwise return value"""
+    return default if value is None else value

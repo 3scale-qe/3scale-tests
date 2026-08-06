@@ -2,11 +2,10 @@
 Rewrite spec/functional_specs/policies/ip_check/ip_check_forward_whitelist_spec.rb
 """
 
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-
 import pytest
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [pytest.mark.nopersistence]
 
@@ -35,7 +34,7 @@ def test_ip_check_policy_ip_blacklisted(api_client):
             403,
             marks=[
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7076"),
-                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+                pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
             ],
         ),
         pytest.param(
@@ -43,7 +42,7 @@ def test_ip_check_policy_ip_blacklisted(api_client):
             403,
             marks=[
                 pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7075"),
-                pytest.mark.skipif("TESTED_VERSION < Version('2.11')"),
+                pytest.mark.skipif(TESTED_VERSION < Version("2.11"), reason="TESTED_VERSION < Version('2.11')"),
             ],
         ),
     ],

@@ -1,6 +1,6 @@
 """Contains basic views for Developer portal"""
 
-from widgetastic.widget import View, Text, TextInput, GenericLocatorWidget
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 
 from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.widgets.oas3 import Endpoint

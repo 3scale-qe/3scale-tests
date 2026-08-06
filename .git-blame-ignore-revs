@@ -13,3 +13,4 @@ d499948418f6e1dc432dabf11f158e58d9a0b0d8 # black 25.1.0 changes
 7619a4c61d7914b16088f585e2bceacebf26ec88 # reduce new lines to one after import block
 a5deb34f80c6644936cb192686ded29a292d1e8f # unpacking tuple does not need () on lhs
 80bb9d6d9f11ac33d6c9287261d2ce44aadd3f87 # fix type ignore comment
+1518dcb9486e58b2223b6026eebbc15f516c7709 # isort --profile black

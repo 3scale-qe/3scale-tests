@@ -5,9 +5,10 @@ Rewrite spec/functional_specs/policies/routing/routing_by_jwt_spec.rb
 from urllib.parse import urlparse
 
 import pytest
+
 from testsuite import rawobj
-from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.echoed_request import EchoedRequest
+from testsuite.rhsso.rhsso import OIDCClientAuthHook
 from testsuite.utils import blame
 
 

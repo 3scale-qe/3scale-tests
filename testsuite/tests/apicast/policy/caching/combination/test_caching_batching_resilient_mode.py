@@ -3,13 +3,15 @@ Test caching policy with strict mode.
 """
 
 from time import sleep
+
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.9.1')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.9.1"), reason="TESTED_VERSION < Version('2.9.1')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-5753"),
     pytest.mark.required_capabilities(Capability.SCALING),
 ]

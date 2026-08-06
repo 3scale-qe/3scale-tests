@@ -9,9 +9,9 @@ from urllib.parse import urlparse
 import importlib_resources as resources
 import pytest
 import yaml
-from testsuite.config import settings
 
 from testsuite import rawobj
+from testsuite.config import settings
 from testsuite.rhsso.rhsso import OIDCClientAuth
 from testsuite.toolbox import toolbox
 from testsuite.utils import blame

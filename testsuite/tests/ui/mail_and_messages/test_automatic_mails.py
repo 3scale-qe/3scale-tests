@@ -1,8 +1,8 @@
 """Test of automatic mails functionality in UI"""
 
 import re
-import pytest
 
+import pytest
 
 from testsuite.ui.views.admin.audience.account import AccountInvitationNewView
 from testsuite.ui.views.devel.login import InvitationSignupView

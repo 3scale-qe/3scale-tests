@@ -4,7 +4,7 @@ from typing import Dict
 from urllib.parse import urlparse
 
 import importlib_resources as resources
-from threescale_api.resources import Service, Application
+from threescale_api.resources import Application, Service
 
 from testsuite.capabilities import Capability
 from testsuite.gateways import AbstractGateway

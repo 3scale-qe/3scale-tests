@@ -23,18 +23,18 @@ from weakget import weakget
 # to actually initialize all the providers
 # pylint: disable=unused-import
 import testsuite.capabilities.providers  # noqa
-from testsuite.tools import Tools
-from testsuite import TESTED_VERSION, rawobj, HTTP2, gateways, configuration, resilient
+from testsuite import HTTP2, TESTED_VERSION, configuration, gateways, rawobj, resilient
 from testsuite.capabilities import Capability, CapabilityRegistry
 from testsuite.config import settings
 from testsuite.httpx import HttpxHook
+from testsuite.mailhog import MailhogClient
 from testsuite.mockserver import Mockserver
 from testsuite.openshift.client import OpenShiftClient
 from testsuite.prometheus import PrometheusClient
-from testsuite.rhsso import RHSSOServiceConfiguration, RHSSO
+from testsuite.rhsso import RHSSO, RHSSOServiceConfiguration
 from testsuite.toolbox import toolbox
+from testsuite.tools import Tools
 from testsuite.utils import blame, blame_desc, warn_and_skip
-from testsuite.mailhog import MailhogClient
 
 if weakget(settings)["reporting"]["print_app_logs"] % True:
     pytest_plugins = ("testsuite.gateway_logs",)
@@ -486,7 +486,7 @@ def master_threescale(testconfig):
 @pytest.fixture(scope="session")
 def account_password():
     """Default password for Accounts"""
-    return "123456"
+    return "1234567890121416"
 
 
 @pytest.fixture(scope="session")
@@ -675,7 +675,12 @@ def _resolve_rhsso(testconfig, tools, route_name):
     if "password" not in cnf:
         return None
 
-    return RHSSO(server_url=tools[route_name], username=cnf["username"], password=cnf["password"])
+    return RHSSO(
+        server_url=tools[route_name],
+        username=cnf["username"],
+        password=cnf["password"],
+        verify=testconfig["ssl_verify"],
+    )
 
 
 @pytest.fixture(scope="session")

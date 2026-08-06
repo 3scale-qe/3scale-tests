@@ -3,15 +3,16 @@ Test 3scale Operator pod resource limits and requests
 """
 
 import re
-import pytest
 
+import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.sandbag,  # requires operator in same namespace
-    pytest.mark.skipif("TESTED_VERSION < Version('2.10')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.10"), reason="TESTED_VERSION < Version('2.10')"),
     pytest.mark.required_capabilities(Capability.OCP4),
     pytest.mark.nopersistence,
 ]

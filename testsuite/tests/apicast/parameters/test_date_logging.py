@@ -5,16 +5,18 @@ Test for logging policy with custom date format
 from datetime import datetime, timezone
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION, APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import APICAST_OPERATOR_VERSION, TESTED_VERSION, rawobj
 from testsuite.capabilities import Capability
 
 pytestmark = [
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6594"),
     pytest.mark.required_capabilities(Capability.LOGS),
-    pytest.mark.skipif("TESTED_VERSION < Version('2.12')"),
-    pytest.mark.skipif("APICAST_OPERATOR_VERSION < Version('0.6.0')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.12"), reason="TESTED_VERSION < Version('2.12')"),
+    pytest.mark.skipif(
+        APICAST_OPERATOR_VERSION < Version("0.6.0"), reason="APICAST_OPERATOR_VERSION < Version('0.6.0')"
+    ),
 ]
 
 

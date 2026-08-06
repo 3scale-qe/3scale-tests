@@ -1,7 +1,7 @@
 """View representations of 3rd party auth pages"""
 
 from weakget import weakget
-from widgetastic.widget import View, TextInput, GenericLocatorWidget, Text
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 
 from testsuite import settings
 from testsuite.ui.navigation import Navigable

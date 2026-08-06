@@ -1,7 +1,7 @@
 """Collection of classes for working with different ssl certificate tools."""
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
 from testsuite.certificates.persist import TmpFilePersist
 

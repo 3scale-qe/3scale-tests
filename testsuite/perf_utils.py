@@ -4,10 +4,10 @@ This file contains methods that are used in performance testing
 
 import os
 from urllib.parse import urlparse
-import importlib_resources as resources
 
+import importlib_resources as resources
 import yaml
-from hyperfoil.factories import HyperfoilFactory, Benchmark
+from hyperfoil.factories import Benchmark, HyperfoilFactory
 
 
 def _load_benchmark(filename):

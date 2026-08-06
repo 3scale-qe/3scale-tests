@@ -1,12 +1,12 @@
 """Represents mockserver calls used in tests"""
 
-from urllib.parse import urljoin
 import json
+from urllib.parse import urljoin
 
-from requests import HTTPError
-from weakget import weakget
 import backoff
 import requests
+from requests import HTTPError
+from weakget import weakget
 
 from testsuite.utils import generate_tail
 

@@ -3,6 +3,7 @@ Rewrite spec/functional_specs/api_default_spec.rb
 """
 
 import pytest
+
 from testsuite.capabilities import Capability
 
 

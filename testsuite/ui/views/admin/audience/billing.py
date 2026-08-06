@@ -1,6 +1,6 @@
 """View representations of Billing pages"""
 
-from widgetastic.widget import Select, ConditionalSwitchableView, View, TextInput, Text
+from widgetastic.widget import ConditionalSwitchableView, Select, Text, TextInput, View
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.views.admin.audience import BaseAudienceView

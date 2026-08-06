@@ -1,8 +1,9 @@
 """Tests for importing service(not product) from CSV Toolbox feature"""
 
+import json
 import random
 import string
-import json
+
 import pytest
 
 from testsuite.config import settings

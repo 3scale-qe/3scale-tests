@@ -4,7 +4,6 @@ import logging
 import time
 
 import backoff
-
 from threescale_api.errors import ApiClientError
 
 log = logging.getLogger(__name__)

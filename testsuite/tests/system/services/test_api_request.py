@@ -3,9 +3,10 @@ Rewrite spec/functional_specs/api_request_spec.rb
 """
 
 import pytest
-from testsuite.utils import blame, randomize
+
 from testsuite import rawobj
 from testsuite.echoed_request import EchoedRequest
+from testsuite.utils import blame, randomize
 
 
 @pytest.fixture(scope="module")

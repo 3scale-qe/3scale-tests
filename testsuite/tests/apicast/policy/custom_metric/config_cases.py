@@ -3,7 +3,8 @@ Configuration for custom metric policy test
 This file contains different cases for testing.
 """
 
-from typing import Tuple, List
+from typing import List, Tuple
+
 from testsuite import rawobj
 
 

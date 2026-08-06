@@ -1,8 +1,8 @@
 """Devel account settings"""
 
-from widgetastic.widget import View, Text
+from widgetastic.widget import Text, View
 
-from testsuite.ui.navigation import step, Navigable
+from testsuite.ui.navigation import Navigable, step
 from testsuite.ui.views.devel import BaseDevelView, Navbar
 
 

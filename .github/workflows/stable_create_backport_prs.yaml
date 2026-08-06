@@ -1,0 +1,156 @@
+name: stable_create_backport_prs
+
+# Trigger: a PR targeting main is merged AND carries the backport-to-X.Y label.
+# For each matching label the workflow cherry-picks the squash/merge commit onto
+# the corresponding stable-X.Y branch and opens a backport PR.
+# The label format must be exactly "backport-to-X.Y" (e.g. backport-to-2.15).
+
+on:
+  pull_request_target:
+    types: [closed, labeled]
+    branches:
+      - main
+
+jobs:
+  stable_create_backport_prs:
+    if: >
+      github.event.pull_request.merged == true &&
+      (
+        (github.event.action == 'closed' && contains(toJson(github.event.pull_request.labels.*.name), 'backport-to-')) ||
+        (github.event.action == 'labeled' && startsWith(github.event.label.name, 'backport-to-'))
+      )
+    runs-on: ubuntu-latest
+    strategy:
+      # on 'closed': fan out over all backport-to-* labels present
+      # on 'labeled': only the single label just added
+      matrix:
+        label: >-
+          ${{
+            github.event.action == 'labeled'
+            && fromJson(format('["{0}"]', github.event.label.name))
+            || fromJson(toJson(github.event.pull_request.labels.*.name))
+          }}
+      fail-fast: false
+    steps:
+      # Skip matrix entries that are not backport labels
+      - name: Check label
+        id: check
+        env:
+          LABEL: ${{ matrix.label }}
+        run: |
+          if [[ "$LABEL" == backport-to-* ]]; then
+            BRANCH="stable-${LABEL#backport-to-}"
+            echo "target_branch=$BRANCH" >> "$GITHUB_OUTPUT"
+            echo "do_backport=true"      >> "$GITHUB_OUTPUT"
+          else
+            echo "do_backport=false"     >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.check.outputs.do_backport == 'true'
+        with:
+          fetch-depth: 0
+          # PAT so the push and gh pr create can trigger further workflows
+          token: ${{ secrets.BOTBEZBOT_TOKEN }}
+
+      - name: setup git user
+        if: steps.check.outputs.do_backport == 'true'
+        run: |
+          git config user.name  github-actions
+          git config user.email github-actions@github.com
+
+      - name: cherry-pick and push
+        if: steps.check.outputs.do_backport == 'true'
+        id: push
+        env:
+          TARGET: ${{ steps.check.outputs.target_branch }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          BACKPORT_BRANCH="backport/pr-${PR_NUMBER}-to-${TARGET}"
+          git checkout "$TARGET"
+          # Check if the commit is already present on the target branch
+          if git merge-base --is-ancestor "$MERGE_SHA" HEAD; then
+            echo "already_present=true" >> "$GITHUB_OUTPUT"
+            echo "conflict=false"       >> "$GITHUB_OUTPUT"
+          else
+            git checkout -b "$BACKPORT_BRANCH"
+            if ! git cherry-pick -x "$MERGE_SHA"; then
+              git cherry-pick --abort
+              echo "conflict=true"        >> "$GITHUB_OUTPUT"
+              echo "already_present=false" >> "$GITHUB_OUTPUT"
+            else
+              git push origin "$BACKPORT_BRANCH"
+              echo "conflict=false"                        >> "$GITHUB_OUTPUT"
+              echo "already_present=false"                 >> "$GITHUB_OUTPUT"
+              echo "backport_branch=$BACKPORT_BRANCH"      >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: swap label already present
+        if: steps.check.outputs.do_backport == 'true' && steps.push.outputs.already_present == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
+          GH_REPO:      ${{ github.repository }}
+          PR_NUMBER:    ${{ github.event.pull_request.number }}
+          TARGET:       ${{ steps.check.outputs.target_branch }}
+          LABEL:        ${{ matrix.label }}
+        run: |
+          VERSION="${LABEL#backport-to-}"
+          gh pr edit "$PR_NUMBER" \
+            --remove-label "backport-to-${VERSION}" \
+            --add-label    "backported-in-${VERSION}" \
+            --repo "$GH_REPO"
+
+      - name: comment on conflict
+        if: steps.check.outputs.do_backport == 'true' && steps.push.outputs.conflict == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          TARGET: ${{ steps.check.outputs.target_branch }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          BACKPORT_BRANCH="backport/pr-${PR_NUMBER}-to-${TARGET}"
+          TITLE=$(gh pr view "$PR_NUMBER" --repo 3scale-qe/3scale-tests --json title --jq .title)
+          gh pr comment "$PR_NUMBER" --body "$(printf '%s\n' \
+            "@${PR_AUTHOR} Backport to \`${TARGET}\` failed due to conflicts." \
+            "" \
+            "Manual backport steps:" \
+            '```bash' \
+            "git fetch upstream" \
+            "git checkout ${TARGET}" \
+            "git checkout -b ${BACKPORT_BRANCH}" \
+            "git cherry-pick -x ${MERGE_SHA}" \
+            "# resolve conflicts, then:" \
+            "git add ." \
+            "git cherry-pick --continue" \
+            "git push origin ${BACKPORT_BRANCH}" \
+            "gh pr create \\" \
+            "  --repo  3scale-qe/3scale-tests \\" \
+            "  --base  ${TARGET} \\" \
+            "  --head  ${BACKPORT_BRANCH} \\" \
+            "  --title \"[backport ${TARGET}] ${TITLE}\" \\" \
+            "  --body  \"Backport of #${PR_NUMBER} to \`${TARGET}\`.\"" \
+            '```')"
+
+
+      - name: create backport PR
+        if: >
+          steps.check.outputs.do_backport == 'true' &&
+          steps.push.outputs.conflict == 'false' &&
+          steps.push.outputs.already_present == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
+          TARGET: ${{ steps.check.outputs.target_branch }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BACKPORT_BRANCH: ${{ steps.push.outputs.backport_branch }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          gh pr create \
+            --base  "$TARGET" \
+            --head  "$BACKPORT_BRANCH" \
+            --title "[backport $TARGET] $PR_TITLE" \
+            --body  "Backport of #${PR_NUMBER} to \`${TARGET}\`." \
+            --label "$LABEL"

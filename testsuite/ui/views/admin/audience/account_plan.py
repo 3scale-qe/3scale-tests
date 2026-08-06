@@ -1,7 +1,7 @@
 """View representations of Account plan pages"""
 
-from widgetastic.widget import TextInput, GenericLocatorWidget, Text
-from widgetastic_patternfly4 import PatternflyTable, Dropdown
+from widgetastic.widget import GenericLocatorWidget, Text, TextInput
+from widgetastic_patternfly4 import Dropdown, PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView

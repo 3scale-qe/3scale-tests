@@ -7,10 +7,15 @@ import pytest
 from testsuite import rawobj
 from testsuite.config import settings
 from testsuite.ui.views.admin.foundation import BaseAdminView
-from testsuite.ui.views.admin.login import RequestAdminPasswordView, LoginView, ResetPasswordView
+from testsuite.ui.views.admin.login import (
+    LoginView,
+    RequestAdminPasswordView,
+    ResetPasswordView,
+)
 from testsuite.ui.views.devel import Navbar
-from testsuite.ui.views.devel.login import ForgotPasswordView, LoginView as DevelLoginView
-from testsuite.utils import randomize, blame
+from testsuite.ui.views.devel.login import ForgotPasswordView
+from testsuite.ui.views.devel.login import LoginView as DevelLoginView
+from testsuite.utils import blame, randomize
 
 
 @pytest.fixture(scope="module")
@@ -62,7 +67,9 @@ def test_admin_forgotten_password(
 
     login_view = navigator.new_page(LoginView)
     custom_admin_login(name=account_name, password=account_password, fresh=True)
-    assert "Incorrect email or password. Please try again" in login_view.error_message.text
+    assert "Incorrect email or password. Please try again" in login_view.error_message.browser.text(
+        login_view.error_message
+    )
 
     custom_admin_login(name=account_name, password=password, fresh=True)
     assert BaseAdminView(navigator.browser).is_displayed

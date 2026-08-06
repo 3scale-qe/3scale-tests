@@ -3,8 +3,14 @@
 from collections import Counter
 
 import pytest
-from testsuite.ui.views.admin.product.integration.configuration import ProductConfigurationView
-from testsuite.ui.views.admin.product.integration.policies import ProductPoliciesView, Policies
+
+from testsuite.ui.views.admin.product.integration.configuration import (
+    ProductConfigurationView,
+)
+from testsuite.ui.views.admin.product.integration.policies import (
+    Policies,
+    ProductPoliciesView,
+)
 
 pytestmark = pytest.mark.usefixtures("login")
 

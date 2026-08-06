@@ -4,10 +4,9 @@ import re
 
 import pytest
 
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
-from testsuite.utils import blame, blame_desc, randomize
 from testsuite import rawobj
+from testsuite.toolbox import constants, toolbox
+from testsuite.utils import blame, blame_desc, randomize
 
 SWAGGER_LINK = (
     "https://raw.githubusercontent.com/OAI/learn.openapis.org/refs/heads/main/examples/v2.0/json/petstore.json"

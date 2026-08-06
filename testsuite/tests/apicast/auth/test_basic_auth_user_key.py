@@ -5,7 +5,6 @@ Rewrite ./spec/functional_specs/auth/basic_auth_user_key_spec.rb
 """
 
 import pytest
-
 from threescale_api.resources import Service
 
 from testsuite.utils import basic_auth_string

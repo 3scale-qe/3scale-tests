@@ -1,6 +1,7 @@
 """Tools conftest"""
 
 import json
+
 import pytest
 
 from testsuite.utils import get_results_dir_path

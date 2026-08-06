@@ -3,11 +3,12 @@ Test if APIAP routing only match paths that start with the routing path of the b
 """
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
-from testsuite import TESTED_VERSION, rawobj  # noqa # pylint: disable=unused-import
+from packaging.version import Version
+
+from testsuite import TESTED_VERSION, rawobj
 
 pytestmark = [
-    pytest.mark.skipif("TESTED_VERSION < Version('2.8.1')"),
+    pytest.mark.skipif(TESTED_VERSION < Version("2.8.1"), reason="TESTED_VERSION < Version('2.8.1')"),
     pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-4736"),
 ]
 

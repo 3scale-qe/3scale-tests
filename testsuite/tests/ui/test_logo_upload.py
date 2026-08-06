@@ -1,7 +1,7 @@
 """Tests developer portal logo upload"""
 
-import pytest
 import importlib_resources as resources
+import pytest
 
 from testsuite.ui.views.admin.audience.developer_portal import DeveloperPortalLogoView
 from testsuite.utils import warn_and_skip

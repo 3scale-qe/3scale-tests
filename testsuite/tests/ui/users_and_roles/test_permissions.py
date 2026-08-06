@@ -2,12 +2,12 @@
 
 import pytest
 
-from testsuite.ui.views.admin.audience.billing import BillingView, BillingSettingsView
+from testsuite.ui.views.admin.audience.billing import BillingSettingsView, BillingView
 from testsuite.ui.views.admin.audience.developer_portal import (
-    DeveloperPortalContentView,
+    ActiveDocsView,
     CMSNewPageView,
     CMSNewSectionView,
-    ActiveDocsView,
+    DeveloperPortalContentView,
 )
 from testsuite.ui.views.admin.foundation import AccessDeniedView
 

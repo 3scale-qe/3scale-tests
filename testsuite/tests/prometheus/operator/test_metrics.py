@@ -5,6 +5,7 @@ Test metrics provided by apicast to Prometheus.
 
 import pytest
 from packaging.version import Version
+
 from testsuite import TESTED_VERSION
 
 OPERATOR_SERVICE = ["threescale-operator-controller-manager-metrics-service"]

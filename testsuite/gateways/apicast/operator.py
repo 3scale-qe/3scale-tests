@@ -2,10 +2,9 @@
 
 import re
 import time
-from typing import Dict, Callable, Pattern, Any, Match, Union
+from typing import Any, Callable, Dict, Match, Pattern, Union
 
 from openshift_client import OpenShiftPythonException
-
 from weakget import weakget
 
 from testsuite import settings

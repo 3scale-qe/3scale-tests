@@ -1,7 +1,7 @@
 """Provide custom gateway for tests changing apicast parameters."""
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
 from testsuite.gateways import gateway
 from testsuite.gateways.apicast.selfmanaged import SelfManagedApicast

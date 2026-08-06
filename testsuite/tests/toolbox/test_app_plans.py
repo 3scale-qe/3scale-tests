@@ -1,18 +1,17 @@
 """Tests for Application Plans Toolbox feature"""
 
-import string
+import logging
 import random
 import re
-import logging
-import yaml
+import string
 
 import pytest
+import yaml
 
-from testsuite.config import settings
-from testsuite.toolbox import constants
-from testsuite.toolbox import toolbox
-from testsuite.utils import blame
 from testsuite import rawobj
+from testsuite.config import settings
+from testsuite.toolbox import constants, toolbox
+from testsuite.utils import blame
 
 pytestmark = [
     pytest.mark.xdist_group(name="toolbox"),

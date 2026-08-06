@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream9
+FROM quay.io/centos/centos:stream10
 LABEL description="Run 3scale integration tests \
 Default ENTRYPOINT: 'make' and CMD: 'smoke' \
 Bind dynaconf settings to /opt/secrets.yaml \
@@ -15,9 +15,9 @@ ADD https://gist.githubusercontent.com/mdujava/c87f687cbb9bbed0144ddc136758292c/
 RUN update-ca-trust
 
 RUN useradd --no-log-init -u 1000 -g root -m default
-RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.16/openshift-client-linux.tar.gz | tar xz -C /usr/local/bin
+RUN curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.20/openshift-client-linux.tar.gz | tar xz -C /usr/local/bin
 
-RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.1/cfssl_1.6.1_linux_amd64 >/usr/local/bin/cfssl && \
+RUN curl -L https://github.com/cloudflare/cfssl/releases/download/v1.6.5/cfssl_1.6.5_linux_amd64 >/usr/local/bin/cfssl && \
     chmod +x /usr/local/bin/cfssl
 
 ARG PYTHON_VERSION=3.14

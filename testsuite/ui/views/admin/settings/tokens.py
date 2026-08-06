@@ -3,12 +3,12 @@
 import enum
 from typing import List
 
-from widgetastic.widget import TextInput, Text
+from widgetastic.widget import Text, TextInput
 from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.settings import BaseSettingsView
-from testsuite.ui.widgets import ThreescaleDropdown, PfCheckBoxGroup
+from testsuite.ui.widgets import PfCheckBoxGroup, ThreescaleDropdown
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 
 

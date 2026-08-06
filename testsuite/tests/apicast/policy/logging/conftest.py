@@ -1,7 +1,7 @@
 """logging policy tests shared fixtures"""
 
-from weakget import weakget
 import pytest
+from weakget import weakget
 
 from testsuite.utils import warn_and_skip
 

@@ -3,11 +3,11 @@
 import re
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import rawobj, TESTED_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import TESTED_VERSION
 
-pytestmark = [pytest.mark.skipif("TESTED_VERSION < Version('2.14-dev')")]
+pytestmark = [pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')")]
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7942")

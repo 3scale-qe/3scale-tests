@@ -10,7 +10,7 @@ It tests only embedded type as path requires manipulation with the deployment
 
 import pytest
 
-from testsuite import rawobj, gateways
+from testsuite import gateways, rawobj
 from testsuite.capabilities import Capability
 from testsuite.certificates import Certificate
 from testsuite.tests.apicast.policy.tls import embedded

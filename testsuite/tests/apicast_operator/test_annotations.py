@@ -2,12 +2,12 @@
 Check if annotations of apicast-operator pod are present
 """
 
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union
 
 import pytest
-from packaging.version import Version  # noqa # pylint: disable=unused-import
+from packaging.version import Version
 
-from testsuite import APICAST_OPERATOR_VERSION  # noqa # pylint: disable=unused-import
+from testsuite import APICAST_OPERATOR_VERSION
 from testsuite.capabilities import Capability
 
 pytestmark = [
@@ -37,7 +37,9 @@ ANNOTATIONS_POST_2_12: List[Union[Tuple[str, str], Tuple[str, None]]] = [
 ]
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION >  Version('0.6.0')")  # since threescale 2.12
+@pytest.mark.skipif(
+    APICAST_OPERATOR_VERSION > Version("0.6.0"), reason="APICAST_OPERATOR_VERSION >  Version('0.6.0')"
+)  # since threescale 2.12
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_PRE_2_12)
 def test_labels_operator_old(annotation, expected_value, apicast_operator):
     """Test labels of operator pod."""
@@ -47,7 +49,7 @@ def test_labels_operator_old(annotation, expected_value, apicast_operator):
         assert value == expected_value
 
 
-@pytest.mark.skipif("APICAST_OPERATOR_VERSION <= Version('0.6.0')")
+@pytest.mark.skipif(APICAST_OPERATOR_VERSION <= Version("0.6.0"), reason="APICAST_OPERATOR_VERSION <= Version('0.6.0')")
 @pytest.mark.parametrize("annotation,expected_value", ANNOTATIONS_POST_2_12)
 def test_labels_operator_new(annotation, expected_value, apicast_operator):
     """Test labels of operator pod."""
