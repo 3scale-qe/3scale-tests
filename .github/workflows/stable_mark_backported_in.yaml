@@ -1,0 +1,45 @@
+name: stable_mark_backported_in
+
+# Trigger: a PR merged into a stable-* branch whose title starts with "[backport".
+# Finds the original PR number from the PR body ("Backport of #NNN") and swaps
+# the backport-to-X.Y label for backported-in-X.Y on the original PR.
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'stable-*'
+
+jobs:
+  stable_mark_backported_in:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.title, '[backport')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse original PR number and stable branch
+        id: parse
+        env:
+          BODY:   ${{ github.event.pull_request.body }}
+          TARGET: ${{ github.base_ref }}
+        run: |
+          # Body written by backport.yaml: "Backport of #NNN to `stable-X.Y`."
+          # grep -oP '\d+' guarantees only digits reach GITHUB_OUTPUT.
+          ORIG_PR=$(echo "$BODY" | grep -oP '(?<=Backport of #)\d+')
+          VERSION="${TARGET#stable-}"
+          echo "orig_pr=$ORIG_PR"                          >> "$GITHUB_OUTPUT"
+          echo "backport_label=backport-to-${VERSION}"     >> "$GITHUB_OUTPUT"
+          echo "backported_label=backported-in-${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Swap label on original PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
+          GH_REPO:      ${{ github.repository }}
+          ORIG_PR:      ${{ steps.parse.outputs.orig_pr }}
+          REMOVE_LABEL: ${{ steps.parse.outputs.backport_label }}
+          ADD_LABEL:    ${{ steps.parse.outputs.backported_label }}
+        run: |
+          gh pr edit "$ORIG_PR" \
+            --remove-label "$REMOVE_LABEL" \
+            --add-label    "$ADD_LABEL" \
+            --repo "$GH_REPO"
