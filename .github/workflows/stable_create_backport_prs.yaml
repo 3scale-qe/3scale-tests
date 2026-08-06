@@ -6,7 +6,7 @@ name: stable_create_backport_prs
 # The label format must be exactly "backport-to-X.Y" (e.g. backport-to-2.15).
 
 on:
-  pull_request:
+  pull_request_target:
     types: [closed, labeled]
     branches:
       - main
