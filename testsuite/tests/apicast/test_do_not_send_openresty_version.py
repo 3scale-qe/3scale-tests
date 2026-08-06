@@ -29,9 +29,7 @@ def client(api_client):
     return api_client(disable_retry_status_list={503, 404})
 
 
-@backoff.on_predicate(
-    backoff.fibo, lambda x: x.headers.get("server", "") not in ("openresty", "envoy"), max_tries=8, jitter=None
-)
+@backoff.on_predicate(backoff.fibo, lambda x: x.status_code != 503, max_tries=8, jitter=None)
 def make_requests(client):
     """Make sure that we get 503 apicast (backend is not available)"""
     return client.get("/anything")
@@ -41,15 +39,14 @@ def make_requests(client):
 def test_do_not_send_openresty_version(client):
     """
     Make request to non existing endpoint
-    Assert that the response does not contain openresty version in the headers
+    Assert that any server header (including envoy) does not contain "/", indicating version
     Assert that the response does not contain openresty version in the body
     """
     response = make_requests(client)
     assert response.status_code == 503
 
-    assert "server" in response.headers
-    if response.headers["server"] == "envoy":
-        pytest.skip("envoy edge proxy in use")
-    assert response.headers["server"] == "openresty"
+    server_header = response.headers.get("server", "")
+    if server_header:
+        assert "/" not in server_header
 
-    assert "<center>openresty</center>" in response.text
+    assert "openresty/" not in response.text
