@@ -69,13 +69,14 @@ jobs:
         run: |
           BACKPORT_BRANCH="backport/pr-${PR_NUMBER}-to-${TARGET}"
           git checkout "$TARGET"
-          # Check if the commit is already present on the target branch
-          if git merge-base --is-ancestor "$MERGE_SHA" HEAD; then
+          # Check if the patch is already on the target branch (handles cherry-picks)
+          if git cherry HEAD "$MERGE_SHA" "$MERGE_SHA~1" | grep -q "^-"; then
             echo "already_present=true" >> "$GITHUB_OUTPUT"
             echo "conflict=false"       >> "$GITHUB_OUTPUT"
           else
             git checkout -b "$BACKPORT_BRANCH"
-            if ! git cherry-pick -x "$MERGE_SHA"; then
+            # -m 1: diff against first parent (merge commits need this)
+            if ! git cherry-pick -x -m 1 "$MERGE_SHA"; then
               git cherry-pick --abort
               echo "conflict=true"        >> "$GITHUB_OUTPUT"
               echo "already_present=false" >> "$GITHUB_OUTPUT"
@@ -121,7 +122,7 @@ jobs:
             "git fetch upstream" \
             "git checkout ${TARGET}" \
             "git checkout -b ${BACKPORT_BRANCH}" \
-            "git cherry-pick -x ${MERGE_SHA}" \
+            "git cherry-pick -x -m 1 ${MERGE_SHA}" \
             "# resolve conflicts, then:" \
             "git add ." \
             "git cherry-pick --continue" \
