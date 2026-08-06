@@ -486,7 +486,7 @@ def master_threescale(testconfig):
 @pytest.fixture(scope="session")
 def account_password():
     """Default password for Accounts"""
-    return "123456"
+    return "1234567890121416"
 
 
 @pytest.fixture(scope="session")
@@ -675,7 +675,12 @@ def _resolve_rhsso(testconfig, tools, route_name):
     if "password" not in cnf:
         return None
 
-    return RHSSO(server_url=tools[route_name], username=cnf["username"], password=cnf["password"])
+    return RHSSO(
+        server_url=tools[route_name],
+        username=cnf["username"],
+        password=cnf["password"],
+        verify=testconfig["ssl_verify"],
+    )
 
 
 @pytest.fixture(scope="session")

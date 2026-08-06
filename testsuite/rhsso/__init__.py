@@ -117,12 +117,19 @@ class RHSSOServiceConfiguration:
         more info here: https://docs.python.org/3/library/pickle.html#object.__getstate__
         """
         return {
-            "client": self.client.client_id,
-            "realm": self.realm.name,
+            "client": {
+                "client_id": self.client.client_id,
+                "verify": self.client.verify,
+            },
+            "realm": {
+                "name": self.realm.name,
+                "verify": self.realm.verify,
+            },
             "rhsso": {
                 "url": self.rhsso.server_url,
                 "username": self.rhsso.master.connection.username,
                 "password": self.rhsso.master.connection.password,
+                "verify": self.rhsso.verify,
             },
             "user": self.user,
             "username": self.username,
@@ -135,11 +142,14 @@ class RHSSOServiceConfiguration:
         more info here: https://docs.python.org/3/library/pickle.html#object.__setstate__
         """
         self.rhsso = RHSSO(
-            server_url=state["rhsso"]["url"], username=state["rhsso"]["username"], password=state["rhsso"]["password"]
+            server_url=state["rhsso"]["url"],
+            username=state["rhsso"]["username"],
+            password=state["rhsso"]["password"],
+            verify=state["rhsso"]["verify"],
         )
-        self.realm = Realm(self.rhsso.master, state["realm"])
+        self.realm = Realm(self.rhsso.master, state["realm"]["name"], verify=state["realm"]["verify"])
         self.user = state["user"]
-        self.client = Client(self.realm, state["client"])
+        self.client = Client(self.realm, state["client"]["client_id"], verify=state["client"]["verify"])
         self.username = state["username"]
         self.password = state["password"]
         self._oidc_client = self.client.oidc_client

@@ -205,6 +205,10 @@ container-image: IMAGENAME ?= 3scale-tests
 container-image: fetch-tools
 	docker build -t $(IMAGENAME) $(DOCKER_BUILD_ARGS) .
 
+container-image-temp: ## Build container image that expires on quay.io in 7 days
+container-image-temp: DOCKER_BUILD_ARGS += --label quay.expires-after=7d
+container-image-temp: container-image
+
 clean: ## Clean pip deps
 clean: mostlyclean
 	rm -f Pipfile.lock

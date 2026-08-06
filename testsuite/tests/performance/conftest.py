@@ -4,7 +4,6 @@ Conftest for performance tests
 
 import asyncio
 import os
-from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -73,18 +72,7 @@ def shared_template(testconfig, number_of_agents):
 
 
 @pytest.fixture(scope="module")
-def event_loop():
-    """Event loop for use in performance tests"""
-    with ThreadPoolExecutor() as pool:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.set_default_executor(pool)
-        yield loop
-        loop.close()
-
-
-@pytest.fixture(scope="module")
-async def applications(services, custom_application, lifecycle_hooks, number_of_apps, event_loop):
+async def applications(services, custom_application, lifecycle_hooks, number_of_apps):
     """Create multiple application for each service"""
 
     def _create_apps(svc):
@@ -92,7 +80,7 @@ async def applications(services, custom_application, lifecycle_hooks, number_of_
         return custom_application(rawobj.Application(randomize("App"), plan), hooks=lifecycle_hooks)
 
     return await asyncio.gather(
-        *(event_loop.run_in_executor(None, _create_apps, svc) for _ in range(number_of_apps) for svc in services)
+        *(asyncio.to_thread(_create_apps, svc) for _ in range(number_of_apps) for svc in services)
     )
 
 
@@ -104,7 +92,6 @@ async def services(
     custom_service,
     custom_app_plan,
     number_of_products,
-    event_loop,
     number_of_backends,
     service_proxy_settings,
     service_settings,
@@ -122,9 +109,7 @@ async def services(
         custom_app_plan(rawobj.ApplicationPlan(randomize("AppPlan")), svc)
         return svc
 
-    return await asyncio.gather(
-        *(event_loop.run_in_executor(None, _create_services) for _ in range(number_of_products))
-    )
+    return await asyncio.gather(*(asyncio.to_thread(_create_services) for _ in range(number_of_products)))
 
 
 @pytest.fixture(scope="module")
