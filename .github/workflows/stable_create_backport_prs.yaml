@@ -147,11 +147,9 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           BACKPORT_BRANCH: ${{ steps.push.outputs.backport_branch }}
-          LABEL: ${{ matrix.label }}
         run: |
           gh pr create \
             --base  "$TARGET" \
             --head  "$BACKPORT_BRANCH" \
             --title "[backport $TARGET] $PR_TITLE" \
             --body  "Backport of #${PR_NUMBER} to \`${TARGET}\`." \
-            --label "$LABEL"
