@@ -1,5 +1,5 @@
 """
-Tests for policy registry token permissions
+Test for Developer Portal API scope
 """
 
 import pytest
@@ -12,12 +12,12 @@ from testsuite.utils import blame
 @pytest.fixture(scope="module")
 def token(custom_admin_login, navigator, request, threescale, permission):
     """
-    Create token with scope set to 'Policy Registry'
+    Create token with scope set to 'Developer Portal'
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
     name = blame(request, "token")
-    token = new.create(name, [Scopes.POLICY.value], permission[0])
+    token = new.create(name, [Scopes.DEVELOPER_PORTAL.value], permission[0])
 
     def _delete():
         token = list(filter(lambda x: x["name"] == name, threescale.access_tokens.list()))[0]
@@ -85,23 +85,20 @@ def test_create_invoice_line_item(invoice, token, api_client, request):
 
 def test_get_registry_policies_list(token, api_client):
     """
-    Request to get list of registry policies should have status code 200
+    Request to get list of registry policies should have status code 403
     """
 
     response = api_client("GET", "/admin/api/registry/policies", token)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
-# pylint: disable=too-many-arguments
-def test_create_registry_policy(threescale, token, api_client, schema, permission, request):
+def test_create_registry_policy(token, api_client, schema):
     """
-    Request to create policy registry should have status code 403 (201 for write permission)
+    Request to create policy registry should have status code 403
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
-    if permission[0]:
-        request.addfinalizer(lambda: threescale.policy_registry.delete("policy_registry-0.1"))
-    assert response.status_code == permission[1]
+    assert response.status_code == 403
 
 
 def test_create_provider_account(request, token, api_client):
@@ -127,53 +124,53 @@ def test_create_app_key(token, api_client, account, application):
 
 def test_get_cms_templates(token, api_client):
     """
-    Request to get CMS templates. Should have status code 403.
+    Request to get CMS templates. Should have status code 200.
     """
 
     response = api_client("GET", "/admin/api/cms/templates", token)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
 def test_get_cms_sections(token, api_client):
     """
-    Request to get CMS sections. Should have status code 403.
+    Request to get CMS sections. Should have status code 200.
     """
 
     response = api_client("GET", "/admin/api/cms/sections", token)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
 def test_get_cms_files(token, api_client):
     """
-    Request to get CMS files. Should have status code 403.
+    Request to get CMS files. Should have status code 200.
     """
 
     response = api_client("GET", "/admin/api/cms/files", token)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
-def test_create_cms_section(token, api_client, request):
-    """POST CMS section. Should have status code 403"""
+def test_create_cms_section(token, api_client, request, permission):
+    """POST CMS section - 201 (write) or 403 (read-only)"""
     title = blame(request, "section")
     params = {"title": title, "public": True, "partial_path": f"/{title}"}
     response = api_client("POST", "/admin/api/cms/sections", token, json=params)
-    assert response.status_code == 403
+    assert response.status_code == permission[1]
 
 
-def test_delete_registry_policy(token, api_client, request, schema, permission, threescale):
-    """Create policy, then test DELETE policy."""
-    name = blame(request, "policy")
-    threescale.policy_registry.create({"name": name, "version": "0.1", "schema": schema})
-    policy_id = f"{name}-0.1"
+def test_delete_cms_section(token, api_client, request, permission, threescale):
+    """Create a new CMS section, then DELETE. 200 (write) or 403 (read-only)"""
+    name = blame(request, "section")
+    section = threescale.cms_sections.create({"title": name, "public": True, "partial_path": f"/{name}"})
+    section_id = section["id"]
 
-    response = api_client("DELETE", f"/admin/api/registry/policies/{policy_id}", token)
+    response = api_client("DELETE", f"/admin/api/cms/sections/{section_id}", token)
     if permission[0]:
         assert response.status_code == 200
     else:
         assert response.status_code == 403
 
     try:
-        threescale.policy_registry.delete(policy_id)
+        threescale.policy_registry.delete(section_id)
     except ApiClientError as e:
         if e.code != 404:
             raise

@@ -3,6 +3,8 @@ Rewrite of spec/ui_specs/tokens/billing_read_spec.rb
 """
 
 import pytest
+from threescale_api.errors import ApiClientError
+from threescale_api.resources import InvoiceState
 
 from testsuite.ui.views.admin.settings.tokens import Scopes, TokenNewView
 from testsuite.utils import blame
@@ -119,3 +121,62 @@ def test_create_app_key(token, api_client, account, application):
     params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
     response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token, params)
     assert response.status_code == 403
+
+
+def test_get_cms_templates(token, api_client):
+    """
+    Request to get CMS templates. Should have status code 403.
+    """
+
+    response = api_client("GET", "/admin/api/cms/templates", token)
+    assert response.status_code == 403
+
+
+def test_get_cms_sections(token, api_client):
+    """
+    Request to get CMS sections. Should have status code 403.
+    """
+
+    response = api_client("GET", "/admin/api/cms/sections", token)
+    assert response.status_code == 403
+
+
+def test_get_cms_files(token, api_client):
+    """
+    Request to get CMS files. Should have status code 403.
+    """
+
+    response = api_client("GET", "/admin/api/cms/files", token)
+    assert response.status_code == 403
+
+
+def test_create_cms_section(token, api_client, request):
+    """POST CMS section. Should have status code 403"""
+    title = blame(request, "section")
+    params = {"title": title, "public": True, "partial_path": f"/{title}"}
+    response = api_client("POST", "/admin/api/cms/sections", token, json=params)
+    assert response.status_code == 403
+
+
+# pylint: disable=too-many-arguments
+def test_delete_invoice_line_item(token, api_client, request, threescale, account, permission):
+    """DELETE billing invoice line item. 200 (write) or 403 (read-only)."""
+    invoice = threescale.invoices.create({"account_id": account["id"]})
+    name = blame(request, "item")
+    line_item = invoice.line_items.create({"name": name, "description": "line item", "quantity": "1", "cost": 10})
+    line_item_id = line_item["id"]
+
+    response = api_client("DELETE", f"/api/invoices/{invoice.entity_id}/line_items/{line_item_id}", token)
+
+    if permission[0]:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+
+    try:
+        invoice.line_items.delete(line_item_id)
+    except ApiClientError as e:
+        if e.code != 404:
+            raise
+
+    invoice.state_update(InvoiceState.CANCELLED)
