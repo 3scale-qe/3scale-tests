@@ -51,7 +51,7 @@ def client(api_client, service):
     assert api_client().get("/get").status_code == 200
 
     proxy = service.proxy.list()
-    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+    proxy.mapping_rules.list()[0].delete()
     proxy.deploy()
 
     return api_client(disable_retry_status_list={404})
