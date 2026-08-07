@@ -35,7 +35,8 @@ def test_read_service(token, api_client):
     assert response.status_code == 200
 
 
-def test_create_account_user(account, token, api_client, request, permission):
+# pylint: disable=too-many-arguments
+def test_create_account_user(account, token, api_client, request, permission, account_password):
     """
     Request to create user should have status code 403 (201 for write permission)
     """
@@ -45,7 +46,7 @@ def test_create_account_user(account, token, api_client, request, permission):
         "account_id": account.entity_id,
         "username": name,
         "email": f"{name}@anything.invalid",
-        "password": "123456",
+        "password": account_password,
     }
     response = api_client("POST", f"/admin/api/accounts/{account.entity_id}/users", token, params)
     assert response.status_code == permission[1]
@@ -104,12 +105,13 @@ def test_create_registry_policy(token, api_client, schema):
     assert response.status_code == 403
 
 
-def test_create_provider_account(request, token, api_client, permission, threescale):
+# pylint: disable=too-many-arguments
+def test_create_provider_account(request, token, api_client, permission, threescale, account_password):
     """
     Request to create provider account should have status code 403 (201 for write permission)
     """
     username = blame(request, "username")
-    params = {"username": username, "email": f"{username}@example.com", "password": "account_password"}
+    params = {"username": username, "email": f"{username}@example.com", "password": account_password}
     response = api_client("POST", "/admin/api/users", token, params)
     if permission[0]:
         request.addfinalizer(lambda: threescale.provider_account_users.delete(response.json()["user"]["id"]))
