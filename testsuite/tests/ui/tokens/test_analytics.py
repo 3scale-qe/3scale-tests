@@ -37,7 +37,7 @@ def test_read_service(token, api_client):
     assert response.status_code == 403
 
 
-def test_create_account_user(account, token, api_client, request):
+def test_create_account_user(account, token, api_client, request, account_password):
     """
     Request to create user should have status code 403
     """
@@ -47,7 +47,7 @@ def test_create_account_user(account, token, api_client, request):
         "account_id": account.entity_id,
         "username": name,
         "email": f"{name}@anything.invalid",
-        "password": "123456",
+        "password": account_password,
     }
     response = api_client("POST", f"/admin/api/accounts/{account.entity_id}/users", token, params)
     assert response.status_code == 403

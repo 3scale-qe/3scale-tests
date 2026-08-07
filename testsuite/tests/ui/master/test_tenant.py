@@ -27,9 +27,11 @@ def tenant_name(request):
 
 
 @pytest.fixture(scope="module")
-def ui_tenant(tenant_name, custom_ui_tenant):
+def ui_tenant(tenant_name, custom_ui_tenant, account_password):
     """Overrides the ui_tenant fixture and creates and returns new tenant"""
-    return custom_ui_tenant(username=tenant_name, email=tenant_name, password="12345678", organisation=tenant_name)
+    return custom_ui_tenant(
+        username=tenant_name, email=tenant_name, password=account_password, organisation=tenant_name
+    )
 
 
 @pytest.fixture(scope="module")

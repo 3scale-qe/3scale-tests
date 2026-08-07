@@ -80,7 +80,8 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
 @pytest.mark.skipif(TESTED_VERSION < Version("2.14-dev"), reason="TESTED_VERSION < Version('2.14-dev')")
 @pytest.mark.usefixtures("dev_portal_group")
 @pytest.mark.usefixtures("login")
-def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):
+# pylint: disable=too-many-arguments
+def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page, account_password):
     """
     Preparation:
         - Creates a new dev portal section
@@ -97,7 +98,7 @@ def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, d
 
     assert browser.element(".//h1").accessible_name == "Test"
 
-    custom_devel_login(name="john", password="123456", fresh=True)
+    custom_devel_login(name="john", password=account_password, fresh=True)
     browser.url = testconfig["threescale"]["devel"]["url"] + dev_portal_page
 
     assert NotFoundView(browser).is_displayed

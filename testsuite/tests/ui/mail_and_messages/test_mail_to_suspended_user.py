@@ -9,14 +9,14 @@ from testsuite.utils import blame
 
 
 @pytest.fixture()
-def ui_account(request, custom_ui_account):
+def ui_account(request, custom_ui_account, account_password):
     """Creates a custom account via UI"""
 
     def _ui_account():
         username = blame(request, "username")
         org_name = blame(request, "org_name")
         email = f"{username}@anything.invalid"
-        return custom_ui_account(username, email, "123456", org_name)
+        return custom_ui_account(username, email, account_password, org_name)
 
     return _ui_account
 
