@@ -102,12 +102,12 @@ def test_create_registry_policy(token, api_client, schema):
     assert response.status_code == 403
 
 
-def test_create_provider_account(request, token, api_client):
+def test_create_provider_account(request, token, api_client, account_password):
     """
     Request to create provider account should have status code 403
     """
     username = blame(request, "username")
-    params = {"username": username, "email": f"{username}@example.com", "password": "account_password"}
+    params = {"username": username, "email": f"{username}@example.com", "password": account_password}
     response = api_client("POST", "/admin/api/users", token, params)
     assert response.status_code == 403
 
