@@ -106,12 +106,12 @@ def test_create_registry_policy(token, api_client, schema):
 
 
 # pylint: disable=too-many-arguments
-def test_create_provider_account(request, token, api_client, permission, threescale):
+def test_create_provider_account(request, token, api_client, permission, threescale, account_password):
     """
     Request to create provider account should have status code 403 (201 for write permission)
     """
     username = blame(request, "username")
-    params = {"username": username, "email": f"{username}@example.com", "password": "account_password"}
+    params = {"username": username, "email": f"{username}@example.com", "password": account_password}
     response = api_client("POST", "/admin/api/users", token, params)
     if permission[0]:
         request.addfinalizer(lambda: threescale.provider_account_users.delete(response.json()["user"]["id"]))
