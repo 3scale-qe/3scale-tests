@@ -132,7 +132,7 @@ jobs:
             "  --base  ${TARGET} \\" \
             "  --head  ${PR_AUTHOR}:${BACKPORT_BRANCH} \\" \
             "  --title \"[backport ${TARGET}] ${TITLE}\" \\" \
-            "  --body  'Backport of #${PR_NUMBER} to \`${TARGET}\`.' \\" \
+            "  --body  \"Backport of #${PR_NUMBER} to \\\`${TARGET}\\\`.\"" \
             '```')"
 
 
