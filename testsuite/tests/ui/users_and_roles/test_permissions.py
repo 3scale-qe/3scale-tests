@@ -50,13 +50,14 @@ def test_member_user_permissions_per_section(
     navigator,
     provider_member_user,
     all_page_objects,
+    account_password,
     permission,
     page_view,
     allowed_services=False,
 ):
     """Tests user permissions permission per permission section"""
     member_user = provider_member_user(allowed_sections=permission, allowed_services=allowed_services)
-    custom_admin_login(member_user.entity_name, "123456")
+    custom_admin_login(member_user.entity_name, account_password)
 
     page_objects = all_page_objects(permission, page_view)
 
