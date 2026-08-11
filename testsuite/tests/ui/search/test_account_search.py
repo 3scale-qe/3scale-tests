@@ -24,7 +24,7 @@ def ui_application(service, custom_app_plan, custom_ui_application, request):
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-6205")
-def test_search_account(navigator, custom_ui_account, ui_application, request):
+def test_search_account(navigator, custom_ui_account, ui_application, request, account_password):
     """
     Preparation:
         - Create custom account
@@ -38,7 +38,7 @@ def test_search_account(navigator, custom_ui_account, ui_application, request):
     username = blame(request, "username")
     org_name = blame(request, "org_name")
     email = f"{username}@anything.invalid"
-    account = custom_ui_account(username, email, "123456", org_name)
+    account = custom_ui_account(username, email, account_password, org_name)
     app = ui_application(account)
     accounts = navigator.navigate(AccountsView)
 
@@ -50,7 +50,7 @@ def test_search_account(navigator, custom_ui_account, ui_application, request):
 
 
 @pytest.fixture(scope="module")
-def custom_account(custom_account, request):
+def custom_account(custom_account, request, account_password):
     """
     Parametrized custom Account
     """
@@ -61,7 +61,7 @@ def custom_account(custom_account, request):
                 "org_name": name,
                 "username": blame(request, "username"),
                 "email": f"{blame(request, 'email')}@anything.invalid",
-                "password": "123456",
+                "password": account_password,
             }
         )
 
@@ -95,7 +95,7 @@ def test_search_multiple_accounts(navigator, custom_account, request):
     assert accounts.table.row().state.text == "Approved"
 
 
-def test_search_non_existing_value(request, navigator, custom_account):
+def test_search_non_existing_value(request, navigator, custom_account, account_password):
     """
     Preparation:
         - Create custom account
@@ -107,7 +107,7 @@ def test_search_non_existing_value(request, navigator, custom_account):
         "org_name": blame(request, "org_name"),
         "username": username,
         "email": f"{blame(request, 'email')}@anything.invalid",
-        "password": "123456",
+        "password": account_password,
     }
     custom_account(params)
 
@@ -119,7 +119,7 @@ def test_search_non_existing_value(request, navigator, custom_account):
 
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8468")
-def test_search_short_keyword(navigator, custom_account, request):
+def test_search_short_keyword(navigator, custom_account, request, account_password):
     """
     Preparation:
         - Create custom account with short keyword (less than 3 characters)
@@ -131,7 +131,7 @@ def test_search_short_keyword(navigator, custom_account, request):
         "org_name": org_name,
         "username": blame(request, "username"),
         "email": f"{blame(request, 'email')}@anything.invalid",
-        "password": "123456",
+        "password": account_password,
     }
     custom_account(params)
     accounts = navigator.navigate(AccountsView)
