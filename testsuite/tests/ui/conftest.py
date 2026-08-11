@@ -253,10 +253,10 @@ def custom_ui_tenant(master_login, navigator, threescale, testconfig, request, m
 
 
 @pytest.fixture(scope="module")
-def ui_tenant(custom_ui_tenant, request):
+def ui_tenant(custom_ui_tenant, request, account_password):
     """Preconfigured tenant existing over whole testing session"""
     name = blame(request, "ui-tenant")
-    return custom_ui_tenant(username=name, email=name, password="12345678", organisation=name)
+    return custom_ui_tenant(username=name, email=name, password=account_password, organisation=name)
 
 
 @pytest.fixture(scope="module")

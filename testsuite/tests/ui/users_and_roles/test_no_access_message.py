@@ -15,7 +15,7 @@ pytestmark = [
 
 
 @pytest.mark.usefixtures("login")
-def test_no_access_message(custom_admin_login, navigator, provider_account_user, browser):
+def test_no_access_message(custom_admin_login, navigator, provider_account_user, browser, account_password):
     """
     Test:
         - Navigate to Support Emails view
@@ -29,7 +29,7 @@ def test_no_access_message(custom_admin_login, navigator, provider_account_user,
     email = email.support_email.read()
     provider_account_user.activate()
     browser.selenium.delete_all_cookies()
-    custom_admin_login(provider_account_user.entity_name, "123456")
+    custom_admin_login(provider_account_user.entity_name, account_password)
     dashboard = navigator.navigate(DashboardView)
     assert not dashboard.products.is_displayed
     assert not dashboard.backends.is_displayed

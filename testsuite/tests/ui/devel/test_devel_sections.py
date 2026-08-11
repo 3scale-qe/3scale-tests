@@ -77,7 +77,8 @@ def dev_portal_group(navigator, request, account, dev_portal_section, custom_adm
 @backoff.on_exception(backoff.fibo, AssertionError, max_tries=5, jitter=None)
 @pytest.mark.usefixtures("dev_portal_group")
 @pytest.mark.usefixtures("login")
-def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page):
+# pylint: disable=too-many-arguments
+def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, dev_portal_page, account_password):
     """
     Preparation:
         - Creates a new dev portal section
@@ -95,7 +96,7 @@ def test_dev_portal_sections(account, custom_devel_login, browser, testconfig, d
 
     assert browser.element(".//h1").accessible_name == "Test"
 
-    custom_devel_login(name="john", password="123456", fresh=True)
+    custom_devel_login(name="john", password=account_password, fresh=True)
 
     browser.url = testconfig["threescale"]["devel"]["url"] + dev_portal_page
 
