@@ -99,6 +99,17 @@ def pytest_addoption(parser):
     parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
 
 
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Fail fast if zync configuration doesn't match the actual 3scale deployment.
+    Only runs on the controller process, not on xdist workers."""
+    if hasattr(session.config, "workerinput"):
+        return
+    try:
+        _ = Capability.ZYNC_ROUTES in CapabilityRegistry()
+    except RuntimeError as e:
+        pytest.exit(f"Zync configuration mismatch: {e}", returncode=3)
+
+
 def pytest_configure(config: pytest.Config) -> None:
     """Ensure mutually exclusive options"""
     fuzz = config.getoption("--fuzz")
@@ -403,7 +414,7 @@ def tools(testconfig):
 
 
 @pytest.fixture(scope="module")
-def prod_client(production_gateway, application, request):
+def prod_client(production_gateway, application, request, lifecycle_hooks):
     """Prepares application and service for production use and creates new production client
 
     Parameters:
@@ -422,6 +433,8 @@ def prod_client(production_gateway, application, request):
             if version == -1:
                 version = app.service.proxy.list().configs.latest()["version"]
             app.service.proxy.list().promote(version=version)
+            for hook in _select_hooks("on_proxy_promote", lifecycle_hooks):
+                hook(app.service)
         if redeploy:
             production_gateway.reload()
 
@@ -689,6 +702,8 @@ def rhsso_service_info(request, testconfig, tools, rhsso_kind, rhsso_route):
     Set up client for zync
     :return: dict with all important details
     """
+    if Capability.ZYNC_OIDC_SYNC not in CapabilityRegistry():
+        warn_and_skip("ZYNC_OIDC_SYNC capability not available: zync is disabled or not running")
     rhsso = _resolve_rhsso(testconfig, tools, rhsso_route)
     if not rhsso:
         warn_and_skip("SSO admin password neither discovered not set in config", "fail")

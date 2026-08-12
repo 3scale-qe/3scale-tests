@@ -14,6 +14,7 @@ import backoff
 import pytest
 from threescale_api.resources import Service
 
+from testsuite.capabilities import Capability
 from testsuite.rhsso import OIDCClientAuth
 from testsuite.utils import blame_desc
 
@@ -21,6 +22,7 @@ pytestmark = [
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1948"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1949"),
     pytest.mark.issue("https://issues.jboss.org/browse/THREESCALE-1951"),
+    pytest.mark.required_capabilities(Capability.ZYNC_OIDC_SYNC),
 ]
 
 

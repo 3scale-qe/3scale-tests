@@ -7,10 +7,11 @@ import pytest
 from keycloak.exceptions import KeycloakGetError
 
 from testsuite import rawobj
+from testsuite.capabilities import Capability
 from testsuite.rhsso import OIDCClientAuthHook
 from testsuite.utils import randomize
 
-pytestmark = [pytest.mark.nopersistence]
+pytestmark = [pytest.mark.nopersistence, pytest.mark.required_capabilities(Capability.ZYNC_OIDC_SYNC)]
 
 
 @pytest.fixture(scope="module", autouse=True)
