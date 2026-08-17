@@ -78,7 +78,9 @@ def service2(request, custom_service, lifecycle_hooks, backends_mapping2, servic
     proxy.mapping_rules.create(rawobj.Mapping(metric, service2_mapping))
     proxy.update()
 
-    return service2
+    yield service2
+    for usage in service2.backend_usages.list():
+        usage.delete()
 
 
 @pytest.fixture(scope="module")
