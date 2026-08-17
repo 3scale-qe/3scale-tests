@@ -130,9 +130,9 @@ jobs:
             "gh pr create \\" \
             "  --repo  3scale-qe/3scale-tests \\" \
             "  --base  ${TARGET} \\" \
-            "  --head  ${BACKPORT_BRANCH} \\" \
+            "  --head  ${PR_AUTHOR}:${BACKPORT_BRANCH} \\" \
             "  --title \"[backport ${TARGET}] ${TITLE}\" \\" \
-            "  --body  \"Backport of #${PR_NUMBER} to \`${TARGET}\`.\"" \
+            "  --body  \"Backport of #${PR_NUMBER} to \\\`${TARGET}\\\`.\"" \
             '```')"
 
 
