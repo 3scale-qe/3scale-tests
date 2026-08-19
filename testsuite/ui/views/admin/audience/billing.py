@@ -20,7 +20,7 @@ class BillingView(BaseAudienceView):
 
     @property
     def is_displayed(self):
-        return self.title.text == "Earnings by Month" and self.table.is_displayed and self.path in self.browser.url
+        return self.title.text == "Earnings by month" and self.table.is_displayed and self.path in self.browser.url
 
 
 class ChargingForm(View):
