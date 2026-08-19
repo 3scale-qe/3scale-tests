@@ -1,7 +1,7 @@
 """
-Rewrite of :
-    spec/ui_specs/tokens/analytics_write_spec.rb
-    spec/ui_specs/tokens/analytics_read_spec.rb
+Tests verifying that an access token scoped to 'Analytics' can access
+statistics endpoints but is denied access to all other admin API endpoints
+(services, accounts, invoices, CMS, policies, etc.).
 """
 
 import pytest
@@ -13,7 +13,8 @@ from testsuite.utils import blame
 @pytest.fixture(scope="module", params=[pytest.param(False, id="Read Only"), pytest.param(True, id="Read and Write")])
 def token(custom_admin_login, navigator, request, threescale):
     """
-    Create token with scope set to 'Analytics'
+    Log in as admin, navigate to Settings > Tokens > New, and create an access
+    token with scope set to 'Analytics' and the given permission level.
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
@@ -30,7 +31,8 @@ def token(custom_admin_login, navigator, request, threescale):
 
 def test_read_service(token, api_client):
     """
-    Request to get list of services should have status code 403
+    Using an Analytics-scoped token, send a GET request to /admin/api/services.
+    Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", "/admin/api/services", token)
@@ -39,7 +41,8 @@ def test_read_service(token, api_client):
 
 def test_create_account_user(account, token, api_client, request, account_password):
     """
-    Request to create user should have status code 403
+    Using an Analytics-scoped token, send a POST request to create a new user
+    under an existing account. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "acc")
@@ -55,7 +58,8 @@ def test_create_account_user(account, token, api_client, request, account_passwo
 
 def test_get_service_top_applications(service, token, api_client):
     """
-    Request to get top applications should have status code 200
+    Using an Analytics-scoped token, send a GET request for a service's top
+    applications statistics. Verify the response is 200 OK.
     """
 
     params = {"service_id": service.entity_id, "since": "2012-02-22 00:00:00", "period": "year", "metric_name": "hits"}
@@ -65,7 +69,8 @@ def test_get_service_top_applications(service, token, api_client):
 
 def test_get_invoice_list(account, token, api_client):
     """
-    Request to get list of invoices should have status code 403
+    Using an Analytics-scoped token, send a GET request for an account's
+    invoices. Verify the response is 403 Forbidden.
     """
 
     params = {"account_id": account.entity_id}
@@ -75,7 +80,8 @@ def test_get_invoice_list(account, token, api_client):
 
 def test_create_invoice_line_item(invoice, token, api_client, request):
     """
-    Request to create line item should have status code 403
+    Using an Analytics-scoped token, send a POST request to create a line
+    item on an existing invoice. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "item")
@@ -86,7 +92,8 @@ def test_create_invoice_line_item(invoice, token, api_client, request):
 
 def test_get_registry_policies_list(token, api_client):
     """
-    Request to get list of registry policies should have status code 403
+    Using an Analytics-scoped token, send a GET request to list registry
+    policies. Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", "/admin/api/registry/policies", token)
@@ -95,7 +102,8 @@ def test_get_registry_policies_list(token, api_client):
 
 def test_create_registry_policy(token, api_client, schema):
     """
-    Request to create policy registry should have status code 403
+    Using an Analytics-scoped token, send a POST request to create a new
+    policy registry entry. Verify the response is 403 Forbidden.
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
@@ -104,7 +112,8 @@ def test_create_registry_policy(token, api_client, schema):
 
 def test_create_provider_account(request, token, api_client, account_password):
     """
-    Request to create provider account should have status code 403
+    Using an Analytics-scoped token, send a POST request to create a new
+    provider account user. Verify the response is 403 Forbidden.
     """
     username = blame(request, "username")
     params = {"username": username, "email": f"{username}@example.com", "password": account_password}
@@ -114,10 +123,33 @@ def test_create_provider_account(request, token, api_client, account_password):
 
 def test_create_app_key(token, api_client, account, application):
     """
-    Request to create application key should have status code 403
+    Using an Analytics-scoped token, send a POST request to create an
+    application key for an existing account's application. Verify the response is 403 Forbidden.
     """
     account_id = account.entity_id
     application_id = application.entity_id
     params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
     response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token, params)
+    assert response.status_code == 403
+
+
+@pytest.mark.parametrize("resource", ["templates", "sections", "files"])
+def test_get_cms_resource(token, api_client, resource):
+    """
+    Using an Analytics-scoped token, send a GET request to list a CMS resource.
+    Verify the response is 403 Forbidden.
+    """
+
+    response = api_client("GET", f"/admin/api/cms/{resource}", token)
+    assert response.status_code == 403
+
+
+def test_create_cms_section(token, api_client, request):
+    """
+    Using an Analytics-scoped token, send a POST request to create a new CMS
+    section. Verify the response is 403 Forbidden.
+    """
+    title = blame(request, "section")
+    params = {"title": title, "public": True, "partial_path": f"/{title}"}
+    response = api_client("POST", "/admin/api/cms/sections", token, json=params)
     assert response.status_code == 403
