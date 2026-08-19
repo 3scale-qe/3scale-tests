@@ -82,17 +82,18 @@ def test_get_invoice_list(account, token, api_client):
     assert response.status_code == 403
 
 
+@pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-761")
-def test_create_invoice_line_item(invoice, token, api_client, request, permission):
+def test_create_invoice_line_item(invoice, token, api_client, request):
     """
     Using a Management-scoped token, send a POST request to create a line item on
-    an existing invoice. Verify the response is 201 Created (write) or 403 Forbidden (read-only).
+    an existing invoice. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "item")
     params = {"invoice_id": invoice.entity_id, "name": name, "description": "description", "quantity": "1", "cost": 1}
     response = api_client("POST", f"/api/invoices/{invoice.entity_id}/line_items", token, json=params)
-    assert response.status_code == permission[1]
+    assert response.status_code == 403
 
 
 def test_get_registry_policies_list(token, api_client):
@@ -142,26 +143,30 @@ def test_create_app_key(token, api_client, account, application, permission):
     assert response.status_code == permission[1]
 
 
+@pytest.mark.xfail
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-761")
 @pytest.mark.parametrize("resource", ["templates", "sections", "files"])
 def test_get_cms_resource(token, api_client, resource):
     """
     Using a Management-scoped token, send a GET request to list a CMS resource.
-    Verify the response is 200 OK.
+    Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", f"/admin/api/cms/{resource}", token)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
-def test_create_cms_section(token, api_client, request, permission):
+@pytest.mark.xfail
+@pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-761")
+def test_create_cms_section(token, api_client, request):
     """
     Using a Management-scoped token, send a POST request to create a new CMS
-    section. Verify the response is 201 Created (write) or 403 Forbidden (read-only).
+    section. Verify the response is 403 Forbidden.
     """
     title = blame(request, "section")
     params = {"title": title, "public": True, "partial_path": f"/{title}"}
     response = api_client("POST", "/admin/api/cms/sections", token, json=params)
-    assert response.status_code == permission[1]
+    assert response.status_code == 403
 
 
 def test_delete_service(custom_service, token, api_client, permission, request):
