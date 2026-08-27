@@ -44,8 +44,9 @@ class MailhogClient:
         """Url of the mailhog app"""
         return self._url
 
+    @backoff.on_exception(backoff.expo, requests.exceptions.RequestException, max_tries=3)
     def request(self, method: str = "GET", params: dict = None, endpoint: str = None):
-        """Requests the mailhog API"""
+        """Requests the mailhog API with automatic retry on connection errors"""
         params = params or {}
 
         full_url = f"{self._url}/{endpoint}"
