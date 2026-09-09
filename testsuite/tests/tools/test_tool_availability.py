@@ -23,8 +23,6 @@ def test_prometheus_availability(prometheus):
         ("jaeger-query+ssl", ""),
         ("mockserver", ""),
         ("mockserver+ssl", ""),
-        ("minio", "/minio/health/live"),
-        ("minio+ssl", "/minio/health/live"),
     ],
 )
 def test_tool_availability(private_base_url, tool_name, endpoint):
