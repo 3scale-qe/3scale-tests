@@ -25,6 +25,7 @@ def enable_notifications(threescale):
     """
     params = {f"notification_preferences[{n}]": "true" for n in NOTIFICATIONS}
     threescale.rest.patch(path="/admin/api/personal/notification_preferences", data=params)
+    # Enable service_plans_ui_visible which defaults to false, gating service_contract_created
     threescale.rest.put(path="/admin/api/settings", data={"service_plans_ui_visible": "true"})
 
     yield
