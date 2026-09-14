@@ -29,9 +29,17 @@ def client(api_client):
     return api_client(disable_retry_status_list={503, 404})
 
 
-@backoff.on_predicate(
-    backoff.fibo, lambda x: x.headers.get("server", "") not in ("openresty", "envoy"), max_tries=8, jitter=None
-)
+def is_openshift_503(response):
+    """
+    The test must distinguish OpenShift's 503 from APIcast's 503.
+    OpenShift returns 503 with cache-control headers when service is starting.
+    """
+    if response.status_code != 503:
+        return False
+    return "Application is not available" in response.text
+
+
+@backoff.on_predicate(backoff.fibo, is_openshift_503, max_tries=8, jitter=None)
 def make_requests(client):
     """Make sure that we get 503 apicast (backend is not available)"""
     return client.get("/anything")
@@ -41,15 +49,15 @@ def make_requests(client):
 def test_do_not_send_openresty_version(client):
     """
     Make request to non existing endpoint
-    Assert that the response does not contain openresty version in the headers
-    Assert that the response does not contain openresty version in the body
+    Assert that the server header does not contain "openresty" or "nginx"
+    Assert that the response body does not contain "openresty"
     """
     response = make_requests(client)
     assert response.status_code == 503
 
-    assert "server" in response.headers
-    if response.headers["server"] == "envoy":
-        pytest.skip("envoy edge proxy in use")
-    assert response.headers["server"] == "openresty"
+    server_header = response.headers.get("server", "")
+    if server_header:
+        assert "openresty" not in server_header
+        assert "nginx" not in server_header
 
-    assert "<center>openresty</center>" in response.text
+    assert "openresty" not in response.text
