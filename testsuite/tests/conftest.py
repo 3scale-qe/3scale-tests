@@ -301,8 +301,6 @@ def pytest_metadata(metadata):
         "go-httpbin+ssl",
         "jaeger-query",
         "jaeger-query+ssl",
-        "minio",
-        "minio+ssl",
         "mockserver",
         "mockserver+ssl",
     ]
