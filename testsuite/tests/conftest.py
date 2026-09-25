@@ -543,7 +543,7 @@ def user(custom_user, account, request, testconfig):
     usr = {
         "username": username,
         "email": f"{username}@{domain}",
-        "password": blame(request, ""),
+        "password": blame(request, "", tail=15),
         "account_id": account["id"],
     }
     usr = custom_user(account, params=usr)
