@@ -97,7 +97,7 @@ def test_emails_content_after_account_creation(mailhog_client, mail_template):
         for m in mailhog_client.all_messages()
         if message_match(tpl, "Headers", headers(m).get("X-SMTPAPI", "DO NOT MATCH"))
     ]
-    assert messages, f"Didn't find assumed X-SMTPAPI: {tpl['Headers']}"
+    assert messages, "Didn't find any messages with expected X-SMTPAPI headers"
 
     messages = [
         m

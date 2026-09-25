@@ -4,7 +4,7 @@ subject_templates:
       Headers: '{"unique_args":{"event_name":"Accounts::AccountCreatedEvent","event_id":".*","user_id":[0-9]+,"account_id":[0-9]+},"category":\["notification","accounts/account_created_event"\]}'
       Body: '----==_mimepart_.+Content-Type: text/plain; charset=UTF-8Content-Transfer-Encoding:
       7bitDear <username>,<test_account> from <test_group> has signed-up for: .+New
-      user details:  Username: <test_account>  Email: <test_account>@<account_email_domain>New
+      user details:  Username: <test_account>  Email: <test_account>@<account_email_domain>.*New
       account details:  Organization/Group Name: <test_group>  To view new signup
       in your 3scale Admin Portal, follow this link: https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+You
       are receiving this because you subscribed to this notification.View notification
@@ -13,7 +13,7 @@ subject_templates:
       html><html lang=3D"en"><head><meta charset=3D"utf-8" /></head><body style=3D"font-family:
       &#39;Lucida Grande&#39;, verdana, sans-serif;"><p>Dear <username>,</p><p><test_account>
       from <test_group> has signed-up for: .+</p><p><b>New user details:</b></p><ul><li><b>Username:</b>
-      <test_account></li><li><b>Email:</b> <test_account>@<account_email_domain></li></ul><p><b>New
+      <test_account></li><li><b>Email:</b> <test_account>@<account_email_domain></li>.*</ul><p><b>New
       account details:</b></p><ul><li><b>Organization/Group Name:</b> <test_group></li></ul><p><a
       href=3D"https://3scale-admin.<threescale_superdomain>/buyers/accounts/[0-9]+">View
       new signup in your 3scale Admin Portal</a></p><p>=E2=80=94<br />You are receiving
