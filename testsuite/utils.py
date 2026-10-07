@@ -36,8 +36,7 @@ def _whoami():
     try:
         return os.getlogin()
     # want to catch broad exception and fallback at any circumstance
-    # pylint: disable=broad-except
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         return str(os.getuid())
 
 
