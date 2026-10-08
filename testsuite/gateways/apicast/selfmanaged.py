@@ -19,7 +19,7 @@ class NoSuitableApicastError(Exception):
 
 
 # pylint: disable=too-many-instance-attributes
-class SelfManagedApicast(AbstractApicast):
+class SelfManagedApicast(AbstractApicast):  # pylint: disable=abstract-method
     """Gateway for use with already deployed self-managed APIcast in OpenShift
 
     This is a "special" class behaving bit more dynamically during
