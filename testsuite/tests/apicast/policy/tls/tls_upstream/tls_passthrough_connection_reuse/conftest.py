@@ -104,7 +104,7 @@ def mapping_rules(service, backend_orig, backend_new):
     Adds the "/" mapping rule to both backends.
     """
     proxy = service.proxy.list()
-    proxy.mapping_rules.delete(proxy.mapping_rules.list()[0]["id"])
+    proxy.mapping_rules.list()[0].delete()
 
     orig_metric = backend_orig.metrics.list()[0]
     new_metric = backend_new.metrics.list()[0]
