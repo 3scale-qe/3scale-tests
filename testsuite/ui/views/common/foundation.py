@@ -8,7 +8,7 @@ from widgetastic.widget import GenericLocatorWidget, Text, View
 class FlashMessage(View):
     """View that represents the Flash Message (div bar) on top of the page when some information is provided to user"""
 
-    flash_message = Text('//*[(@id="flashWrapper" or @id="flash-messages")]/div[1]')
+    flash_message = Text('(//ul[contains(@class, "pf-c-alert-group")]//div[contains(@class, "pf-c-alert__title")])[1]')
 
     def string_in_flash_message(self, message):
         """
