@@ -1,8 +1,11 @@
 """
-Tests for policy registry token permissions
+Tests verifying that an access token scoped to 'Policy Registry' can access
+policy registry endpoints but is denied access to all other admin API endpoints
+(services, accounts, invoices, CMS, etc.).
 """
 
 import pytest
+from threescale_api.errors import ApiClientError
 
 from testsuite.ui.views.admin.settings.tokens import Scopes, TokenNewView
 from testsuite.utils import blame
@@ -11,7 +14,8 @@ from testsuite.utils import blame
 @pytest.fixture(scope="module")
 def token(custom_admin_login, navigator, request, threescale, permission):
     """
-    Create token with scope set to 'Policy Registry'
+    Log in as admin, navigate to Settings > Tokens > New, and create an access
+    token with scope set to 'Policy Registry' and the given permission level.
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
@@ -28,7 +32,8 @@ def token(custom_admin_login, navigator, request, threescale, permission):
 
 def test_read_service(token, api_client):
     """
-    Request to get list of services should have status code 403
+    Using a Policy Registry-scoped token, send a GET request to /admin/api/services.
+    Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", "/admin/api/services", token)
@@ -37,7 +42,8 @@ def test_read_service(token, api_client):
 
 def test_create_account_user(account, token, api_client, request, account_password):
     """
-    Request to create user should have status code 403
+    Using a Policy Registry-scoped token, send a POST request to create a new user
+    under an existing account. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "acc")
@@ -53,7 +59,8 @@ def test_create_account_user(account, token, api_client, request, account_passwo
 
 def test_get_service_top_applications(service, token, api_client):
     """
-    Request to get top applications should have status code 403
+    Using a Policy Registry-scoped token, send a GET request for a service's top
+    applications statistics. Verify the response is 403 Forbidden.
     """
 
     params = {"service_id": service.entity_id, "since": "2012-02-22 00:00:00", "period": "year", "metric_name": "hits"}
@@ -63,7 +70,8 @@ def test_get_service_top_applications(service, token, api_client):
 
 def test_get_invoice_list(account, token, api_client):
     """
-    Request to get list of invoices should have status code 403
+    Using a Policy Registry-scoped token, send a GET request for an account's
+    invoices. Verify the response is 403 Forbidden.
     """
 
     params = {"account_id": account.entity_id}
@@ -73,7 +81,8 @@ def test_get_invoice_list(account, token, api_client):
 
 def test_create_invoice_line_item(invoice, token, api_client, request):
     """
-    Request to create line item should have status code 403
+    Using a Policy Registry-scoped token, send a POST request to create a line
+    item on an existing invoice. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "item")
@@ -84,7 +93,8 @@ def test_create_invoice_line_item(invoice, token, api_client, request):
 
 def test_get_registry_policies_list(token, api_client):
     """
-    Request to get list of registry policies should have status code 200
+    Using a Policy Registry-scoped token, send a GET request to list registry
+    policies. Verify the response is 200 OK.
     """
 
     response = api_client("GET", "/admin/api/registry/policies", token)
@@ -94,7 +104,8 @@ def test_get_registry_policies_list(token, api_client):
 # pylint: disable=too-many-arguments
 def test_create_registry_policy(threescale, token, api_client, schema, permission, request):
     """
-    Request to create policy registry should have status code 403 (201 for write permission)
+    Using a Policy Registry-scoped token, send a POST request to create a new
+    policy registry entry. Verify the response is 201 Created (write) or 403 Forbidden (read-only).
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
@@ -105,7 +116,8 @@ def test_create_registry_policy(threescale, token, api_client, schema, permissio
 
 def test_create_provider_account(request, token, api_client, account_password):
     """
-    Request to create provider account should have status code 403
+    Using a Policy Registry-scoped token, send a POST request to create a new
+    provider account user. Verify the response is 403 Forbidden.
     """
     username = blame(request, "username")
     params = {"username": username, "email": f"{username}@example.com", "password": account_password}
@@ -115,10 +127,56 @@ def test_create_provider_account(request, token, api_client, account_password):
 
 def test_create_app_key(token, api_client, account, application):
     """
-    Request to create application key should have status code 403
+    Using a Policy Registry-scoped token, send a POST request to create an
+    application key for an existing account's application. Verify the response is 403 Forbidden.
     """
     account_id = account.entity_id
     application_id = application.entity_id
     params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
     response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token, params)
     assert response.status_code == 403
+
+
+@pytest.mark.parametrize("resource", ["templates", "sections", "files"])
+def test_get_cms_resource(token, api_client, resource):
+    """
+    Using a Policy Registry-scoped token, send a GET request to list a CMS resource.
+    Verify the response is 403 Forbidden.
+    """
+
+    response = api_client("GET", f"/admin/api/cms/{resource}", token)
+    assert response.status_code == 403
+
+
+def test_create_cms_section(token, api_client, request):
+    """
+    Using a Policy Registry-scoped token, send a POST request to create a new CMS
+    section. Verify the response is 403 Forbidden.
+    """
+    title = blame(request, "section")
+    params = {"title": title, "public": True, "partial_path": f"/{title}"}
+    response = api_client("POST", "/admin/api/cms/sections", token, json=params)
+    assert response.status_code == 403
+
+
+def test_delete_registry_policy(token, api_client, request, schema, permission, threescale):
+    """
+    Create a policy registry entry via the API, then using a Policy Registry-scoped
+    token, send a DELETE request to remove it. Verify the response is 200 OK (write)
+    or 403 Forbidden (read-only).
+    """
+    name = blame(request, "policy")
+    threescale.policy_registry.create({"name": name, "version": "0.1", "schema": schema})
+    policy_id = f"{name}-0.1"
+
+    response = api_client("DELETE", f"/admin/api/registry/policies/{policy_id}", token)
+    if permission[0]:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+
+    try:
+        threescale.policy_registry.delete(policy_id)
+    except ApiClientError as e:
+        if e.code != 404:
+            raise
