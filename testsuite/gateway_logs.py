@@ -66,8 +66,7 @@ def _print_logs(item, start_time, phase, suffix):
                 item.add_report_section(
                     phase, "stdout", _generate_log_section(name, "Gateway doesn't have LOGS capability")
                 )
-    # pylint: disable=broad-except
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         item.add_report_section(
             phase, "stderr", f"({suffix}) Exception encountered while getting gateway logs: {exc}\n"
         )
