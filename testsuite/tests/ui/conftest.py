@@ -532,8 +532,7 @@ def fullpage_screenshot(driver, file_path):
         fullpath = f"{file_path}/{date}.png"
         stitched_image.save(fullpath)
         return fullpath
-    # pylint: disable=broad-exception-caught
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return f"Error: Failed to take full-page screenshot. Details: {str(e)}"
 
 
