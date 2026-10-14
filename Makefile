@@ -78,12 +78,12 @@ speedrun: ## Bigger than smoke faster than test
 speedrun: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --drop-sandbag --drop-fuzz $(flags) testsuite/tests
 
-sandbag:  ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
-sandbag: pipenv
+sandbag: ## Complemetary set to speedrun that makes the rest of test target (speedrun+sandbag == test)
+sandbag: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadfile -m 'not flaky' --sandbag --drop-fuzz $(flags) testsuite/tests
 
-fuzz:  ## Run tests from tests/fuzz
-fuzz: pipenv
+fuzz: ## Run tests from tests/fuzz
+fuzz: pipenv check-secrets.yaml
 	$(PYTEST) -n8 -m 'not flaky' --fuzz $(flags) testsuite/tests/fuzz
 
 
@@ -111,6 +111,7 @@ disruptive: ## Run disruptive tests
 disruptive: pipenv check-secrets.yaml
 	$(PYTEST) -mdisruptive --disruptive $(flags) testsuite/tests
 
+performance-smoke: ## Run performance-smoke tests
 performance-smoke: pipenv check-secrets.yaml
 	$(PYTEST) --performance $(flags) testsuite/tests/performance/smoke
 
@@ -123,7 +124,7 @@ toolbox: pipenv check-secrets.yaml
 	$(PYTEST) -n4 --dist loadgroup --toolbox $(flags) testsuite/tests/toolbox
 
 test-images: ## Verify deployed images matches extracted digest from configs/settings.local.yaml
-test-images:
+test-images: pipenv check-secrets.yaml
 	$(PYTEST) --images $(flags) testsuite/tests/images
 
 check: ## Run small tests to verify tools are configured and respond to requests
@@ -226,7 +227,7 @@ help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 polish-junit: ## Remove skipped tests and logs from passing tests
-polish-junit:
+polish-junit: pipenv
 	gzip -f $(resultsdir)/junit-*.xml
 	# 'cat' on next line is neessary to avoid wipe of the files
 	for file in $(resultsdir)/junit-*.xml.gz; do zcat $$file | $(RUNSCRIPT)xslt-apply ./xslt/polish-junit.xsl >$${file%.gz}; done  # bashism!!!
