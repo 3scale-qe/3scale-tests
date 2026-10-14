@@ -1,8 +1,12 @@
 """
-Rewrite of spec/ui_specs/tokens/billing_read_spec.rb
+Tests verifying that an access token scoped to 'Billing' can access
+billing/invoice endpoints but is denied access to all other admin API endpoints
+(services, accounts, CMS, policies, etc.).
 """
 
 import pytest
+from threescale_api.errors import ApiClientError
+from threescale_api.resources import InvoiceState
 
 from testsuite.ui.views.admin.settings.tokens import Scopes, TokenNewView
 from testsuite.utils import blame
@@ -11,7 +15,8 @@ from testsuite.utils import blame
 @pytest.fixture(scope="module")
 def token(custom_admin_login, navigator, request, threescale, permission):
     """
-    Create token with scope set to 'Billing'
+    Log in as admin, navigate to Settings > Tokens > New, and create an access
+    token with scope set to 'Billing' and the given permission level.
     """
     custom_admin_login()
     new = navigator.navigate(TokenNewView)
@@ -28,7 +33,8 @@ def token(custom_admin_login, navigator, request, threescale, permission):
 
 def test_read_service(token, api_client):
     """
-    Request to get list of services should have status code 403
+    Using a Billing-scoped token, send a GET request to /admin/api/services.
+    Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", "/admin/api/services", token)
@@ -37,7 +43,8 @@ def test_read_service(token, api_client):
 
 def test_create_account_user(account, token, api_client, request, account_password):
     """
-    Request to create user should have status code 403
+    Using a Billing-scoped token, send a POST request to create a new user
+    under an existing account. Verify the response is 403 Forbidden.
     """
 
     name = blame(request, "acc")
@@ -53,7 +60,8 @@ def test_create_account_user(account, token, api_client, request, account_passwo
 
 def test_get_service_top_applications(service, token, api_client):
     """
-    Request to get top applications should have status code 403
+    Using a Billing-scoped token, send a GET request for a service's top
+    applications statistics. Verify the response is 403 Forbidden.
     """
 
     params = {"service_id": service.entity_id, "since": "2012-02-22 00:00:00", "period": "year", "metric_name": "hits"}
@@ -63,7 +71,8 @@ def test_get_service_top_applications(service, token, api_client):
 
 def test_get_invoice_list(account, token, api_client):
     """
-    Request to get list of invoices should have status code 200
+    Using a Billing-scoped token, send a GET request for an account's
+    invoices. Verify the response is 200 OK.
     """
 
     params = {"account_id": account.entity_id}
@@ -73,7 +82,8 @@ def test_get_invoice_list(account, token, api_client):
 
 def test_create_invoice_line_item(invoice, token, api_client, request, permission):
     """
-    Request to create line item should have status code 403 (201 for write permission)
+    Using a Billing-scoped token, send a POST request to create a line item on
+    an existing invoice. Verify the response is 201 Created (write) or 403 Forbidden (read-only).
     """
 
     name = blame(request, "item")
@@ -84,7 +94,8 @@ def test_create_invoice_line_item(invoice, token, api_client, request, permissio
 
 def test_get_registry_policies_list(token, api_client):
     """
-    Request to get list of registry policies should have status code 403
+    Using a Billing-scoped token, send a GET request to list registry
+    policies. Verify the response is 403 Forbidden.
     """
 
     response = api_client("GET", "/admin/api/registry/policies", token)
@@ -93,7 +104,8 @@ def test_get_registry_policies_list(token, api_client):
 
 def test_create_registry_policy(token, api_client, schema):
     """
-    Request to create policy registry should have status code 403
+    Using a Billing-scoped token, send a POST request to create a new
+    policy registry entry. Verify the response is 403 Forbidden.
     """
     params = {"name": "policy_registry", "version": "0.1", "schema": schema}
     response = api_client("POST", "/admin/api/registry/policies", token, json=params)
@@ -102,7 +114,8 @@ def test_create_registry_policy(token, api_client, schema):
 
 def test_create_provider_account(request, token, api_client, account_password):
     """
-    Request to create provider account should have status code 403
+    Using a Billing-scoped token, send a POST request to create a new
+    provider account user. Verify the response is 403 Forbidden.
     """
     username = blame(request, "username")
     params = {"username": username, "email": f"{username}@example.com", "password": account_password}
@@ -112,10 +125,61 @@ def test_create_provider_account(request, token, api_client, account_password):
 
 def test_create_app_key(token, api_client, account, application):
     """
-    Request to create application key should have status code 403
+    Using a Billing-scoped token, send a POST request to create an
+    application key for an existing account's application. Verify the response is 403 Forbidden.
     """
     account_id = account.entity_id
     application_id = application.entity_id
     params = {"account_id": account_id, "application_id": application_id, "key": "test_key"}
     response = api_client("POST", f"/admin/api/accounts/{account_id}/applications/{application_id}/keys", token, params)
     assert response.status_code == 403
+
+
+@pytest.mark.parametrize("resource", ["templates", "sections", "files"])
+def test_get_cms_resource(token, api_client, resource):
+    """
+    Using a Billing-scoped token, send a GET request to list a CMS resource.
+    Verify the response is 403 Forbidden.
+    """
+
+    response = api_client("GET", f"/admin/api/cms/{resource}", token)
+    assert response.status_code == 403
+
+
+def test_create_cms_section(token, api_client, request):
+    """
+    Using a Billing-scoped token, send a POST request to create a new CMS
+    section. Verify the response is 403 Forbidden.
+    """
+    title = blame(request, "section")
+    params = {"title": title, "public": True, "partial_path": f"/{title}"}
+    response = api_client("POST", "/admin/api/cms/sections", token, json=params)
+    assert response.status_code == 403
+
+
+# pylint: disable=too-many-arguments
+def test_delete_invoice_line_item(token, api_client, request, threescale, account, permission):
+    """
+    Create an invoice and line item via the API, then using a Billing-scoped token,
+    send a DELETE request to remove the line item. Verify the response is 200 OK (write)
+    or 403 Forbidden (read-only).
+    """
+    invoice = threescale.invoices.create({"account_id": account["id"]})
+    name = blame(request, "item")
+    line_item = invoice.line_items.create({"name": name, "description": "line item", "quantity": "1", "cost": 10})
+    line_item_id = line_item["id"]
+
+    response = api_client("DELETE", f"/api/invoices/{invoice.entity_id}/line_items/{line_item_id}", token)
+
+    if permission[0]:
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 403
+
+    try:
+        invoice.line_items.delete(line_item_id)
+    except ApiClientError as e:
+        if e.code != 404:
+            raise
+
+    invoice.state_update(InvoiceState.CANCELLED)
