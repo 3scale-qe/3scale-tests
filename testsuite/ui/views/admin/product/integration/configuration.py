@@ -16,16 +16,18 @@ class ProductConfigurationView(BaseProductView):
     class configuration(View):
         """Configuration tab with promote to staging button"""
 
-        ROOT = ParametrizedLocator('//*[@id="integration-tabs"]/div[2]/section[1]')
-        staging_promote_btn = Button(locator=".//button[contains(@class,'PromoteButton')]")
+        ROOT = ParametrizedLocator('//*[@id="integration-tabs"]//div[@class="integration"]/section[1]')
+        staging_promote_btn = Button(
+            locator=".//form[contains(@action, '/integration') and not(contains(@action, 'production'))]//button"
+        )
 
     @View.nested
     # pylint: disable=invalid-name
     class staging(View):
         """Staging tab with promote to production button"""
 
-        ROOT = ParametrizedLocator('//*[@id="integration-tabs"]/div[2]/section[2]/div[1]')
-        production_promote_btn = Button(locator=".//button[contains(@class,'PromoteButton')]")
+        ROOT = ParametrizedLocator('//*[@id="integration-tabs"]//div[@class="integration"]/section[2]/div[1]')
+        production_promote_btn = Button(locator=".//form[contains(@action, 'promote_to_production')]//button")
 
     def prerequisite(self):
         return BaseProductView
