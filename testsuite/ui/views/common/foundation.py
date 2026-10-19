@@ -5,21 +5,21 @@ Module contains Base View used for all Views that are the same in Admin and Mast
 from widgetastic.widget import GenericLocatorWidget, Text, View
 
 
-class FlashMessage(View):
+class ToastMessage(View):
     """View that represents the Flash Message (div bar) on top of the page when some information is provided to user"""
 
-    flash_message = Text('(//ul[contains(@class, "pf-c-alert-group")]//div[contains(@class, "pf-c-alert__title")])[1]')
+    toast_message = Text('(//ul[contains(@class, "pf-c-alert-group")]//div[contains(@class, "pf-c-alert__title")])[1]')
 
-    def string_in_flash_message(self, message):
+    def string_in_toast_message(self, message):
         """
         Checks whether the flash message contains substring
         Note: Compared string need to be lowercase
         """
-        return message in self.flash_message.text.lower()
+        return message in self.toast_message.text.lower()
 
     @property
     def is_displayed(self):
-        return self.flash_message.is_displayed
+        return self.toast_message.is_displayed
 
 
 class NotFoundView(View):

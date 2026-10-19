@@ -5,7 +5,7 @@ from widgetastic_patternfly4 import Button
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.views.common.foundation import ToastMessage
 from testsuite.ui.widgets.buttons import ThreescaleCreateButton, ThreescaleDeleteButton
 
 
@@ -18,7 +18,7 @@ class ProductMethodsView(BaseProductView):
     methods_table = Table(
         ".//table[@data-ouia-component-id='OUIA-Generated-Table-2']", column_widgets={"Method": Text("./a")}
     )
-    notification = View.nested(FlashMessage)
+    notification = View.nested(ToastMessage)
 
     @step("NewMethodView")
     def add_method(self):
@@ -109,7 +109,7 @@ class ProductMetricsView(BaseProductView):
     metrics_table = Table(
         ".//table[@data-ouia-component-id='OUIA-Generated-Table-2']", column_widgets={"Metric": Text("./a")}
     )
-    notification = View.nested(FlashMessage)
+    notification = View.nested(ToastMessage)
 
     @step("NewMetricView")
     def add_metric(self):

@@ -103,7 +103,7 @@ def test_message_from_admin_to_dev_portal(
     """
     compose = navigator.navigate(ComposeMessageView)
     compose.send_message(subject, content)
-    assert compose.notification.string_in_flash_message("message was sent.")
+    assert compose.notification.string_in_toast_message("message was sent.")
 
     mailhog_client.assert_message_received(subject=f"[msg] {subject}", expected_count=len(threescale.accounts.list()))
 
