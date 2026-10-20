@@ -9,7 +9,7 @@ from widgetastic_patternfly4.ouia import Dropdown as OUIADropdown
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.views.common.foundation import ToastMessage
 
 
 class InboxMessageView(BaseAudienceView):
@@ -105,7 +105,7 @@ class ComposeMessageView(BaseAudienceView):
     subject = TextInput(id="message_subject")
     body = TextInput(id="message_body")
     send_btn = Button("Send message", classes=[Button.PRIMARY])
-    notification = View.nested(FlashMessage)
+    notification = View.nested(ToastMessage)
 
     def prerequisite(self):
         return MessagesView

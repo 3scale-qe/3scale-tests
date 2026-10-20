@@ -43,7 +43,7 @@ def test_default_app_plan_change(request, service, custom_app_plan, navigator):
     assert app_plans_view.change_plan_button.is_enabled
     app_plans_view.change_plan_button.click()
     assert app_plans_view.notification.is_displayed
-    assert app_plans_view.notification.string_in_flash_message("the default plan has been changed.")
+    assert app_plans_view.notification.string_in_toast_message("the default plan has been changed.")
 
     assert not app_plans_view.change_plan_button.is_enabled
     app_plans_view.default_plan_select.item_select(plan2["name"])
@@ -65,9 +65,9 @@ def test_unset_default_app_plan(request, service, custom_app_plan, navigator):
     app_plans_view = navigator.navigate(ApplicationPlansView, product=service)
     app_plans_view.change_default_plan(app_plan["name"])
     assert app_plans_view.notification.is_displayed
-    assert app_plans_view.notification.string_in_flash_message("the default plan has been changed.")
+    assert app_plans_view.notification.string_in_toast_message("the default plan has been changed.")
 
     app_plans_view.change_default_plan("No plan selected")
     assert app_plans_view.notification.is_displayed
-    assert app_plans_view.notification.string_in_flash_message("the default plan has been changed.")
+    assert app_plans_view.notification.string_in_toast_message("the default plan has been changed.")
     assert app_plans_view.is_displayed

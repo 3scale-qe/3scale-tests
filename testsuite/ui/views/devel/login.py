@@ -5,7 +5,7 @@ from widgetastic.widget import GenericLocatorWidget, Text, TextInput, View
 from testsuite.ui.exception import UIException
 from testsuite.ui.navigation import step
 from testsuite.ui.views.auth import Auth0View, RhssoView
-from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.views.common.foundation import ToastMessage
 from testsuite.ui.views.common.login import LoginForm
 from testsuite.ui.views.devel import BaseDevelView, SignUpView
 from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
@@ -30,7 +30,7 @@ class LoginView(BaseDevelView):
     auth0_link = Text("//*[contains(@class,'auth-provider-auth0')]")
     rhsso_link = Text("//*[contains(@class,'auth-provider-keycloak')]")
     forgot_passwd = Text("//*[contains(text(),'Forgot password?')]")
-    flash_message = View.nested(FlashMessage)
+    flash_message = View.nested(ToastMessage)
     recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
 
     @step("ForgotPasswordView")
@@ -164,7 +164,7 @@ class ForgotPasswordView(BaseDevelView):
     email = TextInput(id="email")
     recaptcha = GenericLocatorWidget("//div[contains(@class,'grecaptcha-logo')]")
     reset_button = ThreescaleSubmitButton()
-    flash_message = View.nested(FlashMessage)
+    flash_message = View.nested(ToastMessage)
 
     def fill_form(self, email: str):
         """

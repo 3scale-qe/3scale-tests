@@ -5,7 +5,7 @@ from widgetastic_patternfly4 import PatternflyTable
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.audience import BaseAudienceView
-from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.views.common.foundation import ToastMessage
 from testsuite.ui.widgets import (
     CheckBoxGroup,
     HorizontalNavigation,
@@ -310,7 +310,7 @@ class InvoiceDetailView(BaseAudienceView):
     charge_button = Text("//form[contains(@action, 'charge.js')]/button")
     id_field = Text("#field-friendly_id")
     state_field = Text("#field-state")
-    notification = View.nested(FlashMessage)
+    notification = View.nested(ToastMessage)
 
     # Selector which we can use to check if the charge has finished
     paid_field = Text("//div[text()='Paid']")

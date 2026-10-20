@@ -5,7 +5,7 @@ from widgetastic_patternfly4 import PatternflyTable, Select
 
 from testsuite.ui.navigation import step
 from testsuite.ui.views.admin.product import BaseProductView
-from testsuite.ui.views.common.foundation import FlashMessage
+from testsuite.ui.views.common.foundation import ToastMessage
 from testsuite.ui.widgets import GenericLocatorWidget
 from testsuite.ui.widgets.buttons import (
     ThreescaleCreateButton,
@@ -22,7 +22,7 @@ class ApplicationPlansView(BaseProductView):
     create_button = ThreescaleCreateButton()
     change_plan_button = ThreescaleSubmitButton()
     default_plan_select = Select()
-    notification = View.nested(FlashMessage)
+    notification = View.nested(ToastMessage)
 
     def change_default_plan(self, plan_name: str):
         """

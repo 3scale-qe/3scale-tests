@@ -56,7 +56,7 @@ def test_delete_method_mapping_rule(navigator, service, method):
     view.delete()
     view = navigator.new_page(ProductMethodsView, product=service)
     assert view.notification.is_displayed
-    assert view.notification.string_in_flash_message(
+    assert view.notification.string_in_toast_message(
         "method is used by the latest gateway configuration and cannot be deleted"
     )
 
@@ -67,7 +67,7 @@ def test_delete_method_mapping_rule(navigator, service, method):
     view.delete()
     view = navigator.new_page(ProductMethodsView, product=service)
     assert view.notification.is_displayed
-    assert view.notification.string_in_flash_message("the method was deleted")
+    assert view.notification.string_in_toast_message("the method was deleted")
 
 
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-7112")
@@ -86,7 +86,7 @@ def test_delete_metric_mapping_rule(navigator, service, metric):
     view.delete()
     view = navigator.new_page(ProductMetricsView, product=service)
     assert view.notification.is_displayed
-    assert view.notification.string_in_flash_message(
+    assert view.notification.string_in_toast_message(
         "metric is used by the latest gateway configuration and cannot be deleted"
     )
 
@@ -97,4 +97,4 @@ def test_delete_metric_mapping_rule(navigator, service, metric):
     view.delete()
     view = navigator.new_page(ProductMetricsView, product=service)
     assert view.notification.is_displayed
-    assert view.notification.string_in_flash_message("the metric was deleted")
+    assert view.notification.string_in_toast_message("the metric was deleted")
