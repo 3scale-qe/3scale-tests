@@ -3,7 +3,7 @@
 import pytest
 
 # the creation of an account triggers a one-time email to be sent; this is not affected by an upgrade
-pytestmark = [pytest.mark.nopersistence]
+pytestmark = [pytest.mark.nopersistence, pytest.mark.usefixtures("enable_notifications")]
 
 
 def test_application_suspend_automatic_email(mailhog_client, account, application):

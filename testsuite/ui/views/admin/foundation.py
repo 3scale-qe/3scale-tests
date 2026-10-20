@@ -78,21 +78,24 @@ class DashboardView(BaseAdminView):
     billing_link = Text('//a[@href="/finance"]')
     develop_portal_link = Text('//a[@href="/p/admin/cms"]')
     message_link = Text('//a[@href="/p/admin/messages"]')
-    unread_messages_count = Text("//li[a[@href='/p/admin/messages']]/span[@class='u-notice']")
     explore_all_products = Text('//a[@href="/apiconfig/services"]')
     explore_all_backends = Text('//a[@href="/p/admin/backend_apis"]')
 
     @property
     def msg_count(self):
-        """Return number of messages in the inbox"""
-        return int(self.message_link.text.split()[0])
+        """Return total number of messages in the inbox"""
+        link_text = self.message_link.text
+        if "UNREAD" in link_text.upper():
+            raise ValueError("Can't show msg_count, there are unread messages. Use unread_msg_count instead.")
+        return int(link_text.split()[0])
 
     @property
     def unread_msg_count(self):
         """Returns number of unread messages"""
-        if not self.unread_messages_count.is_displayed:
-            return 0
-        return int(self.unread_messages_count.text)
+        link_text = self.message_link.text
+        if "UNREAD" in link_text.upper():
+            return int(link_text.split()[0].rstrip("+"))
+        return 0
 
     @View.nested
     # pylint: disable=invalid-name
