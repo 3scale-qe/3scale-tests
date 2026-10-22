@@ -13,7 +13,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: github_pre_release
-        run: git log --no-merges --pretty=oneline|grep -m1 'v[0-9.]*rc[0-9]*'|(read COMMIT MSG; gh release create "v${MSG##*-v}" -p --generate-notes --target $COMMIT)
+        run: |
+          git log --no-merges --pretty=oneline|grep -m1 'v[0-9.]*rc[0-9]*'|(read COMMIT MSG
+            if ! git ls-tree "$COMMIT" -- Pipfile.lock | grep -q .; then
+              echo "::error::Pipfile.lock is missing from commit $COMMIT. The PR was likely squash-merged — use 'Rebase and merge' instead."
+              exit 1
+            fi
+            gh release create "v${MSG##*-v}" -p --generate-notes --target "$COMMIT"
+          )
         env:
           # github-actions account doesn't seem to trigger events, therefore different account must be used
           GITHUB_TOKEN: ${{ secrets.BOTBEZBOT_TOKEN }}
