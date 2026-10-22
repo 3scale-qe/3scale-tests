@@ -58,9 +58,9 @@ def test_message_counter(
     Test:
         - Take a note of total message count from messages view
         - Send two e-mails from developer to admin
-        - Assert that messages tab shows 2 unread messages (Portal: "X UNREAD MESSAGES" format)
+        - Assert that messages start_unread_count + 2 after emails sent ("X UNREAD MESSAGES" format)
         - Read two new messages
-        - Assert that messages tab shows correct total count and 0 unread (Portal: "X MESSAGES" format)
+        - Assert that messages tab shows correct total count ("X MESSAGES" format)
         - Delete two new messages
         - Assert that messages tab shows original total count
     """
