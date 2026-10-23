@@ -40,7 +40,9 @@ def service2(service2):
     proxy.mapping_rules.create(rawobj.Mapping(metric, pattern="/anything/foo?baz={baz}", http_method="GET"))
     proxy.deploy()
 
-    return service2
+    yield service2
+    for usage in service2.backend_usages.list():
+        usage.delete()
 
 
 def test_args(client2):
