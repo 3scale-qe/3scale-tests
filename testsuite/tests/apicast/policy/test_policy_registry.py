@@ -57,7 +57,7 @@ def custom_policies(threescale, schema, request, testconfig):
 
         def _cleanup():
             for policy in policies:
-                threescale.policy_registry.delete(policy["id"])
+                policy.delete()
 
         if not testconfig["skip_cleanup"]:
             request.addfinalizer(_cleanup)
