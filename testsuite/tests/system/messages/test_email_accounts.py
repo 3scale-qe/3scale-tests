@@ -16,8 +16,7 @@ from testsuite import rawobj
 from testsuite.utils import blame
 
 # the creation of an account triggers a one-time email to be sent; this is not affected by an upgrade
-pytestmark = [pytest.mark.nopersistence]
-
+pytestmark = [pytest.mark.nopersistence, pytest.mark.usefixtures("enable_notifications")]
 
 @pytest.fixture(scope="module")
 def test_account(custom_account, request):
