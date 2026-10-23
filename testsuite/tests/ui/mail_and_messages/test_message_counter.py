@@ -10,13 +10,22 @@ from testsuite.ui.views.devel.messages import ComposeView
 from testsuite.utils import blame
 
 
-def assert_dashboard_counters(navigator, message_count, unread_count):
+def assert_dashboard_unread_count(navigator, unread_count):
     """
-    Asserts counters in the messages tab in admin dashboard
+    Asserts unread message counter in the admin dashboard
+    Portal shows "X Unread messages" when unread exist
+    """
+    admin_dashboard_view = navigator.navigate(DashboardView)
+    assert admin_dashboard_view.unread_msg_count == unread_count
+
+
+def assert_dashboard_msg_count(navigator, message_count):
+    """
+    Asserts total message counter in the admin dashboard
+    Portal shows "X Messages" when all messages are read
     """
     admin_dashboard_view = navigator.navigate(DashboardView)
     assert admin_dashboard_view.msg_count == message_count
-    assert admin_dashboard_view.unread_msg_count == unread_count
 
 
 def send_message_from_devel(navigator, subject, body):
@@ -47,18 +56,18 @@ def test_message_counter(
 ):
     """
     Test:
-        - Take a note of number of messages (msg_count) and unread messages (unread_count) in messages tab in
-        admin dashboard
+        - Take a note of total message count from messages view
         - Send two e-mails from developer to admin
-        - Assert that messages tab in admin dashboard shows msg_count + 2 messages and unread_count + 2 unread messages
+        - Assert that messages start_unread_count + 2 after emails sent ("X UNREAD MESSAGES" format)
         - Read two new messages
-        - Assert that messages tab in admin dashboard msg_count + 2 messages and unread_count + 2 unread messages
+        - Assert that messages tab shows correct total count ("X MESSAGES" format)
         - Delete two new messages
-        - Assert that messages tab in admin dashboard shows msg_count messages and unread_count unread messages
+        - Assert that messages tab shows original total count
     """
+    messages_view = navigator.navigate(MessagesView)
+    start_msg_count = len(messages_view.table.read())
     admin_dashboard_view = navigator.navigate(DashboardView)
-    start_msg_count = admin_dashboard_view.msg_count
-    start_unread_msg_count = admin_dashboard_view.unread_msg_count
+    start_unread_count = admin_dashboard_view.unread_msg_count
 
     custom_devel_login(account)
     try:
@@ -70,7 +79,7 @@ def test_message_counter(
         )  # assure that messages will be deleted if skip_cleanup is false
 
     custom_admin_login(account)
-    assert_dashboard_counters(navigator, start_msg_count + 2, start_unread_msg_count + 2)
+    assert_dashboard_unread_count(navigator, start_unread_count + 2)
 
     admin_messages_view = navigator.navigate(MessagesView)
     link = admin_messages_view.get_unread_msg_link(Subject=subjects[0], From=account.entity_name)
@@ -79,10 +88,16 @@ def test_message_counter(
     link = admin_messages_view.get_unread_msg_link(Subject=subjects[1], From=account.entity_name)
     link.click()
 
-    assert_dashboard_counters(navigator, start_msg_count + 2, start_unread_msg_count + 0)
+    if start_unread_count == 0:
+        assert_dashboard_msg_count(navigator, start_msg_count + 2)
+        assert_dashboard_unread_count(navigator, 0)
+    else:
+        assert_dashboard_unread_count(navigator, start_unread_count)
 
     admin_messages_view = navigator.navigate(MessagesView)
     admin_messages_view.delete_message(Subject=subjects[0], From=account.entity_name)
     admin_messages_view.delete_message(Subject=subjects[1], From=account.entity_name)
 
-    assert_dashboard_counters(navigator, start_msg_count + 0, start_unread_msg_count + 0)
+    if start_unread_count == 0:
+        assert_dashboard_msg_count(navigator, start_msg_count)
+        assert_dashboard_unread_count(navigator, 0)

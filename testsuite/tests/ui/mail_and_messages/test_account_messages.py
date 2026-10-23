@@ -17,6 +17,7 @@ from testsuite.ui.views.devel.login import ForgotPasswordView
 from testsuite.ui.views.devel.login import LoginView as DevelLoginView
 from testsuite.utils import blame, randomize
 
+pytestmark = pytest.mark.usefixtures("enable_notifications")
 
 @pytest.fixture(scope="module")
 def account(custom_account, request, account_password):
