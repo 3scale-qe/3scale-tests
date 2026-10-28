@@ -7,7 +7,7 @@ import pytest
 
 # fixture fires a one-time event that triggers an email to be sent,
 # this event (sending message to account) is not affected by an upgrade
-pytestmark = [pytest.mark.nopersistence]
+pytestmark = [pytest.mark.nopersistence, pytest.mark.usefixtures("enable_notifications")]
 
 
 @pytest.fixture(scope="module")

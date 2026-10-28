@@ -2,6 +2,7 @@
 
 import re
 
+from widgetastic.exceptions import RowNotFound
 from widgetastic.widget import GenericLocatorWidget, Text, View
 from widgetastic_patternfly import TextInput
 from widgetastic_patternfly4 import Button, Dropdown, PatternflyTable
@@ -62,14 +63,20 @@ class MessagesView(BaseAudienceView):
         """
         row = self.table.row(**kwargs)
         if row.From.text != "(deleted)":
-            row[4].click()
+            dropdown = row[4].browser.element(".//button[contains(@class, 'pf-c-dropdown__toggle')]")
+            dropdown.click()
+            delete_btn = row[4].browser.element(".//button[contains(@class, 'pf-c-dropdown__menu-item')]")
+            delete_btn.click()
 
     def get_unread_msg_link(self, **kwargs):
         """Returns link to the first unread message, None if such message does not exist
         **kwargs: Allows filter rows by values in the columns.
         Keys are names of the columns, values are text values in the specified column.
         """
-        return self.table.row(_row__attr=("class", "unread"), **kwargs).Subject.browser.element("./a")
+        try:
+            return self.table.row(_row__attr=("class", "unread"), **kwargs).Subject.browser.element("./a")
+        except RowNotFound:
+            return None
 
     def get_first_unread_msg_link_gen(self):
         """
