@@ -1210,3 +1210,26 @@ def mailhog_client(openshift, tools, testconfig):
 
     if not testconfig["skip_cleanup"]:
         mailhog.delete_searched_messages()
+
+
+@pytest.fixture(scope="session")
+def enable_notifications(threescale):
+    """
+    Enable notification preferences for the current provider's admin user.
+
+    After porta PR #4039, notifications use a per-user NotificationPreferences model
+    instead of account-level settings. In fresh deployments, notifications default to disabled.
+    """
+    notifications = [
+        "account_created",
+        "application_created",
+        "service_contract_created",
+        "account_deleted",
+        "service_deleted",
+        "cinstance_plan_changed",
+    ]
+
+    params = {f"notification_preferences[{n}]": "true" for n in notifications}
+    threescale.rest.patch(path="/admin/api/personal/notification_preferences", data=params)
+    # Enable service_plans_ui_visible which defaults to false, gating service_contract_created
+    threescale.rest.put(path="/admin/api/settings", data={"service_plans_ui_visible": "true"})

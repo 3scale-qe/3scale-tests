@@ -88,7 +88,7 @@ class ApplicationDetailView(BaseProductView):
     regenerate_button = Text("//*[contains(@class, 'refresh')]")
     add_random_app_key_button = Text("//*[contains(@class, 'create_key')]")
     api_credentials_table = PatternflyTable(
-        "//*[@id='keys']", column_widgets={1: Text("./span/a[contains(@class, 'delete')]")}
+        "//*[@id='keys']", column_widgets={1: Text("ancestor::tr//span[@class='delete_key operations']/a")}
     )
     referer_filters_input = TextInput(id="referrer_filter")
     add_referer_filter_btn = ThreescaleSubmitButton()
