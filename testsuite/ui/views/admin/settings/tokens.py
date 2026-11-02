@@ -41,6 +41,7 @@ class Scopes(enum.Enum):
     MANAGEMENT = "access_token_scopes_account_management"
     ANALYTICS = "access_token_scopes_stats"
     POLICY = "access_token_scopes_policy_registry"
+    DEVELOPER_PORTAL = "access_token_scopes_cms"
 
 
 class TokenNewView(BaseSettingsView):
