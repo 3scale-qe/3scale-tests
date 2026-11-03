@@ -97,6 +97,7 @@ def pytest_addoption(parser):
     parser.addoption("--images", action="store_true", default=False, help="Run also image check tests (default: False)")
     parser.addoption("--tool-check", action="store_true", default=False, help="Run also tool availability check tests")
     parser.addoption("--sso-only", action="store_true", default=False, help="Run only tests that uses RHSSO/RHBK")
+    parser.addoption("--sso-drop", action="store_true", default=False, help="Do not run any test against RHSSO/RHBK")
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
@@ -237,6 +238,13 @@ def pytest_collection_modifyitems(session, config, items):
                 selected.append(item)
             else:
                 deselected.append(item)
+            continue
+
+        if config.option.sso_drop:
+            if sso_fixture in list(item.fixturenames):
+                deselected.append(item)
+            else:
+                selected.append(item)
             continue
 
         selected.append(item)
