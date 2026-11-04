@@ -25,7 +25,9 @@ def listed_service(service_proxy_settings, custom_service, request, lifecycle_ho
 
     staging_gateway.environ["APICAST_SERVICES_LIST"] = service["id"]
 
-    return service
+    yield service
+    for usage in service.backend_usages.list():
+        usage.delete()
 
 
 @pytest.fixture(scope="module")
