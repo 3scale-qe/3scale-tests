@@ -46,13 +46,18 @@ class BaseProductView(BaseAdminView):
     This value is verified in `is_displayed` method.
     """
 
-    NAV_ITEMS = ["Product Overview", "Analytics", "Applications", "ActiveDocs", "Integration"]
     nav = Navigation()
     outdated_config = GenericLocatorWidget(locator="//*/li/a[contains(@class, 'outdated-config')]")
 
     def __init__(self, parent, product, **kwargs):
         super().__init__(parent, product_id=product.entity_id, **kwargs)
         self.product = product
+
+        # Construct NAV_ITEMS
+        self.NAV_ITEMS = ["Product Overview", "Analytics", "Applications"]  # pylint: disable=invalid-name
+        if getattr(self.browser, "service_plans_enabled", False):
+            self.NAV_ITEMS.append("Subscriptions")
+        self.NAV_ITEMS.extend(["ActiveDocs", "Integration"])
 
     @step("@href")
     def step(self, href, **kwargs):
