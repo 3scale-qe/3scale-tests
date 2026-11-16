@@ -9,7 +9,7 @@ from testsuite.ui.widgets.buttons import ThreescaleSubmitButton
 class AdminBotProtection(BaseSettingsView):
     """View representation of Admin Portal Bot Protection settings"""
 
-    path_pattern = "/p/admin/bot_protection/edit"
+    path_pattern = "/p/admin/security/edit"
     no_protection = Text('//*[@id="settings_admin_bot_protection_level_none"]')
     recaptcha_protection = Text('//*[@id="settings_admin_bot_protection_level_captcha"]')
     submit_button = ThreescaleSubmitButton()
