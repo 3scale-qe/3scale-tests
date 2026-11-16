@@ -307,7 +307,7 @@ class ActiveDocsNewView(BaseAudienceView):
 class BotProtection(BaseAudienceView):
     """View representation of Developer Portal's Spam Protection setup"""
 
-    path_pattern = "/site/spam_protection/edit"
+    path_pattern = "/site/security/edit"
     no_protection = Text('//*[@id="settings_spam_protection_level_none"]')
     recaptcha_protection = Text('//*[@id="settings_spam_protection_level_captcha"]')
     submit_button = ThreescaleSubmitButton()
