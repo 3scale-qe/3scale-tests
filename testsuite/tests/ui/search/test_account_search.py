@@ -85,31 +85,22 @@ def test_search_multiple_accounts(navigator, custom_account, request):
     accounts = navigator.navigate(AccountsView)
     accounts.search(name)
 
-    accounts = navigator.navigate(AccountsView)
-    accounts.search(name)
-
     assert len(list(accounts.table.rows())) == 3
 
     accounts.search(f"{name}_name2")
+    assert len(list(accounts.table.rows())) == 1
     assert accounts.table.row()[1].text == f"{name}_name2"
     assert accounts.table.row().state.text == "Approved"
 
 
-def test_search_non_existing_value(request, navigator, custom_account, account_password):
+def test_search_non_existing_value(request, navigator, custom_account):
     """
     Preparation:
         - Create custom account
     Test if:
         - you search account by non-existing-value it won't return anything
     """
-    username = blame(request, "username")
-    params = {
-        "org_name": blame(request, "org_name"),
-        "username": username,
-        "email": f"{blame(request, 'email')}@anything.invalid",
-        "password": account_password,
-    }
-    custom_account(params)
+    custom_account(blame(request, "org_name"))
 
     accounts = navigator.navigate(AccountsView)
     accounts.search("non-existing-value")
@@ -119,21 +110,15 @@ def test_search_non_existing_value(request, navigator, custom_account, account_p
 
 @pytest.mark.xfail
 @pytest.mark.issue("https://issues.redhat.com/browse/THREESCALE-8468")
-def test_search_short_keyword(navigator, custom_account, request, account_password):
+def test_search_short_keyword(navigator, custom_account, request):
     """
     Preparation:
-        - Create custom account with short keyword (less than 3 characters)
+        - Create custom account with short keyword
     Test if:
         - you search account by specific org_name it will return the correct one
     """
     org_name = blame(request, "org-cz")
-    params = {
-        "org_name": org_name,
-        "username": blame(request, "username"),
-        "email": f"{blame(request, 'email')}@anything.invalid",
-        "password": account_password,
-    }
-    custom_account(params)
+    custom_account(org_name)
     accounts = navigator.navigate(AccountsView)
 
     accounts.search(org_name)
