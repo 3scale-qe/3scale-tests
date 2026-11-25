@@ -74,16 +74,18 @@ def webdriver():
 
 
 @pytest.fixture(scope="module")
-def browser(webdriver, request, metadata):
+def browser(webdriver, request, metadata, service_plans_enabled):
     """
     Browser representation based on UI settings
     Args:
         :param webdriver: Selenium driver configuration
+        :param service_plans_enabled: is service_plans_enabled True
         :param request: Finalizer for session cleanup
         :param metadata: Test session metadata
         :return browser: Browser instance
     """
     browser = ThreeScaleBrowser(webdriver=webdriver)
+    browser.service_plans_enabled = service_plans_enabled
     request.addfinalizer(webdriver.finalize)
     caps = webdriver.webdriver.webdriver.caps
     metadata["Browser"] = f"{caps['browserName']} {caps['browserVersion']}"
@@ -651,3 +653,19 @@ def auth0_user(auth0_client, request, testconfig, auth0_user_password):
 
         request.addfinalizer(_delete)
     return user
+
+
+@pytest.fixture(scope="module")
+def service_plans_enabled(threescale):
+    """
+    Check if service plans UI is visible.
+
+    Returns True if service_plans_ui_visible is enabled, otherwise False.
+    Needed to determine if 'Subscriptions' should appear in product navigation.
+    """
+    try:
+        response = threescale.rest.get(path="/admin/api/settings")
+        data = response.json()
+        return data.get("settings", {}).get("service_plans_ui_visible", False)
+    except (ApiClientError, ValueError, AttributeError):
+        return False
